@@ -61,6 +61,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.maptool = self.canvas.mapTool()
         self.get_point_for_angles()
         self.layer = None
+        self.memorylayer = None
      
     def setupUi_extra(self):
         """
@@ -101,22 +102,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
     def working_layer(self):
         self.layer = terre_image_utils.working_layer(self.canvas)
-#         source = self.canvas.currentLayer().source()
-#         self.layer = WorkingLayer(source, self.canvas.currentLayer())
-#         
-#         
-#         #self.layer = self.canvas.currentLayer()
-#         if self.layer :
-#             #self.define_bands(self.layer)
-#             #manage_bands()
-#             #self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
-#             red, green, blue, pir, mir = manage_bands().get_values()
-#             
-#             bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
-#             self.layer.set_bands(bands)
-#             
-#             
-#             print red, green, blue, pir, mir
         if self.layer:
             self.label_working_layer.setText(self.layer.name())
             
@@ -151,7 +136,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         #init the temp layer where the polyline is draw
         self.polygon = False
         self.rubberband = QgsRubberBand(self.canvas, self.polygon)
-        self.rubberband.setWidth(2)
+        self.rubberband.setWidth(10)
         self.rubberband.setColor(QtGui.QColor(QtCore.Qt.red))
         #init the table where is saved the poyline
         self.pointstoDraw = []
@@ -159,16 +144,16 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
     def deactivate(self):        #enable clean exit of the plugin
         QtCore.QObject.disconnect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
-        self.rubberband.reset(self.polygon)
+        #self.rubberband.reset(self.polygon)
         
         
     def rightClicked(self,position):    #used to quit the current action
         mapPos = self.canvas.getCoordinateTransform().toMapCoordinates(position["x"],position["y"])
         newPoints = [[mapPos.x(), mapPos.y()]]
         #if newPoints == self.lastClicked: return # sometimes a strange "double click" is given
-
-        self.rubberband.reset(self.polygon)
-        self.rubberband.reset(QGis.Point)
+        self.memorylayer = manage_QGIS.show_clicked_point( QgsPoint(mapPos.x(),mapPos.y()), "spectral_angles_points", self.iface, self.memorylayer )
+        #self.rubberband.reset(self.polygon)
+        #self.rubberband.reset(QGis.Point)
         self.rubberband.addPoint(QgsPoint(mapPos.x(),mapPos.y()))
         #create new vlayer ???
         self.angles(mapPos.x(),mapPos.y())
