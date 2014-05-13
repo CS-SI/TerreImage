@@ -129,7 +129,7 @@ class QGISEducation:
     
     
         self.processing_menu.addActions( [ self.ndvi, self.ndti, self.brightness, self.angles, self.kmeans, self.classif ] )
-    
+      
         # conversion menu (Rasterize (Vector to raster), Polygonize (Raster to vector), Translate, RGB to PCT, PCT to RGB)
         self.visualization_menu = QMenu( QCoreApplication.translate( "TerreImage", "Visualisation" ), self.iface.mainWindow() )
     
@@ -160,6 +160,8 @@ class QGISEducation:
     def extra_menu_visu( self, bands ):
         corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
         
+        self.visualization_menu.clear()
+        self.visualization_menu.addActions( [ self.histo, self.values ] )
             
         for i in range(self.layer.get_band_number()):
             y=[x for x in bands if bands[x]==i+1]
@@ -247,17 +249,19 @@ class QGISEducation:
         if self.layer :
             self.educationWidget.layer = self.layer
             self.extra_menu_visu(bands)
-        
-        #if dock not already opened, open the dock and all the necessary thing (model,doProfile...)
-        if self.dockOpened == False:
-            self.educationWidget.show()
-            # add the dockwidget to iface
-            self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.valuedockwidget)
-            self.dockOpened = True
-        else :
-            self.educationWidget.hide()
-            self.dockOpened = False
-            self.iface.removeDockWidget(self.valuedockwidget)
+            
+        self.educationWidget.hide()
+        self.iface.removeDockWidget(self.valuedockwidget)
+#         #if dock not already opened, open the dock and all the necessary thing (model,doProfile...)
+#         if self.dockOpened == False:
+#             self.educationWidget.show()
+#             # add the dockwidget to iface
+#             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.valuedockwidget)
+#             self.dockOpened = True
+#         else :
+#             self.educationWidget.hide()
+#             self.dockOpened = False
+#             self.iface.removeDockWidget(self.valuedockwidget)
 
 
     def showHideDockWidget( self ):
