@@ -247,7 +247,7 @@ def concatenateImages( listImagesIn, outputname ):
    
 
 
-def kmeans( image, nbClass, outputDirectory, nbvalidPixels, mask=None ):
+def kmeans( image, nbClass, outputDirectory, mask=None, nbvalidPixels=None ):
     """
     pass
     """
@@ -268,13 +268,37 @@ def kmeans( image, nbClass, outputDirectory, nbvalidPixels, mask=None ):
         if mask :
             app.SetParameterString( "vm", mask)
         app.SetParameterInt("rand", 42)
-        app.SetParameterInt("ts", nbvalidPixels)
+        if nbvalidPixels :
+            app.SetParameterInt("ts", nbvalidPixels)
 
         #execute the application
         app.ExecuteAndWriteOutput()
         
     return output
 
+
+
+def kmeans_cli( image, nbClass, outputDirectory ):
+    """
+    pass
+    """
+    filenameWithoutExtension = os.path.basename(os.path.splitext(image)[0]) 
+    output = os.path.join( outputDirectory, filenameWithoutExtension + "_kmeans.tif" ) # + temp[index:]
+      
+    if image and nbClass and outputDirectory :
+        command = "otbcli_KMeansClassification "
+        command += " -in " + image
+        command += " -out " + output
+        command += " -nc " + str(nbClass)
+        command += " -rand " + str(42)
+        
+        os.system(command)
+        
+    return output
+
+
+    
+    
 
 # def jetColorMapping( image, outputDirectory ):
 #     """

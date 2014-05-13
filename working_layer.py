@@ -29,11 +29,15 @@ class WorkingLayer():
         self.qgis_layer = qgis_layer
         
         if bands :
+            self.bands = bands
             self.set_bands(bands)
+            
+        self.type = None
         
         
         
     def set_bands(self, bands):
+        self.bands = bands
         self.red    = bands['red']
         self.green  = bands['green']
         self.blue   = bands['blue']
@@ -52,7 +56,10 @@ class WorkingLayer():
         return self.source_file
     
     
-    
+    def get_band_number(self):
+        return self.qgis_layer.bandCount()
         
         
+    def set_type(self, type):
+        self.type = type
         

@@ -142,20 +142,29 @@ def kmeans( layer, working_directory, iface ):
     """
     bands = []
 
-    for band_number in range(layer.get_qgis_layer().bandCount()):
-
-        bands.append("band " + str(band_number +1))
-        testqt, ok = QInputDialog.getInt(None, "Kmeans", "Nombre de classes")
-        if ok:
-            nb_class = testqt
-            #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
-            OTBApplications.kmeans(layer.get_source(), nb_class, working_directory)
+#     for band_number in range(layer.get_qgis_layer().bandCount()):
+# 
+#         bands.append("band " + str(band_number +1))
+    testqt, ok = QInputDialog.getInt(None, "Kmeans", "Nombre de classes", 5)
+    if ok:
+        nb_class = testqt
+        #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
+        output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, working_directory)
+        manage_QGIS.addRasterLayerToQGIS(output, os.path.splitext(os.path.basename(output))[0], iface)
 
 
 
     
     
-    
+def get_sensor_id( image ):
+    command = "otbcli_ReadImageInfo -in " + image + " | grep \"sensor:\""
+    result_sensor = os.popen( command ).readlines()
+    if result_sensor :
+        sensor_line = result_sensor[0]
+        if 'Spot 5' in sensor_line or 'Spot 4' in sensor_line:
+            return "spot"
+        #same pleiade
+        #same formosat
     
     
     

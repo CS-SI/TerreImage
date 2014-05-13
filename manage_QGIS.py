@@ -39,9 +39,13 @@ from qgis.core import ( QGis,
                         QgsSymbolV2,
                         QgsVectorLayer,
                         QgsRasterLayer,
-                        QgsGraduatedSymbolRendererV2
+                        QgsRaster,
+                        QgsGraduatedSymbolRendererV2,
+                        QgsMultiBandColorRenderer
                         )
 
+
+import terre_image_utils
 
 
 def addVectorLayerToQGIS( vectorLayer, layername, legendInterface ):
@@ -66,7 +70,35 @@ def addVectorLayerToQGIS( vectorLayer, layername, legendInterface ):
     layerAdded = QgsMapLayerRegistry.instance().addMapLayer( vector )
 
       
-def addRasterLayerToQGIS( raster, layername, legendInterface ):
+def get_raster_layer( raster, name ):
+    rasterLayer = QgsRasterLayer( raster, name )
+    return rasterLayer
+
+
+
+def add_qgis_raser_layer( rasterLayer, bands=None):
+    if bands:
+        print bands
+        pir = bands['pir']
+        red = bands['red']
+        green = bands['green']
+        print 'pir', pir
+        print "red", red
+        print "green", green
+        if pir and red and green:
+            renderer = rasterLayer.renderer()
+            #rasterLayer.setDrawingStyle("MultiBandColor")
+            renderer.setRedBand(pir)
+            renderer.setGreenBand(red)
+            renderer.setBlueBand(green)
+            #rasterLayer.setRenderer( renderer )
+        contrastForRasters( rasterLayer, 0, 0 )
+    
+    
+    QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
+      
+      
+def addRasterLayerToQGIS( raster, layername, iface = None ):
     """
     Add the given raster to qgis and improve contrast between min max
     
@@ -79,6 +111,8 @@ def addRasterLayerToQGIS( raster, layername, legendInterface ):
         layername = os.path.basename( raster )
     
     rasterLayer = QgsRasterLayer( raster, layername )
+    
+    
     QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
     return rasterLayer
         
@@ -107,9 +141,9 @@ def contrastForRasters( theRasterLayer, minLayer, maxLayer ):
                 layerCE.setMaximumValue( maxLayer )
         elif theRasterLayer.rasterType() == 2  and layerRenderer:
             if minLayer == 0 and maxLayer == 0 :
-                min1, max1, _, _ = Saterre_gdalFunctions.computeStatistics(theRasterLayer.source(),0, 1)
-                min2, max2, _, _ = Saterre_gdalFunctions.computeStatistics(theRasterLayer.source(),0, 2)
-                min3, max3, _, _ = Saterre_gdalFunctions.computeStatistics(theRasterLayer.source(),0, 3)
+                min1, max1, _, _ = terre_image_utils.computeStatistics(theRasterLayer.source(),0, 1)
+                min2, max2, _, _ = terre_image_utils.computeStatistics(theRasterLayer.source(),0, 2)
+                min3, max3, _, _ = terre_image_utils.computeStatistics(theRasterLayer.source(),0, 3)
                 #print min1, max1, min2, max2, min3, max3
                 layerCERed = layerRenderer.redContrastEnhancement()
                 layerCEGreen = layerRenderer.greenContrastEnhancement()
@@ -133,3 +167,62 @@ def contrastForRasters( theRasterLayer, minLayer, maxLayer ):
                     layerRenderer.setBlueContrastEnhancement( blueEnhancement )
         theRasterLayer.triggerRepaint()
         
+        
+        
+def display_one_band( layer, keyword ): 
+    corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir" }
+    
+    rasterLayer = QgsRasterLayer( layer.get_source(), layer.name() + corres[keyword] )
+    
+    
+    band = layer.bands[keyword]
+    if band :
+        print "band num:", band
+        rasterLayer.setDrawingStyle("MultiBandSingleBandGray")
+        renderer = rasterLayer.renderer()
+        print renderer
+        renderer.setGrayBand(band)
+        
+        #contrastForRasters( rasterLayer, 0, 0 )
+        
+        QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
+        return rasterLayer
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

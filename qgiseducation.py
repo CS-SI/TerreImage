@@ -33,6 +33,7 @@ from manage_bands import manage_bands
 from working_layer import WorkingLayer
 import terre_image_processing
 import terre_image_utils
+import manage_QGIS
 
 
 class QGISEducation:
@@ -132,37 +133,16 @@ class QGISEducation:
         # conversion menu (Rasterize (Vector to raster), Polygonize (Raster to vector), Translate, RGB to PCT, PCT to RGB)
         self.visualization_menu = QMenu( QCoreApplication.translate( "TerreImage", "Visualisation" ), self.iface.mainWindow() )
     
-
-        self.polygonize = QAction( QIcon(":/icons/polygonize.png"), QCoreApplication.translate( "TerreImage", "Polygonize (Raster to vector)" ), self.iface.mainWindow() )
-        self.polygonize.setStatusTip( QCoreApplication.translate( "TerreImage", "Produces a polygon feature layer from a raster") )
-        #QObject.connect( self.polygonize, SIGNAL( "triggered()" ), self.doPolygonize )
-        #self.visualization_menu.addAction( self.polygonize )
+        self.histo = QAction( QIcon( ":icons/24-to-8-bits.png" ), QCoreApplication.translate( "TerreImage", "Afficher l'histogramme" ), self.iface.mainWindow() )
+        self.histo.setStatusTip( QCoreApplication.translate( "TerreImage", "Affiche l'histogramme de l'image de travail" ) )
+        QObject.connect( self.histo, SIGNAL( "triggered()" ), self.do_histogram )
     
-        self.translate = QAction( QIcon(":/icons/translate.png"), QCoreApplication.translate( "TerreImage", "Translate (Convert format)" ), self.iface.mainWindow() )
-        self.translate.setStatusTip( QCoreApplication.translate( "TerreImage", "Converts raster data between different formats") )
-        #QObject.connect( self.translate, SIGNAL( "triggered()" ), self.doTranslate )
+        self.values = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Afficher les valeurs des pixels" ), self.iface.mainWindow() )
+        self.values.setStatusTip( QCoreApplication.translate( "TerreImage", "Affiche les valeurs des pixels sous la douris pour toutes les images" ) )
+        QObject.connect( self.values, SIGNAL( "triggered()" ), self.do_display_values )
     
-        self.paletted = QAction( QIcon( ":icons/24-to-8-bits.png" ), QCoreApplication.translate( "TerreImage", "RGB to PCT" ), self.iface.mainWindow() )
-        self.paletted.setStatusTip( QCoreApplication.translate( "TerreImage", "Convert a 24bit RGB image to 8bit paletted" ) )
-        #QObject.connect( self.paletted, SIGNAL( "triggered()" ), self.doPaletted )
+        self.visualization_menu.addActions( [ self.histo, self.values ] )
     
-        self.rgb = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "PCT to RGB" ), self.iface.mainWindow() )
-        self.rgb.setStatusTip( QCoreApplication.translate( "TerreImage", "Convert an 8bit paletted image to 24bit RGB" ) )
-        #QObject.connect( self.rgb, SIGNAL( "triggered()" ), self.doRGB )
-    
-        #self.visualization_menu.addActions( [ self.translate, self.paletted, self.rgb ] )
-    
-        # extraction menu (Clipper, Contour)
-        self.extractionMenu = QMenu( QCoreApplication.translate( "TerreImage", "Extraction" ), self.iface.mainWindow() )
-    
-        self.contour = QAction( QIcon(":/icons/contour.png"), QCoreApplication.translate( "TerreImage", "Contour" ), self.iface.mainWindow() )
-        self.contour.setStatusTip( QCoreApplication.translate( "TerreImage", "Builds vector contour lines from a DEM") )
-        #QObject.connect( self.contour, SIGNAL( "triggered()" ), self.doContour )
-        #self.extractionMenu.addAction( self.contour )
-    
-        self.clipper = QAction( QIcon( ":icons/raster-clip.png" ), QCoreApplication.translate( "TerreImage", "Clipper" ), self.iface.mainWindow() )
-        #self.clipper.setStatusTip( QCoreApplication.translate( "GdalTools", "Converts raster data between different formats") )
-        #QObject.connect( self.clipper, SIGNAL( "triggered()" ), self.doClipper )
     
         #self.extractionMenu.addActions( [ self.clipper ] )
         self.kmz = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Export KMZ" ), self.iface.mainWindow() )
@@ -172,11 +152,24 @@ class QGISEducation:
         
         self.menu.addMenu( self.processing_menu )
         self.menu.addMenu( self.visualization_menu )
-        self.menu.addMenu( self.extractionMenu )
         self.menu.addActions([self.kmz])
         
 #         if not self.analysisMenu.isEmpty():
 #           self.menu.addMenu( self.analysisMenu )
+
+    def extra_menu_visu( self, bands ):
+        corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
+        
+            
+        for i in range(self.layer.get_band_number()):
+            y=[x for x in bands if bands[x]==i+1]
+            if y :
+                text = corres[y[0]]
+                visu_band = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", text ), self.iface.mainWindow() )
+                visu_band.setStatusTip( QCoreApplication.translate( "TerreImage", "Export the current view in KMZ" ) )
+                QObject.connect( visu_band, SIGNAL( "triggered()" ), lambda who=str(y[0]): self.do_display_one_band(who)) #self.do_display_one_band )
+                self.visualization_menu.addAction(visu_band)
+
 
 
     def do_ndvi(self):
@@ -205,9 +198,10 @@ class QGISEducation:
             terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
     
     def do_angles(self):
-        pass
+        self.educationWidget.spectral_angles()
     
     def do_kmeans(self):
+        print "kmeans signal"
         if not self.layer:
             self.layer = self.educationWidget.layer
         if self.layer == None :
@@ -220,6 +214,19 @@ class QGISEducation:
 
     def do_export_kmz(self):
         pass
+    
+    def do_display_one_band(self, who):
+        print "who", who
+        manage_QGIS.display_one_band(self.layer, who)
+
+    
+    def do_histogram(self):
+        pass
+    
+    def do_display_values(self):
+        pass
+
+
 
     def unload(self):
         """
@@ -236,8 +243,10 @@ class QGISEducation:
         """
         Defines the behavior of the plugin
         """
-        self.layer = terre_image_utils.get_workinglayer_on_opening( self.iface )
-        self.educationWidget.layer = self.layer
+        self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
+        if self.layer :
+            self.educationWidget.layer = self.layer
+            self.extra_menu_visu(bands)
         
         #if dock not already opened, open the dock and all the necessary thing (model,doProfile...)
         if self.dockOpened == False:
