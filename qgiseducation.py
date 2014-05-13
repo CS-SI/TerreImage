@@ -29,6 +29,10 @@ import resources_rc
 from qgiseducationwidget import QGISEducationWidget
 import os.path
 
+from manage_bands import manage_bands
+from working_layer import WorkingLayer
+import terre_image_processing
+
 
 class QGISEducation:
 
@@ -52,11 +56,13 @@ class QGISEducation:
         # Add toolbar button and menu item
         self.iface.addToolBarIcon(self.action)
         self.iface.addPluginToMenu(u"&QGISEducation", self.action)
+        self.extra_menu()
         
         self.dockOpened = False
         
         # create the widget to display information
         self.educationWidget = QGISEducationWidget(self.iface)
+        self.working_directory = self.educationWidget.working_directory
         
         # create the dockwidget with the correct parent and add the valuewidget
         self.valuedockwidget = QDockWidget("QGIS Education", self.iface.mainWindow() )
@@ -67,6 +73,142 @@ class QGISEducation:
         # add the dockwidget to iface
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.valuedockwidget)
         #self.educationWidget.show()
+
+    def extra_menu(self):
+        # find the Raster menu
+        rasterMenu = None
+        menu_bar = self.iface.mainWindow().menuBar()
+        actions = menu_bar.actions()
+    
+        rasterText = QCoreApplication.translate( "QgisApp", "&TerreImage" )
+    
+        for a in actions:
+            if a.menu() != None and a.menu().title() == rasterText:
+                rasterMenu = a.menu()
+                break
+    
+        if rasterMenu == None:
+            # no Raster menu, create and insert it before the Help menu
+            self.menu = QMenu( rasterText, self.iface.mainWindow() )
+            lastAction = actions[ len( actions ) - 1 ]
+            menu_bar.insertMenu( lastAction, self.menu )
+        else:
+            self.menu = rasterMenu
+            self.menu.addSeparator()
+    
+        # projections menu (Warp (Reproject), Assign projection)
+        self.processing_menu = QMenu( QCoreApplication.translate( "TerreImage", "Traitements" ), self.iface.mainWindow() )
+    
+        self.ndvi = QAction( QIcon(":/icons/warp.png"),  QCoreApplication.translate( "TerreImage", "NDVI" ), self.iface.mainWindow() )
+        self.ndvi.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule le NDVI de l'image de travail") )
+        QObject.connect( self.ndvi, SIGNAL( "triggered()" ), self.do_ndvi )
+    
+        self.ndti = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "NDTI" ), self.iface.mainWindow() )
+        self.ndti.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule le NDTI de l'image de travail" ) )
+        QObject.connect( self.ndti, SIGNAL( "triggered()" ), self.do_ndti )
+    
+        self.brightness = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "Indice de brillance" ), self.iface.mainWindow() )
+        self.brightness.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule l'indice de brillance de l'image de travail" ) )
+        QObject.connect( self.brightness, SIGNAL( "triggered()" ), self.do_brightness )
+    
+        self.angles = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "Angle spectral" ), self.iface.mainWindow() )
+        self.angles.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule l'angle spectral pour la coordonnée pointée de l'image de travail" ) )
+        QObject.connect( self.angles, SIGNAL( "triggered()" ), self.do_angles )
+        
+        self.kmeans = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "KMeans" ), self.iface.mainWindow() )
+        self.kmeans.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule le kmeans sur l'image de travail" ) )
+        QObject.connect( self.kmeans, SIGNAL( "triggered()" ), self.do_kmeans )
+        
+        self.classif = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "Classif" ), self.iface.mainWindow() )
+        self.classif.setStatusTip( QCoreApplication.translate( "TerreImage", "Ouvre le module de classification sur l'image de travail" ) )
+        QObject.connect( self.classif, SIGNAL( "triggered()" ), self.do_classif )
+    
+    
+        self.processing_menu.addActions( [ self.ndvi, self.ndti, self.brightness, self.angles, self.kmeans, self.classif ] )
+    
+        # conversion menu (Rasterize (Vector to raster), Polygonize (Raster to vector), Translate, RGB to PCT, PCT to RGB)
+        self.visualization_menu = QMenu( QCoreApplication.translate( "TerreImage", "Visualisation" ), self.iface.mainWindow() )
+    
+
+        self.polygonize = QAction( QIcon(":/icons/polygonize.png"), QCoreApplication.translate( "TerreImage", "Polygonize (Raster to vector)" ), self.iface.mainWindow() )
+        self.polygonize.setStatusTip( QCoreApplication.translate( "TerreImage", "Produces a polygon feature layer from a raster") )
+        #QObject.connect( self.polygonize, SIGNAL( "triggered()" ), self.doPolygonize )
+        #self.visualization_menu.addAction( self.polygonize )
+    
+        self.translate = QAction( QIcon(":/icons/translate.png"), QCoreApplication.translate( "TerreImage", "Translate (Convert format)" ), self.iface.mainWindow() )
+        self.translate.setStatusTip( QCoreApplication.translate( "TerreImage", "Converts raster data between different formats") )
+        #QObject.connect( self.translate, SIGNAL( "triggered()" ), self.doTranslate )
+    
+        self.paletted = QAction( QIcon( ":icons/24-to-8-bits.png" ), QCoreApplication.translate( "TerreImage", "RGB to PCT" ), self.iface.mainWindow() )
+        self.paletted.setStatusTip( QCoreApplication.translate( "TerreImage", "Convert a 24bit RGB image to 8bit paletted" ) )
+        #QObject.connect( self.paletted, SIGNAL( "triggered()" ), self.doPaletted )
+    
+        self.rgb = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "PCT to RGB" ), self.iface.mainWindow() )
+        self.rgb.setStatusTip( QCoreApplication.translate( "TerreImage", "Convert an 8bit paletted image to 24bit RGB" ) )
+        #QObject.connect( self.rgb, SIGNAL( "triggered()" ), self.doRGB )
+    
+        #self.visualization_menu.addActions( [ self.translate, self.paletted, self.rgb ] )
+    
+        # extraction menu (Clipper, Contour)
+        self.extractionMenu = QMenu( QCoreApplication.translate( "TerreImage", "Extraction" ), self.iface.mainWindow() )
+    
+        self.contour = QAction( QIcon(":/icons/contour.png"), QCoreApplication.translate( "TerreImage", "Contour" ), self.iface.mainWindow() )
+        self.contour.setStatusTip( QCoreApplication.translate( "TerreImage", "Builds vector contour lines from a DEM") )
+        #QObject.connect( self.contour, SIGNAL( "triggered()" ), self.doContour )
+        #self.extractionMenu.addAction( self.contour )
+    
+        self.clipper = QAction( QIcon( ":icons/raster-clip.png" ), QCoreApplication.translate( "TerreImage", "Clipper" ), self.iface.mainWindow() )
+        #self.clipper.setStatusTip( QCoreApplication.translate( "GdalTools", "Converts raster data between different formats") )
+        #QObject.connect( self.clipper, SIGNAL( "triggered()" ), self.doClipper )
+    
+        #self.extractionMenu.addActions( [ self.clipper ] )
+        self.kmz = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Export KMZ" ), self.iface.mainWindow() )
+        self.kmz.setStatusTip( QCoreApplication.translate( "TerreImage", "Export the current view in KMZ" ) )
+        QObject.connect( self.kmz, SIGNAL( "triggered()" ), self.do_export_kmz )
+        
+        
+        self.menu.addMenu( self.processing_menu )
+        self.menu.addMenu( self.visualization_menu )
+        self.menu.addMenu( self.extractionMenu )
+        self.menu.addActions([self.kmz])
+        
+#         if not self.analysisMenu.isEmpty():
+#           self.menu.addMenu( self.analysisMenu )
+
+
+    def do_ndvi(self):
+        self.layer = self.educationWidget.layer
+        if self.layer == None :
+            print "Aucune layer selectionnée"
+        else :
+            terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
+                
+                 
+    def do_ndti(self):
+        self.layer = self.educationWidget.layer
+        if self.layer == None :
+            print "Aucune layer selectionnée"
+        else :
+            terre_image_processing.ndti(self.layer, self.working_directory, self.iface)
+            
+    def do_brightness(self):
+        self.layer = self.educationWidget.layer
+        if self.layer == None :
+            print "Aucune layer selectionnée"
+        else :
+            terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
+    
+    def do_angles(self):
+        pass
+    
+    def do_kmeans(self):
+        pass
+    
+    def do_classif(self):
+        pass
+
+    def do_export_kmz(self):
+        pass
 
     def unload(self):
         """
