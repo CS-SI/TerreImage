@@ -97,7 +97,7 @@ def get_workinglayer_on_opening(iface):
             pass
         else :
             raster_layer = manage_QGIS.get_raster_layer(fileOpened, os.path.splitext(os.path.basename(fileOpened))[0])
-            
+             
             type_image = terre_image_processing.get_sensor_id(fileOpened)
             print "type_image", type_image
             layer = WorkingLayer( fileOpened, raster_layer )
@@ -113,7 +113,7 @@ def get_workinglayer_on_opening(iface):
                 layer.set_bands(bands)
                 
                 print red, green, blue, pir, mir
-                manage_QGIS.add_qgis_raser_layer(raster_layer, bands)
+                manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
                 return layer, bands
     
     

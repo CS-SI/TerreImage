@@ -132,7 +132,7 @@ def angles(layer, working_directory, iface, x, y):
             output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y) + os.path.splitext(image_in)[1])
             OTBApplications.bandmath_cli( [image_in], formula, output_filename )
             rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
-            manage_QGIS.contrastForRasters( rlayer, 0, 0.5)
+            manage_QGIS.histogram_stretching( rlayer, iface.mapCanvas())
                 
                 
                 
@@ -150,7 +150,8 @@ def kmeans( layer, working_directory, iface ):
         nb_class = testqt
         #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
         output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, working_directory)
-        manage_QGIS.addRasterLayerToQGIS(output, os.path.splitext(os.path.basename(output))[0], iface)
+        output_colored = OTBApplications.color_mapping_cli_ref_image( output, layer.get_source(), working_directory)
+        manage_QGIS.addRasterLayerToQGIS(output_colored, os.path.splitext(os.path.basename(output_colored))[0], iface)
 
 
 
