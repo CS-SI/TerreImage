@@ -6,7 +6,7 @@
  QGISEducation
                              -------------------
         begin                : 2014-05-12
-        copyright            : (C) 2014 by CS SI
+        copyright            : (C) 2014 by CNES
         email                : alexia.mondot@c-s.fr
  ***************************************************************************/
 
@@ -47,6 +47,12 @@ class WorkingLayer():
         
     def get_qgis_layer(self):
         return self.qgis_layer
+    
+    def get_source(self):
+        return self.source_file
+    
+    
+    
         
         
         

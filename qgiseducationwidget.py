@@ -6,7 +6,7 @@
  QGISEducation
                              -------------------
         begin                : 2014-04-30
-        copyright            : (C) 2014 by CS SI
+        copyright            : (C) 2014 by CNES
         email                : alexia.mondot@c-s.fr
  ***************************************************************************/
 
@@ -66,6 +66,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         """
         Initialize the interface
         """
+        self.pushButton_working_layer.hide()
+        self.label.hide()
+        self.label_working_layer.hide()
+        self.groupBox.hide()
         self.pushButton_brightness.clicked.connect(self.brightness)
         self.pushButton_ndti.clicked.connect(self.ndti)
         self.pushButton_ndvi.clicked.connect(self.ndvi)

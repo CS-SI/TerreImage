@@ -6,7 +6,7 @@
  QGISEducation
                              -------------------
         begin                : 2014-05-13
-        copyright            : (C) 2014 by CS SI
+        copyright            : (C) 2014 by CNES
         email                : alexia.mondot@c-s.fr
  ***************************************************************************/
 
@@ -26,6 +26,10 @@ import datetime
 
 from working_layer import WorkingLayer
 from manage_bands import manage_bands
+import manage_QGIS
+
+from PyQt4.QtGui import QFileDialog
+from PyQt4.QtCore import QDir
 
 
 def fill_default_directory( ):
@@ -62,5 +66,37 @@ def working_layer(canvas):
         
         
         
+def get_workinglayer_on_opening(iface):
+    path = QDir.currentPath()
+    fileOpened = QFileDialog.getOpenFileName( None, "Select the QGIS project or a raster", path )
+    
+    if fileOpened.endswith( ".qgs" ):
+        #open new qgis project
+        pass
+    else :
+        raster_layer = manage_QGIS.addRasterLayerToQGIS(fileOpened, os.path.splitext(os.path.basename(fileOpened))[0], iface)
+        layer = WorkingLayer( fileOpened, raster_layer )
+        #self.layer = self.canvas.currentLayer()
+        if layer :
+            #self.define_bands(self.layer)
+            #manage_bands()
+            #self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
+            red, green, blue, pir, mir = manage_bands().get_values()
+            
+            bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
+            layer.set_bands(bands)
+            
+            
+            print red, green, blue, pir, mir
+            return layer    
+    
+    
+    
+    
+    
+    
+    
+    
+    
         
         

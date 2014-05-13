@@ -6,7 +6,7 @@
  Segmentation using OTB application
                               -------------------
         begin                : 2013-11-21
-        copyright            : (C) 2013 by CS Systèmes d'Information
+        copyright            : (C) 2014 by CNES
         email                : alexia.mondot@c-s.fr
  ***************************************************************************/
 

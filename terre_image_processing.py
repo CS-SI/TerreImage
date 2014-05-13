@@ -6,7 +6,7 @@
  QGISEducation
                               -------------------
         begin                : 2014-05-12
-        copyright            : (C) 2014 by CS SI
+        copyright            : (C) 2014 by CNES
         email                : alexia.mondot@c-s.fr
  ***************************************************************************/
 
@@ -26,7 +26,7 @@ import manage_QGIS
 
 from qgis.core import QGis, QgsPoint, QgsRaster
 
-
+from PyQt4.QtGui import QInputDialog
         
         
 def ndvi(layer, working_directory, iface):
@@ -136,5 +136,27 @@ def angles(layer, working_directory, iface, x, y):
                 
                 
                 
-                
+def kmeans( layer, working_directory, iface ):
+    """
+    WARNING: nb_valid_pixels à calculer ?
+    """
+    bands = []
+
+    for band_number in range(layer.get_qgis_layer().bandCount()):
+
+        bands.append("band " + str(band_number +1))
+        testqt, ok = QInputDialog.getInt(None, "Kmeans", "Nombre de classes")
+        if ok:
+            nb_class = testqt
+            #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
+            OTBApplications.kmeans(layer.get_source(), nb_class, working_directory)
+
+
+
+    
+    
+    
+    
+    
+    
                 

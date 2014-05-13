@@ -6,7 +6,7 @@
  QGISEducation
                               -------------------
         begin                : 2014-04-30
-        copyright            : (C) 2014 by CS SI
+        copyright            : (C) 2014 by CNES
         email                : alexia.mondot@c-s.fr
  ***************************************************************************/
 
@@ -32,6 +32,7 @@ import os.path
 from manage_bands import manage_bands
 from working_layer import WorkingLayer
 import terre_image_processing
+import terre_image_utils
 
 
 class QGISEducation:
@@ -57,6 +58,8 @@ class QGISEducation:
         self.iface.addToolBarIcon(self.action)
         self.iface.addPluginToMenu(u"&QGISEducation", self.action)
         self.extra_menu()
+        
+        self.layer = None
         
         self.dockOpened = False
         
@@ -177,7 +180,8 @@ class QGISEducation:
 
 
     def do_ndvi(self):
-        self.layer = self.educationWidget.layer
+        if not self.layer:
+            self.layer = self.educationWidget.layer
         if self.layer == None :
             print "Aucune layer selectionnée"
         else :
@@ -185,14 +189,16 @@ class QGISEducation:
                 
                  
     def do_ndti(self):
-        self.layer = self.educationWidget.layer
+        if not self.layer:
+            self.layer = self.educationWidget.layer
         if self.layer == None :
             print "Aucune layer selectionnée"
         else :
             terre_image_processing.ndti(self.layer, self.working_directory, self.iface)
             
     def do_brightness(self):
-        self.layer = self.educationWidget.layer
+        if not self.layer:
+            self.layer = self.educationWidget.layer
         if self.layer == None :
             print "Aucune layer selectionnée"
         else :
@@ -202,7 +208,12 @@ class QGISEducation:
         pass
     
     def do_kmeans(self):
-        pass
+        if not self.layer:
+            self.layer = self.educationWidget.layer
+        if self.layer == None :
+            print "Aucune layer selectionnée"
+        else :
+            terre_image_processing.kmeans(self.layer, self.working_directory, self.iface)
     
     def do_classif(self):
         pass
@@ -225,6 +236,9 @@ class QGISEducation:
         """
         Defines the behavior of the plugin
         """
+        self.layer = terre_image_utils.get_workinglayer_on_opening( self.iface )
+        self.educationWidget.layer = self.layer
+        
         #if dock not already opened, open the dock and all the necessary thing (model,doProfile...)
         if self.dockOpened == False:
             self.educationWidget.show()
