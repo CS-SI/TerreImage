@@ -58,6 +58,7 @@ class manage_bands:
         self.bandsUi.radioButton_formosat.toggled.connect(self.define_formosat)
         self.bandsUi.radioButton_pleiades.toggled.connect(self.define_pleiade)
         self.bandsUi.radioButton_spot.toggled.connect(self.define_spot)
+        self.bandsUi.radioButton_autre.toggled.connect(self.define_other)
         
         print "type from manage_bands", type_image
         if type_image :
@@ -98,6 +99,13 @@ class manage_bands:
             self.bandsUi.label_red.setEnabled(True)
             self.bandsUi.spinBox_red.setEnabled(True)
     
+    def define_other(self):
+        self.bandsUi.spinBox_red.setEnabled(True)
+        self.bandsUi.spinBox_green.setEnabled(True)
+        self.bandsUi.spinBox_blue.setEnabled(True)
+        self.bandsUi.spinBox_pir.setEnabled(True)
+        self.bandsUi.spinBox_mir.setEnabled(True)
+    
     
     def set_bands(self):
         
@@ -118,10 +126,20 @@ class manage_bands:
         
     def update_spin_box(self):
         self.bandsUi.spinBox_red.setValue(self.red)
+        if not self.red:
+            self.bandsUi.spinBox_red.setEnabled(False)
         self.bandsUi.spinBox_green.setValue(self.green)
+        if not self.green:
+            self.bandsUi.spinBox_green.setEnabled(False)
         self.bandsUi.spinBox_blue.setValue(self.blue)
+        if not self.blue:
+            self.bandsUi.spinBox_blue.setEnabled(False)
         self.bandsUi.spinBox_pir.setValue(self.pir)
+        if not self.pir:
+            self.bandsUi.spinBox_pir.setEnabled(False)
         self.bandsUi.spinBox_mir.setValue(self.mir)
+        if not self.mir:
+            self.bandsUi.spinBox_mir.setEnabled(False)
         
     def define_formosat(self):
         self.red = 3
