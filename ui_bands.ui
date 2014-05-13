@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Terre Image</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -52,24 +52,32 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_red">
        <property name="text">
         <string>Bande rouge</string>
        </property>
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="label_mir">
        <property name="text">
         <string>Bande moyen IR</string>
        </property>
       </widget>
      </item>
      <item row="4" column="2">
-      <widget class="QSpinBox" name="spinBox_mir"/>
+      <widget class="QSpinBox" name="spinBox_mir">
+       <property name="value">
+        <number>5</number>
+       </property>
+      </widget>
      </item>
      <item row="0" column="2">
-      <widget class="QSpinBox" name="spinBox_red"/>
+      <widget class="QSpinBox" name="spinBox_red">
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
      </item>
      <item row="1" column="1">
       <widget class="QLabel" name="label_2">
@@ -79,10 +87,18 @@
       </widget>
      </item>
      <item row="2" column="2">
-      <widget class="QSpinBox" name="spinBox_blue"/>
+      <widget class="QSpinBox" name="spinBox_blue">
+       <property name="value">
+        <number>3</number>
+       </property>
+      </widget>
      </item>
      <item row="1" column="2">
-      <widget class="QSpinBox" name="spinBox_green"/>
+      <widget class="QSpinBox" name="spinBox_green">
+       <property name="value">
+        <number>2</number>
+       </property>
+      </widget>
      </item>
      <item row="2" column="1">
       <widget class="QLabel" name="label_3">
@@ -92,7 +108,11 @@
       </widget>
      </item>
      <item row="3" column="2">
-      <widget class="QSpinBox" name="spinBox_pir"/>
+      <widget class="QSpinBox" name="spinBox_pir">
+       <property name="value">
+        <number>4</number>
+       </property>
+      </widget>
      </item>
      <item row="1" column="0">
       <spacer name="horizontalSpacer">
@@ -106,6 +126,20 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item row="0" column="3">
+      <widget class="QCheckBox" name="checkBox_red">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="3">
+      <widget class="QCheckBox" name="checkBox_mir">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
