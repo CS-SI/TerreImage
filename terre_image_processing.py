@@ -23,6 +23,7 @@
 import os
 import OTBApplications
 import manage_QGIS
+import re
 
 from qgis.core import QGis, QgsPoint, QgsRaster
 
@@ -162,11 +163,12 @@ def get_sensor_id( image ):
     result_sensor = os.popen( command ).readlines()
     if result_sensor :
         sensor_line = result_sensor[0]
-        if 'Spot 5' in sensor_line or 'Spot 4' in sensor_line:
-            return "spot"
-        #same pleiade
-        #same formosat
-    
+        sensor = re.search("sensor: ([a-zA-Z \d]+)$", sensor_line)
+        
+        if sensor:
+            #group 1 parce qu'on a demande qqchose de particulier a la regexpr a cause des ()
+            sensor = sensor.group(1)
+        return sensor
     
     
                 

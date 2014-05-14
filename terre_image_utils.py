@@ -107,7 +107,7 @@ def get_workinglayer_on_opening(iface):
                 #self.define_bands(self.layer)
                 #manage_bands()
                 #self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
-                red, green, blue, pir, mir = manage_bands(type_image).get_values()
+                red, green, blue, pir, mir = manage_bands(type_image, layer.get_band_number()).get_values()
                 
                 bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
                 layer.set_bands(bands)
