@@ -67,15 +67,68 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         """
         Initialize the interface
         """
+        
+        itemProcessing = [ "", "NDVI", "NDTI", "Indice de brillance", "Angle Spectral" ]
+        for index in range(len(itemProcessing)):
+            item = itemProcessing[index]
+            self.comboBox_processing.insertItem ( index, item )
+        self.comboBox_processing.currentIndexChanged[str].connect(self.do_manage_processing)
+            
+        
+        
         self.pushButton_working_layer.hide()
         self.label.hide()
         self.label_working_layer.hide()
         self.groupBox.hide()
-        self.pushButton_brightness.clicked.connect(self.brightness)
-        self.pushButton_ndti.clicked.connect(self.ndti)
-        self.pushButton_ndvi.clicked.connect(self.ndvi)
-        self.pushButton_working_layer.clicked.connect(self.working_layer)
-        self.pushButton_angle.clicked.connect(self.spectral_angles)
+        self.pushButton_brightness.hide()
+        self.pushButton_ndti.hide()
+        self.pushButton_ndvi.hide()
+        self.pushButton_angle.hide()
+        
+#         self.pushButton_brightness.clicked.connect(self.brightness)
+#         self.pushButton_ndti.clicked.connect(self.ndti)
+#         self.pushButton_ndvi.clicked.connect(self.ndvi)
+#         self.pushButton_working_layer.clicked.connect(self.working_layer)
+#         self.pushButton_angle.clicked.connect(self.spectral_angles)
+        
+        
+        
+    def do_manage_processing(self, text_changed):
+        print "text changed", text_changed
+        if "NDVI" in text_changed:
+            self.ndvi()
+        if "NDTI" in text_changed:
+            self.ndti()
+        if "Indice de brillance" in text_changed:
+            self.brightness()
+        if "Angle Spectral" in text_changed:
+            self.spectral_angles()
+        
+        
+    def set_comboBox_sprectral_band_display( self ):
+        if self.layer:
+            bands = self.layer.bands
+            corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
+        
+            self.comboBox_sprectral_band_display.clear()
+            self.comboBox_sprectral_band_display.insertItem( 0, "" )
+            for i in range(self.layer.get_band_number()):
+                y=[x for x in bands if bands[x]==i+1]
+                if y :
+                    text = corres[y[0]]
+                    self.comboBox_sprectral_band_display.insertItem( i+1, text )
+            self.comboBox_sprectral_band_display.currentIndexChanged[str].connect(self.do_manage_sprectral_band_display)
+            
+    def do_manage_sprectral_band_display(self, text_changed):
+        band_to_display = None
+        corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
+        for key in corres:
+            if corres[key] == text_changed :
+                who = key
+                band_to_display = self.layer.bands[key]
+                break
+        manage_QGIS.display_one_band(self.layer, who, self.iface)
+        
         
         
     def brightness(self):

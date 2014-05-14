@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>982</width>
-    <height>762</height>
+    <width>421</width>
+    <height>1126</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>QGISEducation</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
     <widget class="QPushButton" name="pushButton_working_layer">
      <property name="text">
@@ -22,22 +22,68 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Layer courrante :</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_working_layer">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QLabel" name="label_working_layer">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Layer courrante :</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Bandes spectrales affichées</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTextEdit" name="textEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Affichage des bandes spectrales</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QComboBox" name="comboBox_sprectral_band_display"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Traitements</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QComboBox" name="comboBox_processing"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton_histogramme">
+     <property name="text">
+      <string>Histogramme</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton_profil_spectral">
+     <property name="text">
+      <string>Profil spectral</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="pushButton_ndvi">
@@ -68,124 +114,151 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="title">
+      <string>Classification</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QPushButton" name="pushButton_kmeans">
+        <property name="text">
+         <string>Classification non supervisée</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinBox_kmeans">
+        <property name="value">
+         <number>5</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Value Tool</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>90</y>
+        <width>296</width>
+        <height>262</height>
+       </rect>
+      </property>
+      <widget class="QWidget" name="page">
+       <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Y max</string>
+         <widget class="QTabWidget" name="tabWidget">
+          <property name="currentIndex">
+           <number>1</number>
           </property>
+          <widget class="QWidget" name="tab_values">
+           <attribute name="title">
+            <string>Values</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QTableWidget" name="tableWidget">
+              <column>
+               <property name="text">
+                <string>Layer</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Value</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Pixel</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Line</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_graph">
+           <attribute name="title">
+            <string>Graph</string>
+           </attribute>
+          </widget>
          </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="leYMax"/>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>782</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Y min</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="leYMin"/>
         </item>
        </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QCheckBox" name="cbxGraph">
-          <property name="text">
-           <string>Graph</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QStackedWidget" name="stackedWidget">
-        <widget class="QWidget" name="page">
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QTabWidget" name="tabWidget">
-            <property name="currentIndex">
-             <number>1</number>
-            </property>
-            <widget class="QWidget" name="tab_values">
-             <attribute name="title">
-              <string>Values</string>
-             </attribute>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QTableWidget" name="tableWidget">
-                <column>
-                 <property name="text">
-                  <string>Layer</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Value</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Pixel</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Line</string>
-                 </property>
-                </column>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="tab_graph">
-             <attribute name="title">
-              <string>Graph</string>
-             </attribute>
-            </widget>
-           </widget>
-          </item>
-         </layout>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Y max</string>
+         </property>
         </widget>
-       </widget>
-      </item>
-     </layout>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="leYMax"/>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>782</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Y min</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="leYMin"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QCheckBox" name="cbxGraph">
+         <property name="text">
+          <string>Graph</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
