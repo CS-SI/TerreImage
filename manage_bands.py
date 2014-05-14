@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  QGISEducationDialog
@@ -20,7 +21,7 @@
 """
 
 
-from PyQt4.QtGui import QDialog, QButtonGroup
+from PyQt4.QtGui import QDialog, QButtonGroup, QMessageBox
 from PyQt4.QtCore import QObject, SIGNAL, Qt
 
 from ui_bands import Ui_Dialog
@@ -31,7 +32,7 @@ logger = logging.getLogger( 'manage_bands' )
 
 class manage_bands:
     
-    def __init__(self, type_image=None):
+    def __init__(self, type_image=None, nb_bands=None):
         
         #creating interface
         Dialog = QDialog()
@@ -53,30 +54,84 @@ class manage_bands:
         #connect the qdialog button box
         QObject.connect(self.bandsUi.buttonBox, SIGNAL("accepted()"), self.set_bands)
         #QObject.connect(self.bandsUi.buttonBox, SIGNAL("rejected()"), self.reset_bands)
-        self.bandsUi.checkBox_red.stateChanged.connect(self.red_checkbox_changed)
+        self.bandsUi.checkBox_blue.stateChanged.connect(self.blue_checkbox_changed)
         self.bandsUi.checkBox_mir.stateChanged.connect(self.mir_checkbox_changed)
         self.bandsUi.radioButton_formosat.toggled.connect(self.define_formosat)
         self.bandsUi.radioButton_pleiades.toggled.connect(self.define_pleiade)
         self.bandsUi.radioButton_spot.toggled.connect(self.define_spot)
         self.bandsUi.radioButton_autre.toggled.connect(self.define_other)
         
+        if nb_bands:
+            self.custom_from_nb_of_bands(nb_bands)
+        
+        
         print "type from manage_bands", type_image
         if type_image :
-            if type_image == "spot":
+            if type_image == "Spot 5" or type_image == "spot":
                 print "define spot"
                 self.bandsUi.radioButton_spot.setChecked(True)
                 self.define_spot()
-            #test type pleiade
-            #test type formosat
+            elif type_image == "PHR 1A":
+                print "define spot"
+                self.bandsUi.radioButton_pleiades.setChecked(True)
+                self.define_pleiade()
+            elif type_image == "Formosat 2":
+                print "define spot"
+                self.bandsUi.radioButton_formosat.setChecked(True)
+                self.define_formosat()
             else :
+                print "define others"
                 self.bandsUi.radioButton_autre.setChecked(True)
-        
+                self.bandsUi.radioButton_formosat.setEnabled(False)
+                self.bandsUi.radioButton_spot.setEnabled(False)
+                self.bandsUi.radioButton_pleiades.setEnabled(False)
+                self.set_spinbox_read_only(False)
+                
         #execute the dialog
         Dialog.exec_()
     
     
-    def red_checkbox_changed(self):
-        if self.bandsUi.checkBox_red.checkState() == Qt.Checked:
+    def custom_from_nb_of_bands(self, number_of_bands):
+        if number_of_bands == 1:
+            self.red = 0
+            self.green = 0
+            self.blue = 0
+            self.pir = 0
+            self.mir = 0
+            self.bandsUi.radioButton_formosat.setEnabled(False)
+            self.bandsUi.radioButton_spot.setEnabled(False)
+            self.bandsUi.radioButton_pleiades.setEnabled(False)
+            self.update_spin_box()
+        elif number_of_bands == 3:
+            self.blue = -1
+            self.green = 1
+            self.red = 2
+            self.pir = 3
+            self.mir = -1
+            self.bandsUi.radioButton_formosat.setEnabled(False)
+            self.bandsUi.radioButton_pleiades.setEnabled(False)
+            self.update_spin_box()
+        elif number_of_bands == 4:
+            self.blue = 1
+            self.green = 2
+            self.red = 3
+            self.pir = 4
+            self.mir = -1
+            self.update_spin_box()
+        else:
+            QMessageBox.critical( None , "Erreur", "L'image en entrée doit avoir 1, 3 ou 4 bandes !", QMessageBox.Ok )
+    
+    
+    def set_spinbox_read_only(self, state):
+        self.bandsUi.spinBox_blue.setReadOnly(state)
+        self.bandsUi.spinBox_red.setReadOnly(state)
+        self.bandsUi.spinBox_green.setReadOnly(state)
+        self.bandsUi.spinBox_pir.setReadOnly(state)
+        self.bandsUi.spinBox_mir.setReadOnly(state)
+        
+    
+    def blue_checkbox_changed(self):
+        if self.bandsUi.checkBox_blue.checkState() == Qt.Checked:
             self.bandsUi.label_mir.setEnabled(False)
             self.bandsUi.spinBox_mir.setEnabled(False)
             self.bandsUi.checkBox_mir.setCheckState(Qt.Unchecked)
@@ -89,9 +144,9 @@ class manage_bands:
     
     def mir_checkbox_changed(self):
         if self.bandsUi.checkBox_mir.checkState() == Qt.Checked:
-            self.bandsUi.label_red.setEnabled(False)
-            self.bandsUi.spinBox_red.setEnabled(False)
-            self.bandsUi.checkBox_red.setCheckState(Qt.Unchecked)
+            self.bandsUi.label_blue.setEnabled(False)
+            self.bandsUi.spinBox_blue.setEnabled(False)
+            self.bandsUi.checkBox_blue.setCheckState(Qt.Unchecked)
             self.bandsUi.label_mir.setEnabled(True)
             self.bandsUi.spinBox_mir.setEnabled(True)
             
@@ -100,11 +155,20 @@ class manage_bands:
             self.bandsUi.spinBox_red.setEnabled(True)
     
     def define_other(self):
+        self.set_spinbox_read_only(False)
         self.bandsUi.spinBox_red.setEnabled(True)
         self.bandsUi.spinBox_green.setEnabled(True)
         self.bandsUi.spinBox_blue.setEnabled(True)
         self.bandsUi.spinBox_pir.setEnabled(True)
         self.bandsUi.spinBox_mir.setEnabled(True)
+        
+    def gray_other(self):
+        self.set_spinbox_read_only(True)
+        self.bandsUi.spinBox_red.setEnabled(False)
+        self.bandsUi.spinBox_green.setEnabled(False)
+        self.bandsUi.spinBox_blue.setEnabled(False)
+        self.bandsUi.spinBox_pir.setEnabled(False)
+        self.bandsUi.spinBox_mir.setEnabled(False)
     
     
     def set_bands(self):
@@ -126,46 +190,49 @@ class manage_bands:
         
     def update_spin_box(self):
         self.bandsUi.spinBox_red.setValue(self.red)
-        if not self.red:
+        if self.red == -1:
             self.bandsUi.spinBox_red.setEnabled(False)
         self.bandsUi.spinBox_green.setValue(self.green)
-        if not self.green:
+        if self.green == -1:
             self.bandsUi.spinBox_green.setEnabled(False)
         self.bandsUi.spinBox_blue.setValue(self.blue)
-        if not self.blue:
+        if self.blue == -1:
             self.bandsUi.spinBox_blue.setEnabled(False)
         self.bandsUi.spinBox_pir.setValue(self.pir)
-        if not self.pir:
+        if self.pir == -1:
             self.bandsUi.spinBox_pir.setEnabled(False)
         self.bandsUi.spinBox_mir.setValue(self.mir)
-        if not self.mir:
+        if self.mir == -1:
             self.bandsUi.spinBox_mir.setEnabled(False)
         
     def define_formosat(self):
-        self.red = 3
-        self.green = 2
         self.blue = 1
+        self.green = 2
+        self.red = 3
         self.pir = 4
-        self.mir = 0
+        self.mir = -1
         self.update_spin_box()
+        self.gray_other()
         
         
     def define_pleiade(self):
-        self.red = 3
-        self.green = 2
         self.blue = 1
+        self.green = 2
+        self.red = 3
         self.pir = 4
-        self.mir = 0
+        self.mir = -1
         self.update_spin_box()
+        self.gray_other()
         
     def define_spot(self):
         #spot 4-5
-        self.red = 2
+        self.blue = -1
         self.green = 1
-        self.blue = 0
+        self.red = 2
         self.pir = 3
         self.mir = 4
         self.update_spin_box()
+        self.gray_other()
     
         
     def get_values(self):
