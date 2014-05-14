@@ -210,7 +210,7 @@ def contrastForRasters( theRasterLayer, minLayer, maxLayer, band=None ):
         theRasterLayer.triggerRepaint()
          
         
-def display_one_band( layer, keyword ): 
+def display_one_band( layer, keyword, iface ): 
     corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir" }
     
     rasterLayer = QgsRasterLayer( layer.get_source(), layer.name() + corres[keyword] )
@@ -225,7 +225,7 @@ def display_one_band( layer, keyword ):
         renderer.setGrayBand(band)
         
         #contrastForRasters( rasterLayer, 0, 0 )
-        
+        histogram_stretching(rasterLayer, iface.mapCanvas())
         QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
         return rasterLayer
     
