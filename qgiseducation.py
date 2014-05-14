@@ -75,7 +75,7 @@ class QGISEducation:
         QObject.connect(self.valuedockwidget, SIGNAL('visibilityChanged ( bool )'), self.showHideDockWidget)
         
         # add the dockwidget to iface
-        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.valuedockwidget)
+        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.valuedockwidget)
         #self.educationWidget.show()
 
     def extra_menu(self):
@@ -219,7 +219,7 @@ class QGISEducation:
     
     def do_display_one_band(self, who):
         print "who", who
-        manage_QGIS.display_one_band(self.layer, who)
+        manage_QGIS.display_one_band(self.layer, who, self.iface)
 
     
     def do_histogram(self):
@@ -250,8 +250,9 @@ class QGISEducation:
             self.educationWidget.layer = self.layer
             self.extra_menu_visu(bands)
             
-        self.educationWidget.hide()
-        self.iface.removeDockWidget(self.valuedockwidget)
+            self.educationWidget.show()
+            self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.valuedockwidget)
+            self.educationWidget.set_comboBox_sprectral_band_display()
 #         #if dock not already opened, open the dock and all the necessary thing (model,doProfile...)
 #         if self.dockOpened == False:
 #             self.educationWidget.show()
