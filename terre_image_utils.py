@@ -115,6 +115,8 @@ def get_workinglayer_on_opening(iface):
                 print red, green, blue, pir, mir
                 manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
                 return layer, bands
+    else:
+        return None, None
     
     
 def computeStatistics( OneFeature, i, j=None, nodata=True ):
