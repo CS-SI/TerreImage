@@ -38,6 +38,8 @@ class manage_bands:
         Dialog = QDialog()
         self.bandsUi = Ui_Dialog()
         self.bandsUi.setupUi( Dialog )
+        #screen = QApplication.desktop().screenGeometry()
+        #self.move( screen.center() - self.rect().center() )
         
         groupButton1 = QButtonGroup()
         groupButton1.addButton(self.bandsUi.radioButton_formosat)
@@ -82,9 +84,6 @@ class manage_bands:
             else :
                 print "define others"
                 self.bandsUi.radioButton_autre.setChecked(True)
-                self.bandsUi.radioButton_formosat.setEnabled(False)
-                self.bandsUi.radioButton_spot.setEnabled(False)
-                self.bandsUi.radioButton_pleiades.setEnabled(False)
                 self.set_spinbox_read_only(False)
                 
         #execute the dialog
@@ -111,6 +110,7 @@ class manage_bands:
             self.bandsUi.radioButton_formosat.setEnabled(False)
             self.bandsUi.radioButton_pleiades.setEnabled(False)
             self.update_spin_box()
+            self.update_blue_mir("none")
         elif number_of_bands == 4:
             self.blue = 1
             self.green = 2
@@ -118,6 +118,7 @@ class manage_bands:
             self.pir = 4
             self.mir = -1
             self.update_spin_box()
+            self.update_blue_mir("blue")
         else:
             QMessageBox.critical( None , "Erreur", "L'image en entrée doit avoir 1, 3 ou 4 bandes !", QMessageBox.Ok )
     
@@ -132,11 +133,7 @@ class manage_bands:
     
     def blue_checkbox_changed(self):
         if self.bandsUi.checkBox_blue.checkState() == Qt.Checked:
-            self.bandsUi.label_mir.setEnabled(False)
-            self.bandsUi.spinBox_mir.setEnabled(False)
-            self.bandsUi.checkBox_mir.setCheckState(Qt.Unchecked)
-            self.bandsUi.label_red.setEnabled(True)
-            self.bandsUi.spinBox_red.setEnabled(True)
+            self.update_blue_mir("blue")
         else :
             self.bandsUi.label_mir.setEnabled(True)
             self.bandsUi.spinBox_mir.setEnabled(True)
@@ -144,15 +141,10 @@ class manage_bands:
     
     def mir_checkbox_changed(self):
         if self.bandsUi.checkBox_mir.checkState() == Qt.Checked:
-            self.bandsUi.label_blue.setEnabled(False)
-            self.bandsUi.spinBox_blue.setEnabled(False)
-            self.bandsUi.checkBox_blue.setCheckState(Qt.Unchecked)
-            self.bandsUi.label_mir.setEnabled(True)
-            self.bandsUi.spinBox_mir.setEnabled(True)
-            
+            self.update_blue_mir("mir")
         else :
-            self.bandsUi.label_red.setEnabled(True)
-            self.bandsUi.spinBox_red.setEnabled(True)
+            self.bandsUi.label_blue.setEnabled(True)
+            self.bandsUi.spinBox_blue.setEnabled(True)
     
     def define_other(self):
         self.set_spinbox_read_only(False)
@@ -169,8 +161,7 @@ class manage_bands:
         self.bandsUi.spinBox_blue.setEnabled(False)
         self.bandsUi.spinBox_pir.setEnabled(False)
         self.bandsUi.spinBox_mir.setEnabled(False)
-    
-    
+      
     def set_bands(self):
         
         if self.bandsUi.radioButton_formosat.isChecked():
@@ -187,6 +178,39 @@ class manage_bands:
             self.mir = self.bandsUi.spinBox_mir.value()
         self.update_spin_box()
 
+
+    def update_blue_mir(self, keyword):
+        if keyword == "blue":
+            self.bandsUi.label_mir.setEnabled(False)
+            self.bandsUi.spinBox_mir.setEnabled(False)
+            self.bandsUi.checkBox_mir.setCheckState(Qt.Unchecked)
+            self.bandsUi.label_blue.setEnabled(True)
+            self.bandsUi.spinBox_blue.setEnabled(True)
+            self.bandsUi.spinBox_mir.setValue(0)
+        if keyword == "mir":
+            self.bandsUi.label_blue.setEnabled(False)
+            self.bandsUi.spinBox_blue.setEnabled(False)
+            self.bandsUi.checkBox_blue.setCheckState(Qt.Unchecked)
+            self.bandsUi.label_mir.setEnabled(True)
+            self.bandsUi.spinBox_mir.setEnabled(True)
+            self.bandsUi.spinBox_blue.setValue(0)
+        if keyword == "all" : 
+            self.bandsUi.label_blue.setEnabled(True)
+            self.bandsUi.spinBox_blue.setEnabled(True)
+            self.bandsUi.checkBox_blue.setCheckState(Qt.Unchecked)
+            self.bandsUi.checkBox_mir.setCheckState(Qt.Unchecked)
+            self.bandsUi.label_mir.setEnabled(True)
+            self.bandsUi.spinBox_mir.setEnabled(True)
+        if keyword == "none":
+            self.bandsUi.label_blue.setEnabled(False)
+            self.bandsUi.spinBox_blue.setEnabled(False)
+            self.bandsUi.checkBox_blue.setCheckState(Qt.Unchecked)
+            self.bandsUi.checkBox_mir.setCheckState(Qt.Unchecked)
+            self.bandsUi.label_mir.setEnabled(False)
+            self.bandsUi.spinBox_mir.setEnabled(False)
+            
+            
+
         
     def update_spin_box(self):
         self.bandsUi.spinBox_red.setValue(self.red)
@@ -198,12 +222,14 @@ class manage_bands:
         self.bandsUi.spinBox_blue.setValue(self.blue)
         if self.blue == -1:
             self.bandsUi.spinBox_blue.setEnabled(False)
+            self.bandsUi.checkBox_mir.setCheckState(Qt.Checked)
         self.bandsUi.spinBox_pir.setValue(self.pir)
         if self.pir == -1:
             self.bandsUi.spinBox_pir.setEnabled(False)
         self.bandsUi.spinBox_mir.setValue(self.mir)
         if self.mir == -1:
             self.bandsUi.spinBox_mir.setEnabled(False)
+            self.bandsUi.checkBox_blue.setCheckState(Qt.Checked)
         
     def define_formosat(self):
         self.blue = 1
