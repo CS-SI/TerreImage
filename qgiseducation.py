@@ -162,13 +162,17 @@ class QGISEducation:
         
         self.visualization_menu.clear()
         self.visualization_menu.addActions( [ self.histo, self.values ] )
-            
+        
+        visu_band = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ), self.iface.mainWindow() )
+        visu_band.setStatusTip( QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ) )
+        QObject.connect( visu_band, SIGNAL( "triggered()" ), lambda who=str(y[0]): self.do_display_one_band(who)) #self.do_display_one_band )
+        self.visualization_menu.addAction(visu_band)
         for i in range(self.layer.get_band_number()):
             y=[x for x in bands if bands[x]==i+1]
             if y :
                 text = corres[y[0]]
                 visu_band = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", text ), self.iface.mainWindow() )
-                visu_band.setStatusTip( QCoreApplication.translate( "TerreImage", "Export the current view in KMZ" ) )
+                visu_band.setStatusTip( QCoreApplication.translate( "TerreImage", text ) )
                 QObject.connect( visu_band, SIGNAL( "triggered()" ), lambda who=str(y[0]): self.do_display_one_band(who)) #self.do_display_one_band )
                 self.visualization_menu.addAction(visu_band)
 
@@ -246,8 +250,10 @@ class QGISEducation:
         Defines the behavior of the plugin
         """
         self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
-        if self.layer :
+        if self.layer and bands:
             self.educationWidget.layer = self.layer
+            text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
+            self.educationWidget.textEdit.setText(text)
             self.extra_menu_visu(bands)
             
             self.educationWidget.show()
