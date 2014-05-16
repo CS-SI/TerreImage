@@ -224,6 +224,25 @@ def rasterizationWithSupportImage( vectorIn, supportImage, outputDirectory, fiel
     return output
 
 
+def concatenateImages_cli( listImagesIn, outputname ):
+    """
+    Runs the ConcatenateImages OTB application.
+    
+    Keyword arguments:
+        listImagesIn     --    list of images to concatenates
+        outputname     --    output image
+    """
+    
+    if listImagesIn and outputname :
+        command = "otbcli_ConcatenateImages "
+        command += " -il " + " ".join(listImagesIn)
+        command += " -out " + outputname
+        
+        print "concatenateImages_cli", command
+        
+        os.system(command)
+
+
 def concatenateImages( listImagesIn, outputname ):
     """
     Runs the ConcatenateImages OTB application.
