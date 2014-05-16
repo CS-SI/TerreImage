@@ -137,25 +137,55 @@ def angles(layer, working_directory, iface, x, y):
                 
                 
                 
-def kmeans( layer, working_directory, iface ):
+def kmeans( layer, working_directory, iface, nb_class=None ):
     """
     WARNING: nb_valid_pixels à calculer ?
     """
     bands = []
-
-#     for band_number in range(layer.get_qgis_layer().bandCount()):
-# 
-#         bands.append("band " + str(band_number +1))
-    testqt, ok = QInputDialog.getInt(None, "Kmeans", "Nombre de classes", 5)
-    if ok:
-        nb_class = testqt
+    if nb_class == None:
+        testqt, ok = QInputDialog.getInt(None, "Kmeans", "Nombre de classes", 5)
+        if ok:
+            nb_class = testqt
+    else :
         #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
         output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, working_directory)
-        output_colored = OTBApplications.color_mapping_cli_ref_image( output, layer.get_source(), working_directory)
+        image_ref = recompose_image(layer, working_directory)
+        output_colored = OTBApplications.color_mapping_cli_ref_image( output, image_ref, working_directory)
         manage_QGIS.addRasterLayerToQGIS(output_colored, os.path.splitext(os.path.basename(output_colored))[0], iface)
 
 
-
+def recompose_image( layer, working_directory ):
+    bands = layer.bands
+    image_in = layer.get_source()
+    num_band_pir = bands['pir']
+    num_band_red = bands['red']
+    num_band_green = bands['green']
+    band_pir = gdal_translate_get_one_band(image_in, num_band_pir, working_directory)
+    band_red = gdal_translate_get_one_band(image_in, num_band_red, working_directory)
+    band_green = gdal_translate_get_one_band(image_in, num_band_green, working_directory)
+    
+    print "pir", band_pir
+    print"red", band_red
+    print "green", band_green
+    
+    output_filename = os.path.join( working_directory, os.path.splitext(os.path.basename(image_in))[0] + "pir_red_green" + os.path.splitext(os.path.basename(image_in))[1] )
+    print "recomposed image", output_filename
+    OTBApplications.concatenateImages_cli( [band_pir, band_red, band_green], output_filename )
+    return output_filename
+    
+    
+    
+def gdal_translate_get_one_band(image_in, band_number, working_dir):
+    """
+    Runs gdal translate to get the band_number of the image_in
+    TODO : working dir
+    """
+    output_image_one_band = os.path.join(working_dir, os.path.splitext(os.path.basename(image_in))[0] + "-b" + str(band_number) + os.path.splitext(image_in)[1])
+    if not os.path.isfile(output_image_one_band):
+        command_gdal = "gdal_translate -b " + str(band_number) + " " + image_in + " " + output_image_one_band
+        #print "command_gdal", command_gdal
+        os.system(command_gdal)
+    return output_image_one_band
     
     
 def get_sensor_id( image ):
