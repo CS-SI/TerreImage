@@ -34,6 +34,8 @@ from working_layer import WorkingLayer
 import terre_image_processing
 import terre_image_utils
 import manage_QGIS
+import time
+#from supervisedclassification import SupervisedClassification
 
 
 class QGISEducation:
@@ -77,6 +79,9 @@ class QGISEducation:
         # add the dockwidget to iface
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.valuedockwidget)
         #self.educationWidget.show()
+        
+        #self.classif_tool = SupervisedClassification()
+        #print self.classif_tool
 
     def extra_menu(self):
         # find the Raster menu
@@ -163,10 +168,12 @@ class QGISEducation:
         self.visualization_menu.clear()
         self.visualization_menu.addActions( [ self.histo, self.values ] )
         
-        visu_band = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ), self.iface.mainWindow() )
-        visu_band.setStatusTip( QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ) )
-        QObject.connect( visu_band, SIGNAL( "triggered()" ), lambda who=str(y[0]): self.do_display_one_band(who)) #self.do_display_one_band )
-        self.visualization_menu.addAction(visu_band)
+        if bands['red'] != 0 and bands['green'] != 0 and bands['blue'] != 0:
+            visu_band = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ), self.iface.mainWindow() )
+            visu_band.setStatusTip( QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ) )
+            QObject.connect( visu_band, SIGNAL( "triggered()" ), lambda who='nat': self.do_display_one_band(who)) #self.do_display_one_band )
+            self.visualization_menu.addAction(visu_band)
+            
         for i in range(self.layer.get_band_number()):
             y=[x for x in bands if bands[x]==i+1]
             if y :
@@ -179,12 +186,17 @@ class QGISEducation:
 
 
     def do_ndvi(self):
+        timeBegin = time.time()
         if not self.layer:
             self.layer = self.educationWidget.layer
         if self.layer == None :
             print "Aucune layer selectionnée"
         else :
             terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
+        
+        timeEnd = time.time()
+        timeExec = timeEnd - timeBegin
+        print "temps du ndvi : ", timeExec
                 
                  
     def do_ndti(self):
@@ -207,13 +219,19 @@ class QGISEducation:
         self.educationWidget.spectral_angles()
     
     def do_kmeans(self):
+        timeBegin = time.time()
         print "kmeans signal"
         if not self.layer:
             self.layer = self.educationWidget.layer
         if self.layer == None :
             print "Aucune layer selectionnée"
         else :
+            print "lancement du kmeans"
             terre_image_processing.kmeans(self.layer, self.working_directory, self.iface)
+        
+        timeEnd = time.time()
+        timeExec = timeEnd - timeBegin
+        print "temps du kmeans : ", timeExec
     
     def do_classif(self):
         pass
@@ -249,7 +267,13 @@ class QGISEducation:
         """
         Defines the behavior of the plugin
         """
+        timeBegin = time.time()
+        
         self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
+        timeEnd = time.time()
+        timeExec = timeEnd - timeBegin
+        print "temps de chargement : ", timeExec
+        
         if self.layer and bands:
             self.educationWidget.layer = self.layer
             text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
