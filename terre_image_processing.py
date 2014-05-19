@@ -30,6 +30,56 @@ from qgis.core import QGis, QgsPoint, QgsRaster
 from PyQt4.QtGui import QInputDialog
         
         
+class TerreImageProcessing():
+    
+    def __init__(self, iface, working_dir, layer, processing_type, processing):
+        """
+        processing_type : [processing/display]
+        """
+        self.iface = iface
+        self.working_directory = working_dir
+        self.layer = layer
+        self.processing_type = processing_type
+        self.processing_name = processing
+        self.canvas = self.iface.mapCanvas() 
+        self.mirrormap = None
+        self.result_file_name = ""
+        
+        if processing_type == "processing":
+            self.run_processing()
+        else:
+            self.run_display()
+        
+
+        
+    def run_processing(self):
+        if "NDVI" in self.processing_name:
+            ndvi(self.layer, self.working_directory, self.iface)
+        if "NDTI" in self.processing_name:
+            ndti(self.layer, self.working_directory, self.iface)
+        if "Indice de brillance" in self.processing_name:
+            brightness(self.layer, self.working_directory, self.iface)
+        if "Angle Spectral" in self.processing_name:
+            from spectral_angle import SpectralAngle
+            self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer)
+            self.angle_tool.get_point_for_angles(self.layer)
+            #spectral_angles(self.layer, self.working_directory, self.iface)
+            
+            
+    def run_display(self):
+        pass
+        
+        
+    def get_mirror_map(self):
+        return self.mirrormap
+    
+    def get_filename_result(self):
+        return self.result_file_name
+    
+    
+    
+    
+        
 def ndvi(layer, working_directory, iface):
     #NDVI= (PIR-R)/(PIR+R)
     if not layer :

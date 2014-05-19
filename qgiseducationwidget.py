@@ -31,6 +31,7 @@ from qgis.core import QGis, QgsPoint, QgsRaster
 
 from working_layer import WorkingLayer
 import terre_image_processing
+from terre_image_processing import TerreImageProcessing
 import terre_image_utils
 import manage_QGIS
 
@@ -41,6 +42,7 @@ from ptmaptool import ProfiletoolMapTool
 from valuewidget import ValueWidget
 
 from spectral_angle import SpectralAngle
+
 
 class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     def __init__(self, iface):
@@ -99,15 +101,21 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         
     def do_manage_processing(self, text_changed):
-        print "text changed", text_changed
-        if "NDVI" in text_changed:
-            self.ndvi()
-        if "NDTI" in text_changed:
-            self.ndti()
-        if "Indice de brillance" in text_changed:
-            self.brightness()
         if "Angle Spectral" in text_changed:
             self.spectral_angles()
+        else :
+            my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, "processing", text_changed )
+        
+        
+#         print "text changed", text_changed
+#         if "NDVI" in text_changed:
+#             self.ndvi()
+#         if "NDTI" in text_changed:
+#             self.ndti()
+#         if "Indice de brillance" in text_changed:
+#             self.brightness()
+#         if "Angle Spectral" in text_changed:
+#             self.spectral_angles()
         self.comboBox_processing.setCurrentIndex( 0 )
         
         

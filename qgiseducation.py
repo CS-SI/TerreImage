@@ -32,6 +32,7 @@ import os.path
 from manage_bands import manage_bands
 from working_layer import WorkingLayer
 import terre_image_processing
+from terre_image_processing import TerreImageProcessing
 import terre_image_utils
 import manage_QGIS
 import time
@@ -184,36 +185,55 @@ class QGISEducation:
                 self.visualization_menu.addAction(visu_band)
 
 
-
-    def do_ndvi(self):
+    def do_process(self, name):
         timeBegin = time.time()
         if not self.layer:
             self.layer = self.educationWidget.layer
         if self.layer == None :
             print "Aucune layer selectionnée"
         else :
-            terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
+            my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, "processing", name )
+            #terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
         
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
-        print "temps du ndvi : ", timeExec
+        print "temps du " + str(name) + "  : " + str(timeExec)
+        
+
+    def do_ndvi(self):
+#         timeBegin = time.time()
+#         if not self.layer:
+#             self.layer = self.educationWidget.layer
+#         if self.layer == None :
+#             print "Aucune layer selectionnée"
+#         else :
+#             my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, "processing", text_changed )
+#             #terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
+#         
+#         timeEnd = time.time()
+#         timeExec = timeEnd - timeBegin
+#         print "temps du ndvi : ", timeExec
+        self.do_process("NDVI")
                 
                  
     def do_ndti(self):
-        if not self.layer:
-            self.layer = self.educationWidget.layer
-        if self.layer == None :
-            print "Aucune layer selectionnée"
-        else :
-            terre_image_processing.ndti(self.layer, self.working_directory, self.iface)
+#         if not self.layer:
+#             self.layer = self.educationWidget.layer
+#         if self.layer == None :
+#             print "Aucune layer selectionnée"
+#         else :
+#             terre_image_processing.ndti(self.layer, self.working_directory, self.iface)
+        self.do_process("NDTI")
             
     def do_brightness(self):
-        if not self.layer:
-            self.layer = self.educationWidget.layer
-        if self.layer == None :
-            print "Aucune layer selectionnée"
-        else :
-            terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
+#         if not self.layer:
+#             self.layer = self.educationWidget.layer
+#         if self.layer == None :
+#             print "Aucune layer selectionnée"
+#         else :
+#             terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
+        self.do_process("Indice de brillance")    
+        
     
     def do_angles(self):
         self.educationWidget.spectral_angles()
