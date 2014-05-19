@@ -141,17 +141,17 @@ def kmeans( layer, working_directory, iface, nb_class=None ):
     """
     WARNING: nb_valid_pixels à calculer ?
     """
+    print "enntree dans le kmeans"
     bands = []
     if nb_class == None:
         testqt, ok = QInputDialog.getInt(None, "Kmeans", "Nombre de classes", 5)
         if ok:
             nb_class = testqt
-    else :
-        #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
-        output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, working_directory)
-        image_ref = recompose_image(layer, working_directory)
-        output_colored = OTBApplications.color_mapping_cli_ref_image( output, image_ref, working_directory)
-        manage_QGIS.addRasterLayerToQGIS(output_colored, os.path.splitext(os.path.basename(output_colored))[0], iface)
+    #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
+    output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, working_directory)
+    image_ref = recompose_image(layer, working_directory)
+    output_colored = OTBApplications.color_mapping_cli_ref_image( output, image_ref, working_directory)
+    manage_QGIS.addRasterLayerToQGIS(output_colored, os.path.splitext(os.path.basename(output_colored))[0], iface)
 
 
 def recompose_image( layer, working_directory ):
