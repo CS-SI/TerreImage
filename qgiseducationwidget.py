@@ -108,6 +108,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             self.brightness()
         if "Angle Spectral" in text_changed:
             self.spectral_angles()
+        self.comboBox_processing.setCurrentIndex( 0 )
         
         
     def set_comboBox_sprectral_band_display( self ):
@@ -139,6 +140,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                 #band_to_display = self.layer.bands[key]
                 manage_QGIS.display_one_band(self.layer, who, self.iface)
                 break
+        self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
         
         
         
