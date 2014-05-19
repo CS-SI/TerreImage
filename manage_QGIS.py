@@ -138,8 +138,6 @@ def histogram_stretching(raster_layer, canvas):
     canvas.refresh()
 
 
-
-
 def get_min_max_via_qgis( theRasterLayer, num_band ):
 #     my_raster_stats = theRasterLayer.dataProvider().bandStatistics( num_band )#, 2, 98  )
 #     my_min = my_raster_stats.minimumValue
@@ -211,23 +209,39 @@ def contrastForRasters( theRasterLayer, minLayer, maxLayer, band=None ):
          
         
 def display_one_band( layer, keyword, iface ): 
-    corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir" }
+    print "keyword", keyword
+    corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir", "nat":"_couleurs_naturelles" }
     
     rasterLayer = QgsRasterLayer( layer.get_source(), layer.name() + corres[keyword] )
     
-    
-    band = layer.bands[keyword]
-    if band :
-        print "band num:", band
-        rasterLayer.setDrawingStyle("MultiBandSingleBandGray")
+    if keyword == 'nat':
+        print "display on natural colors"
+        band_red = layer.bands['red']
+        band_green = layer.bands['green']
+        band_blue = layer.bands['blue']
         renderer = rasterLayer.renderer()
-        print renderer
-        renderer.setGrayBand(band)
-        
-        #contrastForRasters( rasterLayer, 0, 0 )
+        #rasterLayer.setDrawingStyle("MultiBandColor")
+        renderer.setRedBand(band_red)
+        renderer.setGreenBand(band_green)
+        renderer.setBlueBand(band_blue)
+        #rasterLayer.setRenderer( renderer )
+        #contrastForRasters( rasterLayer, 0, 0, [pir, red, green] )
         histogram_stretching(rasterLayer, iface.mapCanvas())
         QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
-        return rasterLayer
+    else:
+        
+        band = layer.bands[keyword]
+        if band :
+            print "band num:", band
+            rasterLayer.setDrawingStyle("MultiBandSingleBandGray")
+            renderer = rasterLayer.renderer()
+            print renderer
+            renderer.setGrayBand(band)
+            
+            #contrastForRasters( rasterLayer, 0, 0 )
+            histogram_stretching(rasterLayer, iface.mapCanvas())
+            QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
+            return rasterLayer
     
     
 def show_clicked_point( point, name, iface, vl = None ):
