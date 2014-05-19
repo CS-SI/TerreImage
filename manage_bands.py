@@ -91,6 +91,12 @@ class manage_bands:
     
     
     def custom_from_nb_of_bands(self, number_of_bands):
+        
+        self.bandsUi.spinBox_red.setMaximum( number_of_bands )
+        self.bandsUi.spinBox_green.setMaximum( number_of_bands )
+        self.bandsUi.spinBox_blue.setMaximum( number_of_bands )
+        self.bandsUi.spinBox_pir.setMaximum( number_of_bands )
+        self.bandsUi.spinBox_mir.setMaximum( number_of_bands )
         if number_of_bands == 1:
             self.red = 0
             self.green = 0
