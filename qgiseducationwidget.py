@@ -129,13 +129,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                     self.comboBox_sprectral_band_display.insertItem( i+2, text )
             self.comboBox_sprectral_band_display.currentIndexChanged[str].connect(self.do_manage_sprectral_band_display)
             
+            
     def do_manage_sprectral_band_display(self, text_changed):
         band_to_display = None
-        corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
+        corres = { 'nat':"Afficher en couleurs naturelles", 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
         for key in corres:
             if corres[key] == text_changed :
                 who = key
-                band_to_display = self.layer.bands[key]
+                #band_to_display = self.layer.bands[key]
                 manage_QGIS.display_one_band(self.layer, who, self.iface)
                 break
         
@@ -152,7 +153,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         if self.layer == None :
             print "Aucune layer selectionnée"
         else :
-            terre_image_processing.ndti(self.layer, self.working_directory, self.iface)
+            terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
                 
                  
     def ndti(self):
