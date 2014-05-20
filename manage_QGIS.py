@@ -228,6 +228,7 @@ def display_one_band( layer, keyword, iface ):
         #contrastForRasters( rasterLayer, 0, 0, [pir, red, green] )
         histogram_stretching(rasterLayer, iface.mapCanvas())
         QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
+        return rasterLayer
     else:
         
         band = layer.bands[keyword]
