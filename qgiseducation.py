@@ -201,57 +201,19 @@ class QGISEducation:
         
 
     def do_ndvi(self):
-#         timeBegin = time.time()
-#         if not self.layer:
-#             self.layer = self.educationWidget.layer
-#         if self.layer == None :
-#             print "Aucune layer selectionnée"
-#         else :
-#             my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, "processing", text_changed )
-#             #terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
-#         
-#         timeEnd = time.time()
-#         timeExec = timeEnd - timeBegin
-#         print "temps du ndvi : ", timeExec
-        self.do_process("NDVI")
-                
+        self.do_process("NDVI")   
                  
     def do_ndti(self):
-#         if not self.layer:
-#             self.layer = self.educationWidget.layer
-#         if self.layer == None :
-#             print "Aucune layer selectionnée"
-#         else :
-#             terre_image_processing.ndti(self.layer, self.working_directory, self.iface)
         self.do_process("NDTI")
             
     def do_brightness(self):
-#         if not self.layer:
-#             self.layer = self.educationWidget.layer
-#         if self.layer == None :
-#             print "Aucune layer selectionnée"
-#         else :
-#             terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
         self.do_process("Indice de brillance")    
-        
     
     def do_angles(self):
         self.educationWidget.spectral_angles()
     
     def do_kmeans(self):
-        timeBegin = time.time()
-        print "kmeans signal"
-        if not self.layer:
-            self.layer = self.educationWidget.layer
-        if self.layer == None :
-            print "Aucune layer selectionnée"
-        else :
-            print "lancement du kmeans"
-            terre_image_processing.kmeans(self.layer, self.working_directory, self.iface)
-        
-        timeEnd = time.time()
-        timeExec = timeEnd - timeBegin
-        print "temps du kmeans : ", timeExec
+        self.do_process("KMEANS")
     
     def do_classif(self):
         pass
