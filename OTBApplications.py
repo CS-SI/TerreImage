@@ -302,16 +302,16 @@ def kmeans_cli( image, nbClass, outputDirectory ):
     pass
     """
     filenameWithoutExtension = os.path.basename(os.path.splitext(image)[0]) 
-    output = os.path.join( outputDirectory, filenameWithoutExtension + "_kmeans.tif" ) # + temp[index:]
-      
-    if image and nbClass and outputDirectory :
-        command = "otbcli_KMeansClassification "
-        command += " -in " + image
-        command += " -out " + output
-        command += " -nc " + str(nbClass)
-        command += " -rand " + str(42)
-        
-        os.system(command)
+    output = os.path.join( outputDirectory, filenameWithoutExtension + "_kmeans_" + str(nbClass) + ".tif" ) # + temp[index:]
+    if not os.path.isfile(output):
+        if image and nbClass and outputDirectory :
+            command = "otbcli_KMeansClassification "
+            command += " -in " + image
+            command += " -out " + output
+            command += " -nc " + str(nbClass)
+            command += " -rand " + str(42)
+            
+            os.system(command)
         
     return output
 
