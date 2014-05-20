@@ -32,7 +32,7 @@ from PyQt4.QtGui import QInputDialog
         
 class TerreImageProcessing():
     
-    def __init__(self, iface, working_dir, layer, processing_type, processing):
+    def __init__(self, iface, working_dir, layer, mirror_map_tool, processing_type, processing, arg=None):
         """
         processing_type : [processing/display]
         """
@@ -42,8 +42,13 @@ class TerreImageProcessing():
         self.processing_type = processing_type
         self.processing_name = processing
         self.canvas = self.iface.mapCanvas() 
-        self.mirrormap = None
+        self.mirrormap_tool = mirror_map_tool
+        self.mirror = None
+        
         self.result_file_name = ""
+        self.arg=None
+        if arg:
+            self.arg = arg
         
         if processing_type == "processing":
             self.run_processing()
@@ -53,18 +58,28 @@ class TerreImageProcessing():
 
         
     def run_processing(self):
+        output_filename = ""
         if "NDVI" in self.processing_name:
-            ndvi(self.layer, self.working_directory, self.iface)
+            output_filename = ndvi(self.layer, self.working_directory, self.iface)
         if "NDTI" in self.processing_name:
-            ndti(self.layer, self.working_directory, self.iface)
+            output_filename = ndti(self.layer, self.working_directory, self.iface)
         if "Indice de brillance" in self.processing_name:
-            brightness(self.layer, self.working_directory, self.iface)
+            output_filename = brightness(self.layer, self.working_directory, self.iface)
         if "Angle Spectral" in self.processing_name:
             from spectral_angle import SpectralAngle
             self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer)
+            print "self.angle_tool", self.angle_tool
             self.angle_tool.get_point_for_angles(self.layer)
             #spectral_angles(self.layer, self.working_directory, self.iface)
-            
+        if "KMEANS" in self.processing_name:
+            if self.arg:
+                output_filename = kmeans(self.layer, self.working_directory, self.iface, self.arg)
+            else :
+                output_filename = kmeans(self.layer, self.working_directory, self.iface)
+        if output_filename:
+            print output_filename
+            self.display(output_filename)
+        
             
     def run_display(self):
         pass
@@ -76,7 +91,11 @@ class TerreImageProcessing():
     def get_filename_result(self):
         return self.result_file_name
     
-    
+    def display(self, output_filename):
+        manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name, self.iface )
+        # 1 mettre image en queue
+        # 2 ouvrir une nouvelle vue
+        self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
     
     
         
@@ -99,7 +118,8 @@ def ndvi(layer, working_directory, iface):
             print expression
             print "image_in", image_in
             OTBApplications.bandmath_cli( [image_in], expression, output_filename )
-            manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_ndvi", iface )    
+            return output_filename
+    return ""
     
     
 def ndti(layer, working_directory, iface):
@@ -117,7 +137,7 @@ def ndti(layer, working_directory, iface):
             print expression
             print "image_in", image_in
             OTBApplications.bandmath_cli( [image_in], expression, output_filename )
-            manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_ndti", iface )
+            return output_filename
                 
 
 def brightness( layer, working_directory, iface ):
@@ -139,7 +159,7 @@ def brightness( layer, working_directory, iface ):
             print expression
             print "image_in", image_in
             OTBApplications.bandmath_cli( [image_in], expression, output_filename )
-            manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_brillance", iface )    
+            return output_filename   
     
     
     
@@ -201,7 +221,7 @@ def kmeans( layer, working_directory, iface, nb_class=None ):
     output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, working_directory)
     image_ref = recompose_image(layer, working_directory)
     output_colored = OTBApplications.color_mapping_cli_ref_image( output, image_ref, working_directory)
-    manage_QGIS.addRasterLayerToQGIS(output_colored, os.path.splitext(os.path.basename(output_colored))[0], iface)
+    return output_colored
 
 
 def recompose_image( layer, working_directory ):
