@@ -29,75 +29,7 @@ from qgis.core import QGis, QgsPoint, QgsRaster
 
 from PyQt4.QtGui import QInputDialog
         
-        
-class TerreImageProcessing():
-    
-    def __init__(self, iface, working_dir, layer, mirror_map_tool, processing_type, processing, arg=None):
-        """
-        processing_type : [processing/display]
-        """
-        self.iface = iface
-        self.working_directory = working_dir
-        self.layer = layer
-        self.processing_type = processing_type
-        self.processing_name = processing
-        self.canvas = self.iface.mapCanvas() 
-        self.mirrormap_tool = mirror_map_tool
-        self.mirror = None
-        
-        self.result_file_name = ""
-        self.arg=None
-        if arg:
-            self.arg = arg
-        
-        if processing_type == "processing":
-            self.run_processing()
-        else:
-            self.run_display()
-        
-
-        
-    def run_processing(self):
-        output_filename = ""
-        if "NDVI" in self.processing_name:
-            output_filename = ndvi(self.layer, self.working_directory, self.iface)
-        if "NDTI" in self.processing_name:
-            output_filename = ndti(self.layer, self.working_directory, self.iface)
-        if "Indice de brillance" in self.processing_name:
-            output_filename = brightness(self.layer, self.working_directory, self.iface)
-        if "Angle Spectral" in self.processing_name:
-            from spectral_angle import SpectralAngle
-            self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer)
-            print "self.angle_tool", self.angle_tool
-            self.angle_tool.get_point_for_angles(self.layer)
-            #spectral_angles(self.layer, self.working_directory, self.iface)
-        if "KMEANS" in self.processing_name:
-            if self.arg:
-                output_filename = kmeans(self.layer, self.working_directory, self.iface, self.arg)
-            else :
-                output_filename = kmeans(self.layer, self.working_directory, self.iface)
-        if output_filename:
-            print output_filename
-            self.display(output_filename)
-        
-            
-    def run_display(self):
-        pass
-        
-        
-    def get_mirror_map(self):
-        return self.mirrormap
-    
-    def get_filename_result(self):
-        return self.result_file_name
-    
-    def display(self, output_filename):
-        manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name, self.iface )
-        # 1 mettre image en queue
-        # 2 ouvrir une nouvelle vue
-        self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
-    
-    
+ 
         
 def ndvi(layer, working_directory, iface):
     #NDVI= (PIR-R)/(PIR+R)
@@ -112,12 +44,13 @@ def ndvi(layer, working_directory, iface):
                                             os.path.basename(os.path.splitext(image_in)[0]) + "_ndvi" + os.path.splitext(image_in)[1]
                                           )
             print output_filename
-            layer_pir = "im1b" + str(layer.pir)
-            layer_red = "im1b" + str(layer.red)
-            expression = "\"(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + ")\""
-            print expression
-            print "image_in", image_in
-            OTBApplications.bandmath_cli( [image_in], expression, output_filename )
+            if not os.path.isfile(output_filename) : 
+                layer_pir = "im1b" + str(layer.pir)
+                layer_red = "im1b" + str(layer.red)
+                expression = "\"(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + ")\""
+                print expression
+                print "image_in", image_in
+                OTBApplications.bandmath_cli( [image_in], expression, output_filename )
             return output_filename
     return ""
     
@@ -132,11 +65,12 @@ def ndti(layer, working_directory, iface):
             print "image_in", image_in
             output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_ndti" + os.path.splitext(image_in)[1])
             print output_filename
-            layer_red = "im1b" + str(layer.red)
-            expression = "\"sqrt(" + layer_red + "+0.5)\""
-            print expression
-            print "image_in", image_in
-            OTBApplications.bandmath_cli( [image_in], expression, output_filename )
+            if not os.path.isfile(output_filename) : 
+                layer_red = "im1b" + str(layer.red)
+                expression = "\"sqrt(" + layer_red + "+0.5)\""
+                print expression
+                print "image_in", image_in
+                OTBApplications.bandmath_cli( [image_in], expression, output_filename )
             return output_filename
                 
 
@@ -153,12 +87,13 @@ def brightness( layer, working_directory, iface ):
                                             os.path.basename(os.path.splitext(image_in)[0]) + "_brillance" + os.path.splitext(image_in)[1]
                                           )
             print output_filename
-            layer_pir = "im1b" + str(layer.pir)
-            layer_red = "im1b" + str(layer.red)
-            expression = "\"sqrt(" + layer_red + "*" + layer_red + "*" + layer_pir + "*" + layer_pir + ")\""
-            print expression
-            print "image_in", image_in
-            OTBApplications.bandmath_cli( [image_in], expression, output_filename )
+            if not os.path.isfile(output_filename) : 
+                layer_pir = "im1b" + str(layer.pir)
+                layer_red = "im1b" + str(layer.red)
+                expression = "\"sqrt(" + layer_red + "*" + layer_red + "*" + layer_pir + "*" + layer_pir + ")\""
+                print expression
+                print "image_in", image_in
+                OTBApplications.bandmath_cli( [image_in], expression, output_filename )
             return output_filename   
     
     
@@ -172,38 +107,42 @@ def angles(layer, working_directory, iface, x, y):
         attr = ident.results()
         print attr
         if len(attr) == layer.get_qgis_layer().bandCount():
-            formula = "\"acos("
-            num = []
-            denom = []
-            fact = []
-            #acos((im1b1*1269+im1b2*1060+im1b3*974+im1b4*1576)/
-            #(sqrt((1269*1269+1060*1060+974*974+1576*1576)*
-            #(im1b1*im1b1+im1b2*im1b2+im1b3*im1b3+im1b4*im1b4))))
-            for index in range( 1,layer.get_qgis_layer().bandCount()+1 ):
-                current_band = "im1b" + str(index)
-                band_value = attr[index]
-                num.append( current_band + "*" + str(band_value)  )
-                denom.append(str(band_value) + "*" + str(band_value) )
-                fact.append(current_band + "*" + current_band)
-            
-            formula += "(" + "+".join(num) + ")/"
-            formula += "(sqrt("
-            formula += "(" + "+".join(denom) + ")*"
-            formula += "(" + "+".join(fact) + ")"
-            formula += "))"
-            formula += ")\""
-            
-            print "num", num
-            print "denom", denom
-            print "fact", fact
-            print "formula", formula
-            
-            
             image_in = layer.get_qgis_layer().source()
             output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y) + os.path.splitext(image_in)[1])
-            OTBApplications.bandmath_cli( [image_in], formula, output_filename )
-            rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
-            manage_QGIS.histogram_stretching( rlayer, iface.mapCanvas())
+            
+            if not os.path.isfile(output_filename) :
+            
+                formula = "\"acos("
+                num = []
+                denom = []
+                fact = []
+                #acos((im1b1*1269+im1b2*1060+im1b3*974+im1b4*1576)/
+                #(sqrt((1269*1269+1060*1060+974*974+1576*1576)*
+                #(im1b1*im1b1+im1b2*im1b2+im1b3*im1b3+im1b4*im1b4))))
+                for index in range( 1,layer.get_qgis_layer().bandCount()+1 ):
+                    current_band = "im1b" + str(index)
+                    band_value = attr[index]
+                    num.append( current_band + "*" + str(band_value)  )
+                    denom.append(str(band_value) + "*" + str(band_value) )
+                    fact.append(current_band + "*" + current_band)
+                
+                formula += "(" + "+".join(num) + ")/"
+                formula += "(sqrt("
+                formula += "(" + "+".join(denom) + ")*"
+                formula += "(" + "+".join(fact) + ")"
+                formula += "))"
+                formula += ")\""
+                
+                print "num", num
+                print "denom", denom
+                print "fact", fact
+                print "formula", formula
+                
+                
+                OTBApplications.bandmath_cli( [image_in], formula, output_filename )
+                rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
+                manage_QGIS.histogram_stretching( rlayer, iface.mapCanvas())
+            return output_filename
                 
                 
                 
@@ -219,8 +158,10 @@ def kmeans( layer, working_directory, iface, nb_class=None ):
             nb_class = testqt
     #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
     output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, working_directory)
-    image_ref = recompose_image(layer, working_directory)
-    output_colored = OTBApplications.color_mapping_cli_ref_image( output, image_ref, working_directory)
+    if not os.path.isfile(image_ref) :
+        image_ref = recompose_image(layer, working_directory)
+    if not os.path.isfile(output_colored):
+        output_colored = OTBApplications.color_mapping_cli_ref_image( output, image_ref, working_directory)
     return output_colored
 
 
@@ -259,7 +200,12 @@ def gdal_translate_get_one_band(image_in, band_number, working_dir):
     
     
 def get_sensor_id( image ):
-    command = "otbcli_ReadImageInfo -in " + image + " | grep \"sensor:\""
+    currentOs = os.name
+    
+    if currentOs == "posix" :
+        command = "otbcli_ReadImageInfo -in " + image + " | grep \"sensor:\""
+    else :
+        commandgdal = "otbcli_ReadImageInfo -in " + image + " | findstr \"sensor:\""
     result_sensor = os.popen( command ).readlines()
     if result_sensor :
         sensor_line = result_sensor[0]
