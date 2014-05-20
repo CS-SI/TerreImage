@@ -43,6 +43,7 @@ from valuewidget import ValueWidget
 
 from spectral_angle import SpectralAngle
 
+from DockableMirrorMap.dockableMirrorMapPlugin import DockableMirrorMapPlugin
 
 class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     def __init__(self, iface):
@@ -60,8 +61,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.layer = None
         self.memorylayer = None
         
+        self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
         
-        self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer)
+        #self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer)
 #         self.tool = ProfiletoolMapTool(self.iface.mapCanvas())        #the mouselistener
 #         print "self.tool", self.tool
 #         self.pointstoDraw = None    #Polyline in mapcanvas CRS analysed
@@ -91,20 +93,12 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.pushButton_ndvi.hide()
         self.pushButton_angle.hide()
         
-#         self.pushButton_brightness.clicked.connect(self.brightness)
-#         self.pushButton_ndti.clicked.connect(self.ndti)
-#         self.pushButton_ndvi.clicked.connect(self.ndvi)
-#         self.pushButton_working_layer.clicked.connect(self.working_layer)
-#         self.pushButton_angle.clicked.connect(self.spectral_angles)
 
         self.pushButton_kmeans.clicked.connect(self.kmeans)
         
         
     def do_manage_processing(self, text_changed):
-        if "Angle Spectral" in text_changed:
-            self.spectral_angles()
-        else :
-            my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, "processing", text_changed )
+        my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, self.mirror_map_tool, "processing", text_changed )
         
         
 #         print "text changed", text_changed
@@ -151,35 +145,37 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
         
         
-        
-    def brightness(self):
-        if not self.layer :
-            print "Aucune layer selectionnée"
-        else :
-            terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
-               
-    
-    def ndvi(self):
-        if self.layer == None :
-            print "Aucune layer selectionnée"
-        else :
-            terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
-                
-                 
-    def ndti(self):
-        if self.layer == None :
-            print "Aucune layer selectionnée"
-        else :
-            terre_image_processing.ndti(self.layer, self.working_directory, self.iface)
-                
+#         
+#     def brightness(self):
+#         if not self.layer :
+#             print "Aucune layer selectionnée"
+#         else :
+#             terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
+#                
+#     
+#     def ndvi(self):
+#         if self.layer == None :
+#             print "Aucune layer selectionnée"
+#         else :
+#             terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
+#                 
+#                  
+#     def ndti(self):
+#         if self.layer == None :
+#             print "Aucune layer selectionnée"
+#         else :
+#             terre_image_processing.ndti(self.layer, self.working_directory, self.iface)
+#                 
                  
     def kmeans(self):
+        
         if self.layer == None :
             print "Aucune layer selectionnée"
         else :
             nb_class = self.spinBox_kmeans.value()
             print "nb_colass from spinbox", nb_class
-            terre_image_processing.kmeans(self.layer, self.working_directory, self.iface, nb_class)
+            my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, "processing", "KMEANS", nb_class )
+            #terre_image_processing.kmeans(self.layer, self.working_directory, self.iface, nb_class)
         
         
     def working_layer(self):
@@ -191,53 +187,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     
     def spectral_angles( self ):
         self.angle_tool.get_point_for_angles(self.layer)
-#         self.get_point_for_angles()
-#         if self.layer :
-#             angle_tool = SpectralAngle(self.iface, self.layer)
-        
-   
-#     def angles(self, x, y):
-#         if self.layer :
-#             terre_image_processing.angles(self.layer, self.working_directory, self.iface, x, y)
-#         self.tool.deactivate()
-#         self.deactivate()
-#         self.canvas.setMapTool(self.maptool) 
-#                     
-#                     
-#     
-#     def get_point_for_angles(self):
-#         print "get point for angles"
-#         QtCore.QObject.connect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
-#         
-#         #init the mouse listener comportement and save the classic to restore it on quit
-#         self.canvas.setMapTool(self.tool)
-#         
-#         print "listener set"
-#         
-#         #init the temp layer where the polyline is draw
-#         self.polygon = False
-#         self.rubberband = QgsRubberBand(self.canvas, self.polygon)
-#         self.rubberband.setWidth(10)
-#         self.rubberband.setColor(QtGui.QColor(QtCore.Qt.yellow))
-#         #init the table where is saved the poyline
-#         self.pointstoDraw = []
-#         self.pointstoCal = []
-#         
-#     def deactivate(self):        #enable clean exit of the plugin
-#         QtCore.QObject.disconnect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
-#         #self.rubberband.reset(self.polygon)
-#         
-#         
-#     def rightClicked(self,position):    #used to quit the current action
-#         mapPos = self.canvas.getCoordinateTransform().toMapCoordinates(position["x"],position["y"])
-#         newPoints = [[mapPos.x(), mapPos.y()]]
-#         #if newPoints == self.lastClicked: return # sometimes a strange "double click" is given
-#         self.memorylayer = manage_QGIS.show_clicked_point( QgsPoint(mapPos.x(),mapPos.y()), "spectral_angles_points", self.iface, self.memorylayer )
-#         #self.rubberband.reset(self.polygon)
-#         #self.rubberband.reset(QGis.Point)
-#         self.rubberband.addPoint(QgsPoint(mapPos.x(),mapPos.y()))
-#         #create new vlayer ???
-#         self.angles(mapPos.x(),mapPos.y())
+
    
         
         
