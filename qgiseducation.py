@@ -31,10 +31,9 @@ import os.path
 
 from manage_bands import manage_bands
 from working_layer import WorkingLayer
-import terre_image_processing
-from terre_image_processing import TerreImageProcessing
+from terre_image_task import TerreImageProcessing
+from terre_image_task import TerreImageDisplay
 import terre_image_utils
-import manage_QGIS
 import time
 #from supervisedclassification import SupervisedClassification
 
@@ -192,7 +191,7 @@ class QGISEducation:
         if self.layer == None :
             print "Aucune layer selectionnée"
         else :
-            my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, "processing", name )
+            my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, self.educationWidget.mirror_map_tool, name )
             #terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
         
         timeEnd = time.time()
@@ -223,8 +222,8 @@ class QGISEducation:
     
     def do_display_one_band(self, who):
         print "who", who
-        manage_QGIS.display_one_band(self.layer, who, self.iface)
-
+        #manage_QGIS.display_one_band(self.layer, who, self.iface)
+        my_process = TerreImageDisplay( self.iface, self.working_directory, self.layer, self.educationWidget.mirror_map_tool, who )
     
     def do_histogram(self):
         pass

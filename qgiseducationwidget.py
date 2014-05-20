@@ -30,10 +30,9 @@ from qgis.core import QGis, QgsPoint, QgsRaster
 
 
 from working_layer import WorkingLayer
-import terre_image_processing
-from terre_image_processing import TerreImageProcessing
+from terre_image_task import TerreImageProcessing
+from terre_image_task import TerreImageDisplay
 import terre_image_utils
-import manage_QGIS
 
 
 import datetime
@@ -62,6 +61,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.memorylayer = None
         
         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
+        self.mirror_map_tool.initGui()
         
         #self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer)
 #         self.tool = ProfiletoolMapTool(self.iface.mapCanvas())        #the mouselistener
@@ -98,7 +98,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         
     def do_manage_processing(self, text_changed):
-        my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, self.mirror_map_tool, "processing", text_changed )
+        my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, self.mirror_map_tool, text_changed )
         
         
 #         print "text changed", text_changed
@@ -140,32 +140,11 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             if corres[key] == text_changed :
                 who = key
                 #band_to_display = self.layer.bands[key]
-                manage_QGIS.display_one_band(self.layer, who, self.iface)
+                #manage_QGIS.display_one_band(self.layer, who, self.iface)
+                TerreImageDisplay( self.iface, self.working_directory, self.layer, self.mirror_map_tool, who )
                 break
         self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
-        
-        
-#         
-#     def brightness(self):
-#         if not self.layer :
-#             print "Aucune layer selectionnée"
-#         else :
-#             terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
-#                
-#     
-#     def ndvi(self):
-#         if self.layer == None :
-#             print "Aucune layer selectionnée"
-#         else :
-#             terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
-#                 
-#                  
-#     def ndti(self):
-#         if self.layer == None :
-#             print "Aucune layer selectionnée"
-#         else :
-#             terre_image_processing.ndti(self.layer, self.working_directory, self.iface)
-#                 
+             
                  
     def kmeans(self):
         
@@ -174,7 +153,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         else :
             nb_class = self.spinBox_kmeans.value()
             print "nb_colass from spinbox", nb_class
-            my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, "processing", "KMEANS", nb_class )
+            my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, "KMEANS", nb_class )
             #terre_image_processing.kmeans(self.layer, self.working_directory, self.iface, nb_class)
         
         
