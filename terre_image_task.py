@@ -43,6 +43,14 @@ class TerreImageTask(object):
         return self.mirrormap
         
         
+    def freezeCanvas(self, setFreeze):
+        if setFreeze:
+            if not self.iface.mapCanvas().isFrozen():
+                self.iface.mapCanvas().freeze( True )
+        else:
+            if self.iface.mapCanvas().isFrozen():
+                self.iface.mapCanvas().freeze( False )
+                self.iface.mapCanvas().refresh()    
         
         
 class TerreImageProcessing(TerreImageTask):
@@ -63,14 +71,7 @@ class TerreImageProcessing(TerreImageTask):
         
         self.run()
         
-    def freezeCanvas(self, setFreeze):
-        if setFreeze:
-            if not self.iface.mapCanvas().isFrozen():
-                self.iface.mapCanvas().freeze( True )
-        else:
-            if self.iface.mapCanvas().isFrozen():
-                self.iface.mapCanvas().freeze( False )
-                self.iface.mapCanvas().refresh()
+
         
 
         
@@ -155,6 +156,7 @@ class TerreImageDisplay(TerreImageTask):
         
         
     def run(self):
+        self.freezeCanvas( True )
         print "self.who", self.who
         result_layer = manage_QGIS.display_one_band(self.layer, self.who, self.iface)
         if result_layer:
@@ -163,5 +165,18 @@ class TerreImageDisplay(TerreImageTask):
             self.mirror.mainWidget.addLayer( result_layer.id() )
         
         
-    
+            ifaceLegend = self.iface.legendInterface()
+            ifaceLayers = QgsMapLayerRegistry.instance().mapLayers()
+            print "ifacelayers", ifaceLayers
+            id_layer = result_layer.id()
+            print "id_layer", id_layer
+            print "result layer", result_layer
+            #QgsMapLayerRegistry.instance().mapLayers()
+            #{u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>, u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
+            ifaceLegend.setLayerVisible( result_layer, False )
+            self.iface.mapCanvas().refresh()
+            print ifaceLegend.isLayerVisible(result_layer)
+            
+            # thaw the canvas
+            self.freezeCanvas( False )
       
