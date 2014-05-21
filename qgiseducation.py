@@ -96,39 +96,26 @@ class QGISEducation:
     
         # projections menu (Warp (Reproject), Assign projection)
         self.processing_menu = QMenu( QCoreApplication.translate( "TerreImage", "Traitements" ), self.iface.mainWindow() )
-    
-        self.ndvi = QAction( QIcon(":/icons/warp.png"),  QCoreApplication.translate( "TerreImage", "NDVI" ), self.iface.mainWindow() )
-        self.ndvi.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule le NDVI de l'image de travail") )
-        #QObject.connect( self.ndvi, SIGNAL( "triggered()" ), self.do_ndvi )
-        QObject.connect( self.ndvi, SIGNAL( "triggered()" ), lambda who="NDVI": self.do_process(who))
-    
-        self.ndti = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "NDTI" ), self.iface.mainWindow() )
-        self.ndti.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule le NDTI de l'image de travail" ) )
-        #QObject.connect( self.ndti, SIGNAL( "triggered()" ), self.do_ndti )
-        QObject.connect( self.ndti, SIGNAL( "triggered()" ), lambda who="NDTI": self.do_process(who))
-    
-        self.brightness = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "Indice de brillance" ), self.iface.mainWindow() )
-        self.brightness.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule l'indice de brillance de l'image de travail" ) )
-        #QObject.connect( self.brightness, SIGNAL( "triggered()" ), self.do_brightness )
-        QObject.connect( self.brightness, SIGNAL( "triggered()" ), lambda who="Indice de brillance": self.do_process(who))
+        
+        processings = {"NDVI":"Calcule le NDVI de l'image de travail", "NDTI":"Calcule le NDTI de l'image de travail",\
+                       "Indice de brillance":"Calcule l'indice de brillance de l'image de travail", "KMEANS":"Calcule le kmeans sur l'image de travail",\
+                       "Classif":"Ouvre le module de classification sur l'image de travail"}
+        icons = {"NDVI":":/icons/warp.png", "NDTI":":icons/projection-add.png", "Indice de brillance":":/icons/warp.png", \
+                 "KMEANS":":icons/projection-add.png", "Classif":":/icons/warp.png"}
+        
+        for key in processings.keys():
+            action = QAction( QIcon(icons[key]),  QCoreApplication.translate( "TerreImage", key ), self.iface.mainWindow() )
+            action.setStatusTip( QCoreApplication.translate( "TerreImage", processings[key]) )
+            QObject.connect( action, SIGNAL( "triggered()" ), lambda who=key: self.do_process(who))
+            self.processing_menu.addAction( action )
     
         self.angles = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "Angle spectral" ), self.iface.mainWindow() )
         self.angles.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule l'angle spectral pour la coordonnée pointée de l'image de travail" ) )
         QObject.connect( self.angles, SIGNAL( "triggered()" ), self.do_angles )
         #QObject.connect( self.angles, SIGNAL( "triggered()" ), lambda who="KMZ": self.do_process(who))
-        
-        self.kmeans = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "KMeans" ), self.iface.mainWindow() )
-        self.kmeans.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule le kmeans sur l'image de travail" ) )
-        #QObject.connect( self.kmeans, SIGNAL( "triggered()" ), self.do_kmeans )
-        QObject.connect( self.kmeans, SIGNAL( "triggered()" ), lambda who="KMEANS": self.do_process(who))
-        
-        self.classif = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "Classif" ), self.iface.mainWindow() )
-        self.classif.setStatusTip( QCoreApplication.translate( "TerreImage", "Ouvre le module de classification sur l'image de travail" ) )
-        #QObject.connect( self.classif, SIGNAL( "triggered()" ), self.do_classif )
-        QObject.connect( self.classif, SIGNAL( "triggered()" ), lambda who="KMZ": self.do_process(who))
+
     
-    
-        self.processing_menu.addActions( [ self.ndvi, self.ndti, self.brightness, self.angles, self.kmeans, self.classif ] )
+        self.processing_menu.addActions( [ self.angles ] )
       
         # conversion menu (Rasterize (Vector to raster), Polygonize (Raster to vector), Translate, RGB to PCT, PCT to RGB)
         self.visualization_menu = QMenu( QCoreApplication.translate( "TerreImage", "Visualisation" ), self.iface.mainWindow() )
@@ -144,7 +131,6 @@ class QGISEducation:
         self.visualization_menu.addActions( [ self.histo, self.values ] )
     
     
-        #self.extractionMenu.addActions( [ self.clipper ] )
         self.kmz = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Export KMZ" ), self.iface.mainWindow() )
         self.kmz.setStatusTip( QCoreApplication.translate( "TerreImage", "Export the current view in KMZ" ) )
         #QObject.connect( self.kmz, SIGNAL( "triggered()" ), self.do_export_kmz )
@@ -193,22 +179,11 @@ class QGISEducation:
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
         print "temps du " + str(name) + "  : " + str(timeExec)
-        
-
-    def do_ndvi(self):
-        self.do_process("NDVI")   
-                 
-    def do_ndti(self):
-        self.do_process("NDTI")
-            
-    def do_brightness(self):
-        self.do_process("Indice de brillance")    
+    
     
     def do_angles(self):
         self.educationWidget.spectral_angles()
     
-    def do_kmeans(self):
-        self.do_process("KMEANS")
     
     def do_classif(self):
         pass
@@ -266,7 +241,6 @@ class QGISEducation:
                 self.valuedockwidget = QDockWidget("QGIS Education", self.iface.mainWindow() )
                 self.valuedockwidget.setObjectName("QGIS Education")
                 self.valuedockwidget.setWidget(self.educationWidget)
-                QObject.connect(self.valuedockwidget, SIGNAL('visibilityChanged ( bool )'), self.showHideDockWidget)
                 
                 # add the dockwidget to iface
                 self.iface.addDockWidget(Qt.RightDockWidgetArea, self.valuedockwidget)
@@ -279,25 +253,5 @@ class QGISEducation:
             self.valuedockwidget.show()
             self.educationWidget.set_comboBox_sprectral_band_display()
             self.dockOpened = True
-#         #if dock not already opened, open the dock and all the necessary thing (model,doProfile...)
-#         if self.dockOpened == False:
-#             self.educationWidget.show()
-#             # add the dockwidget to iface
-#             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.valuedockwidget)
-#             self.dockOpened = True
-#         else :
-#             self.educationWidget.hide()
-#             self.dockOpened = False
-#             self.iface.removeDockWidget(self.valuedockwidget)
 
 
-    def showHideDockWidget( self ):
-        """
-        Change the state of the widget, and run the connections of signals of the widget
-        """
-#         if self.valuedockwidget.isVisible() and self.educationWidget.cbxActive.isChecked():
-#             state = Qt.Checked
-#         else:
-#             state = Qt.Unchecked
-#         self.educationWidget.changeActive( state )
-        pass
