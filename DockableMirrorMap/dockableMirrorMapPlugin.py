@@ -33,10 +33,10 @@ class DockableMirrorMapPlugin:
 	def __init__(self, iface):
 		# Save a reference to the QGIS iface
 		self.iface = iface
-		self.dockableMirrors = []
-		self.lastDockableMirror = 0
 		
 	def initGui(self):
+		self.dockableMirrors = []
+		self.lastDockableMirror = 0
 		self.dockableAction = QAction(QIcon(":/plugins/DockableMirrorMap/icons/dockablemirrormap.png"), "Dockable MirrorMap", self.iface.mainWindow())
 		QObject.connect(self.dockableAction, SIGNAL("triggered()"), self.runDockableMirror)
 
@@ -88,7 +88,9 @@ class DockableMirrorMapPlugin:
 		wdg.setMaximumSize(maxsize)
 
 		if wdg.isFloating():
-			wdg.move(50, 50)	# move the widget to the center
+			wdg.move(50, 50)	# move the widget to the center	
+		return wdg
+	
 
 	def setupDockWidget(self, wdg):
 		othersize = QGridLayout().verticalSpacing()
