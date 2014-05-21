@@ -59,51 +59,11 @@ class MirrorMap(QWidget):
 
 		self.canvas = QgsMapCanvas( self )
 		self.canvas.setCanvasColor( QColor(255,255,255) )
-		#QObject.connect(self.canvas, SIGNAL( "extentsChanged()" ), self.mirror_extent_changed)
 		settings = QSettings()
 		self.canvas.enableAntiAliasing( settings.value( "/qgis/enable_anti_aliasing", False, type=bool ))
 		self.canvas.useImageToRender( settings.value( "/qgis/use_qimage_to_render", False, type=bool ))
-		#action = settings.value( "/qgis/wheel_action", 3, type=int)
-		#zoomFactor = settings.value( "/qgis/zoom_factor", 2.0, type=float )
 		self.canvas.setWheelAction( 3 )
 		gridLayout.addWidget( self.canvas, 0, 0, 1, 5 )
-
-# 		self.addLayerBtn = QToolButton(self)
-# 		#self.addLayerBtn.setToolButtonStyle( Qt.ToolButtonTextBesideIcon )
-# 		#self.addLayerBtn.setText("Add current layer")
-# 		self.addLayerBtn.setIcon( QIcon(":/plugins/DockableMirrorMap/icons/plus.png") )
-# 		QObject.connect(self.addLayerBtn, SIGNAL( "clicked()" ), self.addLayer)
-# 		gridLayout.addWidget( self.addLayerBtn, 1, 0, 1, 1 )
-# 
-# 		self.delLayerBtn = QToolButton(self)
-# 		#self.delLayerBtn.setToolButtonStyle( Qt.ToolButtonTextBesideIcon )
-# 		#self.delLayerBtn.setText("Remove current layer")
-# 		self.delLayerBtn.setIcon( QIcon(":/plugins/DockableMirrorMap/icons/minus.png") )
-# 		QObject.connect(self.delLayerBtn, SIGNAL( "clicked()" ), self.delLayer)
-# 		gridLayout.addWidget( self.delLayerBtn, 1, 1, 1, 1 )
-# 
-# 		self.renderCheck = QCheckBox( "Render", self )
-# 		QObject.connect(self.renderCheck, SIGNAL( "toggled(bool)" ), self.toggleRender)
-# 		self.renderCheck.setChecked(True)
-# 		gridLayout.addWidget( self.renderCheck, 1, 2, 1, 1 )
-# 
-# 		self.scaleFactorLabel = QLabel(self)
-# 		self.scaleFactorLabel.setText("Scale factor:")
-# 		self.scaleFactorLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-# 		gridLayout.addWidget(self.scaleFactorLabel, 1, 3, 1, 1)
-# 		self.scaleFactor = QDoubleSpinBox(self)
-# 		self.scaleFactor.setMinimum(0.0)
-# 		self.scaleFactor.setMaximum(1000.0)
-# 		self.scaleFactor.setDecimals(3)
-# 		self.scaleFactor.setValue(1)
-# 		self.scaleFactor.setObjectName("scaleFactor")
-# 		self.scaleFactor.setSingleStep(.05)
-# 		gridLayout.addWidget(self.scaleFactor, 1, 4, 1, 1)
-# 		self.scaleFactor.valueChanged.connect(self.onExtentsChanged)
-
-		# Add a default pan tool
-		#self.toolPan = QgsMapToolPan( self.canvas )
-		#self.canvas.setMapTool( self.toolPan )
 
 		QObject.connect(self.iface.mapCanvas(), SIGNAL( "extentsChanged()" ), self.onExtentsChanged)
 		QObject.connect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "destinationCrsChanged()" ), self.onCrsChanged)
@@ -111,8 +71,6 @@ class MirrorMap(QWidget):
 		QObject.connect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "hasCrsTransformEnabled(bool)" ), self.onCrsTransformEnabled)
 		QObject.connect(QgsMapLayerRegistry.instance(), SIGNAL( "layerWillBeRemoved(QString)" ), self.delLayer)
 		QObject.connect(self.iface, SIGNAL( "currentLayerChanged(QgsMapLayer *)" ), self.refreshLayerButtons)
-
-		#self.refreshLayerButtons()
 
 		self.onExtentsChanged()
 		self.onCrsChanged()
@@ -153,19 +111,6 @@ class MirrorMap(QWidget):
 		self.canvas.mapRenderer().setProjectionsEnabled( enabled )
 
 		self.canvas.setRenderFlag( prevFlag )
-
-
-	def refreshLayerButtons(self):
-		layer = self.iface.activeLayer()
-
-		isLayerSelected = layer != None
-		hasLayer = False
-		for l in self.canvas.layers():
-			if l == layer:
-				hasLayer = True
-				break
-# 		self.addLayerBtn.setEnabled( isLayerSelected and not hasLayer )
-# 		self.delLayerBtn.setEnabled( isLayerSelected and hasLayer )
 
 
 	def getLayerSet(self):
