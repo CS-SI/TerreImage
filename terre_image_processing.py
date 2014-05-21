@@ -158,8 +158,7 @@ def kmeans( layer, working_directory, iface, nb_class=None ):
             nb_class = testqt
     #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
     output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, working_directory)
-    if not os.path.isfile(image_ref) :
-        image_ref = recompose_image(layer, working_directory)
+    image_ref = recompose_image(layer, working_directory)
     if not os.path.isfile(output_colored):
         output_colored = OTBApplications.color_mapping_cli_ref_image( output, image_ref, working_directory)
     return output_colored
@@ -181,7 +180,8 @@ def recompose_image( layer, working_directory ):
     
     output_filename = os.path.join( working_directory, os.path.splitext(os.path.basename(image_in))[0] + "pir_red_green" + os.path.splitext(os.path.basename(image_in))[1] )
     print "recomposed image", output_filename
-    OTBApplications.concatenateImages_cli( [band_pir, band_red, band_green], output_filename )
+    if not os.path.isfile(output_filename):
+        OTBApplications.concatenateImages_cli( [band_pir, band_red, band_green], output_filename )
     return output_filename
     
     
