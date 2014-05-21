@@ -33,6 +33,7 @@ from manage_bands import manage_bands
 from working_layer import WorkingLayer
 from terre_image_task import TerreImageProcessing
 from terre_image_task import TerreImageDisplay
+from processing_manager import ProcessingManager
 import terre_image_utils
 import time
 #from supervisedclassification import SupervisedClassification
@@ -64,9 +65,9 @@ class QGISEducation:
         
         self.layer = None
         
+        self.valuedockwidge = None
         self.dockOpened = False
         
-
         
         #self.classif_tool = SupervisedClassification()
         #print self.classif_tool
@@ -98,27 +99,33 @@ class QGISEducation:
     
         self.ndvi = QAction( QIcon(":/icons/warp.png"),  QCoreApplication.translate( "TerreImage", "NDVI" ), self.iface.mainWindow() )
         self.ndvi.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule le NDVI de l'image de travail") )
-        QObject.connect( self.ndvi, SIGNAL( "triggered()" ), self.do_ndvi )
+        #QObject.connect( self.ndvi, SIGNAL( "triggered()" ), self.do_ndvi )
+        QObject.connect( self.ndvi, SIGNAL( "triggered()" ), lambda who="NDVI": self.do_process(who))
     
         self.ndti = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "NDTI" ), self.iface.mainWindow() )
         self.ndti.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule le NDTI de l'image de travail" ) )
-        QObject.connect( self.ndti, SIGNAL( "triggered()" ), self.do_ndti )
+        #QObject.connect( self.ndti, SIGNAL( "triggered()" ), self.do_ndti )
+        QObject.connect( self.ndti, SIGNAL( "triggered()" ), lambda who="NDTI": self.do_process(who))
     
         self.brightness = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "Indice de brillance" ), self.iface.mainWindow() )
         self.brightness.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule l'indice de brillance de l'image de travail" ) )
-        QObject.connect( self.brightness, SIGNAL( "triggered()" ), self.do_brightness )
+        #QObject.connect( self.brightness, SIGNAL( "triggered()" ), self.do_brightness )
+        QObject.connect( self.brightness, SIGNAL( "triggered()" ), lambda who="Indice de brillance": self.do_process(who))
     
         self.angles = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "Angle spectral" ), self.iface.mainWindow() )
         self.angles.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule l'angle spectral pour la coordonnée pointée de l'image de travail" ) )
         QObject.connect( self.angles, SIGNAL( "triggered()" ), self.do_angles )
+        #QObject.connect( self.angles, SIGNAL( "triggered()" ), lambda who="KMZ": self.do_process(who))
         
         self.kmeans = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "KMeans" ), self.iface.mainWindow() )
         self.kmeans.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule le kmeans sur l'image de travail" ) )
-        QObject.connect( self.kmeans, SIGNAL( "triggered()" ), self.do_kmeans )
+        #QObject.connect( self.kmeans, SIGNAL( "triggered()" ), self.do_kmeans )
+        QObject.connect( self.kmeans, SIGNAL( "triggered()" ), lambda who="KMEANS": self.do_process(who))
         
         self.classif = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "Classif" ), self.iface.mainWindow() )
         self.classif.setStatusTip( QCoreApplication.translate( "TerreImage", "Ouvre le module de classification sur l'image de travail" ) )
-        QObject.connect( self.classif, SIGNAL( "triggered()" ), self.do_classif )
+        #QObject.connect( self.classif, SIGNAL( "triggered()" ), self.do_classif )
+        QObject.connect( self.classif, SIGNAL( "triggered()" ), lambda who="KMZ": self.do_process(who))
     
     
         self.processing_menu.addActions( [ self.ndvi, self.ndti, self.brightness, self.angles, self.kmeans, self.classif ] )
@@ -140,8 +147,9 @@ class QGISEducation:
         #self.extractionMenu.addActions( [ self.clipper ] )
         self.kmz = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Export KMZ" ), self.iface.mainWindow() )
         self.kmz.setStatusTip( QCoreApplication.translate( "TerreImage", "Export the current view in KMZ" ) )
-        QObject.connect( self.kmz, SIGNAL( "triggered()" ), self.do_export_kmz )
-        
+        #QObject.connect( self.kmz, SIGNAL( "triggered()" ), self.do_export_kmz )
+        QObject.connect( self.kmz, SIGNAL( "triggered()" ), lambda who="KMZ": self.do_process(who)) #self.do_display_one_band )
+                
         
         self.menu.addMenu( self.processing_menu )
         self.menu.addMenu( self.visualization_menu )
@@ -225,9 +233,10 @@ class QGISEducation:
         """
         Defines the unload of the plugin
         """
-        self.valuedockwidget.close()
-        self.educationWidget.disconnectP()
-        # Remove the plugin menu item and icon
+        if self.valuedockwidget:
+            self.valuedockwidget.close()
+            self.educationWidget.disconnectP()
+            # Remove the plugin menu item and icon
         self.iface.removePluginMenu(u"&QGISEducation", self.action)
         self.iface.removeToolBarIcon(self.action)
 
@@ -237,6 +246,10 @@ class QGISEducation:
         Defines the behavior of the plugin
         """
         timeBegin = time.time()
+        
+        
+        #self.qgis_education_manager = ProcessingManager()
+        
         
         self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
         timeEnd = time.time()

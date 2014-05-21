@@ -109,6 +109,9 @@ addLayer
 		self.canvas.setRenderFlag( prevFlag )
 
 
+Developpement
+-------------
+Le zoom lié n'a pas été mis en place parce que le signal extentChanged génère une boucle.
 
 
 

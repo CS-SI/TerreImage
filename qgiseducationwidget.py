@@ -38,7 +38,7 @@ import terre_image_utils
 import datetime
 import os
 from ptmaptool import ProfiletoolMapTool
-from valuewidget import ValueWidget
+from valuetool.valuewidget import ValueWidget
 
 from spectral_angle import SpectralAngle
 
@@ -55,10 +55,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.setupUi_extra()
         
         self.working_directory, _ = terre_image_utils.fill_default_directory()
-        self.value_tool = ValueWidget( self.iface, self )
+        #self.value_tool = ValueWidget( self.iface, self )
         
         self.layer = None
-        self.memorylayer = None
         
         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
         self.mirror_map_tool.initGui()

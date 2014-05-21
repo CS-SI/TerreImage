@@ -92,4 +92,6 @@ class SpectralAngle():
         self.rubberband.addPoint(QgsPoint(mapPos.x(),mapPos.y()))
         #create new vlayer ???
         self.angles(mapPos.x(),mapPos.y())
+        self.toolPan = QgsMapToolPan( self.canvas )
+        self.canvas.setMapTool( self.toolPan )
  

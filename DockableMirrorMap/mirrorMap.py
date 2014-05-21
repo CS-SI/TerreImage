@@ -70,7 +70,6 @@ class MirrorMap(QWidget):
 		QObject.connect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "mapUnitsChanged()" ), self.onCrsChanged)
 		QObject.connect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "hasCrsTransformEnabled(bool)" ), self.onCrsTransformEnabled)
 		QObject.connect(QgsMapLayerRegistry.instance(), SIGNAL( "layerWillBeRemoved(QString)" ), self.delLayer)
-		QObject.connect(self.iface, SIGNAL( "currentLayerChanged(QgsMapLayer *)" ), self.refreshLayerButtons)
 
 		self.onExtentsChanged()
 		self.onCrsChanged()
@@ -164,7 +163,6 @@ class MirrorMap(QWidget):
 		self.layerId2canvasLayer = id2cl_dict
 		self.canvas.setLayerSet( self.canvasLayers )
 
-		self.refreshLayerButtons()
 		self.onExtentsChanged()
 		self.canvas.setRenderFlag( prevFlag )
 
@@ -188,7 +186,6 @@ class MirrorMap(QWidget):
 		self.canvas.setLayerSet( self.canvasLayers )
 		del cl
 
-		self.refreshLayerButtons()
 		self.onExtentsChanged()
 		self.canvas.setRenderFlag( prevFlag )
 
