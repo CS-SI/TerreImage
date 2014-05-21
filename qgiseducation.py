@@ -66,19 +66,7 @@ class QGISEducation:
         
         self.dockOpened = False
         
-        # create the widget to display information
-        self.educationWidget = QGISEducationWidget(self.iface)
-        self.working_directory = self.educationWidget.working_directory
-        
-        # create the dockwidget with the correct parent and add the valuewidget
-        self.valuedockwidget = QDockWidget("QGIS Education", self.iface.mainWindow() )
-        self.valuedockwidget.setObjectName("QGIS Education")
-        self.valuedockwidget.setWidget(self.educationWidget)
-        QObject.connect(self.valuedockwidget, SIGNAL('visibilityChanged ( bool )'), self.showHideDockWidget)
-        
-        # add the dockwidget to iface
-        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.valuedockwidget)
-        #self.educationWidget.show()
+
         
         #self.classif_tool = SupervisedClassification()
         #print self.classif_tool
@@ -256,14 +244,28 @@ class QGISEducation:
         print "temps de chargement : ", timeExec
         
         if self.layer and bands:
+            if not self.dockOpened :
+                # create the widget to display information
+                self.educationWidget = QGISEducationWidget(self.iface)
+                self.working_directory = self.educationWidget.working_directory
+                
+                # create the dockwidget with the correct parent and add the valuewidget
+                self.valuedockwidget = QDockWidget("QGIS Education", self.iface.mainWindow() )
+                self.valuedockwidget.setObjectName("QGIS Education")
+                self.valuedockwidget.setWidget(self.educationWidget)
+                QObject.connect(self.valuedockwidget, SIGNAL('visibilityChanged ( bool )'), self.showHideDockWidget)
+                
+                # add the dockwidget to iface
+                self.iface.addDockWidget(Qt.RightDockWidgetArea, self.valuedockwidget)
+
             self.educationWidget.layer = self.layer
             text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
             self.educationWidget.textEdit.setText(text)
             self.extra_menu_visu(bands)
             
-            self.educationWidget.show()
-            self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.valuedockwidget)
+            self.valuedockwidget.show()
             self.educationWidget.set_comboBox_sprectral_band_display()
+            self.dockOpened = True
 #         #if dock not already opened, open the dock and all the necessary thing (model,doProfile...)
 #         if self.dockOpened == False:
 #             self.educationWidget.show()
