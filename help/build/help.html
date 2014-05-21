@@ -55,32 +55,36 @@
 <dt>::</dt>
 <dd><dl>
 <dt>def addLayer(self, layerId=None):</dt>
-<dd><dl>
-<dt>if layerId == None:</dt>
-<dd><p>layer = self.iface.activeLayer()</p>
-</dd>
-<dt>else:</dt>
-<dd><p>print layerId layer = QgsMapLayerRegistry.instance().mapLayer( layerId )</p>
-</dd>
-</dl>
-<p>print layer</p>
+<dd><p># dans la plupart des cas, le layerID est None if layerId == None: # on prend la layer current layer = self.iface.activeLayer() else: # sinon, on récupère la layer layerID layer = QgsMapLayerRegistry.instance().mapLayer( layerId )</p>
 <dl>
 <dt>if layer == None:</dt>
 <dd><p>return</p>
 </dd>
 </dl>
-<p>prevFlag = self.canvas.renderFlag() self.canvas.setRenderFlag( False )</p>
-<p># add the layer to the map canvas layer set self.canvasLayers = [] id2cl_dict = {} for l in self.iface.legendInterface().layers(): lid = self._layerId(l) if self.layerId2canvasLayer.has_key( lid ): # previously added cl = self.layerId2canvasLayer[ lid ] elif l == layer: # selected layer cl = QgsMapCanvasLayer( layer ) else: continue print type(cl)</p>
+<p>prevFlag = self.canvas.renderFlag() #stop rendering self.canvas.setRenderFlag( False )</p>
+<p># add the layer to the map canvas layer set self.canvasLayers = [] # id to canvas layer dictionnary id2cl_dict = {} # for each layer for l in self.iface.legendInterface().layers(): # lid est l'id de la layer l lid = self._layerId(l) #si la layer a été chargée précédemment dans la vue if self.layerId2canvasLayer.has_key( lid ): # previously added cl = self.layerId2canvasLayer[ lid ] elif l == layer: # selected layer cl = QgsMapCanvasLayer( layer ) else: continue print type(cl) #qgis.gui.QgsMapCanvasLayer</p>
 <blockquote>
-<p>id2cl_dict[ lid ] = cl self.canvasLayers.append( cl )</p>
+<p># maj dictionnaire id/canvas layer id2cl_dict[ lid ] = cl #ajout de la canvas layer self.canvasLayers.append( cl )</p>
 </blockquote>
 <p>self.layerId2canvasLayer = id2cl_dict self.canvas.setLayerSet( self.canvasLayers )</p>
-<p>self.refreshLayerButtons() self.onExtentsChanged() self.canvas.setRenderFlag( prevFlag )</p>
+<p>self.refreshLayerButtons() self.onExtentsChanged() #remet le rendering comme avant l'opération self.canvas.setRenderFlag( prevFlag )</p>
 </dd>
 </dl>
 </dd>
 </dl>
 </blockquote>
+<h2 id="developpement">Developpement</h2>
+<p>Le zoom lié n'a pas été mis en place parce que le signal extentChanged génère une boucle.</p>
+<h1 id="développement-du-module-principal">Développement du module principal</h1>
+<p>Le module principal est comme suit :</p>
+<p>:<code>qgiseducation</code>: Fichier principal du plugin. Il initialise le widget et crée les menus.</p>
+<p>:<code>qgiseducationwidget</code>: Ce fichier s'occupe de toute l'interface widget.</p>
+<p>:<code>process_manager</code>: Ce fichier contient la classe qui va gérer le plugin. Cette classe contient la liste des process, la layer courante et le répertoire de travail.</p>
+<dl>
+<dt>:<code>terre_image_task</code>: Ce fichier contient les classes de traitement.</dt>
+<dd><p>Il y a une classe mère de tache et deux classes filles, <code>processing</code> et <code>display</code>. La première lance les traitements d'image tels que le NDVI et le KMEANS, la seconde va afficher les bandes spectrales et d'autres informations.</p>
+</dd>
+</dl>
 <h1 id="qgis-plugin-builder">QGIS Plugin Builder</h1>
 <h1 id="concepts">Concepts</h1>
 <p>Plugin Builder provides you a working template from which you can create your own plugin.</p>

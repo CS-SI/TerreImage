@@ -114,6 +114,21 @@ Developpement
 Le zoom lié n'a pas été mis en place parce que le signal extentChanged génère une boucle.
 
 
+Développement du module principal
+=================================
+Le module principal est comme suit :
+
+:``qgiseducation``: Fichier principal du plugin. Il initialise le widget et crée les menus.  
+ 
+:``qgiseducationwidget``: Ce fichier s'occupe de toute l'interface widget.  
+
+:``process_manager``: Ce fichier contient la classe qui va gérer le plugin. Cette classe contient la liste des process, la layer courante et le répertoire de travail.
+
+:``terre_image_task``: Ce fichier contient les classes de traitement.
+	Il y a une classe mère de tache et deux classes filles, ``processing`` et ``display``.
+  	La première lance les traitements d'image tels que le NDVI et le KMEANS, la seconde va afficher les bandes spectrales et d'autres informations.
+
+
 
 QGIS Plugin Builder 
 ===============================================
