@@ -57,8 +57,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.setupUi_extra()
         
         self.qgis_education_manager = ProcessingManager( self.iface )
-        
-        #self.value_tool = ValueWidget( self.iface, self )
+        self.value_tool = ValueWidget( self.iface ) #, self )
+        #creating a dock widget
+        #self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea,self.value_tool)
+        print self.value_tool
         
         self.layer = None
         
@@ -82,17 +84,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             
         
         
-        self.pushButton_working_layer.hide()
-        self.label.hide()
-        self.label_working_layer.hide()
-        self.groupBox.hide()
-        self.pushButton_brightness.hide()
-        self.pushButton_ndti.hide()
-        self.pushButton_ndvi.hide()
-        self.pushButton_angle.hide()
-        
-
         self.pushButton_kmeans.clicked.connect(self.kmeans)
+        self.pushButton_profil_spectral.clicked.connect(self.display_values)
         
         
     def do_manage_processing(self, text_changed):
@@ -134,7 +127,11 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                 self.qgis_education_manager.add_processing(my_processing)
                 break
         self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
-             
+        
+        
+        
+    def display_values(self):
+        self.value_tool.show()        
                  
     def kmeans(self):
         

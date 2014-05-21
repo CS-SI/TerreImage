@@ -65,7 +65,7 @@ class QGISEducation:
         
         self.layer = None
         
-        self.valuedockwidge = None
+        self.valuedockwidget = None
         self.dockOpened = False
         
         
@@ -202,7 +202,7 @@ class QGISEducation:
         pass
     
     def do_display_values(self):
-        pass
+        self.educationWidget.value_tool.show()
 
 
 

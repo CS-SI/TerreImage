@@ -1,0 +1,28 @@
+[general]
+name = Value Tool
+qgisMinimumVersion = 2.0
+description = Display in a table or plot the values from the visible raster 
+	layers at the current mouse position
+category = Raster
+version = version 0.6.1
+author = 'Ghislain Picard'
+email=etourigny.dev@gmail.com
+; original author is no longer contributing, current maintainer is Etienne Tourigny
+; other authors include : Richard Duivenvoorde, Ricardo Silva, Etienne Tourigny, Radim Blazek
+; optional metadata entries
+changelog=
+    0.6.1 : update for qgis 2.0
+    0.6.0 : update to sip api v2 (qgis 2.0)
+    0.5.4 : api fixes
+    0.5.3 : restore api fixes in 0.5.1 and add minver = 1.9
+    0.5.2 : more fixes for api changes in 1.9 by Radim
+    0.5.1 : fixes for api changes in 1.9
+    0.5.0 : compatibility for latest master (1.9) and other fixes and enhancements
+
+tags = raster
+homepage = http://hub.qgis.org/projects/valuetool
+tracker = http://hub.qgis.org/projects/valuetool/issues
+repository = https://github.com/etiennesky/valuetool
+icon = 
+experimental = False
+deprecated = False
