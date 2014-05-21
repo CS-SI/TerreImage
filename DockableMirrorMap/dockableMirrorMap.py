@@ -67,4 +67,6 @@ class DockableMirrorMap(QDockWidget):
 		self.setObjectName( "dockablemirrormap_dockwidget" )
 		self.setNumber()
 		self.setWidget(self.mainWidget)
+		
+
 

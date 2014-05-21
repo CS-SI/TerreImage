@@ -59,12 +59,13 @@ class MirrorMap(QWidget):
 
 		self.canvas = QgsMapCanvas( self )
 		self.canvas.setCanvasColor( QColor(255,255,255) )
+		#QObject.connect(self.canvas, SIGNAL( "extentsChanged()" ), self.mirror_extent_changed)
 		settings = QSettings()
 		self.canvas.enableAntiAliasing( settings.value( "/qgis/enable_anti_aliasing", False, type=bool ))
 		self.canvas.useImageToRender( settings.value( "/qgis/use_qimage_to_render", False, type=bool ))
-		action = settings.value( "/qgis/wheel_action", 0, type=int)
-		zoomFactor = settings.value( "/qgis/zoom_factor", 2.0, type=float )
-		self.canvas.setWheelAction( QgsMapCanvas.WheelAction(action), zoomFactor )
+		#action = settings.value( "/qgis/wheel_action", 3, type=int)
+		#zoomFactor = settings.value( "/qgis/zoom_factor", 2.0, type=float )
+		self.canvas.setWheelAction( 3 )
 		gridLayout.addWidget( self.canvas, 0, 0, 1, 5 )
 
 # 		self.addLayerBtn = QToolButton(self)
@@ -101,8 +102,8 @@ class MirrorMap(QWidget):
 # 		self.scaleFactor.valueChanged.connect(self.onExtentsChanged)
 
 		# Add a default pan tool
-		self.toolPan = QgsMapToolPan( self.canvas )
-		self.canvas.setMapTool( self.toolPan )
+		#self.toolPan = QgsMapToolPan( self.canvas )
+		#self.canvas.setMapTool( self.toolPan )
 
 		QObject.connect(self.iface.mapCanvas(), SIGNAL( "extentsChanged()" ), self.onExtentsChanged)
 		QObject.connect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "destinationCrsChanged()" ), self.onCrsChanged)
@@ -111,7 +112,7 @@ class MirrorMap(QWidget):
 		QObject.connect(QgsMapLayerRegistry.instance(), SIGNAL( "layerWillBeRemoved(QString)" ), self.delLayer)
 		QObject.connect(self.iface, SIGNAL( "currentLayerChanged(QgsMapLayer *)" ), self.refreshLayerButtons)
 
-		self.refreshLayerButtons()
+		#self.refreshLayerButtons()
 
 		self.onExtentsChanged()
 		self.onCrsChanged()
@@ -123,11 +124,17 @@ class MirrorMap(QWidget):
 	def onExtentsChanged(self):
 		prevFlag = self.canvas.renderFlag()
 		self.canvas.setRenderFlag( False )
-
+ 
 		self.canvas.setExtent( self.iface.mapCanvas().extent() )
 		#self.canvas.zoomByFactor( self.scaleFactor.value() )
-
+ 
 		self.canvas.setRenderFlag( prevFlag )
+		
+	def mirror_extent_changed(self):
+		print self.canvas.extent()
+		print self.iface.mapCanvas().extent()
+		if self.canvas.extent() != self.iface.mapCanvas().extent():
+			self.emit(SIGNAL("extentChanged( QgsRectangle )"), self.canvas.extent() )
 
 	def onCrsChanged(self):
 		prevFlag = self.canvas.renderFlag()
