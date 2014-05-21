@@ -40,7 +40,7 @@ class MirrorMap(QWidget):
 		self.setupUi()
 
 	def closeEvent(self, event):
-		self.scaleFactor.valueChanged.disconnect(self.onExtentsChanged)
+		#self.scaleFactor.valueChanged.disconnect(self.onExtentsChanged)
 		QObject.disconnect(self.iface.mapCanvas(), SIGNAL( "extentsChanged()" ), self.onExtentsChanged)
 		QObject.disconnect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "destinationCrsChanged()" ), self.onCrsChanged)
 		QObject.disconnect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "mapUnitsChanged()" ), self.onMapUnitsChanged)
@@ -67,38 +67,38 @@ class MirrorMap(QWidget):
 		self.canvas.setWheelAction( QgsMapCanvas.WheelAction(action), zoomFactor )
 		gridLayout.addWidget( self.canvas, 0, 0, 1, 5 )
 
-		self.addLayerBtn = QToolButton(self)
-		#self.addLayerBtn.setToolButtonStyle( Qt.ToolButtonTextBesideIcon )
-		#self.addLayerBtn.setText("Add current layer")
-		self.addLayerBtn.setIcon( QIcon(":/plugins/DockableMirrorMap/icons/plus.png") )
-		QObject.connect(self.addLayerBtn, SIGNAL( "clicked()" ), self.addLayer)
-		gridLayout.addWidget( self.addLayerBtn, 1, 0, 1, 1 )
-
-		self.delLayerBtn = QToolButton(self)
-		#self.delLayerBtn.setToolButtonStyle( Qt.ToolButtonTextBesideIcon )
-		#self.delLayerBtn.setText("Remove current layer")
-		self.delLayerBtn.setIcon( QIcon(":/plugins/DockableMirrorMap/icons/minus.png") )
-		QObject.connect(self.delLayerBtn, SIGNAL( "clicked()" ), self.delLayer)
-		gridLayout.addWidget( self.delLayerBtn, 1, 1, 1, 1 )
-
-		self.renderCheck = QCheckBox( "Render", self )
-		QObject.connect(self.renderCheck, SIGNAL( "toggled(bool)" ), self.toggleRender)
-		self.renderCheck.setChecked(True)
-		gridLayout.addWidget( self.renderCheck, 1, 2, 1, 1 )
-
-		self.scaleFactorLabel = QLabel(self)
-		self.scaleFactorLabel.setText("Scale factor:")
-		self.scaleFactorLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-		gridLayout.addWidget(self.scaleFactorLabel, 1, 3, 1, 1)
-		self.scaleFactor = QDoubleSpinBox(self)
-		self.scaleFactor.setMinimum(0.0)
-		self.scaleFactor.setMaximum(1000.0)
-		self.scaleFactor.setDecimals(3)
-		self.scaleFactor.setValue(1)
-		self.scaleFactor.setObjectName("scaleFactor")
-		self.scaleFactor.setSingleStep(.05)
-		gridLayout.addWidget(self.scaleFactor, 1, 4, 1, 1)
-		self.scaleFactor.valueChanged.connect(self.onExtentsChanged)
+# 		self.addLayerBtn = QToolButton(self)
+# 		#self.addLayerBtn.setToolButtonStyle( Qt.ToolButtonTextBesideIcon )
+# 		#self.addLayerBtn.setText("Add current layer")
+# 		self.addLayerBtn.setIcon( QIcon(":/plugins/DockableMirrorMap/icons/plus.png") )
+# 		QObject.connect(self.addLayerBtn, SIGNAL( "clicked()" ), self.addLayer)
+# 		gridLayout.addWidget( self.addLayerBtn, 1, 0, 1, 1 )
+# 
+# 		self.delLayerBtn = QToolButton(self)
+# 		#self.delLayerBtn.setToolButtonStyle( Qt.ToolButtonTextBesideIcon )
+# 		#self.delLayerBtn.setText("Remove current layer")
+# 		self.delLayerBtn.setIcon( QIcon(":/plugins/DockableMirrorMap/icons/minus.png") )
+# 		QObject.connect(self.delLayerBtn, SIGNAL( "clicked()" ), self.delLayer)
+# 		gridLayout.addWidget( self.delLayerBtn, 1, 1, 1, 1 )
+# 
+# 		self.renderCheck = QCheckBox( "Render", self )
+# 		QObject.connect(self.renderCheck, SIGNAL( "toggled(bool)" ), self.toggleRender)
+# 		self.renderCheck.setChecked(True)
+# 		gridLayout.addWidget( self.renderCheck, 1, 2, 1, 1 )
+# 
+# 		self.scaleFactorLabel = QLabel(self)
+# 		self.scaleFactorLabel.setText("Scale factor:")
+# 		self.scaleFactorLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+# 		gridLayout.addWidget(self.scaleFactorLabel, 1, 3, 1, 1)
+# 		self.scaleFactor = QDoubleSpinBox(self)
+# 		self.scaleFactor.setMinimum(0.0)
+# 		self.scaleFactor.setMaximum(1000.0)
+# 		self.scaleFactor.setDecimals(3)
+# 		self.scaleFactor.setValue(1)
+# 		self.scaleFactor.setObjectName("scaleFactor")
+# 		self.scaleFactor.setSingleStep(.05)
+# 		gridLayout.addWidget(self.scaleFactor, 1, 4, 1, 1)
+# 		self.scaleFactor.valueChanged.connect(self.onExtentsChanged)
 
 		# Add a default pan tool
 		self.toolPan = QgsMapToolPan( self.canvas )
@@ -125,7 +125,7 @@ class MirrorMap(QWidget):
 		self.canvas.setRenderFlag( False )
 
 		self.canvas.setExtent( self.iface.mapCanvas().extent() )
-		self.canvas.zoomByFactor( self.scaleFactor.value() )
+		#self.canvas.zoomByFactor( self.scaleFactor.value() )
 
 		self.canvas.setRenderFlag( prevFlag )
 
@@ -157,8 +157,8 @@ class MirrorMap(QWidget):
 			if l == layer:
 				hasLayer = True
 				break
-		self.addLayerBtn.setEnabled( isLayerSelected and not hasLayer )
-		self.delLayerBtn.setEnabled( isLayerSelected and hasLayer )
+# 		self.addLayerBtn.setEnabled( isLayerSelected and not hasLayer )
+# 		self.delLayerBtn.setEnabled( isLayerSelected and hasLayer )
 
 
 	def getLayerSet(self):
