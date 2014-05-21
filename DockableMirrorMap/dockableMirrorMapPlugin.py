@@ -52,6 +52,9 @@ class DockableMirrorMapPlugin:
 		QObject.connect(self.iface, SIGNAL("projectRead()"), self.onProjectLoaded)
 		QObject.connect(QgsProject.instance(), SIGNAL("writeProject(QDomDocument &)"), self.onWriteProject)
 	
+	
+		QObject.connect(self.iface.mapCanvas(), SIGNAL( "extentsChanged()" ), self.onExtentsChanged)
+	
 	def unload(self):
 		QObject.disconnect(self.iface, SIGNAL("projectRead()"), self.onProjectLoaded)
 		QObject.disconnect(QgsProject.instance(), SIGNAL("writeProject(QDomDocument &)"), self.onWriteProject)
@@ -89,7 +92,25 @@ class DockableMirrorMapPlugin:
 
 		if wdg.isFloating():
 			wdg.move(50, 50)	# move the widget to the center	
+			
+		#QObject.connect(wdg.mainWidget.canvas, SIGNAL( "extentsChanged()" ), wdg.mainWidget.mirror_extent_changed)
+		#QObject.connect(wdg.mainWidget, SIGNAL("extentChanged( QgsRectangle )"), self.extentChanged )
 		return wdg
+	
+	
+	def onExtentsChanged(self):
+		for view in self.dockableMirrors :
+			prevFlag = view.mainWidget.canvas.renderFlag()
+			view.mainWidget.canvas.setRenderFlag( False )
+	
+			view.mainWidget.canvas.setExtent( self.iface.mapCanvas().extent() )
+	
+			view.mainWidget.canvas.setRenderFlag( prevFlag )
+		
+	def extentChanged(self):
+		print "extent changed"
+		for view in self.dockableMirrors :
+			view.mainWidget.canvas.setExtent( self.iface.mapCanvas().extent() )
 	
 
 	def setupDockWidget(self, wdg):
