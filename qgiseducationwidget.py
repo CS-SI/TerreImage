@@ -34,6 +34,8 @@ from terre_image_task import TerreImageProcessing
 from terre_image_task import TerreImageDisplay
 import terre_image_utils
 
+from processing_manager import ProcessingManager
+
 
 import datetime
 import os
@@ -54,7 +56,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.setupUi(self)
         self.setupUi_extra()
         
-        self.working_directory, _ = terre_image_utils.fill_default_directory()
+        self.qgis_education_manager = ProcessingManager( self.iface )
+        
         #self.value_tool = ValueWidget( self.iface, self )
         
         self.layer = None
@@ -62,12 +65,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
         self.mirror_map_tool.initGui()
         
-        #self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer)
-#         self.tool = ProfiletoolMapTool(self.iface.mapCanvas())        #the mouselistener
-#         print "self.tool", self.tool
-#         self.pointstoDraw = None    #Polyline in mapcanvas CRS analysed
-#         self.maptool = self.canvas.mapTool()
-#         #self.get_point_for_angles()
+        self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer)
+
 
      
     def setupUi_extra(self):
@@ -97,18 +96,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         
     def do_manage_processing(self, text_changed):
-        my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, self.mirror_map_tool, text_changed )
-        
-        
-#         print "text changed", text_changed
-#         if "NDVI" in text_changed:
-#             self.ndvi()
-#         if "NDTI" in text_changed:
-#             self.ndti()
-#         if "Indice de brillance" in text_changed:
-#             self.brightness()
-#         if "Angle Spectral" in text_changed:
-#             self.spectral_angles()
+        print "self.layer", self.layer
+        my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, text_changed )
+        self.qgis_education_manager.add_processing(my_processing)
         self.comboBox_processing.setCurrentIndex( 0 )
         
         
@@ -140,7 +130,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                 who = key
                 #band_to_display = self.layer.bands[key]
                 #manage_QGIS.display_one_band(self.layer, who, self.iface)
-                TerreImageDisplay( self.iface, self.working_directory, self.layer, self.mirror_map_tool, who )
+                my_processing = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, who )
+                self.qgis_education_manager.add_processing(my_processing)
                 break
         self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
              
@@ -152,8 +143,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         else :
             nb_class = self.spinBox_kmeans.value()
             print "nb_colass from spinbox", nb_class
-            my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, "KMEANS", nb_class )
-            #terre_image_processing.kmeans(self.layer, self.working_directory, self.iface, nb_class)
+            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, "KMEANS", nb_class )
+            #terre_image_processing.kmeans(self.layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
         
         
     def working_layer(self):

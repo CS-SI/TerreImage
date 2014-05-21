@@ -173,8 +173,8 @@ class QGISEducation:
         if self.layer == None :
             print "Aucune layer selectionnée"
         else :
-            my_processing = TerreImageProcessing( self.iface, self.working_directory, self.layer, self.educationWidget.mirror_map_tool, name )
-            #terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
+            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.educationWidget.mirror_map_tool, name )
+            self.qgis_education_manager.add_processing(my_processing)
         
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
@@ -194,8 +194,10 @@ class QGISEducation:
     def do_display_one_band(self, who):
         print "who", who
         #manage_QGIS.display_one_band(self.layer, who, self.iface)
-        my_process = TerreImageDisplay( self.iface, self.working_directory, self.layer, self.educationWidget.mirror_map_tool, who )
-    
+        my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.layer, self.educationWidget.mirror_map_tool, who )
+        self.qgis_education_manager.add_processing(my_process)
+        
+        
     def do_histogram(self):
         pass
     
@@ -208,7 +210,7 @@ class QGISEducation:
         """
         Defines the unload of the plugin
         """
-        if self.valuedockwidget:
+        if self.valuedockwidget is not None:
             self.valuedockwidget.close()
             self.educationWidget.disconnectP()
             # Remove the plugin menu item and icon
@@ -223,10 +225,11 @@ class QGISEducation:
         timeBegin = time.time()
         
         
-        #self.qgis_education_manager = ProcessingManager()
+        self.qgis_education_manager = ProcessingManager(self.iface)
         
         
-        self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
+        self.layer, bands  = self.qgis_education_manager.set_current_layer( )
+        print "self.layer", self.layer
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
         print "temps de chargement : ", timeExec
@@ -235,7 +238,7 @@ class QGISEducation:
             if not self.dockOpened :
                 # create the widget to display information
                 self.educationWidget = QGISEducationWidget(self.iface)
-                self.working_directory = self.educationWidget.working_directory
+                self.educationWidget.qgis_education_manager = self.qgis_education_manager
                 
                 # create the dockwidget with the correct parent and add the valuewidget
                 self.valuedockwidget = QDockWidget("QGIS Education", self.iface.mainWindow() )
