@@ -195,7 +195,7 @@ class QGISEducation:
         pass
     
     def do_display_values(self):
-        self.educationWidget.valuedockwidget.show()
+        self.educationWidget.display_values()
 
 
 

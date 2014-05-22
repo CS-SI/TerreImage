@@ -63,7 +63,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.valuedockwidget = QtGui.QDockWidget("Values", self.iface.mainWindow() )
         self.valuedockwidget.setObjectName("Values")
         self.valuedockwidget.setWidget(self.value_tool)
-        self.iface.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.valuedockwidget)
+        self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
         self.valuedockwidget.hide()
         
         
@@ -140,6 +140,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
     def display_values(self):
         self.valuedockwidget.show()
+        self.value_tool.changeActive( QtCore.Qt.Checked )
+        self.value_tool.cbxActive.setCheckState( QtCore.Qt.Checked )
         #self.value_tool.show()
                  
     def kmeans(self):
