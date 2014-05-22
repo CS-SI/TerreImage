@@ -65,7 +65,7 @@ class QGISEducation:
         
         self.layer = None
         
-        self.valuedockwidget = None
+        self.qgisedudockwidget = None
         self.dockOpened = False
         
         
@@ -143,7 +143,7 @@ class QGISEducation:
         self.visualization_menu.clear()
         self.visualization_menu.addActions( [ self.histo, self.values ] )
         
-        if bands['red'] != 0 and bands['green'] != 0 and bands['blue'] != 0:
+        if self.layer.has_natural_colors():
             visu_band = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ), self.iface.mainWindow() )
             visu_band.setStatusTip( QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ) )
             QObject.connect( visu_band, SIGNAL( "triggered()" ), lambda who='nat': self.do_display_one_band(who)) #self.do_display_one_band )
@@ -195,7 +195,7 @@ class QGISEducation:
         pass
     
     def do_display_values(self):
-        self.educationWidget.value_tool.show()
+        self.educationWidget.valuedockwidget.show()
 
 
 
@@ -203,8 +203,8 @@ class QGISEducation:
         """
         Defines the unload of the plugin
         """
-        if self.valuedockwidget is not None:
-            self.valuedockwidget.close()
+        if self.qgisedudockwidget is not None:
+            self.qgisedudockwidget.close()
             self.educationWidget.disconnectP()
             # Remove the plugin menu item and icon
         self.iface.removePluginMenu(u"&QGISEducation", self.action)
@@ -234,19 +234,19 @@ class QGISEducation:
                 self.educationWidget.qgis_education_manager = self.qgis_education_manager
                 
                 # create the dockwidget with the correct parent and add the valuewidget
-                self.valuedockwidget = QDockWidget("QGIS Education", self.iface.mainWindow() )
-                self.valuedockwidget.setObjectName("QGIS Education")
-                self.valuedockwidget.setWidget(self.educationWidget)
+                self.qgisedudockwidget = QDockWidget("QGIS Education", self.iface.mainWindow() )
+                self.qgisedudockwidget.setObjectName("QGIS Education")
+                self.qgisedudockwidget.setWidget(self.educationWidget)
                 
                 # add the dockwidget to iface
-                self.iface.addDockWidget(Qt.RightDockWidgetArea, self.valuedockwidget)
+                self.iface.addDockWidget(Qt.RightDockWidgetArea, self.qgisedudockwidget)
 
             self.educationWidget.layer = self.layer
             text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
             self.educationWidget.textEdit.setText(text)
             self.extra_menu_visu(bands)
             
-            self.valuedockwidget.show()
+            self.qgisedudockwidget.show()
             self.educationWidget.set_comboBox_sprectral_band_display()
             self.dockOpened = True
 

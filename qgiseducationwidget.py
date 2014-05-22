@@ -59,7 +59,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.qgis_education_manager = ProcessingManager( self.iface )
         self.value_tool = ValueWidget( self.iface ) #, self )
         #creating a dock widget
-        #self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea,self.value_tool)
+        # create the dockwidget with the correct parent and add the valuewidget
+        self.valuedockwidget = QtGui.QDockWidget("Values", self.iface.mainWindow() )
+        self.valuedockwidget.setObjectName("Values")
+        self.valuedockwidget.setWidget(self.value_tool)
+        self.iface.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.valuedockwidget)
+        self.valuedockwidget.hide()
+        
+        
         print self.value_tool
         
         self.layer = None
@@ -89,6 +96,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         
     def do_manage_processing(self, text_changed):
+        print "text changed", text_changed
         print "self.layer", self.layer
         my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, text_changed )
         self.qgis_education_manager.add_processing(my_processing)
@@ -103,7 +111,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             self.comboBox_sprectral_band_display.clear()
             self.comboBox_sprectral_band_display.insertItem( 0, "" )
             
-            if bands['red'] != 0 and bands['green'] != 0 and bands['blue'] != 0:
+            if self.layer.has_natural_colors():
                 print "couleurs naturelles"
                 self.comboBox_sprectral_band_display.insertItem( 1, "Afficher en couleurs naturelles" )
             
@@ -131,7 +139,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         
     def display_values(self):
-        self.value_tool.show()        
+        self.valuedockwidget.show()
+        #self.value_tool.show()
                  
     def kmeans(self):
         
@@ -151,8 +160,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             
         
     
-    def spectral_angles( self ):
-        self.angle_tool.get_point_for_angles(self.layer)
+#     def spectral_angles( self ):
+#         self.angle_tool.get_point_for_angles(self.layer)
 
    
         

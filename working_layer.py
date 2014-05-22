@@ -63,3 +63,10 @@ class WorkingLayer():
     def set_type(self, type):
         self.type = type
         
+    def has_natural_colors(self):
+        return self.red not in [0,-1] and self.green not in [0,-1] and self.blue not in [0,-1]
+        
+        
+        
+        
+        
