@@ -108,11 +108,11 @@ def angles(layer, working_directory, iface, x, y):
         print attr
         if len(attr) == layer.get_qgis_layer().bandCount():
             image_in = layer.get_qgis_layer().source()
-            output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y) + os.path.splitext(image_in)[1])
+            output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x).replace(".", "dot") + "_" + str(y).replace(".", "dot") + os.path.splitext(image_in)[1])
             
             if not os.path.isfile(output_filename) :
             
-                formula = "\"acos("
+                
                 num = []
                 denom = []
                 fact = []
@@ -126,12 +126,16 @@ def angles(layer, working_directory, iface, x, y):
                     denom.append(str(band_value) + "*" + str(band_value) )
                     fact.append(current_band + "*" + current_band)
                 
+                
+                formula = "\"if(((" + "+".join(fact) + ") != 0),"
+                
+                formula += "acos("
                 formula += "(" + "+".join(num) + ")/"
                 formula += "(sqrt("
                 formula += "(" + "+".join(denom) + ")*"
                 formula += "(" + "+".join(fact) + ")"
                 formula += "))"
-                formula += ")\""
+                formula += "), 0)\""
                 
                 print "num", num
                 print "denom", denom

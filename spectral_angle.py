@@ -36,10 +36,11 @@ class SpectralAngle():
     
     def __init__(self, iface, working_dir, layer):
         self.iface = iface
+        self.canvas = self.iface.mapCanvas()
+        
         self.working_directory = working_dir
         if layer :
             self.layer = layer
-        self.canvas = self.iface.mapCanvas()
         
         self.tool = ProfiletoolMapTool(self.iface.mapCanvas())        #the mouselistener
         print "self.tool", self.tool

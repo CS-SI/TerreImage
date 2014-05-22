@@ -36,30 +36,18 @@ class ProfiletoolMapTool(QgsMapTool):
 		self.canvas = canvas
 		self.cursor = QCursor(Qt.CrossCursor)
 
-	def canvasMoveEvent(self,event):
-		self.emit( SIGNAL("moved"), {'x': event.pos().x(), 'y': event.pos().y()} )
-
-
 	def canvasReleaseEvent(self,event):
 		print "canvasReleaseEvent"
 		self.emit( SIGNAL("canvas_clicked"), {'x': event.pos().x(), 'y': event.pos().y()} )
-
-
-	def canvasDoubleClickEvent(self,event):
-		self.emit( SIGNAL("doubleClicked"), {'x': event.pos().x(), 'y': event.pos().y()} )
 
 	def activate(self):
 		QgsMapTool.activate(self)
 		self.canvas.setCursor(self.cursor)
 
-
 	def deactivate(self):
 		#self.emit( SIGNAL("deactivate") )
 		#self.canvas.setCursor( QCursor(Qt.ArrowCursor)) 
 		QgsMapTool.deactivate(self)
-
-	def isZoomTool(self):
-		return False
 
 	def setCursor(self,cursor):
 		self.cursor = QCursor(cursor)
