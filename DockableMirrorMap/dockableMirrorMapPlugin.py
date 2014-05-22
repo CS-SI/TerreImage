@@ -37,17 +37,17 @@ class DockableMirrorMapPlugin:
 	def initGui(self):
 		self.dockableMirrors = []
 		self.lastDockableMirror = 0
-		self.dockableAction = QAction(QIcon(":/plugins/DockableMirrorMap/icons/dockablemirrormap.png"), "Dockable MirrorMap", self.iface.mainWindow())
-		QObject.connect(self.dockableAction, SIGNAL("triggered()"), self.runDockableMirror)
+# 		self.dockableAction = QAction(QIcon(":/plugins/DockableMirrorMap/icons/dockablemirrormap.png"), "Dockable MirrorMap", self.iface.mainWindow())
+# 		QObject.connect(self.dockableAction, SIGNAL("triggered()"), self.runDockableMirror)
 
 		self.aboutAction = QAction(QIcon(":/plugins/DockableMirrorMap/icons/about.png"), "About", self.iface.mainWindow())
 		QObject.connect(self.aboutAction, SIGNAL("triggered()"), self.about)
 
 
 		# Add to the plugin menu and toolbar
-		self.iface.addPluginToMenu("Dockable MirrorMap", self.dockableAction)
+# 		self.iface.addPluginToMenu("Dockable MirrorMap", self.dockableAction)
 		self.iface.addPluginToMenu("Dockable MirrorMap", self.aboutAction)
-		self.iface.addToolBarIcon(self.dockableAction)
+# 		self.iface.addToolBarIcon(self.dockableAction)
 
 		QObject.connect(self.iface, SIGNAL("projectRead()"), self.onProjectLoaded)
 		QObject.connect(QgsProject.instance(), SIGNAL("writeProject(QDomDocument &)"), self.onWriteProject)
@@ -62,9 +62,9 @@ class DockableMirrorMapPlugin:
 		self.removeDockableMirrors()
 
 		# Remove the plugin
-		self.iface.removePluginMenu("Dockable MirrorMap",self.dockableAction)
+# 		self.iface.removePluginMenu("Dockable MirrorMap",self.dockableAction)
 		self.iface.removePluginMenu("Dockable MirrorMap",self.aboutAction)
-		self.iface.removeToolBarIcon(self.dockableAction)
+# 		self.iface.removeToolBarIcon(self.dockableAction)
 
 	def about(self):
 		from DlgAbout import DlgAbout
