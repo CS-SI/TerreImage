@@ -99,23 +99,16 @@ class QGISEducation:
         
         processings = {"NDVI":"Calcule le NDVI de l'image de travail", "NDTI":"Calcule le NDTI de l'image de travail",\
                        "Indice de brillance":"Calcule l'indice de brillance de l'image de travail", "KMEANS":"Calcule le kmeans sur l'image de travail",\
-                       "Classif":"Ouvre le module de classification sur l'image de travail"}
+                       "Angle spectral":"Calcule l'angle spectral pour la coordonnée pointée de l'image de travail", "Classif":"Ouvre le module de classification sur l'image de travail"}
         icons = {"NDVI":":/icons/warp.png", "NDTI":":icons/projection-add.png", "Indice de brillance":":/icons/warp.png", \
-                 "KMEANS":":icons/projection-add.png", "Classif":":/icons/warp.png"}
+                 "KMEANS":":icons/projection-add.png", "Angle spectral":":/icons/warp.png", "Classif":":icons/projection-add.png"}
         
         for key in processings.keys():
             action = QAction( QIcon(icons[key]),  QCoreApplication.translate( "TerreImage", key ), self.iface.mainWindow() )
             action.setStatusTip( QCoreApplication.translate( "TerreImage", processings[key]) )
             QObject.connect( action, SIGNAL( "triggered()" ), lambda who=key: self.do_process(who))
             self.processing_menu.addAction( action )
-    
-        self.angles = QAction( QIcon( ":icons/projection-add.png" ), QCoreApplication.translate( "TerreImage", "Angle spectral" ), self.iface.mainWindow() )
-        self.angles.setStatusTip( QCoreApplication.translate( "TerreImage", "Calcule l'angle spectral pour la coordonnée pointée de l'image de travail" ) )
-        QObject.connect( self.angles, SIGNAL( "triggered()" ), self.do_angles )
-        #QObject.connect( self.angles, SIGNAL( "triggered()" ), lambda who="KMZ": self.do_process(who))
 
-    
-        self.processing_menu.addActions( [ self.angles ] )
       
         # conversion menu (Rasterize (Vector to raster), Polygonize (Raster to vector), Translate, RGB to PCT, PCT to RGB)
         self.visualization_menu = QMenu( QCoreApplication.translate( "TerreImage", "Visualisation" ), self.iface.mainWindow() )
