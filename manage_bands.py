@@ -64,27 +64,34 @@ class manage_bands:
         self.bandsUi.radioButton_autre.toggled.connect(self.define_other)
         
         if nb_bands:
+            self.nb_bands = nb_bands
             self.custom_from_nb_of_bands(nb_bands)
         
         
         print "type from manage_bands", type_image
+        gray_other = False
         if type_image :
             if type_image == "Spot 5" or type_image == "spot":
                 print "define spot"
                 self.bandsUi.radioButton_spot.setChecked(True)
                 self.define_spot()
+                gray_other = True
             elif type_image == "PHR 1A":
                 print "define spot"
                 self.bandsUi.radioButton_pleiades.setChecked(True)
                 self.define_pleiade()
+                gray_other = True
             elif type_image == "Formosat 2":
                 print "define spot"
                 self.bandsUi.radioButton_formosat.setChecked(True)
                 self.define_formosat()
+                gray_other = True
             else :
                 print "define others"
                 self.bandsUi.radioButton_autre.setChecked(True)
                 self.set_spinbox_read_only(False)
+            if gray_other:
+                self.gray_other()
                 
         #execute the dialog
         Dialog.exec_()
@@ -155,7 +162,7 @@ class manage_bands:
     def define_other(self):
 #         self.set_spinbox_read_only(False)
         self.bandsUi.groupBox_other.setEnabled(True)
-        self.bandsUi.radioButton_autre.setEnabled(False)
+        self.bandsUi.radioButton_autre.setEnabled(True)
 #         self.bandsUi.spinBox_red.setEnabled(True)
 #         self.bandsUi.spinBox_green.setEnabled(True)
 #         self.bandsUi.spinBox_blue.setEnabled(True)
@@ -163,6 +170,8 @@ class manage_bands:
 #         self.bandsUi.spinBox_mir.setEnabled(True)
         
     def gray_other(self):
+        print "gray other"
+        
 #         self.set_spinbox_read_only(True)
         self.bandsUi.groupBox_other.setEnabled(False)
         self.bandsUi.radioButton_autre.setEnabled(False)
@@ -232,14 +241,16 @@ class manage_bands:
         self.bandsUi.spinBox_blue.setValue(self.blue)
         if self.blue == -1:
             self.bandsUi.spinBox_blue.setEnabled(False)
-            self.bandsUi.checkBox_mir.setCheckState(Qt.Checked)
+            if self.nb_bands > 3:
+                self.bandsUi.checkBox_mir.setCheckState(Qt.Checked)
         self.bandsUi.spinBox_pir.setValue(self.pir)
         if self.pir == -1:
             self.bandsUi.spinBox_pir.setEnabled(False)
         self.bandsUi.spinBox_mir.setValue(self.mir)
         if self.mir == -1:
             self.bandsUi.spinBox_mir.setEnabled(False)
-            self.bandsUi.checkBox_blue.setCheckState(Qt.Checked)
+            if self.nb_bands > 3:
+                self.bandsUi.checkBox_blue.setCheckState(Qt.Checked)
         
     def define_formosat(self):
         self.blue = 1
@@ -251,7 +262,6 @@ class manage_bands:
         self.bandsUi.radioButton_formosat.setChecked(True)
         self.bandsUi.radioButton_spot.setEnabled(False)
         self.bandsUi.radioButton_pleiades.setEnabled(False)
-        self.gray_other()
         
         
     def define_pleiade(self):
@@ -264,7 +274,6 @@ class manage_bands:
         self.bandsUi.radioButton_pleiades.setChecked(True)
         self.bandsUi.radioButton_formosat.setEnabled(False)
         self.bandsUi.radioButton_spot.setEnabled(False)
-        self.gray_other()
         
     def define_spot(self):
         #spot 4-5
@@ -272,12 +281,12 @@ class manage_bands:
         self.green = 1
         self.red = 2
         self.pir = 3
-        self.mir = 4
+        if self.nb_bands > 3 :
+            self.mir = 4
         self.update_spin_box()
         self.bandsUi.radioButton_spot.setChecked(True)
         self.bandsUi.radioButton_formosat.setEnabled(False)
         self.bandsUi.radioButton_pleiades.setEnabled(False)
-        self.gray_other()
     
         
     def get_values(self):
