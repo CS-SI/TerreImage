@@ -144,8 +144,8 @@ def angles(layer, working_directory, iface, x, y):
                 
                 
                 OTBApplications.bandmath_cli( [image_in], formula, output_filename )
-                rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
-                manage_QGIS.histogram_stretching( rlayer, iface.mapCanvas())
+                #rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
+                #manage_QGIS.histogram_stretching( rlayer, iface.mapCanvas())
             return output_filename
                 
                 

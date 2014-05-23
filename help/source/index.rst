@@ -161,6 +161,16 @@ Si aucune layer n'est fournie, alors, on cherche les rasters.
 
 
 
+Angle Spectral
+==============
+Cette fonctionalité est plus ou moins problématique.
+En effet, les signaux ne fonctionnent pas systématiquement, je ne comprends pas pourquoi.
+
+J'ai ajouté la méthode de display dans la classez de spectral angle.
+J'ai essayé d'emettre un signal quand le fichier avait été créé. Impossible de le récuperer dans la classe de Processings.
+
+Le code de display est par contre dupliqué. La classe spectral angle se voit ajouter un attribut ``mirrormap_tool`` pour le display des vues.
+Reste à vérifier que ce mirror tool pointe vers le même mirror tool que les autres pour qu'on puisse gérer la vue du spectral angle depuis le plugin.
 
 
 

@@ -76,7 +76,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
         self.mirror_map_tool.initGui()
         
-        self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer)
+        self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
 
 
      

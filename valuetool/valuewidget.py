@@ -329,60 +329,6 @@ class ValueWidget(QWidget, Ui_Widget):
         else:
             mapCanvasSrs = self.iface.mapCanvas().mapRenderer().destinationSrs()
 
-        
-#         for i in range(self.canvas.layerCount()):
-#             layer = self.canvas.layer(i)
-#             if (layer!=None and layer.isValid() and layer.type()==QgsMapLayer.RasterLayer):
-#               if QGis.QGIS_VERSION_INT >= 10900: # for QGIS >= 1.9
-#                 if not layer.dataProvider():
-#                   continue
-# 
-#                 if not layer.dataProvider().capabilities() & QgsRasterDataProvider.IdentifyValue:
-#                   continue
-# 
-#                 nrow+=layer.bandCount()
-#                 rasterlayers.append(layer)
-# 
-#               else: # < 1.9
-#                 if layer.providerKey()=="wms":
-#                   continue
-# 
-#                 if layer.providerKey()=="grassraster":
-#                   nrow+=1
-#                   rasterlayers.append(layer)
-#                 else: # normal raster layer
-#                   nrow+=layer.bandCount()
-#                   rasterlayers.append(layer)
-#                 
-#               # check statistics for each band
-#               if needextremum:
-#                 for i in range( 1,layer.bandCount()+1 ):
-#                   if QGis.QGIS_VERSION_INT >= 10900: # for QGIS >= 1.9
-#                     has_stats = self.getStats ( layer, i ) is not None
-#                   else:
-#                     has_stats=layer.hasStatistics(i)
-#                   if not layer.id() in self.layerMap and not has_stats\
-#                           and not layer in layersWOStatistics:
-#                     layersWOStatistics.append(layer)
-# 
-#         if layersWOStatistics and not self.statsChecked:
-#           self.calculateStatistics(layersWOStatistics)
-#                   
-#         # create the row if necessary
-#         self.tableWidget.setRowCount(nrow)
-# 
-#         irow=0
-#         self.values=[]
-#         self.ymin=1e38
-#         self.ymax=-1e38
-# 
-#         if QGis.QGIS_VERSION_INT >= 10900:
-#             mapCanvasSrs = self.iface.mapCanvas().mapRenderer().destinationCrs()
-#         else:
-#             mapCanvasSrs = self.iface.mapCanvas().mapRenderer().destinationSrs()
-# 
-#         # TODO - calculate the min/max values only once, instead of every time!!!
-#         # keep them in a dict() with key=layer.id()
                 
         for layer in rasterlayers:
             layername=unicode(layer.name())

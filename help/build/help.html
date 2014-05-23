@@ -85,5 +85,25 @@
 <dd><p>Il y a une classe mère de tache et deux classes filles, <code>processing</code> et <code>display</code>. La première lance les traitements d'image tels que le NDVI et le KMEANS, la seconde va afficher les bandes spectrales et d'autres informations.</p>
 </dd>
 </dl>
+<h1 id="value-tool">Value Tool</h1>
+<p>Il est composé de deux fichiers principaux</p>
+<dl>
+<dt>valuetool</dt>
+<dd><p>fichier d'initialisation du plugin supprimé dans notre version</p>
+</dd>
+<dt>valuewidget</dt>
+<dd><p>fichier qui contient tout le code interessant pour l'affichage des valeurs</p>
+</dd>
+</dl>
+<h2 id="valuewidget">valuewidget</h2>
+<p>Ce fichier parcours les layers visibles du canvas. Il retient toutes les raster layers.</p>
+<p>Il en parcours ensuite les bandes et en prend les valeurs. Ensuite, il fait appel à la fonction de display qui va afficher soit en tableau, soit en courbe.</p>
+<h2 id="customization">customization</h2>
+<p>Les attributs pixel/ligne ont été ajouté pour afficher la coordonnée dans l'image sous le curseur de la souris.</p>
+<p>Les layers à afficher vont être fournies au plugin. Si aucune layer n'est fournie, alors, on cherche les rasters.</p>
+<h1 id="angle-spectral">Angle Spectral</h1>
+<p>Cette fonctionalité est plus ou moins problématique. En effet, les signaux ne fonctionnent pas systématiquement, je ne comprends pas pourquoi.</p>
+<p>J'ai ajouté la méthode de display dans la classez de spectral angle. J'ai essayé d'emettre un signal quand le fichier avait été créé. Impossible de le récuperer dans la classe de Processings.</p>
+<p>Le code de display est par contre dupliqué. La classe spectral angle se voit ajouter un attribut <code>mirrormap_tool</code> pour le display des vues. Reste à vérifier que ce mirror tool pointe vers le même mirror tool que les autres pour qu'on puisse gérer la vue du spectral angle depuis le plugin.</p>
 </body>
 </html>

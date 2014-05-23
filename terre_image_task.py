@@ -28,6 +28,7 @@ import re
 from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
 
 from PyQt4.QtGui import QInputDialog
+from PyQt4.QtCore import QObject, SIGNAL
 import terre_image_processing
         
         
@@ -88,8 +89,9 @@ class TerreImageProcessing(TerreImageTask):
             output_filename = terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
         if "Angle Spectral" in self.processing_name:
             from spectral_angle import SpectralAngle
-            self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer)
+            self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer, self.mirrormap_tool)
             print "self.angle_tool", self.angle_tool
+            #QObject.connect( self.angle_tool, SIGNAL( "anglesComputed(str)" ), self.display )
             self.angle_tool.get_point_for_angles(self.layer)
             #spectral_angles(self.layer, self.working_directory, self.iface)
         if "KMEANS" in self.processing_name:
@@ -111,6 +113,7 @@ class TerreImageProcessing(TerreImageTask):
         self.freezeCanvas( True )
         #result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
         result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name, self.iface )
+        manage_QGIS.histogram_stretching( result_layer, self.iface.mapCanvas())
         self.output_layer = result_layer
         # 2 ouvrir une nouvelle vue
         self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
