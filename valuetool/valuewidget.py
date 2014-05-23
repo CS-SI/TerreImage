@@ -71,6 +71,7 @@ class ValueWidget(QWidget, Ui_Widget):
         
         # custom the displayed layers
         self.layers_to_display = None
+        self.the_layer_to_display = None
 
         self.iface=iface
         self.canvas=self.iface.mapCanvas()
@@ -86,6 +87,7 @@ class ValueWidget(QWidget, Ui_Widget):
         QObject.connect(self.cbxGraph,SIGNAL("stateChanged(int)"),self.changePage)
         QObject.connect(self.canvas, SIGNAL( "keyPressed( QKeyEvent * )" ), self.pauseDisplay )
         QObject.connect(self.plotSelector, SIGNAL( "currentIndexChanged ( int )" ), self.changePlot )
+
 
     def setupUi_extra(self):
 
@@ -167,9 +169,11 @@ class ValueWidget(QWidget, Ui_Widget):
 
         self.stackedWidget.setCurrentIndex(0)
 
+
     def disconnect(self):
         self.changeActive(False)
         QObject.disconnect(self.canvas, SIGNAL( "keyPressed( QKeyEvent * )" ), self.pauseDisplay )
+    
     
     def pauseDisplay(self,e):
       if ( e.modifiers() == Qt.ShiftModifier or e.modifiers() == Qt.MetaModifier ) and e.key() == Qt.Key_A:
@@ -194,16 +198,25 @@ class ValueWidget(QWidget, Ui_Widget):
 
 
     def set_layers(self, list_of_layers_to_display):
+        print "list_of_layers_to_display", list_of_layers_to_display
         temp_list = []
         nrow = 0
         if list_of_layers_to_display:
             for layer in list_of_layers_to_display:
                 if layer is not None :
-                    temp_list.append(layer)
-                    nrow += layer.bandCount()
+                    try:
+                        print "try"
+                        layer_temp = layer.get_qgis_layer()
+                        self.the_layer_to_display = layer
+                        temp_list.append(layer_temp)
+                        nrow += layer_temp.bandCount()
+                    except:
+                        print "except"
+                        temp_list.append(layer)
+                        nrow += layer.bandCount()
             self.layers_to_display = temp_list
-            self.the_layer_to_display = temp_list[0]
             print "self.layers_to_display", self.layers_to_display
+            print "self.the_layer_to_display", self.the_layer_to_display
             self.tableWidget.setRowCount(nrow)
             
 
@@ -241,8 +254,6 @@ class ValueWidget(QWidget, Ui_Widget):
                 QObject.disconnect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint &)"), self.printValue)
             else:
                 QObject.disconnect(self.canvas, SIGNAL("xyCoordinates(QgsPoint &)"), self.printValue)
-
-
 
 
     def get_raster_layers(self):
@@ -298,9 +309,7 @@ class ValueWidget(QWidget, Ui_Widget):
         # TODO - calculate the min/max values only once, instead of every time!!!
         # keep them in a dict() with key=layer.id()
         return rasterlayers
-        
-        
-        
+                
 
     def printValue(self,position):
         
@@ -314,10 +323,13 @@ class ValueWidget(QWidget, Ui_Widget):
 
         needextremum = self.cbxGraph.isChecked() # if plot is checked
         
-        if self.layers_to_display is not None:
-            rasterlayers = self.layers_to_display
+        if self.cbxGraph.isChecked():
+            rasterlayers = [self.the_layer_to_display.get_qgis_layer()]
         else :
-            rasterlayers = self.get_raster_layers()
+            if self.layers_to_display is not None:
+                rasterlayers = self.layers_to_display
+            else :
+                rasterlayers = self.get_raster_layers()
             
         irow=0
         self.values=[]
@@ -331,6 +343,17 @@ class ValueWidget(QWidget, Ui_Widget):
 
                 
         for layer in rasterlayers:
+            
+            # check if the current layer is the working layer
+            is_the_working_layer = False
+            if self.the_layer_to_display is not None:
+                if layer == self.the_layer_to_display.get_qgis_layer():
+                    print "there is a working layer"
+                    is_the_working_layer = True
+            print "is the working layer", is_the_working_layer
+                    
+                    
+            
             layername=unicode(layer.name())
             if QGis.QGIS_VERSION_INT >= 10900:
                 layerSrs = layer.crs()
@@ -387,7 +410,11 @@ class ValueWidget(QWidget, Ui_Widget):
               for iband in range(1,layer.bandCount()+1): # loop over the bands
                 layernamewithband=layername
                 if ident is not None and len(ident)>1:
-                    layernamewithband+=' '+layer.bandName(iband)
+                    if is_the_working_layer:
+                        layernamewithband+=' '+self.the_layer_to_display.band_invert[iband]
+                        print layernamewithband
+                    else:
+                        layernamewithband+=' '+layer.bandName(iband)
 
                 if not ident or not ident.has_key( iband ): # should not happen
                   bandvalue = "?"
@@ -410,6 +437,7 @@ class ValueWidget(QWidget, Ui_Widget):
             
 
         self.showValues()
+
 
     def calculatePixelLine(self, layer, pos):
         """
@@ -466,7 +494,6 @@ class ValueWidget(QWidget, Ui_Widget):
     #            coordy = QgsRasterBlock.printValue( coordy )#QString(pos.y())
                 coordy = str( coordy )#QString(pos.y())
             return coordx, coordy
-
 
 
     def showValues(self):
@@ -530,44 +557,66 @@ class ValueWidget(QWidget, Ui_Widget):
 
       return None
 
+
+    def order_values(self, values):
+        ordre = ["blue", "green", "red", "pir", "mir"]
+        new_values = []
+        #items [(u'toulouse_2_5m_l93 green', '49.0', '2690.09944444', '7962.55055556'), (u'toulouse_2_5m_l93 red', '107.0', '2690.09944444', '7962.55055556'), (u'toulouse_2_5m_l93 pir', '100.0', '2690.09944444', '7962.55055556')]
+        # for each color
+        for color in ordre:
+            # check if one of the items is concerned
+            for item in values:
+                #if yes, add to the ordered list
+                if color in item[0]:
+                    new_values.append(item)
+                    values.remove(item)
+        new_values = new_values +values 
+        print new_values
+        return new_values
+            
+            
     def printInTable(self):
+        items = self.values
+        print self.values
+        new_items = self.order_values(items)
 
         irow=0
-        for row in self.values:
-          layername,value, x, y =row
+        
+        items=[]
+        
+        for row in new_items: #self.values:
+            layername,value, x, y =row
+    
+            if (self.tableWidget.item(irow,0)==None):
+                # create the item
+                self.tableWidget.setItem(irow,0,QTableWidgetItem())
+                self.tableWidget.setItem(irow,1,QTableWidgetItem())
+                self.tableWidget.setItem(irow, 2, QTableWidgetItem())
+                self.tableWidget.setItem(irow, 3, QTableWidgetItem())
+     
+            self.tableWidget.item(irow,0).setText(layername)
+            self.tableWidget.item(irow,1).setText(value)
+            self.tableWidget.item(irow, 2).setText( str( x ) )
+            self.tableWidget.item(irow, 3).setText( str( y ) )
+            irow+=1
           
-          # limit number of decimal places if requested
-#           if self.cbxDigits.isChecked():
-#               try:
-#                   value = str("{0:."+str(self.spinBox.value())+"f}").format(float(value))
-#               except ValueError:
-#                   pass
-
-          if (self.tableWidget.item(irow,0)==None):
-              # create the item
-              self.tableWidget.setItem(irow,0,QTableWidgetItem())
-              self.tableWidget.setItem(irow,1,QTableWidgetItem())
-              self.tableWidget.setItem(irow, 2, QTableWidgetItem())
-              self.tableWidget.setItem(irow, 3, QTableWidgetItem())
-
-          self.tableWidget.item(irow,0).setText(layername)
-          self.tableWidget.item(irow,1).setText(value)
-          self.tableWidget.item(irow, 2).setText( str( x ) )
-          self.tableWidget.item(irow, 3).setText( str( y ) )
-          irow+=1
-          
-
 
     def plot(self):
 
+        items = self.values
+        print self.values
+        new_items = self.order_values(items)
+
         numvalues=[]
         if ( self.hasqwt or self.hasmpl ):
-            for row in self.values:
+            for row in new_items:
                 layername,value,_,_=row
                 try:
                     numvalues.append(float(value))
                 except:
                     numvalues.append(0)
+                    
+        print "numvalues", numvalues
 
         ymin = self.ymin
         ymax = self.ymax
@@ -579,7 +628,7 @@ class ValueWidget(QWidget, Ui_Widget):
 
             self.qwtPlot.setAxisMaxMinor(QwtPlot.xBottom,0)
             #self.qwtPlot.setAxisMaxMajor(QwtPlot.xBottom,0)
-            self.qwtPlot.setAxisScale(QwtPlot.xBottom,1,len(self.values))
+            self.qwtPlot.setAxisScale(QwtPlot.xBottom,1,len(new_items))
             #self.qwtPlot.setAxisScale(QwtPlot.yLeft,self.ymin,self.ymax)
             self.qwtPlot.setAxisScale(QwtPlot.yLeft,ymin,ymax)
             
@@ -593,30 +642,30 @@ class ValueWidget(QWidget, Ui_Widget):
             self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color='k', mfc='b', mec='b')
             self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
             self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-            self.mplPlt.set_xlim( (1-0.25,len(self.values)+0.25 ) )
+            self.mplPlt.set_xlim( (1-0.25,len(new_items)+0.25 ) )
             self.mplPlt.set_ylim( (ymin, ymax) ) 
             self.mplFig.canvas.draw()
 
             #disable optimizations - too many bugs, depending on mpl version!
-#            if self.mplLine is None:
-#                self.mplPlt.clear()
-#                self.mplLine, = self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color='k', mfc='b', mec='b', animated=True)
-#                self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-#                self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-#                self.mplPlt.set_xlim( (1-0.25,len(self.values)+0.25 ) )
-#                self.mplPlt.set_ylim( (self.ymin, self.ymax) )
-#                self.mplFig.canvas.draw()
-#                self.mplBackground = self.mplFig.canvas.copy_from_bbox(self.mplFig.bbox)
-#            else:
-#                # restore the clean slate background
-#                self.mplFig.canvas.restore_region(self.mplBackground)
-#                # update the data
-#                self.mplLine.set_xdata(range(1,len(numvalues)+1))
-#                self.mplLine.set_ydata(numvalues)
-#                self.mplPlt.draw_artist(self.mplLine)
-#                # just redraw the axes rectangle
-#                self.mplFig.canvas.blit(self.mplFig.bbox)
-#            self.mplPlot.setVisible(len(numvalues)>0)
+#             if self.mplLine is None:
+#                 self.mplPlt.clear()
+#                 self.mplLine, = self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color='k', mfc='b', mec='b', animated=True)
+#                 self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+#                 self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+#                 self.mplPlt.set_xlim( (1-0.25,len(self.values)+0.25 ) )
+#                 self.mplPlt.set_ylim( (self.ymin, self.ymax) )
+#                 self.mplFig.canvas.draw()
+#                 self.mplBackground = self.mplFig.canvas.copy_from_bbox(self.mplFig.bbox)
+#             else:
+#                 # restore the clean slate background
+#                 self.mplFig.canvas.restore_region(self.mplBackground)
+#                 # update the data
+#                 self.mplLine.set_xdata(range(1,len(numvalues)+1))
+#                 self.mplLine.set_ydata(numvalues)
+#                 self.mplPlt.draw_artist(self.mplLine)
+#                 # just redraw the axes rectangle
+#                 self.mplFig.canvas.blit(self.mplFig.bbox)
+#             self.mplPlot.setVisible(len(numvalues)>0)
 
         #try:
                 #    attr = float(ident[j])

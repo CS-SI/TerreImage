@@ -43,6 +43,10 @@ class WorkingLayer():
         self.blue   = bands['blue']
         self.pir    = bands['pir']
         self.mir    = bands['mir']
+        self.band_invert = dict((v,k) for k, v in self.bands.iteritems())
+        print self.bands
+        print self.band_invert
+        
         
         
     def name(self):

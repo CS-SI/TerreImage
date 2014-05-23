@@ -51,7 +51,7 @@ class ProcessingManager():
     
     def set_current_layer(self):
         self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
-        self.layers_for_value_tool.append(self.layer.get_qgis_layer())
+        self.layers_for_value_tool.append(self.layer ) #.get_qgis_layer())
         print "set_current_layer: layers_for_value_tool", self.layers_for_value_tool
         return self.layer, bands
         
