@@ -57,6 +57,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.setupUi_extra()
         
         self.qgis_education_manager = ProcessingManager( self.iface )
+        self.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
+        
         self.value_tool = ValueWidget( self.iface ) #, self )
         #creating a dock widget
         # create the dockwidget with the correct parent and add the valuewidget
@@ -101,12 +103,13 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         
     def do_manage_processing(self, text_changed):
-        print "text changed", text_changed
-        print "self.layer", self.layer
-        my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, text_changed )
-        self.qgis_education_manager.add_processing(my_processing)
-        self.comboBox_processing.setCurrentIndex( 0 )
-        self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+        if text_changed:
+            print "text changed", text_changed
+            print "self.layer", self.layer
+            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, text_changed )
+            self.qgis_education_manager.add_processing(my_processing)
+            self.comboBox_processing.setCurrentIndex( 0 )
+            self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
         
         
         
@@ -131,17 +134,18 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             
             
     def do_manage_sprectral_band_display(self, text_changed):
-        band_to_display = None
-        corres = { 'nat':"Afficher en couleurs naturelles", 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
-        for key in corres:
-            if corres[key] == text_changed :
-                who = key
-                #band_to_display = self.layer.bands[key]
-                #manage_QGIS.display_one_band(self.layer, who, self.iface)
-                my_processing = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, who )
-                self.qgis_education_manager.add_processing(my_processing)
-                break
-        self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
+        if text_changed:
+            band_to_display = None
+            corres = { 'nat':"Afficher en couleurs naturelles", 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
+            for key in corres:
+                if corres[key] == text_changed :
+                    who = key
+                    #band_to_display = self.layer.bands[key]
+                    #manage_QGIS.display_one_band(self.layer, who, self.iface)
+                    my_processing = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, who )
+                    self.qgis_education_manager.add_processing(my_processing)
+                    break
+            self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
         
         
         
