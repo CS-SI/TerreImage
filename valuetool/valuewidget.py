@@ -28,6 +28,9 @@ from PyQt4.QtGui import *
 from qgis.core import *
 
 from ui_valuewidgetbase import Ui_ValueWidgetBase as Ui_Widget
+from terre_image_curve import TerreImageCurve
+import random
+from ptmaptool import ProfiletoolMapTool
 
 from osgeo import osr, gdal
 import gdalconst
@@ -51,8 +54,6 @@ if hasmpl:
     if int(matplotlib.__version__[0]) < 1:
         hasmpl = False
 
-print "has matplotlib", hasmpl
-print "has qwt", hasqwt
 
 class ValueWidget(QWidget, Ui_Widget):
 
@@ -72,6 +73,11 @@ class ValueWidget(QWidget, Ui_Widget):
         # custom the displayed layers
         self.layers_to_display = None
         self.the_layer_to_display = None
+        self.saved_curves = []
+        self.memorize_curve = False
+        
+        self.tool = ProfiletoolMapTool(self.iface.mapCanvas())
+        self.maptool = self.canvas.mapTool()
 
         self.iface=iface
         self.canvas=self.iface.mapCanvas()
@@ -87,6 +93,8 @@ class ValueWidget(QWidget, Ui_Widget):
         QObject.connect(self.cbxGraph,SIGNAL("stateChanged(int)"),self.changePage)
         QObject.connect(self.canvas, SIGNAL( "keyPressed( QKeyEvent * )" ), self.pauseDisplay )
         QObject.connect(self.plotSelector, SIGNAL( "currentIndexChanged ( int )" ), self.changePlot )
+        QObject.connect(self.pushButton_get_point, SIGNAL( "clicked()" ), self.on_get_point_button )
+        
 
 
     def setupUi_extra(self):
@@ -103,6 +111,9 @@ class ValueWidget(QWidget, Ui_Widget):
           # stats by default because estimated are fast
           self.cbxStats.setChecked( True )
         self.graphControls.setVisible( False )
+        self.groupBox_saved_layers.setVisible( False )
+        self.pushButton_get_point.hide()
+        self.checkBox_hide_current.setVisible( False )
         if self.hasqwt:
             self.plotSelector.addItem( 'Qwt' )
         if self.hasmpl:
@@ -166,7 +177,6 @@ class ValueWidget(QWidget, Ui_Widget):
         self.qwtPlot.setObjectName("qwtPlot")
         self.mplPlot.updateGeometry()
         self.stackedWidget.addWidget(self.mplPlot)
-
         self.stackedWidget.setCurrentIndex(0)
 
 
@@ -176,6 +186,13 @@ class ValueWidget(QWidget, Ui_Widget):
     
     
     def pauseDisplay(self,e):
+      print(e.text()) # Label pour afficher la touche presser
+ 
+      if(e.key() == QtCore.Qt.Key_Escape): # si c'est echape on quitte
+          print "escape !"
+      if(e.key() == QtCore.Qt.Key_A):
+          print "A !"   
+          self.memorize_curve = True
       if ( e.modifiers() == Qt.ShiftModifier or e.modifiers() == Qt.MetaModifier ) and e.key() == Qt.Key_A:
 
         self.cbxActive.toggle()
@@ -198,25 +215,20 @@ class ValueWidget(QWidget, Ui_Widget):
 
 
     def set_layers(self, list_of_layers_to_display):
-        print "list_of_layers_to_display", list_of_layers_to_display
         temp_list = []
         nrow = 0
         if list_of_layers_to_display:
             for layer in list_of_layers_to_display:
                 if layer is not None :
                     try:
-                        print "try"
                         layer_temp = layer.get_qgis_layer()
                         self.the_layer_to_display = layer
                         temp_list.append(layer_temp)
                         nrow += layer_temp.bandCount()
                     except:
-                        print "except"
                         temp_list.append(layer)
                         nrow += layer.bandCount()
             self.layers_to_display = temp_list
-            print "self.layers_to_display", self.layers_to_display
-            print "self.the_layer_to_display", self.the_layer_to_display
             self.tableWidget.setRowCount(nrow)
             
 
@@ -225,6 +237,10 @@ class ValueWidget(QWidget, Ui_Widget):
             self.plotSelector.setVisible( True )
             self.cbxStats.setVisible( True )
             self.graphControls.setVisible( True )
+            self.groupBox_saved_layers.setVisible( True )
+            self.checkBox_hide_current.setVisible( True )
+            self.pushButton_get_point.show()
+            
             if (self.plotSelector.currentText()=='mpl'):
                 self.stackedWidget.setCurrentIndex(2)
             else:
@@ -234,6 +250,9 @@ class ValueWidget(QWidget, Ui_Widget):
             if QGis.QGIS_VERSION_INT < 10900:
               self.cbxStats.setVisible( False )
             self.graphControls.setVisible( False )
+            #self.groupBox_saved_layers.setVisible( False )
+            self.checkBox_hide_current.setVisible( False )
+            self.pushButton_get_point.hide()
             self.stackedWidget.setCurrentIndex(0)
 
     def changePlot(self):
@@ -348,11 +367,7 @@ class ValueWidget(QWidget, Ui_Widget):
             is_the_working_layer = False
             if self.the_layer_to_display is not None:
                 if layer == self.the_layer_to_display.get_qgis_layer():
-                    print "there is a working layer"
                     is_the_working_layer = True
-            print "is the working layer", is_the_working_layer
-                    
-                    
             
             layername=unicode(layer.name())
             if QGis.QGIS_VERSION_INT >= 10900:
@@ -412,7 +427,6 @@ class ValueWidget(QWidget, Ui_Widget):
                 if ident is not None and len(ident)>1:
                     if is_the_working_layer:
                         layernamewithband+=' '+self.the_layer_to_display.band_invert[iband]
-                        print layernamewithband
                     else:
                         layernamewithband+=' '+layer.bandName(iband)
 
@@ -499,7 +513,12 @@ class ValueWidget(QWidget, Ui_Widget):
     def showValues(self):
         if self.cbxGraph.isChecked():
             #TODO don't plot if there is no data to plot...
-            self.plot()
+            if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
+                self.plot()
+            else:
+                self.mplPlt.clear()
+            if self.saved_curves :
+                self.extra_plot()
         else:
             self.printInTable()
 
@@ -571,13 +590,11 @@ class ValueWidget(QWidget, Ui_Widget):
                     new_values.append(item)
                     values.remove(item)
         new_values = new_values +values 
-        print new_values
         return new_values
             
             
     def printInTable(self):
         items = self.values
-        print self.values
         new_items = self.order_values(items)
 
         irow=0
@@ -602,22 +619,37 @@ class ValueWidget(QWidget, Ui_Widget):
           
 
     def plot(self):
-
         items = self.values
-        print self.values
         new_items = self.order_values(items)
 
+        pixel = 0
+        ligne = 0
+        
         numvalues=[]
         if ( self.hasqwt or self.hasmpl ):
             for row in new_items:
-                layername,value,_,_=row
+                layername,value,pixel_,ligne_=row
+                pixel = pixel_
+                ligne = ligne_
                 try:
                     numvalues.append(float(value))
                 except:
                     numvalues.append(0)
                     
-        print "numvalues", numvalues
-
+        if self.memorize_curve:
+            colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
+            print "len(colors)", len(colors)
+            color = colors[ random.randint(0, len(colors)-1) ] 
+            print 'color from creation courbe', color
+            #QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
+            curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), pixel, ligne, color, numvalues)
+            QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
+            self.saved_curves.append(curve_temp)
+            self.memorize_curve = False
+            print self.saved_curves
+            self.verticalLayout_curves.addWidget( curve_temp )
+            self.groupBox_saved_layers.show()
+                    
         ymin = self.ymin
         ymax = self.ymax
         if self.leYMin.text() != '' and self.leYMax.text() != '': 
@@ -683,6 +715,55 @@ class ValueWidget(QWidget, Ui_Widget):
        #attr = float(ident[j])  ##### I MUST IMPLEMENT RASTER TYPE HANDLING!!!!
        #outFeat.addAttribute(i, QVariant(attr))
 
+
+    def del_extra_curve(self, curve):
+        self.saved_curves.remove(curve)
+        curve.close()
+
+
+    def extra_plot(self):
+        
+        for curve in self.saved_curves:
+            if curve.display_points():
+                numvalues = curve.points
+                
+                ymin = self.ymin
+                ymax = self.ymax
+                
+                color_curve = curve.color
+                
+                self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color=color_curve, mfc='b', mec='b')
+                self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+                self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                self.mplPlt.set_xlim( (1-0.25,len(numvalues)+0.25 ) )
+                self.mplPlt.set_ylim( (ymin, ymax) ) 
+                self.mplFig.canvas.draw()
+
+    def on_get_point_button(self):
+        QtCore.QObject.connect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
+        #init the mouse listener comportement and save the classic to restore it on quit
+        self.canvas.setMapTool(self.tool)
+        
+        
+    def rightClicked(self, position):
+        mapPos = self.canvas.getCoordinateTransform().toMapCoordinates(position["x"],position["y"])
+        newPoints = [[mapPos.x(), mapPos.y()]]
+        ident = layer.get_qgis_layer().dataProvider().identify(QgsPoint(x, y), QgsRaster.IdentifyFormatValue )
+        
+        colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
+        print "len(colors)", len(colors)
+        color = colors[ random.randint(0, len(colors)-1) ] 
+        print 'color from creation courbe', color
+        #QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
+        curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), mapPos.x(), mapPos.y(), color, ident)
+        QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
+        self.saved_curves.append(curve_temp)
+        self.memorize_curve = False
+        print self.saved_curves
+        self.verticalLayout_curves.addWidget( curve_temp )
+        self.groupBox_saved_layers.show()
+        
+        
 
     def statsNeedChecked(self, indx):
         #self.statsChecked = False

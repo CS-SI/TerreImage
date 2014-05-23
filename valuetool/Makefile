@@ -23,7 +23,7 @@ PLUGIN_UPLOAD = $(CURDIR)/plugin_upload.py
 # Makefile for a PyQGIS plugin 
 
 # translation
-SOURCES = valuetool.py ui_valuewidgetbase.py __init__.py valuewidget.py
+SOURCES = valuetool.py ui_valuewidgetbase.py ui_terre_image_curve.py __init__.py valuewidget.py
 #TRANSLATIONS = i18n/valuetoolcs_en.ts
 TRANSLATIONS = 
 
@@ -35,7 +35,7 @@ PY_FILES = valuetool.py valuewidget.py __init__.py
 
 EXTRAS = icon.png 
 
-UI_FILES = ui_valuewidgetbase.py
+UI_FILES = ui_valuewidgetbase.py ui_terre_image_curve.py
 
 RESOURCE_FILES = resources_rc.py
 
