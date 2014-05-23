@@ -77,12 +77,12 @@ class manage_bands:
                 self.define_spot()
                 gray_other = True
             elif type_image == "PHR 1A":
-                print "define spot"
+                print "define pleiade"
                 self.bandsUi.radioButton_pleiades.setChecked(True)
                 self.define_pleiade()
                 gray_other = True
             elif type_image == "Formosat 2":
-                print "define spot"
+                print "define formosat"
                 self.bandsUi.radioButton_formosat.setChecked(True)
                 self.define_formosat()
                 gray_other = True
@@ -98,7 +98,7 @@ class manage_bands:
     
     
     def custom_from_nb_of_bands(self, number_of_bands):
-        
+        print "nb bands", number_of_bands
         self.bandsUi.spinBox_red.setMaximum( number_of_bands )
         self.bandsUi.spinBox_green.setMaximum( number_of_bands )
         self.bandsUi.spinBox_blue.setMaximum( number_of_bands )
@@ -232,7 +232,9 @@ class manage_bands:
 
         
     def update_spin_box(self):
+        print self.red, self.green, self.blue, self.pir, self.mir
         self.bandsUi.spinBox_red.setValue(self.red)
+        print self.bandsUi.spinBox_red.value()
         if self.red == -1:
             self.bandsUi.spinBox_red.setEnabled(False)
         self.bandsUi.spinBox_green.setValue(self.green)
@@ -251,6 +253,8 @@ class manage_bands:
             self.bandsUi.spinBox_mir.setEnabled(False)
             if self.nb_bands > 3:
                 self.bandsUi.checkBox_blue.setCheckState(Qt.Checked)
+                
+        print self.bandsUi.spinBox_red.value(), self.bandsUi.spinBox_green.value()
         
     def define_formosat(self):
         self.blue = 1
@@ -262,6 +266,7 @@ class manage_bands:
         self.bandsUi.radioButton_formosat.setChecked(True)
         self.bandsUi.radioButton_spot.setEnabled(False)
         self.bandsUi.radioButton_pleiades.setEnabled(False)
+        self.bandsUi.radioButton_formosat.setEnabled(True)
         
         
     def define_pleiade(self):
@@ -274,6 +279,7 @@ class manage_bands:
         self.bandsUi.radioButton_pleiades.setChecked(True)
         self.bandsUi.radioButton_formosat.setEnabled(False)
         self.bandsUi.radioButton_spot.setEnabled(False)
+        self.bandsUi.radioButton_pleiades.setEnabled(True)
         
     def define_spot(self):
         #spot 4-5
@@ -287,6 +293,7 @@ class manage_bands:
         self.bandsUi.radioButton_spot.setChecked(True)
         self.bandsUi.radioButton_formosat.setEnabled(False)
         self.bandsUi.radioButton_pleiades.setEnabled(False)
+        self.bandsUi.radioButton_spot.setEnabled(True)
     
         
     def get_values(self):
