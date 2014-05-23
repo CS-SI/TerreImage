@@ -163,8 +163,8 @@ def kmeans( layer, working_directory, iface, nb_class=None ):
     #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
     output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, working_directory)
     image_ref = recompose_image(layer, working_directory)
-    if not os.path.isfile(output_colored):
-        output_colored = OTBApplications.color_mapping_cli_ref_image( output, image_ref, working_directory)
+    #if not os.path.isfile(output_colored):
+    output_colored = OTBApplications.color_mapping_cli_ref_image( output, image_ref, working_directory)
     return output_colored
 
 

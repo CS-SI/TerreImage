@@ -319,14 +319,16 @@ def kmeans_cli( image, nbClass, outputDirectory ):
 def color_mapping_cli_ref_image( image_to_color, reference_image, working_dir):
     print "entering color mapping"
     output_filename = os.path.join( working_dir, os.path.splitext(os.path.basename(image_to_color))[0]) + "colored.tif"# + os.path.splitext(image_to_color)[0]
-    print output_filename
-    command = "otbcli_ColorMapping "
-    command += " -in " + image_to_color
-    command += " -out " + output_filename
-    command += " -method \"image\""
-    command += " -method.image.in " + reference_image
-    print command
-    os.system(command)
+    
+    if not os.path.isfile(output_filename):
+        print output_filename
+        command = "otbcli_ColorMapping "
+        command += " -in " + image_to_color
+        command += " -out " + output_filename
+        command += " -method \"image\""
+        command += " -method.image.in " + reference_image
+        print command
+        os.system(command)
     return output_filename
     
 
