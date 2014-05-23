@@ -96,6 +96,15 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.pushButton_kmeans.clicked.connect(self.kmeans)
         self.pushButton_profil_spectral.clicked.connect(self.display_values)
         self.pushButton_working_dir.clicked.connect(self.define_working_dir)
+        self.pushButton_status.clicked.connect(self.status)
+        
+        
+    def status(self):
+        print self.qgis_education_manager
+        print "self.mirror_map_tool.dockableMirrors", self.mirror_map_tool.dockableMirrors
+        
+        
+        
         
     def define_working_dir(self):
         output_dir = terre_image_utils.getOutputDirectory(self)
@@ -105,8 +114,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     def do_manage_processing(self, text_changed):
         if text_changed:
             print "text changed", text_changed
-            print "self.layer", self.layer
-            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, text_changed )
+            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, text_changed )
             self.qgis_education_manager.add_processing(my_processing)
             self.comboBox_processing.setCurrentIndex( 0 )
             self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
@@ -114,18 +122,18 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         
     def set_comboBox_sprectral_band_display( self ):
-        if self.layer:
-            bands = self.layer.bands
+        if self.qgis_education_manager.layer:
+            bands = self.qgis_education_manager.layer.bands
             corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
         
             self.comboBox_sprectral_band_display.clear()
             self.comboBox_sprectral_band_display.insertItem( 0, "" )
             
-            if self.layer.has_natural_colors():
+            if self.qgis_education_manager.layer.has_natural_colors():
                 print "couleurs naturelles"
                 self.comboBox_sprectral_band_display.insertItem( 1, "Afficher en couleurs naturelles" )
             
-            for i in range(self.layer.get_band_number()):
+            for i in range(self.qgis_education_manager.layer.get_band_number()):
                 y=[x for x in bands if bands[x]==i+1]
                 if y :
                     text = corres[y[0]]
@@ -140,9 +148,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             for key in corres:
                 if corres[key] == text_changed :
                     who = key
-                    #band_to_display = self.layer.bands[key]
-                    #manage_QGIS.display_one_band(self.layer, who, self.iface)
-                    my_processing = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, who )
+                    #band_to_display = self.qgis_education_manager.layer.bands[key]
+                    #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
+                    my_processing = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, who )
                     self.qgis_education_manager.add_processing(my_processing)
                     break
             self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
@@ -156,29 +164,34 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                  
     def kmeans(self):
         
-        if self.layer == None :
+        if self.qgis_education_manager.layer == None :
             print "Aucune layer selectionnée"
         else :
             nb_class = self.spinBox_kmeans.value()
             print "nb_colass from spinbox", nb_class
-            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, "KMEANS", nb_class )
+            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, "KMEANS", nb_class )
             self.qgis_education_manager.add_processing(my_processing)
             
             self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
-            #terre_image_processing.kmeans(self.layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
-        
-        
-    def working_layer(self):
-        self.layer = terre_image_utils.working_layer(self.canvas)
-        if self.layer:
-            self.label_working_layer.setText(self.layer.name())
-            
+            #terre_image_processing.kmeans(self.qgis_education_manager.layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
         
     
 #     def spectral_angles( self ):
 #         self.angle_tool.get_point_for_angles(self.layer)
 
-   
+    def disconnect_interface(self):
+        
+        #disconnect value tool
+        self.value_tool.close()
+        self.value_tool.disconnect()
+        # remove the dockwidget from iface
+        self.iface.removeDockWidget(self.valuedockwidget)
+        
+        # disconnect dockable mirror map
+        self.mirror_map_tool.unload()
+        
+        # disable working layer
+        self.qgis_education_manager = None
         
         
     def disconnectP(self):

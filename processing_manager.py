@@ -58,7 +58,10 @@ class ProcessingManager():
         
     def __str__(self):
         sortie = "working_dir : " + self.working_directory + "\n"
-        sortie += "image de travail : " + self.layer + "\n"
-        
+        sortie += "image de travail : " + str(self.layer) + "\n"
+        sortie += "processings : ["
+        for pro in self.processings:
+            sortie += str(pro) + "\n"
+        sortie += "]"
         return sortie
         

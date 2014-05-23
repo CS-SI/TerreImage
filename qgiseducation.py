@@ -63,8 +63,6 @@ class QGISEducation:
         self.iface.addPluginToMenu(u"&QGISEducation", self.action)
         self.extra_menu()
         
-        self.layer = None
-        
         self.qgisedudockwidget = None
         self.dockOpened = False
         
@@ -143,13 +141,13 @@ class QGISEducation:
         self.visualization_menu.clear()
         self.visualization_menu.addActions( [ self.histo, self.values ] )
         
-        if self.layer.has_natural_colors():
+        if self.qgis_education_manager.layer.has_natural_colors():
             visu_band = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ), self.iface.mainWindow() )
             visu_band.setStatusTip( QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ) )
             QObject.connect( visu_band, SIGNAL( "triggered()" ), lambda who='nat': self.do_display_one_band(who)) #self.do_display_one_band )
             self.visualization_menu.addAction(visu_band)
             
-        for i in range(self.layer.get_band_number()):
+        for i in range(self.qgis_education_manager.layer.get_band_number()):
             y=[x for x in bands if bands[x]==i+1]
             if y :
                 text = corres[y[0]]
@@ -161,12 +159,10 @@ class QGISEducation:
 
     def do_process(self, name):
         timeBegin = time.time()
-        if not self.layer:
-            self.layer = self.educationWidget.layer
-        if self.layer == None :
+        if self.qgis_education_manager.layer == None :
             print "Aucune layer selectionnée"
         else :
-            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.educationWidget.mirror_map_tool, name )
+            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.educationWidget.mirror_map_tool, name )
             self.qgis_education_manager.add_processing(my_processing)
         
         self.educationWidget.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
@@ -187,8 +183,8 @@ class QGISEducation:
     
     def do_display_one_band(self, who):
         print "who", who
-        #manage_QGIS.display_one_band(self.layer, who, self.iface)
-        my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.layer, self.educationWidget.mirror_map_tool, who )
+        #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
+        my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.educationWidget.mirror_map_tool, who )
         self.qgis_education_manager.add_processing(my_process)
         
         
@@ -222,13 +218,13 @@ class QGISEducation:
         self.qgis_education_manager = ProcessingManager(self.iface)
         
         
-        self.layer, bands  = self.qgis_education_manager.set_current_layer( )
-        print "self.layer", self.layer
+        _, bands  = self.qgis_education_manager.set_current_layer( )
+        print "self.layer", self.qgis_education_manager.layer
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
         print "temps de chargement : ", timeExec
         
-        if self.layer and bands:
+        if self.qgis_education_manager.layer and bands:
             if not self.dockOpened :
                 # create the widget to display information
                 self.educationWidget = QGISEducationWidget(self.iface)
@@ -242,7 +238,6 @@ class QGISEducation:
                 # add the dockwidget to iface
                 self.iface.addDockWidget(Qt.RightDockWidgetArea, self.qgisedudockwidget)
 
-            self.educationWidget.layer = self.layer
             text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
             self.educationWidget.textEdit.setText(text)
             self.extra_menu_visu(bands)

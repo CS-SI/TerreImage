@@ -76,7 +76,13 @@ class TerreImageProcessing(TerreImageTask):
         self.run()
         
 
+    def __str__(self):
+        message = self.processing_name
+        if self.result_file_name :
+            message += " : \n\t status ok \n\t image resultante :" + self.result_file_name
+            message += "\n\t mirror:" + str(self.mirror)
         
+        return message
 
         
     def run(self):
@@ -186,4 +192,12 @@ class TerreImageDisplay(TerreImageTask):
             
             # thaw the canvas
             self.freezeCanvas( False )
+            
+            
+    def __str__(self):
+        message = self.processing_name
+        if self.result_file_name :
+            message += "\n\t mirror:" + str(self.mirror)
+        
+        return message
       

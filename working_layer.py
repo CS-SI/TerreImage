@@ -34,7 +34,12 @@ class WorkingLayer():
             
         self.type = None
         
+    
+    def __str__(self):
+        message = "Working Layer : \n\t " + self.source_file + " " + str(self.bands)
         
+        return message
+    
         
     def set_bands(self, bands):
         self.bands = bands

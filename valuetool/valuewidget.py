@@ -76,8 +76,7 @@ class ValueWidget(QWidget, Ui_Widget):
         self.saved_curves = []
         self.memorize_curve = False
         
-        self.tool = ProfiletoolMapTool(self.iface.mapCanvas())
-        self.maptool = self.canvas.mapTool()
+
 
         self.iface=iface
         self.canvas=self.iface.mapCanvas()
@@ -88,7 +87,11 @@ class ValueWidget(QWidget, Ui_Widget):
         QWidget.__init__(self)
         self.setupUi(self)
         self.setupUi_extra()
-
+        
+        self.tool = ProfiletoolMapTool(self.iface.mapCanvas())
+        self.maptool = self.canvas.mapTool()
+        
+        
         QObject.connect(self.cbxActive,SIGNAL("stateChanged(int)"),self.changeActive)
         QObject.connect(self.cbxGraph,SIGNAL("stateChanged(int)"),self.changePage)
         QObject.connect(self.canvas, SIGNAL( "keyPressed( QKeyEvent * )" ), self.pauseDisplay )
@@ -748,14 +751,20 @@ class ValueWidget(QWidget, Ui_Widget):
     def rightClicked(self, position):
         mapPos = self.canvas.getCoordinateTransform().toMapCoordinates(position["x"],position["y"])
         newPoints = [[mapPos.x(), mapPos.y()]]
-        ident = layer.get_qgis_layer().dataProvider().identify(QgsPoint(x, y), QgsRaster.IdentifyFormatValue )
+        ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.x()), QgsRaster.IdentifyFormatValue )
+        
+        #TODO : put values in right order
+        new_points=[]
+        for i in range(1, ident):
+            new_point.append( (self.the_layer_to_display.band_invert[i], ident[i] ))
+        points = self.order_values(new_points)
         
         colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
         print "len(colors)", len(colors)
         color = colors[ random.randint(0, len(colors)-1) ] 
         print 'color from creation courbe', color
         #QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
-        curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), mapPos.x(), mapPos.y(), color, ident)
+        curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), mapPos.x(), mapPos.y(), color, points)
         QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
         self.saved_curves.append(curve_temp)
         self.memorize_curve = False

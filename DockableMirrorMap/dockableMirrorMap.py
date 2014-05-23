@@ -69,4 +69,5 @@ class DockableMirrorMap(QDockWidget):
 		self.setWidget(self.mainWidget)
 		
 
-
+	def __str__(self):
+		return "Vue " + self.title
