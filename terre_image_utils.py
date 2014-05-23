@@ -53,6 +53,21 @@ def fill_default_directory( ):
         os.makedirs( currentDirectory )
     return currentDirectory, datetimeNow
 
+def getOutputDirectory( ui ):
+    """
+    Opens a dialog to get the output directory
+    """
+    if ui.lineEdit_working_dir.text():
+        path = ui.lineEdit_working_dir.text()
+    else:
+        path = QDir.currentPath()
+    outputDirectory = ""
+    dirDest = QFileDialog.getExistingDirectory( None, str( "Répertoire de destination de la segmentation" ), path )
+    if dirDest :
+        ui.lineEdit_working_dir.setText( dirDest )
+        outputDirectory = dirDest
+        
+    return str( outputDirectory )
 
 
 def working_layer(canvas):

@@ -93,6 +93,11 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         self.pushButton_kmeans.clicked.connect(self.kmeans)
         self.pushButton_profil_spectral.clicked.connect(self.display_values)
+        self.pushButton_working_dir.clicked.connect(self.define_working_dir)
+        
+    def define_working_dir(self):
+        output_dir = terre_image_utils.getOutputDirectory(self)
+        self.qgis_education_manager.working_directory = output_dir
         
         
     def do_manage_processing(self, text_changed):
@@ -101,6 +106,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, text_changed )
         self.qgis_education_manager.add_processing(my_processing)
         self.comboBox_processing.setCurrentIndex( 0 )
+        self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+        
         
         
     def set_comboBox_sprectral_band_display( self ):
@@ -142,7 +149,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.valuedockwidget.show()
         self.value_tool.changeActive( QtCore.Qt.Checked )
         self.value_tool.cbxActive.setCheckState( QtCore.Qt.Checked )
-        #self.value_tool.show()
+        self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
                  
     def kmeans(self):
         
@@ -152,6 +159,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             nb_class = self.spinBox_kmeans.value()
             print "nb_colass from spinbox", nb_class
             my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, "KMEANS", nb_class )
+            self.qgis_education_manager.add_processing(my_processing)
+            
+            self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
             #terre_image_processing.kmeans(self.layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
         
         

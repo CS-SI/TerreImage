@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>QGISEducation</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label_working_layer">
      <property name="text">
@@ -114,6 +114,25 @@
        <widget class="QSpinBox" name="spinBox_kmeans">
         <property name="value">
          <number>5</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Répertoire de sortie</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLineEdit" name="lineEdit_working_dir"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_working_dir">
+        <property name="text">
+         <string>...</string>
         </property>
        </widget>
       </item>
