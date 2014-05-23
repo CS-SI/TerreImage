@@ -148,7 +148,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
         
         
-        
     def display_values(self):
         self.valuedockwidget.show()
         self.value_tool.changeActive( QtCore.Qt.Checked )
@@ -162,7 +161,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         else :
             nb_class = self.spinBox_kmeans.value()
             print "nb_colass from spinbox", nb_class
-            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, "KMEANS", nb_class )
+            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool, "KMEANS", nb_class )
             self.qgis_education_manager.add_processing(my_processing)
             
             self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
