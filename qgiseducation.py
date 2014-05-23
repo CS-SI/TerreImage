@@ -169,6 +169,7 @@ class QGISEducation:
             my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.layer, self.educationWidget.mirror_map_tool, name )
             self.qgis_education_manager.add_processing(my_processing)
         
+        self.educationWidget.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
         print "temps du " + str(name) + "  : " + str(timeExec)

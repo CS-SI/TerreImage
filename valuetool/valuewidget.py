@@ -68,6 +68,9 @@ class ValueWidget(QWidget, Ui_Widget):
         # Statistics (>=1.9)
         self.statsSampleSize = 2500000
         self.stats = {} # stats per layer
+        
+        # custom the displayed layers
+        self.layers_to_display = None
 
         self.iface=iface
         self.canvas=self.iface.mapCanvas()
@@ -190,6 +193,20 @@ class ValueWidget(QWidget, Ui_Widget):
         QWidget.keyPressEvent( self, e )
 
 
+    def set_layers(self, list_of_layers_to_display):
+        temp_list = []
+        nrow = 0
+        if list_of_layers_to_display:
+            for layer in list_of_layers_to_display:
+                if layer is not None :
+                    temp_list.append(layer)
+                    nrow += layer.bandCount()
+            self.layers_to_display = temp_list
+            self.the_layer_to_display = temp_list[0]
+            print "self.layers_to_display", self.layers_to_display
+            self.tableWidget.setRowCount(nrow)
+            
+
     def changePage(self,state):
         if (state==Qt.Checked):
             self.plotSelector.setVisible( True )
@@ -226,23 +243,17 @@ class ValueWidget(QWidget, Ui_Widget):
                 QObject.disconnect(self.canvas, SIGNAL("xyCoordinates(QgsPoint &)"), self.printValue)
 
 
-    def printValue(self,position):
-        
-        coordx = "0"
-        coordy = "0"
 
-        if self.canvas.layerCount() == 0:
-            self.values=[]         
-            self.showValues()
-            return
-        
+
+    def get_raster_layers(self):
+                
         needextremum = self.cbxGraph.isChecked() # if plot is checked
-
+        
         # count the number of requires rows and remember the raster layers
         nrow=0
         rasterlayers=[]
         layersWOStatistics=[]
-
+        
         for i in range(self.canvas.layerCount()):
             layer = self.canvas.layer(i)
             if (layer!=None and layer.isValid() and layer.type()==QgsMapLayer.RasterLayer):
@@ -284,6 +295,30 @@ class ValueWidget(QWidget, Ui_Widget):
         # create the row if necessary
         self.tableWidget.setRowCount(nrow)
 
+        # TODO - calculate the min/max values only once, instead of every time!!!
+        # keep them in a dict() with key=layer.id()
+        return rasterlayers
+        
+        
+        
+
+    def printValue(self,position):
+        
+        coordx = "0"
+        coordy = "0"
+
+        if self.canvas.layerCount() == 0:
+            self.values=[]         
+            self.showValues()
+            return
+
+        needextremum = self.cbxGraph.isChecked() # if plot is checked
+        
+        if self.layers_to_display is not None:
+            rasterlayers = self.layers_to_display
+        else :
+            rasterlayers = self.get_raster_layers()
+            
         irow=0
         self.values=[]
         self.ymin=1e38
@@ -294,8 +329,60 @@ class ValueWidget(QWidget, Ui_Widget):
         else:
             mapCanvasSrs = self.iface.mapCanvas().mapRenderer().destinationSrs()
 
-        # TODO - calculate the min/max values only once, instead of every time!!!
-        # keep them in a dict() with key=layer.id()
+        
+#         for i in range(self.canvas.layerCount()):
+#             layer = self.canvas.layer(i)
+#             if (layer!=None and layer.isValid() and layer.type()==QgsMapLayer.RasterLayer):
+#               if QGis.QGIS_VERSION_INT >= 10900: # for QGIS >= 1.9
+#                 if not layer.dataProvider():
+#                   continue
+# 
+#                 if not layer.dataProvider().capabilities() & QgsRasterDataProvider.IdentifyValue:
+#                   continue
+# 
+#                 nrow+=layer.bandCount()
+#                 rasterlayers.append(layer)
+# 
+#               else: # < 1.9
+#                 if layer.providerKey()=="wms":
+#                   continue
+# 
+#                 if layer.providerKey()=="grassraster":
+#                   nrow+=1
+#                   rasterlayers.append(layer)
+#                 else: # normal raster layer
+#                   nrow+=layer.bandCount()
+#                   rasterlayers.append(layer)
+#                 
+#               # check statistics for each band
+#               if needextremum:
+#                 for i in range( 1,layer.bandCount()+1 ):
+#                   if QGis.QGIS_VERSION_INT >= 10900: # for QGIS >= 1.9
+#                     has_stats = self.getStats ( layer, i ) is not None
+#                   else:
+#                     has_stats=layer.hasStatistics(i)
+#                   if not layer.id() in self.layerMap and not has_stats\
+#                           and not layer in layersWOStatistics:
+#                     layersWOStatistics.append(layer)
+# 
+#         if layersWOStatistics and not self.statsChecked:
+#           self.calculateStatistics(layersWOStatistics)
+#                   
+#         # create the row if necessary
+#         self.tableWidget.setRowCount(nrow)
+# 
+#         irow=0
+#         self.values=[]
+#         self.ymin=1e38
+#         self.ymax=-1e38
+# 
+#         if QGis.QGIS_VERSION_INT >= 10900:
+#             mapCanvasSrs = self.iface.mapCanvas().mapRenderer().destinationCrs()
+#         else:
+#             mapCanvasSrs = self.iface.mapCanvas().mapRenderer().destinationSrs()
+# 
+#         # TODO - calculate the min/max values only once, instead of every time!!!
+#         # keep them in a dict() with key=layer.id()
                 
         for layer in rasterlayers:
             layername=unicode(layer.name())

@@ -24,6 +24,7 @@ import os
 
 from PyQt4 import QtCore, QtGui
 import terre_image_utils
+from terre_image_task import TerreImageProcessing
 
 
 
@@ -37,13 +38,21 @@ class ProcessingManager():
         self.layer = None
         self.processings = []
         
+        self.layers_for_value_tool = [ ]
+        
         
     def add_processing(self, processing):
         self.processings.append(processing)
+        if isinstance(processing, TerreImageProcessing):
+            self.layers_for_value_tool.append(processing.output_layer)
+        print " adding", processing. processing_name
+        print "self.layers_for_value_tool", self.layers_for_value_tool
         
     
     def set_current_layer(self):
         self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
+        self.layers_for_value_tool.append(self.layer.get_qgis_layer())
+        print "set_current_layer: layers_for_value_tool", self.layers_for_value_tool
         return self.layer, bands
         
         

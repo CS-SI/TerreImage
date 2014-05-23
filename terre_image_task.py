@@ -39,6 +39,7 @@ class TerreImageTask(object):
         self.layer = layer
         self.mirrormap_tool = mirror_map_tool
         
+        
     def get_mirror_map(self):
         return self.mirrormap
         
@@ -68,6 +69,8 @@ class TerreImageProcessing(TerreImageTask):
         self.arg=None
         if arg:
             self.arg = arg
+        self.output_layer = None
+        
         
         self.run()
         
@@ -108,6 +111,7 @@ class TerreImageProcessing(TerreImageTask):
         self.freezeCanvas( True )
         #result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
         result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name, self.iface )
+        self.output_layer = result_layer
         # 2 ouvrir une nouvelle vue
         self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
         print self.mirror
