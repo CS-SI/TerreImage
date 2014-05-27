@@ -65,6 +65,13 @@ class QGISEducation:
         
         self.qgisedudockwidget = None
         self.dockOpened = False
+        self.educationWidget = None
+        
+        
+        QObject.connect(self.iface, SIGNAL("projectRead()"), self.onProjectLoaded)
+        QObject.connect(QgsProject.instance(), SIGNAL("writeProject(QDomDocument &)"), self.onWriteProject)
+        QObject.connect(self.iface, SIGNAL("newProjectCreated()"), self.newProject)        
+    
         
         
         #self.classif_tool = SupervisedClassification()
@@ -208,6 +215,9 @@ class QGISEducation:
         self.iface.removeToolBarIcon(self.action)
 
     # run method that performs all the real work
+    
+    
+    
     def run(self):
         """
         Defines the behavior of the plugin
@@ -245,5 +255,94 @@ class QGISEducation:
             self.qgisedudockwidget.show()
             self.educationWidget.set_comboBox_sprectral_band_display()
             self.dockOpened = True
+            
+            
+    def newProject(self):
+        if self.educationWidget is not None:
+            self.educationWidget.disconnect_interface()
+            if self.qgisedudockwidget is not None:
+                self.qgisedudockwidget.close()
+                self.educationWidget.disconnectP()
+                self.dockOpened = False
 
+    def onWriteProject(self, domproject):
+        if self.qgis_education_manager.layer is None:
+            return
 
+        QgsProject.instance().writeEntry( "QGISEducation", "/working_layer", self.qgis_education_manager.layer.source_file )
+        # write band orders
+        QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_bands", str(self.qgis_education_manager.layer.bands) )
+        QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_type", self.qgis_education_manager.layer.type )
+        
+
+    def onProjectLoaded(self):
+        # restore mirrors?
+        wl, ok = QgsProject.instance().readNumEntry("QGISEducation", "/working_layer")
+        if not ok or wl is None:
+            return
+        
+        bands, ok = QgsProject.instance().readNumEntry("QGISEducation", "/working_layer_bands")
+        # TODO interpreter bands
+        type, ok = QgsProject.instance().readNumEntry("QGISEducation", "/working_layer_type")
+        
+        self.qgis_education_manager = ProcessingManager( self.iface )
+        self.qgis_education_manager.restore_processing_manager(wl, eval(bands), type)
+        
+        #restore all process ?
+        
+
+#         # remove all mirrors
+#         self.removeDockableMirrors()
+# 
+#         mirror2lids = {}
+#         # load mirrors
+#         for i in range(num):
+#             if num >= 2:
+#                 if i == 0: 
+#                     prevFlag = self.iface.mapCanvas().renderFlag()
+#                     self.iface.mapCanvas().setRenderFlag(False)
+#                 elif i == num-1:
+#                     self.iface.mapCanvas().setRenderFlag(True)
+# 
+#             from dockableMirrorMap import DockableMirrorMap
+#             dockwidget = DockableMirrorMap(self.iface.mainWindow(), self.iface)
+# 
+#             minsize = dockwidget.minimumSize()
+#             maxsize = dockwidget.maximumSize()
+# 
+#             # restore position
+#             floating, ok = QgsProject.instance().readBoolEntry("DockableMirrorMap", "/mirror%s/floating" % i)
+#             if ok: 
+#                 dockwidget.setFloating( floating )
+#                 position, ok = QgsProject.instance().readEntry("DockableMirrorMap", "/mirror%s/position" % i)
+#                 if ok: 
+#                     try:
+#                         if floating:
+#                             parts = position.split(" ")
+#                             if len(parts) >= 2:
+#                                 dockwidget.move( int(parts[0]), int(parts[1]) )
+#                         else:
+#                             dockwidget.setLocation( int(position) )
+#                     except ValueError:
+#                         pass
+# 
+#             # restore geometry
+#             dockwidget.setFixedSize( dockwidget.geometry().width(), dockwidget.geometry().height() )
+#             size, ok = QgsProject.instance().readEntry("DockableMirrorMap", "/mirror%s/size" % i)
+#             if ok:
+#                 try:
+#                     parts = size.split(" ")
+#                     dockwidget.setFixedSize( int(parts[0]), int(parts[1]) )
+#                 except ValueError:
+#                     pass                
+# 
+#             scaleFactor, ok = QgsProject.instance().readDoubleEntry("DockableMirrorMap", "/mirror%s/scaleFactor" % i, 1.0)
+#             if ok: dockwidget.getMirror().scaleFactor.setValue( scaleFactor )
+# 
+#             # get layer list
+#             layerIds, ok = QgsProject.instance().readListEntry("DockableMirrorMap", "/mirror%s/layers" % i)
+#             if ok: dockwidget.getMirror().setLayerSet( layerIds )
+# 
+#             self.addDockWidget( dockwidget )
+#             dockwidget.setMinimumSize(minsize)
+#             dockwidget.setMaximumSize(maxsize)

@@ -133,6 +133,13 @@ def get_workinglayer_on_opening(iface):
     else:
         return None, None
     
+def restore_working_layer( filename, bands, type ):
+    raster_layer = manage_QGIS.get_raster_layer(fileOpened, os.path.splitext(os.path.basename(fileOpened))[0])
+    layer = WorkingLayer( fileOpened, raster_layer )
+    layer.set_type(type_image)
+    layer.set_bands(bands)
+    return layer, bands
+    
     
 def computeStatistics( OneFeature, i, j=None, nodata=True ):
     """
