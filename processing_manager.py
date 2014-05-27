@@ -55,6 +55,9 @@ class ProcessingManager():
         self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
         if self.layer:
             self.working_directory = os.path.join(os.path.dirname(self.layer.source_file), "working_directory")
+            if not os.path.exists( self.working_directory ):
+                os.makedirs( self.working_directory )
+                
         self.layers_for_value_tool.append(self.layer ) #.get_qgis_layer())
         print "set_current_layer: layers_for_value_tool", self.layers_for_value_tool
         print "working directory"
