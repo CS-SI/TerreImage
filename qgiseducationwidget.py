@@ -90,8 +90,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             item = itemProcessing[index]
             self.comboBox_processing.insertItem ( index, item )
         self.comboBox_processing.currentIndexChanged[str].connect(self.do_manage_processing)
-            
-        
         
         self.pushButton_kmeans.clicked.connect(self.kmeans)
         self.pushButton_profil_spectral.clicked.connect(self.display_values)
@@ -113,11 +111,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
     def do_manage_processing(self, text_changed):
         if text_changed:
+            widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
+            iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
             print "text changed", text_changed
             my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, text_changed )
             self.qgis_education_manager.add_processing(my_processing)
             self.comboBox_processing.setCurrentIndex( 0 )
             self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+            self.iface.messageBar().clearWidgets()
         
         
         
@@ -182,8 +183,12 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     def disconnect_interface(self):
         
         #disconnect value tool
+        self.iface.mainWindow().statusBar().clearMessage()
+        self.value_tool.changeActive( QtCore.Qt.Unchecked )
+        self.value_tool.set_layers([])
         self.value_tool.close()
         self.value_tool.disconnect()
+        self.value_tool = None
         # remove the dockwidget from iface
         self.iface.removeDockWidget(self.valuedockwidget)
         
