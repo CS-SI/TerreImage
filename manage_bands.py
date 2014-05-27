@@ -257,9 +257,9 @@ class manage_bands:
         print self.bandsUi.spinBox_red.value(), self.bandsUi.spinBox_green.value()
         
     def define_formosat(self):
-        self.blue = 1
+        self.blue = 3
         self.green = 2
-        self.red = 3
+        self.red = 1
         self.pir = 4
         self.mir = -1
         self.update_spin_box()
@@ -270,9 +270,9 @@ class manage_bands:
         
         
     def define_pleiade(self):
-        self.blue = 1
+        self.blue = 3
         self.green = 2
-        self.red = 3
+        self.red = 1
         self.pir = 4
         self.mir = -1
         self.update_spin_box()
