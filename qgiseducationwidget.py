@@ -24,7 +24,7 @@ from PyQt4 import QtCore, QtGui
 from ui_qgiseducation import Ui_QGISEducation
 # create the dialog for zoom to point
 import OTBApplications
-from qgis.gui import QgsRubberBand, QgsMapToolPan
+from qgis.gui import QgsRubberBand, QgsMapToolPan, QgsMessageBar
 
 from qgis.core import QGis, QgsPoint, QgsRaster
 
@@ -112,7 +112,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     def do_manage_processing(self, text_changed):
         if text_changed:
             widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
-            iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
+            self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
             print "text changed", text_changed
             my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, text_changed )
             self.qgis_education_manager.add_processing(my_processing)

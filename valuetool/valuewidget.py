@@ -769,6 +769,7 @@ class ValueWidget(QWidget, Ui_Widget):
         
     def rightClicked(self, position):
         mapPos = self.canvas.getCoordinateTransform().toMapCoordinates(position["x"],position["y"])
+        x, y = self.calculatePixelLine(self.the_layer_to_display.get_qgis_layer(), mapPos)
         newPoints = [[mapPos.x(), mapPos.y()]]
         
         ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.y()), QgsRaster.IdentifyFormatValue )
@@ -784,7 +785,9 @@ class ValueWidget(QWidget, Ui_Widget):
             
             #TODO : put values in right order
             new_points=[]
-            for i in range(1, len(attr)):
+            for i in range(1, len(attr)+1):
+                print "i", i
+                print self.the_layer_to_display.band_invert
                 new_points.append( (self.the_layer_to_display.band_invert[i], attr[i] ))
             print "new_points", new_points
             points = self.order_values(new_points)
