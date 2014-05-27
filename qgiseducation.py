@@ -239,6 +239,7 @@ class QGISEducation:
                 # create the widget to display information
                 self.educationWidget = QGISEducationWidget(self.iface)
                 self.educationWidget.qgis_education_manager = self.qgis_education_manager
+                self.educationWidget.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
                 
                 # create the dockwidget with the correct parent and add the valuewidget
                 self.qgisedudockwidget = QDockWidget("QGIS Education", self.iface.mainWindow() )
