@@ -34,8 +34,10 @@ class ProcessingManager():
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         
-        self.working_directory, _ = terre_image_utils.fill_default_directory()
+        
         self.layer = None
+        self.working_directory = None #, _ = terre_image_utils.fill_default_directory()
+
         self.processings = []
         
         self.layers_for_value_tool = [ ]
@@ -51,8 +53,11 @@ class ProcessingManager():
     
     def set_current_layer(self):
         self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
+        if self.layer:
+            self.working_directory = os.path.join(os.path.dirname(self.layer.source_file), "working_directory")
         self.layers_for_value_tool.append(self.layer ) #.get_qgis_layer())
         print "set_current_layer: layers_for_value_tool", self.layers_for_value_tool
+        print "working directory"
         return self.layer, bands
         
         
@@ -64,4 +69,12 @@ class ProcessingManager():
             sortie += str(pro) + "\n"
         sortie += "]"
         return sortie
+    
+    def restore_processing_manager(self, filename, bands, type):
+        self.layer, bands  = terre_image_utils.restore_working_layer( filename, bands, type )
+        self.layers_for_value_tool.append(self.layer )
+        return self.layer, bands
+        
+        
+        
         
