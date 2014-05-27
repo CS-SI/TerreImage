@@ -38,13 +38,14 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
     
     
     
-    def __init__(self, name, x, y, points, color = None):
+    def __init__(self, name, x, y, points, abs=None,  color = None):
         QtGui.QWidget.__init__(self)
         self.setupUi(self)
         
         self.name = name
         self.lineEdit_curve_name.setText(name)
         
+        print "from curve", x, y
         self.coordinates = "[ x=" + str(x) + ", " + str(y) + "]"
         self.label_coordinates.setText(self.coordinates)
         
@@ -65,6 +66,11 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
             color = colors[ random.randint(0, len(colors)-1) ] 
             print 'color from creation courbe', color
         self.color = color
+        
+        if abs:
+            self.abs=abs
+        else:
+            self.abs = None
         
         pixmap = QtGui.QPixmap(self.pushButton_color.size())
         pixmap.fill(QColor(self.lettersToNameColor[self.color]))
@@ -116,3 +122,5 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
         return self.name + " " + str(self.coordinates) + " " + str(self.color) 
         
     
+    def has_abs(self):
+        return self.abs is not None

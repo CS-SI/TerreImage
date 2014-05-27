@@ -27,6 +27,7 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
+import qgis.gui
 
 from ui_valuewidgetbase import Ui_ValueWidgetBase as Ui_Widget
 from terre_image_curve import TerreImageCurve
@@ -377,7 +378,11 @@ class ValueWidget(QWidget, Ui_Widget):
                 if layer == self.the_layer_to_display.get_qgis_layer():
                     is_the_working_layer = True
             
-            layername=unicode(layer.name())
+            if not is_the_working_layer:
+                layername=unicode(layer.name())
+            else :
+                layername=""
+                
             if QGis.QGIS_VERSION_INT >= 10900:
                 layerSrs = layer.crs()
             else:
@@ -431,7 +436,7 @@ class ValueWidget(QWidget, Ui_Widget):
                       ident[key] = layer.dataProvider().noDataValue(key)
 
               for iband in range(1,layer.bandCount()+1): # loop over the bands
-                layernamewithband="" #layername
+                layernamewithband=layername
                 if ident is not None and len(ident)>1:
                     if is_the_working_layer:
                         layernamewithband+=' '+self.the_layer_to_display.band_invert[iband]
@@ -494,6 +499,8 @@ class ValueWidget(QWidget, Ui_Widget):
                 #never go in this loop because qgis always georeference a file at opening
                 coordx = pos.x()
                 coordy = pos.y()
+                if coordy < 0:
+                    coordy = - coordy
             else :
                 #getting the extent and the spacing
                 geotransform = dataset.GetGeoTransform()
@@ -655,16 +662,10 @@ class ValueWidget(QWidget, Ui_Widget):
                     numvalues.append(0)
                     
         if self.memorize_curve:
-#             colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
-#             print "len(colors)", len(colors)
-#             color = colors[ random.randint(0, len(colors)-1) ] 
-#             print 'color from creation courbe', color
-            #QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), pixel, ligne, numvalues)
             QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
             self.saved_curves.append(curve_temp)
             self.memorize_curve = False
-            print self.saved_curves
             self.verticalLayout_curves.addWidget( curve_temp )
             self.groupBox_saved_layers.show()
                     
@@ -746,13 +747,11 @@ class ValueWidget(QWidget, Ui_Widget):
                 print curve
                 
                 numvalues = curve.points
-                print "numvalues", numvalues
                 
                 ymin = self.ymin
                 ymax = self.ymax
                 
                 color_curve = curve.color
-                print "color_curve", color_curve
                 
                 self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color=color_curve, mfc='b', mec='b')
                 self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
@@ -762,50 +761,57 @@ class ValueWidget(QWidget, Ui_Widget):
                 self.mplFig.canvas.draw()
 
     def on_get_point_button(self):
-        QtCore.QObject.connect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
-        #init the mouse listener comportement and save the classic to restore it on quit
-        self.canvas.setMapTool(self.tool)
-        
+        if self.pushButton_get_point.isFlat() == False:
+            QtCore.QObject.connect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
+            #init the mouse listener comportement and save the classic to restore it on quit
+            self.canvas.setMapTool(self.tool)
+            self.pushButton_get_point.setFlat( True )
+        else :
+            QtCore.QObject.disconnect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
+            self.toolPan = qgis.gui.QgsMapToolPan( self.canvas )
+            self.canvas.setMapTool( self.toolPan )
+            self.pushButton_get_point.setFlat( False )
+            
         
     def rightClicked(self, position):
         mapPos = self.canvas.getCoordinateTransform().toMapCoordinates(position["x"],position["y"])
         x, y = self.calculatePixelLine(self.the_layer_to_display.get_qgis_layer(), mapPos)
+        
+        try :
+            x = int(float(x))
+            y = int(float(y))
+        except ValueError:
+            pass
+        
+        
         newPoints = [[mapPos.x(), mapPos.y()]]
         
         ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.y()), QgsRaster.IdentifyFormatValue )
-        print ident
         if ident is not None :
             attr = ident.results()
-            print attr
-        
         
         #ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.x()), QgsRaster.IdentifyFormatValue ).results()
         
-            print "attr", attr
-            
             #TODO : put values in right order
             new_points=[]
             for i in range(1, len(attr)+1):
-                print "i", i
-                print self.the_layer_to_display.band_invert
                 new_points.append( (self.the_layer_to_display.band_invert[i], attr[i] ))
-            print "new_points", new_points
             points = self.order_values(new_points)
             
-            points_for_curve = [ x[1] for x in points ]
-            
-            print "points", points
+            points_for_curve = [ t[1] for t in points ]
+            print "points_for_curve", points_for_curve
+            abs = [ t[0] for t in points ]
+            print "abs", abs
             
     #         colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
     #         print "len(colors)", len(colors)
     #         color = colors[ random.randint(0, len(colors)-1) ] 
     #         print 'color from creation courbe', color
             #QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
-            curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), mapPos.x(), mapPos.y(), points_for_curve)
+            curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), x, y, points_for_curve)
             QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
             self.saved_curves.append(curve_temp)
             self.memorize_curve = False
-            print self.saved_curves
             self.verticalLayout_curves.addWidget( curve_temp )
             self.groupBox_saved_layers.show()
         
