@@ -462,7 +462,7 @@ class ValueWidget(QWidget, Ui_Widget):
                     self.ymax=max(self.ymax,stats.maximumValue)
 
         try :
-            message_pixel_line = "Coordonnee (pixel, line) = (" + str( int(float(coordx))) + ", " + str( int(float(coordy))) + ")"
+            message_pixel_line = "Coordonnee (pixel, ligne) = (" + str( int(float(coordx))) + ", " + str( int(float(coordy))) + ")"
             self.iface.mainWindow().statusBar().showMessage( message_pixel_line )
         except ValueError:
             self.iface.mainWindow().statusBar().clearMessage()

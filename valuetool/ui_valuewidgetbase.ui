@@ -34,7 +34,7 @@
         <string>(Shift+A) to toggle</string>
        </property>
        <property name="text">
-        <string>Active</string>
+        <string>Actif</string>
        </property>
       </widget>
      </item>
@@ -48,7 +48,7 @@
      <item>
       <widget class="QCheckBox" name="cbxGraph">
        <property name="text">
-        <string>Graph</string>
+        <string>Graphe</string>
        </property>
       </widget>
      </item>
@@ -154,7 +154,7 @@
         <widget class="QTableWidget" name="tableWidget">
          <column>
           <property name="text">
-           <string>Layer</string>
+           <string>Couche</string>
           </property>
          </column>
          <column>
