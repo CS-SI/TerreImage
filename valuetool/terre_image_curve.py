@@ -28,6 +28,8 @@ from PyQt4.QtGui import *
 
 from ui_terre_image_curve import Ui_Form
 
+import random
+
 
 class TerreImageCurve(QtGui.QWidget, Ui_Form):
     
@@ -36,7 +38,7 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
     
     
     
-    def __init__(self, name, x, y, color, points):
+    def __init__(self, name, x, y, points, color = None):
         QtGui.QWidget.__init__(self)
         self.setupUi(self)
         
@@ -47,25 +49,21 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
         self.label_coordinates.setText(self.coordinates)
         
         
-        self.lettersToQColor = {"b": QColor(0, 132, 255),\
-        "green": QColor(148, 255, 69),\
-        "red": QColor(255, 30, 0),\
-        "cyan": QColor(0, 255, 204),\
-        "magenta": QColor(255, 0, 255),\
-        "yellow": QColor(255, 255, 0),\
-        "black": QColor(0, 0, 0),\
-        "white": QColor(255, 255, 255)}
-        self.lettersToNameColor = {"b": "blue",\
-        "g": "green",\
-        "r": "red",\
-        "c": "cyan",\
-        "m": "magenta",\
-        "y": "yellow",\
-        "k": "black",\
-        "w": "white"}
+        self.lettersToQColor = {"b": QColor(0, 132, 255), "green": QColor(148, 255, 69),\
+        "red": QColor(255, 30, 0), "cyan": QColor(0, 255, 204),\
+        "magenta": QColor(255, 0, 255), "yellow": QColor(255, 255, 0),\
+        "black": QColor(0, 0, 0), "white": QColor(255, 255, 255)}
+        
+        self.lettersToNameColor = {"b": "blue", "g": "green", "r": "red",\
+        "c": "cyan", "m": "magenta", "y": "yellow", "k": "black", "w": "white"}
+        
         self.nameColorsToLetters = dict((v,k) for k, v in self.lettersToNameColor.iteritems())
         
-        
+        if color is None:
+            colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
+            print "len(colors)", len(colors)
+            color = colors[ random.randint(0, len(colors)-1) ] 
+            print 'color from creation courbe', color
         self.color = color
         
         pixmap = QtGui.QPixmap(self.pushButton_color.size())
@@ -114,6 +112,7 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
         
         
         
-        
+    def __str__(self):
+        return self.name + " " + str(self.coordinates) + " " + str(self.color) 
         
     
