@@ -35,9 +35,12 @@ import terre_image_processing
 import manage_QGIS
 
 
-class SpectralAngle():
+class SpectralAngle(QtCore.QObject):
+    
+    __pyqtSignals__ = ("anglesComputed(PyQt_PyObject)")
     
     def __init__(self, iface, working_dir, layer, mirror_map):
+        QtCore.QObject.__init__(self)
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.mirrormap_tool = mirror_map
@@ -60,7 +63,8 @@ class SpectralAngle():
         self.deactivate()
         self.canvas.setMapTool(self.maptool)
         if image_output:
-            self.display(image_output)
+            self.emit( QtCore.SIGNAL("anglesComputed(PyQt_PyObject)"), image_output )
+            #self.display(image_output)
                     
                     
     def freezeCanvas(self, setFreeze):
