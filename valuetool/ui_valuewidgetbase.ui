@@ -162,16 +162,6 @@
            <string>Valeur</string>
           </property>
          </column>
-         <column>
-          <property name="text">
-           <string>Pixel</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Ligne</string>
-          </property>
-         </column>
         </widget>
        </item>
       </layout>

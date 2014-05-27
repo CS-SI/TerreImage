@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 /***************************************************************************
          Value Tool       - A QGIS plugin to get values at the mouse pointer
@@ -345,6 +346,7 @@ class ValueWidget(QWidget, Ui_Widget):
 
         needextremum = self.cbxGraph.isChecked() # if plot is checked
         
+        #if position is not None:
         if self.cbxGraph.isChecked():
             rasterlayers = [self.the_layer_to_display.get_qgis_layer()]
         else :
@@ -352,6 +354,9 @@ class ValueWidget(QWidget, Ui_Widget):
                 rasterlayers = self.layers_to_display
             else :
                 rasterlayers = self.get_raster_layers()
+#         else:
+#             print "position", position
+#             rasterlayers = self.get_raster_layers()
             
         irow=0
         self.values=[]
@@ -363,7 +368,7 @@ class ValueWidget(QWidget, Ui_Widget):
         else:
             mapCanvasSrs = self.iface.mapCanvas().mapRenderer().destinationSrs()
 
-                
+        
         for layer in rasterlayers:
             
             # check if the current layer is the working layer
@@ -426,7 +431,7 @@ class ValueWidget(QWidget, Ui_Widget):
                       ident[key] = layer.dataProvider().noDataValue(key)
 
               for iband in range(1,layer.bandCount()+1): # loop over the bands
-                layernamewithband=layername
+                layernamewithband="" #layername
                 if ident is not None and len(ident)>1:
                     if is_the_working_layer:
                         layernamewithband+=' '+self.the_layer_to_display.band_invert[iband]
@@ -451,8 +456,11 @@ class ValueWidget(QWidget, Ui_Widget):
                     self.ymin=min(self.ymin,stats.minimumValue)
                     self.ymax=max(self.ymax,stats.maximumValue)
 
-            
-
+        try :
+            message_pixel_line = "Coordonnee (pixel, line) = (" + str( int(float(coordx))) + ", " + str( int(float(coordy))) + ")"
+            self.iface.mainWindow().statusBar().showMessage( message_pixel_line )
+        except ValueError:
+            self.iface.mainWindow().statusBar().clearMessage()
         self.showValues()
 
 
@@ -606,18 +614,25 @@ class ValueWidget(QWidget, Ui_Widget):
         
         for row in new_items: #self.values:
             layername,value, x, y =row
+            
+            try:
+                value = str("{0:."+ str(3) +"f}").format(float(value))
+                x = str( int(float(x)))
+                y = str( int(float(y)))
+            except ValueError:
+                pass
     
             if (self.tableWidget.item(irow,0)==None):
                 # create the item
                 self.tableWidget.setItem(irow,0,QTableWidgetItem())
                 self.tableWidget.setItem(irow,1,QTableWidgetItem())
-                self.tableWidget.setItem(irow, 2, QTableWidgetItem())
-                self.tableWidget.setItem(irow, 3, QTableWidgetItem())
+                #self.tableWidget.setItem(irow, 2, QTableWidgetItem())
+                #self.tableWidget.setItem(irow, 3, QTableWidgetItem())
      
             self.tableWidget.item(irow,0).setText(layername)
             self.tableWidget.item(irow,1).setText(value)
-            self.tableWidget.item(irow, 2).setText( str( x ) )
-            self.tableWidget.item(irow, 3).setText( str( y ) )
+            #self.tableWidget.item(irow, 2).setText( x )
+            #self.tableWidget.item(irow, 3).setText( y )
             irow+=1
           
 
@@ -640,12 +655,12 @@ class ValueWidget(QWidget, Ui_Widget):
                     numvalues.append(0)
                     
         if self.memorize_curve:
-            colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
-            print "len(colors)", len(colors)
-            color = colors[ random.randint(0, len(colors)-1) ] 
-            print 'color from creation courbe', color
+#             colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
+#             print "len(colors)", len(colors)
+#             color = colors[ random.randint(0, len(colors)-1) ] 
+#             print 'color from creation courbe', color
             #QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
-            curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), pixel, ligne, color, numvalues)
+            curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), pixel, ligne, numvalues)
             QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
             self.saved_curves.append(curve_temp)
             self.memorize_curve = False
@@ -728,12 +743,16 @@ class ValueWidget(QWidget, Ui_Widget):
         
         for curve in self.saved_curves:
             if curve.display_points():
+                print curve
+                
                 numvalues = curve.points
+                print "numvalues", numvalues
                 
                 ymin = self.ymin
                 ymax = self.ymax
                 
                 color_curve = curve.color
+                print "color_curve", color_curve
                 
                 self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color=color_curve, mfc='b', mec='b')
                 self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
@@ -751,26 +770,41 @@ class ValueWidget(QWidget, Ui_Widget):
     def rightClicked(self, position):
         mapPos = self.canvas.getCoordinateTransform().toMapCoordinates(position["x"],position["y"])
         newPoints = [[mapPos.x(), mapPos.y()]]
-        ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.x()), QgsRaster.IdentifyFormatValue )
         
-        #TODO : put values in right order
-        new_points=[]
-        for i in range(1, ident):
-            new_point.append( (self.the_layer_to_display.band_invert[i], ident[i] ))
-        points = self.order_values(new_points)
+        ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.y()), QgsRaster.IdentifyFormatValue )
+        print ident
+        if ident is not None :
+            attr = ident.results()
+            print attr
         
-        colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
-        print "len(colors)", len(colors)
-        color = colors[ random.randint(0, len(colors)-1) ] 
-        print 'color from creation courbe', color
-        #QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
-        curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), mapPos.x(), mapPos.y(), color, points)
-        QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
-        self.saved_curves.append(curve_temp)
-        self.memorize_curve = False
-        print self.saved_curves
-        self.verticalLayout_curves.addWidget( curve_temp )
-        self.groupBox_saved_layers.show()
+        
+        #ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.x()), QgsRaster.IdentifyFormatValue ).results()
+        
+            print "attr", attr
+            
+            #TODO : put values in right order
+            new_points=[]
+            for i in range(1, len(attr)):
+                new_points.append( (self.the_layer_to_display.band_invert[i], attr[i] ))
+            print "new_points", new_points
+            points = self.order_values(new_points)
+            
+            points_for_curve = [ x[1] for x in points ]
+            
+            print "points", points
+            
+    #         colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
+    #         print "len(colors)", len(colors)
+    #         color = colors[ random.randint(0, len(colors)-1) ] 
+    #         print 'color from creation courbe', color
+            #QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
+            curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), mapPos.x(), mapPos.y(), points_for_curve)
+            QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
+            self.saved_curves.append(curve_temp)
+            self.memorize_curve = False
+            print self.saved_curves
+            self.verticalLayout_curves.addWidget( curve_temp )
+            self.groupBox_saved_layers.show()
         
         
 
