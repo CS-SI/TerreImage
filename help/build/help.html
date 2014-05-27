@@ -101,6 +101,21 @@
 <h2 id="customization">customization</h2>
 <p>Les attributs pixel/ligne ont été ajouté pour afficher la coordonnée dans l'image sous le curseur de la souris.</p>
 <p>Les layers à afficher vont être fournies au plugin. Si aucune layer n'est fournie, alors, on cherche les rasters.</p>
+<p>Lors de la fermeture d'un projet, on enlève les widgets en rapport avec le plugin. Lorsqu'on recharge une image, on obtient l'erreur suivante :#</p>
+<dl>
+<dt>Traceback (most recent call last):</dt>
+<dd><dl>
+<dt>File &quot;/home/amondot/.qgis2/python/plugins/QGISEducation/valuetool/valuewidget.py&quot;, line 789, in invalidatePlot</dt>
+<dd><p>self.printValue( None )</p>
+</dd>
+<dt>File &quot;/home/amondot/.qgis2/python/plugins/QGISEducation/valuetool/valuewidget.py&quot;, line 375, in printValue</dt>
+<dd><p>layername=unicode(layer.name())</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>RuntimeError: underlying C/C++ object has been deleted</p>
+<p>Dans le bout de code que j'ai rajouté je parcours les layers de travail que je passe en argument. Sauf qu'elles ont été deletées.</p>
 <h1 id="angle-spectral">Angle Spectral</h1>
 <p>Cette fonctionalité est plus ou moins problématique. En effet, les signaux ne fonctionnent pas systématiquement, je ne comprends pas pourquoi.</p>
 <p>J'ai ajouté la méthode de display dans la classez de spectral angle. J'ai essayé d'emettre un signal quand le fichier avait été créé. Impossible de le récuperer dans la classe de Processings.</p>

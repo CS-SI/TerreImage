@@ -155,7 +155,19 @@ customization
 Les attributs pixel/ligne ont été ajouté pour afficher la coordonnée dans l'image sous le curseur de la souris.
 
 Les layers à afficher vont être fournies au plugin.
-Si aucune layer n'est fournie, alors, on cherche les rasters. 
+Si aucune layer n'est fournie, alors, on cherche les rasters.
+
+Lors de la fermeture d'un projet, on enlève les widgets en rapport avec le plugin. Lorsqu'on recharge une image, on obtient l'erreur suivante :#
+
+Traceback (most recent call last):
+  File "/home/amondot/.qgis2/python/plugins/QGISEducation/valuetool/valuewidget.py", line 789, in invalidatePlot
+    self.printValue( None )
+  File "/home/amondot/.qgis2/python/plugins/QGISEducation/valuetool/valuewidget.py", line 375, in printValue
+    layername=unicode(layer.name())
+RuntimeError: underlying C/C++ object has been deleted
+
+Dans le bout de code que j'ai rajouté je parcours les layers de travail que je passe en argument. Sauf qu'elles ont été deletées. 
+
 
 
 
@@ -175,9 +187,19 @@ Reste à vérifier que ce mirror tool pointe vers le même mirror tool que les a
 
 
 
+Sauvegarde du projet courant
+============================
 
 
+état terre image
+----------------
+La sauvegarde de projet comprend :
+* L'image de travail
+* 
 
 
+Elle de comprend pas :
+* Les courbes mémorisées dans "profil spectral"
+* La réouvertures des vues des traitements
 
 
