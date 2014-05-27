@@ -284,9 +284,9 @@ class manage_bands:
     def define_spot(self):
         #spot 4-5
         self.blue = -1
-        self.green = 1
+        self.green = 3
         self.red = 2
-        self.pir = 3
+        self.pir = 1
         if self.nb_bands > 3 :
             self.mir = 4
         self.update_spin_box()
