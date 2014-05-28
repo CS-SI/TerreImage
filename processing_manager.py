@@ -50,6 +50,17 @@ class ProcessingManager():
         print " adding", processing. processing_name
         print "self.layers_for_value_tool", self.layers_for_value_tool
         
+        
+    def get_process_to_display(self):
+        for x in self.processings:
+            print x
+            print x.output_layer
+        
+        
+        temp = [x.output_layer for x in self.processings if isinstance(x, TerreImageProcessing) and x.output_layer is not None]
+        print temp
+        return temp
+        
     
     def set_current_layer(self):
         self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
