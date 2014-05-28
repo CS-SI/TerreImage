@@ -125,6 +125,7 @@ class TerreImageProcessing(TerreImageTask):
         self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
         print self.mirror
         self.mirror.mainWidget.addLayer( result_layer.id() )
+        self.mirror.mainWidget.onExtentsChanged()
         # 1 mettre image en queue
         
         
@@ -176,7 +177,7 @@ class TerreImageDisplay(TerreImageTask):
             self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
             print self.mirror
             self.mirror.mainWidget.addLayer( result_layer.id() )
-        
+            self.mirror.mainWidget.onExtentsChanged()
         
             ifaceLegend = self.iface.legendInterface()
             ifaceLayers = QgsMapLayerRegistry.instance().mapLayers()
