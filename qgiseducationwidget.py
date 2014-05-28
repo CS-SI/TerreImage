@@ -33,6 +33,7 @@ from working_layer import WorkingLayer
 from terre_image_task import TerreImageProcessing
 from terre_image_task import TerreImageDisplay
 import terre_image_utils
+from terre_image_histogram import TerreImageHistogram
 
 from processing_manager import ProcessingManager
 
@@ -95,13 +96,20 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.pushButton_profil_spectral.clicked.connect(self.display_values)
         self.pushButton_working_dir.clicked.connect(self.define_working_dir)
         self.pushButton_status.clicked.connect(self.status)
+        self.pushButton_histogramme.clicked.connect(self.histogram)
         
         
     def status(self):
         print self.qgis_education_manager
         print "self.mirror_map_tool.dockableMirrors", self.mirror_map_tool.dockableMirrors
         
+    def histogram(self):
         
+        self.hist = TerreImageHistogram(self.qgis_education_manager.layer) 
+        self.histodockwidget = QtGui.QDockWidget("Histograms", self.iface.mainWindow() )
+        self.histodockwidget.setObjectName("Histograms")
+        self.histodockwidget.setWidget(self.hist)
+        self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
         
         
     def define_working_dir(self):
@@ -113,12 +121,18 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         if text_changed:
             widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
             self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
+            self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
+            
+            self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
+            
             print "text changed", text_changed
             my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, text_changed )
             self.qgis_education_manager.add_processing(my_processing)
             self.comboBox_processing.setCurrentIndex( 0 )
             self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+            
             self.iface.messageBar().clearWidgets()
+            self.iface.mainWindow().statusBar().clearMessage()
         
         
         
@@ -161,9 +175,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.valuedockwidget.show()
         self.value_tool.changeActive( QtCore.Qt.Checked )
         self.value_tool.cbxActive.setCheckState( QtCore.Qt.Checked )
-        self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+        self.value_tool.set_layers([self.qgis_education_manager.layer] + self.qgis_education_manager.get_process_to_display())
                  
     def kmeans(self):
+        widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
+        self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
+        self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
+        
+        self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
         
         if self.qgis_education_manager.layer == None :
             print "Aucune layer selectionnée"
@@ -175,7 +194,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             
             self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
             #terre_image_processing.kmeans(self.qgis_education_manager.layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
-        
+        self.iface.messageBar().clearWidgets()
+        self.iface.mainWindow().statusBar().clearMessage()
     
 #     def spectral_angles( self ):
 #         self.angle_tool.get_point_for_angles(self.layer)
@@ -189,6 +209,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.value_tool.close()
         self.value_tool.disconnect()
         self.value_tool = None
+        #rubberband
+        
         # remove the dockwidget from iface
         self.iface.removeDockWidget(self.valuedockwidget)
         
