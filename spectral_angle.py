@@ -128,7 +128,7 @@ class SpectralAngle(QtCore.QObject):
         
     def deactivate(self):        #enable clean exit of the plugin
         QtCore.QObject.disconnect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
-        #self.rubberband.reset(self.polygon)
+        self.rubberband.reset()
         
         
     def rightClicked(self,position):    #used to quit the current action
