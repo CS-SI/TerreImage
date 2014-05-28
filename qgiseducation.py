@@ -224,6 +224,7 @@ class QGISEducation:
         """
         timeBegin = time.time()
         
+        self.iface.newProject( True )
         
         self.qgis_education_manager = ProcessingManager(self.iface)
         
