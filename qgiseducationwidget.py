@@ -106,8 +106,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     def histogram(self):
         
         self.hist = TerreImageHistogram(self.qgis_education_manager.layer) 
-        self.histodockwidget = QtGui.QDockWidget("Histograms", self.iface.mainWindow() )
-        self.histodockwidget.setObjectName("Histograms")
+        self.histodockwidget = QtGui.QDockWidget("Histogrammes", self.iface.mainWindow() )
+        self.histodockwidget.setObjectName("Histogrammes")
         self.histodockwidget.setWidget(self.hist)
         self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
         

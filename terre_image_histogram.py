@@ -35,6 +35,7 @@ import numpy.ma as ma
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from matplotlib.patches import Rectangle
 
 progname = os.path.basename(sys.argv[0])
 progversion = "0.1"
@@ -71,6 +72,12 @@ class MyMplCanvas(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
+        
+        self.rect = Rectangle((0,0), 1, 1)
+        self.x0 = None
+        self.y0 = None
+        self.x1 = None
+        self.y1 = None
 
     def compute_initial_figure(self):
         pass
@@ -112,9 +119,26 @@ class MyStaticMplCanvas(MyMplCanvas):
         t = range(0, len(histogram))
         s = histogram
         self.axes.plot(t, s, color)
+        self.axes.figure.canvas.mpl_connect('button_press_event', self.on_press)
+        self.axes.figure.canvas.mpl_connect('button_release_event', self.on_release)
         xtext = self.axes.set_xlabel('Valeur') # returns a Text instance
         ytext = self.axes.set_ylabel('Nombre')
         self.axes.set_title(name)
+        
+    def on_press(self, event):
+        print 'press'
+        self.x0 = event.xdata
+        self.y0 = event.ydata
+
+    def on_release(self, event):
+        print 'release'
+        self.x1 = event.xdata
+        self.y1 = event.ydata
+        self.rect.set_width(self.x1 - self.x0)
+        self.rect.set_height(self.y1 - self.y0)
+        self.rect.set_xy((self.x0, self.y0))
+        self.axes.figure.canvas.draw()
+        print self.x0, self.x1, self.y0, self.y1
 
 
 class MyDynamicMplCanvas(MyMplCanvas):
@@ -163,7 +187,7 @@ class TerreImageHistogram(QtGui.QWidget) :#, Ui_Form):
         l.addWidget(sc_3)
         #l.addWidget(dc)
 
-        file_pointer = rasterIO.opengdalraster(layer.get_source())
+        #file_pointer = rasterIO.opengdalraster(layer.get_source())
         # pir, red, green
         print "layer pir", layer.pir
         #band = rasterIO.readrasterband(file_pointer, 1)
