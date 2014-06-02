@@ -86,6 +86,8 @@ class TerreImageProcessing(TerreImageTask):
 
         
     def run(self):
+        print "run, processing name", self.processing_name
+        print "self.arg", self.arg
         output_filename = ""
         if "NDVI" in self.processing_name:
             output_filename = terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
@@ -105,6 +107,9 @@ class TerreImageProcessing(TerreImageTask):
                 output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.iface, self.arg)
             else :
                 output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.iface)
+        if "Threshold" in self.processing_name and self.arg:
+            print "this is thrshold"
+            output_filename = terre_image_processing.threshold(self.layer, self.working_directory, self.arg)
         if output_filename:
             print output_filename
             self.display(output_filename)

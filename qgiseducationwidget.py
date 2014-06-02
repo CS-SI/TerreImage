@@ -34,8 +34,8 @@ from terre_image_task import TerreImageProcessing
 from terre_image_task import TerreImageDisplay
 import terre_image_utils
 from terre_image_histogram import TerreImageHistogram
-
 from processing_manager import ProcessingManager
+import manage_QGIS
 
 
 import datetime
@@ -110,6 +110,16 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.histodockwidget.setObjectName("Histogrammes")
         self.histodockwidget.setWidget(self.hist)
         self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
+        QtCore.QObject.connect( self.hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), self.histogram_threshold )
+        QtCore.QObject.connect( self.hist, QtCore.SIGNAL( "valueChanged(PyQt_PyObject)" ), self.histogram_stretching )
+        
+    def histogram_threshold(self, forms):
+        print "educationwidget forms", forms
+        self.do_manage_processing("Threshold", args=forms)
+        
+    def histogram_stretching(self, values):
+        print "histogram to stretch", values
+        manage_QGIS.custom_stretch(self.qgis_education_manager.layer.qgis_layer, values, self.canvas)
         
         
     def define_working_dir(self):
@@ -117,7 +127,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.qgis_education_manager.working_directory = output_dir
         
         
-    def do_manage_processing(self, text_changed):
+    def do_manage_processing(self, text_changed, args=None):
+        print "do processing args", args
         if text_changed:
             widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
             self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
@@ -126,7 +137,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
             
             print "text changed", text_changed
-            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, text_changed )
+            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, text_changed, args )
             self.qgis_education_manager.add_processing(my_processing)
             self.comboBox_processing.setCurrentIndex( 0 )
             self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
