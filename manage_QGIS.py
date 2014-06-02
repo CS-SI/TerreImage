@@ -121,7 +121,6 @@ def addRasterLayerToQGIS( raster, layername, iface = None ):
         
 
 def histogram_stretching(raster_layer, canvas):
-    pass
 #histogramStretch( true, QgsRaster::ContrastEnhancementCumulativeCut );
 # theLimits =QgsRaster::ContrastEnhancementCumulativeCut
 #   QgsRectangle myRectangle;
@@ -133,6 +132,7 @@ def histogram_stretching(raster_layer, canvas):
 #   myRasterLayer->setCacheImage( NULL );
 #   mMapCanvas->refresh();
     theLimits = QgsRaster.ContrastEnhancementCumulativeCut
+    print "theLimits", theLimits
     raster_layer.setContrastEnhancement( QgsContrastEnhancement.StretchToMinimumMaximum, theLimits )
     raster_layer.setCacheImage( None )
     canvas.refresh()
@@ -301,9 +301,87 @@ def show_clicked_point( point, name, iface, vl = None ):
     
     
     
+def custom_stretch( theRasterLayer, values, canvas ):
+    """
+    Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
+    """
+    
+    min_red, max_red = values[0]
+    min_green, max_green = values[1]
+    min_blue, max_blue = values[2]
+    
+    # type of layer : raster, vector, other
+    typeOfLayer = theRasterLayer.type()
+     
+    #take the layer renderer to get the min and max 
+    layerRenderer = theRasterLayer.renderer() # for qgis > 1.9
+    dataProvider = theRasterLayer.dataProvider()
+     
+    # the layer has to be a raster layer
+    if typeOfLayer == 1 :
+        if theRasterLayer.rasterType() == 2  and layerRenderer:
+                      
+            redEnhancement = QgsContrastEnhancement( dataProvider.dataType( 0 ) )
+            greenEnhancement = QgsContrastEnhancement( dataProvider.dataType( 1 ) )
+            blueEnhancement = QgsContrastEnhancement( dataProvider.dataType( 2 ) )
+            #set stretch to min max
+            redEnhancement.setMinimumValue( min_red )
+            redEnhancement.setMaximumValue( max_red )
+            greenEnhancement.setMinimumValue( min_green )
+            greenEnhancement.setMaximumValue( max_green )
+            blueEnhancement.setMinimumValue( min_blue )
+            blueEnhancement.setMaximumValue( max_blue )
+            redEnhancement.setContrastEnhancementAlgorithm(1)
+            greenEnhancement.setContrastEnhancementAlgorithm(1)
+            blueEnhancement.setContrastEnhancementAlgorithm(1)
+            layerRenderer.setRedContrastEnhancement( redEnhancement) #, QgsRaster.ContrastEnhancementCumulativeCut  )
+            layerRenderer.setGreenContrastEnhancement( greenEnhancement ) #, QgsRaster.ContrastEnhancementCumulativeCut  )
+            layerRenderer.setBlueContrastEnhancement( blueEnhancement)#, QgsRaster.ContrastEnhancementCumulativeCut  )
+        theRasterLayer.setCacheImage( None )    
+
+        #theRasterLayer.triggerRepaint()
+    canvas.refresh()
     
     
     
+    
+    def run(self):
+      # get the currently active layer (if any)
+      layer = self.iface.mapCanvas().currentLayer()
+      # test if a valid layer was returned
+      if layer:
+        # test if the layer is a raster from a local file (not a wms)
+        if layer.type() == layer.RasterLayer and ( not layer.usesProvider() ):
+          # Test if the raster is single band greyscale
+          if layer.rasterType()==QgsRasterLayer.GrayOrUndefined:
+            #Everything looks fine so set stretch and exit
+            #For greyscale layers there is only ever one band
+            band = layer.bandNumber( layer.grayBandName() )
+            extentMin = 0.0
+            extentMax = 0.0
+            generateLookupTableFlag = False
+            # compute the min and max for the current extent
+            extentMin, extentMax = \
+                             layer.computeMinimumMaximumFromLastExtent( band )
+            # set the layer min value for this band
+            layer.setMinimumValue( band, extentMin, generateLookupTableFlag )
+            # set the layer max value for this band
+            layer.setMaximumValue( band, extentMax, generateLookupTableFlag )
+            # ensure that stddev is set to zero
+            layer.setStandardDeviations( 0.0 );
+            # let the layer know that the min max are user defined
+            layer.setUserDefinedGrayMinimumMaximum( True )
+            # ensure any cached render data for this layer is cleared
+            layer.setCacheImage( None )
+            # make sure the layer is redrawn
+            layer.triggerRepaint()
+            #QMessageBox.information(None, 'Raster Scale', \
+            #  "Min %s : Max %s" % ( extentMin , extentMax ))
+            return
+      # One of our tests above failed - show and error message and exit
+      QMessageBox.information(None,"Raster Scale", \
+            "A single band raster layer must be selected")
+      return
     
     
     
