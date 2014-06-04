@@ -28,9 +28,11 @@ from qgis.gui import *
 
 import resources_rc
 
-class DockableMirrorMapPlugin:
-
+class DockableMirrorMapPlugin(QObject):
+	__pyqtSignals__ = ("mirrorClosed(PyQt_PyObject)")
 	def __init__(self, iface):
+		
+		QObject.__init__(self)
 		# Save a reference to the QGIS iface
 		self.iface = iface
 		
@@ -169,11 +171,13 @@ class DockableMirrorMapPlugin:
 
 
 	def onCloseDockableMirror(self, wdg):
+		title = wdg.title
 		if self.dockableMirrors.count( wdg ) > 0:
 			self.dockableMirrors.remove( wdg )
 
 		if len(self.dockableMirrors) <= 0:
 			self.lastDockableMirror = 0
+		self.emit( SIGNAL( "mirrorClosed(PyQt_PyObject)" ), title )
 
 		
 	def onWriteProject(self, domproject):
