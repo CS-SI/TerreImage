@@ -23,6 +23,7 @@
 import os
 import OTBApplications
 import manage_QGIS
+from working_layer import WorkingLayer
 import re
 
 from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
@@ -39,7 +40,8 @@ class TerreImageTask(object):
         self.working_directory = working_dir
         self.layer = layer
         self.mirrormap_tool = mirror_map_tool
-        
+        self.histogram = None
+        self.output_working_layer = None
         
     def get_mirror_map(self):
         return self.mirrormap
@@ -66,20 +68,17 @@ class TerreImageProcessing(TerreImageTask):
         self.processing_name = processing
         self.mirror = None
         
-        self.result_file_name = ""
         self.arg=None
         if arg:
             self.arg = arg
-        self.output_layer = None
-        
         
         self.run()
         
 
     def __str__(self):
         message = self.processing_name
-        if self.result_file_name :
-            message += " : \n\t status ok \n\t image resultante :" + self.result_file_name
+        if self.output_working_layer.source_file :
+            message += " : \n\t status ok \n\t image resultante :" + self.output_working_layer.source_file
             message += "\n\t mirror:" + str(self.mirror)
         
         return message
@@ -107,7 +106,7 @@ class TerreImageProcessing(TerreImageTask):
                 output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.iface, self.arg)
             else :
                 output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.iface)
-        if "Threshold" in self.processing_name and self.arg:
+        if "Seuillage" in self.processing_name and self.arg:
             print "this is thrshold"
             output_filename = terre_image_processing.threshold(self.layer, self.working_directory, self.arg)
         if output_filename:
@@ -115,7 +114,7 @@ class TerreImageProcessing(TerreImageTask):
             self.display(output_filename)
     
     def get_filename_result(self):
-        return self.result_file_name
+        return self.output_working_layer.source_file
     
 
     
@@ -125,7 +124,7 @@ class TerreImageProcessing(TerreImageTask):
         #result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
         result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, self.processing_name, self.iface )
         manage_QGIS.histogram_stretching( result_layer, self.iface.mapCanvas())
-        self.output_layer = result_layer
+        self.output_working_layer = WorkingLayer( output_filename, result_layer )
         # 2 ouvrir une nouvelle vue
         self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
         print self.mirror
@@ -165,7 +164,6 @@ class TerreImageDisplay(TerreImageTask):
         self.processing_name = self.corres[who]
         self.mirror = None
         
-        self.result_file_name = ""
         self.arg=None
         if arg:
             self.arg = arg
@@ -179,6 +177,7 @@ class TerreImageDisplay(TerreImageTask):
         print "self.who", self.who
         result_layer = manage_QGIS.display_one_band(self.layer, self.who, self.iface)
         if result_layer:
+            self.output_working_layer = WorkingLayer( self.layer.source_file, result_layer)
             self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
             print self.mirror
             self.mirror.mainWidget.addLayer( result_layer.id() )
@@ -202,7 +201,7 @@ class TerreImageDisplay(TerreImageTask):
             
     def __str__(self):
         message = self.processing_name
-        if self.result_file_name :
+        if self.output_working_layer.source_file :
             message += "\n\t mirror:" + str(self.mirror)
         
         return message
