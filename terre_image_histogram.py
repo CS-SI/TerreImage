@@ -36,21 +36,10 @@ import numpy.ma as ma
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
-
-progname = os.path.basename(sys.argv[0])
-progversion = "0.1"
-
-from pyrasterRasterIO import rasterIO
 import matplotlib.pyplot as plt
- 
 
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+import manage_QGIS
 
-#from ui_terre_image_curve import Ui_Form
-
-import random
 
 
 class MyMplCanvas(FigureCanvas):
@@ -92,13 +81,19 @@ class MyMplCanvas(FigureCanvas):
         else :
             band = dataset.GetRasterBand(band)
             rasterMin, rasterMax = band.ComputeRasterMinMax()
+            print rasterMax, rasterMin
             nbVal = rasterMax# - rasterMin
             if nbVal < 1 :
-                return 0
-            #get the histogram of the given raster
-            #histogram = band.GetHistogram(rasterMin, rasterMax+1, int(nbVal+1), approx_ok = 0)
-            histogram = band.GetHistogram(0, rasterMax+1, int(nbVal+1), approx_ok = 0)
-            #print "histogram", histogram
+                print "nb val < 1", nbVal
+                if nbVal != 0:
+                    histogram = band.GetHistogram(rasterMin, rasterMax+1, int(nbVal+1)*10, approx_ok = 0)
+                else:
+                    return []
+            else :
+                #get the histogram of the given raster
+                #histogram = band.GetHistogram(rasterMin, rasterMax+1, int(nbVal+1), approx_ok = 0)
+                histogram = band.GetHistogram(0, rasterMax+1, int(nbVal+1), approx_ok = 0)
+            print "histogram", histogram
             
             # get 2 - 98 %
             #taking the size of the raster
@@ -134,7 +129,8 @@ class MyMplCanvas(FigureCanvas):
         self.color = color
         self.name = name
         histogram = self.get_GDAL_histogram(filename, band)
-        #print histogram
+        print type(histogram)
+        print histogram
         self.t = range(0, len(histogram))
         self.s = histogram
         self.draw_histogram()
@@ -218,67 +214,108 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
     __pyqtSignals__ = ("valueChanged(PyQt_PyObject)", "threshold(PyQt_PyObject)")
     
     
-    def __init__(self, layer):
+    def __init__(self, layer, nb_bands = 3):
         QtGui.QWidget.__init__(self)
         QtCore.QObject.__init__(self)
         #self.setupUi(self)
         
         self.layer = layer
+        if nb_bands >= 3:
+            self.nb_hist = 3
+        else :
+            self.nb_hist = 1
         
-        
-        l = QVBoxLayout(self)
+        self.l = QtGui.QVBoxLayout(self)
         self.sc_1 = MyMplCanvas(self, width=5, height=4, dpi=100)
-        #self.sc_1.valueChanged.connect( self.valueChanged )
         QtCore.QObject.connect( self.sc_1, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
-        self.sc_2 = MyMplCanvas(self, width=5, height=4, dpi=100)
-        QtCore.QObject.connect( self.sc_2, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
-        self.sc_3 = MyMplCanvas(self, width=5, height=4, dpi=100)
-        QtCore.QObject.connect( self.sc_3, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
-        l.addWidget(self.sc_1)
-        l.addWidget(self.sc_2)
-        l.addWidget(self.sc_3)
-        b = QtGui.QPushButton("Remise à zéro")
-        b.clicked.connect(self.reset)
-        l.addWidget(b)
-        seuil = QtGui.QPushButton("Seuillage")
-        seuil.clicked.connect(self.seuillage)
-        l.addWidget(seuil)
-        
+        self.l.addWidget(self.sc_1)
         
 
-        #file_pointer = rasterIO.opengdalraster(layer.get_source())
-        # pir, red, green
-        print "layer pir", layer.pir
-        #band = rasterIO.readrasterband(file_pointer, 1)
-        #sc_1.compute_initial_figure(band, 'r')
-        self.sc_1.display_histogram(layer.get_source(), layer.pir, 'r', "Plan R : BS PIR")
-        #band = rasterIO.readrasterband(file_pointer, 2)
-        #sc_2.compute_initial_figure(band, 'g')
-        self.sc_2.display_histogram(layer.get_source(), layer.red, 'g', "Plan V : BS R")
-        #band = rasterIO.readrasterband(file_pointer, 3)
-        #sc_3.compute_initial_figure(band, 'b')
-        self.sc_3.display_histogram(layer.get_source(), layer.green, 'b', "Plan B : BS V")
-        #dc.compute_initial_figure()
+    def set_buttons(self):
+        b = QtGui.QPushButton("Remise à zéro")
+        b.clicked.connect(self.reset)
+        self.l.addWidget(b)
+#         seuil = QtGui.QPushButton("Seuillage")
+#         seuil.clicked.connect(self.seuillage)
+#         self.l.addWidget(seuil)
+        
+        
         
     def reset(self):
         print "resset"
         self.sc_1.draw_reset_percent()
-        self.sc_2.draw_reset_percent()
-        self.sc_3.draw_reset_percent()
+        if self.nb_hist == 3 :
+            self.sc_2.draw_reset_percent()
+            self.sc_3.draw_reset_percent()
+        
         
     def seuillage(self):
         forms = []
-        forms.append( "if(((im1b1>" + str(self.sc_1.x_min) + ") and (im1b1<" + str(self.sc_1.x_max) + ")), im1b1, 0)" )
-        forms.append( "if(((im1b2>" + str(self.sc_2.x_min) + ") and (im1b2<" + str(self.sc_2.x_max) + ")), im1b2, 0)" )
-        forms.append( "if(((im1b3>" + str(self.sc_3.x_min) + ") and (im1b3<" + str(self.sc_3.x_max) + ")), im1b3, 0)" )
+        forms.append( "\"if(((im1b1>" + str(self.sc_1.x_min) + ") and (im1b1<" + str(self.sc_1.x_max) + ")), im1b1, 0)\"" )
+        if self.nb_hist == 3 :
+            forms.append( "\"if(((im1b2>" + str(self.sc_2.x_min) + ") and (im1b2<" + str(self.sc_2.x_max) + ")), im1b2, 0)\"" )
+            forms.append( "\"if(((im1b3>" + str(self.sc_3.x_min) + ") and (im1b3<" + str(self.sc_3.x_max) + ")), im1b3, 0)\"" )
         print forms
         #emit signal
         self.emit( QtCore.SIGNAL("threshold(PyQt_PyObject)"), forms )
         
+        
+        
+class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):        
+        
+    def __init__(self, layer, canvas, processing=None, specific_band=-1):
+        #super(TerreImageHistogram_monoband, self).__init__(layer, 1) 
+        TerreImageHistogram.__init__( self, layer, 1 )
+        self.canvas = processing.mirror.mainWidget.canvas
+        
+        if specific_band == -1:
+            self.sc_1.display_histogram(self.layer.get_source(), 1, 'r', layer.name())
+        else :
+            self.sc_1.display_histogram(self.layer.get_source(), specific_band, 'r', layer.name())
+        self.set_buttons()
+        
+        seuil = QtGui.QPushButton("Seuillage")
+        seuil.clicked.connect(self.seuillage)
+        self.l.addWidget(seuil)
+           
     def valueChanged(self):
         print "value changed"
+        values = [ (self.sc_1.x_min, self.sc_1.x_max ) ]
+        print "values", values
+        manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas)
+        #self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
+           
+           
+           
+class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):    
+      
+    def __init__(self, layer, canvas, nb_bands = 3):
+        #super(TerreImageHistogram_monoband, self).__init__(layer, nb_bands) 
+        TerreImageHistogram.__init__( self, layer, nb_bands )  
+        self.canvas = canvas       
+        
+        self.sc_2 = MyMplCanvas(self, width=5, height=4, dpi=100)
+        QtCore.QObject.connect( self.sc_2, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
+        self.sc_3 = MyMplCanvas(self, width=5, height=4, dpi=100)
+        QtCore.QObject.connect( self.sc_3, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
+        self.l.addWidget(self.sc_2)
+        self.l.addWidget(self.sc_3)
+        
+        
+        self.sc_1.display_histogram(self.layer.get_source(), self.layer.pir, 'r', "Plan R : BS PIR")
+        self.sc_2.display_histogram(self.layer.get_source(), self.layer.red, 'g', "Plan V : BS R")
+        self.sc_3.display_histogram(self.layer.get_source(), self.layer.green, 'b', "Plan B : BS V")
+        self.set_buttons()
+        
+        
+           
+    def valueChanged(self):
         values = [ (self.sc_1.x_min, self.sc_1.x_max ), (self.sc_2.x_min, self.sc_2.x_max ), (self.sc_3.x_min, self.sc_3.x_max )]
         print "values", values
-        self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )
+        manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas)
+        #self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
+           
+
+        
         
         
