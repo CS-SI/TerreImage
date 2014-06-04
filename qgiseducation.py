@@ -36,6 +36,7 @@ from terre_image_task import TerreImageDisplay
 from processing_manager import ProcessingManager
 import terre_image_utils
 import time
+from terre_image_constant import TerreImageConstant
 #from supervisedclassification import SupervisedClassification
 
 
@@ -44,6 +45,12 @@ class QGISEducation:
     def __init__(self, iface):
         # Save reference to the QGIS interface
         self.iface = iface
+        
+        
+        self.constants = TerreImageConstant()
+        self.constants.QGISInterface = self.iface
+        self.constants.QGISCanvas = self.iface.mapCanvas()
+        self.constants.QGISLegendInterface = self.iface.legendInterface()
 
 
     def initGui(self):
@@ -171,6 +178,8 @@ class QGISEducation:
         else :
             my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.educationWidget.mirror_map_tool, name )
             self.qgis_education_manager.add_processing(my_processing)
+            self.qgisedudockwidget.set_combobox_histograms()
+            
         
         self.educationWidget.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
         timeEnd = time.time()
@@ -193,6 +202,7 @@ class QGISEducation:
         #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
         my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.educationWidget.mirror_map_tool, who )
         self.qgis_education_manager.add_processing(my_process)
+        self.qgisedudockwidget.set_combobox_histograms()
         
         
     def do_histogram(self):
@@ -226,6 +236,9 @@ class QGISEducation:
         
         self.iface.newProject( True )
         
+        self.constants.index_group = self.iface.legendInterface().addGroup( "Terre Image", True, None )
+        print self.constants.index_group
+        
         self.qgis_education_manager = ProcessingManager(self.iface)
         
         
@@ -236,6 +249,7 @@ class QGISEducation:
         print "temps de chargement : ", timeExec
         
         if self.qgis_education_manager.layer and bands:
+
             if not self.dockOpened :
                 # create the widget to display information
                 self.educationWidget = QGISEducationWidget(self.iface)
