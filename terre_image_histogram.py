@@ -74,6 +74,9 @@ class MyMplCanvas(FigureCanvas):
         From the given binary image, compute histogram and return the number of 1
         """
         histogram = []
+        
+        decimal_values = False
+        
         print "image", image
         dataset = gdal.Open(str(image), gdal.GA_ReadOnly)
         if dataset is None:
@@ -86,7 +89,8 @@ class MyMplCanvas(FigureCanvas):
             if nbVal < 1 :
                 print "nb val < 1", nbVal
                 if nbVal != 0:
-                    histogram = band.GetHistogram(rasterMin, rasterMax+1, int(nbVal+1)*10, approx_ok = 0)
+                    histogram = band.GetHistogram(rasterMin, rasterMax+1, int(nbVal+1)*100, approx_ok = 0)
+                    decimal_values = True
                 else:
                     return []
             else :
@@ -123,16 +127,21 @@ class MyMplCanvas(FigureCanvas):
             self.ninety_eight_max = self.x_max
             print "self.two_min, self.ninety_eight_max", self.two_min, self.ninety_eight_max
 
-            return histogram
+            return histogram, decimal_values
         
     def display_histogram(self, filename, band, color, name):
         self.color = color
         self.name = name
-        histogram = self.get_GDAL_histogram(filename, band)
+        histogram, decimal_values = self.get_GDAL_histogram(filename, band)
         print type(histogram)
         print histogram
-        self.t = range(0, len(histogram))
+        if not decimal_values:
+            self.t = arange(0, len(histogram)) #range(0, len(histogram))
+        else:
+            self.t = arange(0, len(histogram)/100, 0.01)
         self.s = histogram
+        print "len s and len t", len(self.s), len(self.t)
+        print "self.t", self.t
         self.draw_histogram()
         self.axes.figure.canvas.mpl_connect('button_press_event', self.on_press)
         self.axes.figure.canvas.mpl_connect('button_release_event', self.on_release)
@@ -140,7 +149,7 @@ class MyMplCanvas(FigureCanvas):
         
         
     def draw_histogram(self):
-        if self.t and self.s and self.color and self.name:
+        if self.t.any() and self.s and self.color and self.name:
             self.axes.plot(self.t, self.s, self.color)
             xtext = self.axes.set_xlabel('Valeur') # returns a Text instance
             ytext = self.axes.set_ylabel('Nombre')
