@@ -76,26 +76,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         self.dock_histo_opened = False
         
-        
-        
-        
-        
-#         self.value_tool = ValueWidget( self.iface ) #, self )
-#         #creating a dock widget
-#         # create the dockwidget with the correct parent and add the valuewidget
-#         self.valuedockwidget = QtGui.QDockWidget("Values", self.iface.mainWindow() )
-#         self.valuedockwidget.setObjectName("Values")
-#         self.valuedockwidget.setWidget(self.value_tool)
-#         self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
-#         self.valuedockwidget.hide()
-#         
-#         
-#         print self.value_tool
-#         
-#         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
-#         self.mirror_map_tool.initGui()
-#         
-#         #self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
 
 
      
@@ -122,12 +102,17 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.pushButton_working_dir.clicked.connect(self.define_working_dir)
         self.pushButton_status.clicked.connect(self.status)
         self.pushButton_histogramme.clicked.connect(self.main_histogram)
+        self.pushButton_plugin_classification.clicked.connect(self.plugin_classification)
+        
         
         
     def status(self):
         print self.qgis_education_manager
         print "self.mirror_map_tool.dockableMirrors", self.qgis_education_manager.mirror_map_tool.dockableMirrors
         
+    def plugin_classification(self):
+        self.qgis_education_manager.classif_tool.setupUi()
+        self.qgis_education_manager.classif_tool.show()
         
         
         
@@ -157,14 +142,15 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         histodockwidget.setObjectName("Histogrammes")
         histodockwidget.setWidget(hist)
         histodockwidget.setFloating(True)
-        QtCore.QObject.connect( self.hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), lambda who=processing: self.histogram_threshold(who) )
+        QtCore.QObject.connect( hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), self.histogram_on_result )
         self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, histodockwidget)
         
         
         self.set_working_message(False)
         return hist, histodockwidget
         
-    def histogram_on_result(self, forms, who):
+    def histogram_on_result(self, forms):
+        print "QObject.sender() ",QObject.sender() 
         print "do processing args", args
         
         p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name=="Seuillage"]
@@ -172,7 +158,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             process = p[0]
             QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
         self.set_working_message(True)
-        my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.who.output_working_layer, self.qgis_education_manager.mirror_map_tool, "Seuillage", forms )
+        my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, who.output_working_layer, self.qgis_education_manager.mirror_map_tool, "Seuillage", forms )
         #self.qgis_education_manager.add_processing(my_processing) # TODO : keep it ?
         self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
         self.set_working_message(False)
@@ -222,15 +208,29 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                     process = p[0]
                     QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
             if do_it:
+                if text_changed == "Angle Spectral":
+                    widget = self.iface.messageBar().createMessage("Terre Image", "Cliquez sur un point de l'image pour en obtenir son angle spectral...")
+                    self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
                 self.set_working_message(True)
                 print "text changed", text_changed
                 my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, text_changed, args )
-                self.qgis_education_manager.add_processing(my_processing)
-                self.set_combobox_histograms()
-                self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
-                self.set_working_message(False)
+                if text_changed == "Angle Spectral":
+                    self.set_working_message(True)
+                    QtCore.QObject.connect( my_processing, QtCore.SIGNAL( "display_ok()" ), lambda who=my_processing: self.processing_end_display(who) )
+                if not text_changed == "Angle Spectral":
+                    self.qgis_education_manager.add_processing(my_processing)
+                    self.set_combobox_histograms()
+                    self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+                    self.set_working_message(False)
             self.comboBox_processing.setCurrentIndex( 0 )
             
+        
+    def processing_end_display(self, my_processing):
+        print "processing_end_display"
+        self.qgis_education_manager.add_processing(my_processing)
+        self.set_combobox_histograms()
+        self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+        self.set_working_message(False)
         
         
     def set_comboBox_sprectral_band_display( self ):
@@ -274,8 +274,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             for key in corres:
                 if corres[key] == text_changed :
                     who = key
-                    print "who", who
-                    if who in [process.processing_name for process in self.qgis_education_manager.processings] :
+                    print "do_manage_sprectral_band_display who", who
+                    if corres_name_view[who] in [process.processing_name for process in self.qgis_education_manager.processings] :
                         do_it = False
                     #band_to_display = self.qgis_education_manager.layer.bands[key]
                     #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
