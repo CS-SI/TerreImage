@@ -49,6 +49,7 @@ from qgis.core import ( QGis,
 
 
 import terre_image_utils
+from terre_image_constant import TerreImageConstant
 
 
 def addVectorLayerToQGIS( vectorLayer, layername, legendInterface ):
@@ -79,6 +80,9 @@ def get_raster_layer( raster, name ):
 
 
 def add_qgis_raser_layer( rasterLayer, canvas, bands=None):
+    index_group = TerreImageConstant().index_group
+    print index_group
+    
     if bands:
         print bands
         pir = bands['pir']
@@ -99,6 +103,7 @@ def add_qgis_raser_layer( rasterLayer, canvas, bands=None):
     
     
     QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
+    TerreImageConstant().QGISLegendInterface.moveLayer( rasterLayer, index_group )
       
       
 def addRasterLayerToQGIS( raster, layername, iface = None ):
@@ -110,6 +115,9 @@ def addRasterLayerToQGIS( raster, layername, iface = None ):
         layername     --    name to given to the raster layer for display
         indexGroup    --    index of the QGIS group where to move the layer
     """
+    index_group = TerreImageConstant().index_group
+    print index_group
+    
     if layername == None :
         layername = os.path.basename( raster )
     
@@ -117,6 +125,7 @@ def addRasterLayerToQGIS( raster, layername, iface = None ):
     histogram_stretching(rasterLayer, iface.mapCanvas())
     
     QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
+    TerreImageConstant().QGISLegendInterface.moveLayer( rasterLayer, index_group )
     return rasterLayer
         
 
@@ -209,6 +218,7 @@ def contrastForRasters( theRasterLayer, minLayer, maxLayer, band=None ):
          
         
 def display_one_band( layer, keyword, iface ): 
+    index_group = TerreImageConstant().index_group
     print "keyword", keyword
     corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir", "nat":"_couleurs_naturelles" }
     
@@ -228,6 +238,7 @@ def display_one_band( layer, keyword, iface ):
         #contrastForRasters( rasterLayer, 0, 0, [pir, red, green] )
         histogram_stretching(rasterLayer, iface.mapCanvas())
         QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
+        TerreImageConstant().QGISLegendInterface.moveLayer( rasterLayer, index_group )
         return rasterLayer
     else:
         
@@ -242,6 +253,7 @@ def display_one_band( layer, keyword, iface ):
             #contrastForRasters( rasterLayer, 0, 0 )
             histogram_stretching(rasterLayer, iface.mapCanvas())
             QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
+            TerreImageConstant().QGISLegendInterface.moveLayer( rasterLayer, index_group )
             return rasterLayer
     
     
@@ -305,10 +317,7 @@ def custom_stretch( theRasterLayer, values, canvas ):
     """
     Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
     """
-    
-    min_red, max_red = values[0]
-    min_green, max_green = values[1]
-    min_blue, max_blue = values[2]
+
     
     # type of layer : raster, vector, other
     typeOfLayer = theRasterLayer.type()
@@ -319,8 +328,24 @@ def custom_stretch( theRasterLayer, values, canvas ):
      
     # the layer has to be a raster layer
     if typeOfLayer == 1 :
-        if theRasterLayer.rasterType() == 2  and layerRenderer:
-                      
+        if theRasterLayer.rasterType() == 0 and layerRenderer:
+            min_layer, max_layer = values[0]
+            #gray band
+            #layerRenderer <qgis.core.QgsSingleBandGrayRenderer object at 0x514caf0>
+            grayEnhancement = QgsContrastEnhancement( dataProvider.dataType( 0 ) )
+            # take the contrast enhancement of the layer threw the renderer
+            if grayEnhancement :
+                grayEnhancement.setContrastEnhancementAlgorithm(1) #qgis 1.9
+                grayEnhancement.setMinimumValue( min_layer )
+                grayEnhancement.setMaximumValue( max_layer )
+                layerRenderer.setContrastEnhancement( grayEnhancement )
+                
+        elif theRasterLayer.rasterType() == 2  and layerRenderer:
+                          
+            min_red, max_red = values[0]
+            min_green, max_green = values[1]
+            min_blue, max_blue = values[2]
+            
             redEnhancement = QgsContrastEnhancement( dataProvider.dataType( 0 ) )
             greenEnhancement = QgsContrastEnhancement( dataProvider.dataType( 1 ) )
             blueEnhancement = QgsContrastEnhancement( dataProvider.dataType( 2 ) )
@@ -341,47 +366,6 @@ def custom_stretch( theRasterLayer, values, canvas ):
 
         #theRasterLayer.triggerRepaint()
     canvas.refresh()
-    
-    
-    
-    
-    def run(self):
-      # get the currently active layer (if any)
-      layer = self.iface.mapCanvas().currentLayer()
-      # test if a valid layer was returned
-      if layer:
-        # test if the layer is a raster from a local file (not a wms)
-        if layer.type() == layer.RasterLayer and ( not layer.usesProvider() ):
-          # Test if the raster is single band greyscale
-          if layer.rasterType()==QgsRasterLayer.GrayOrUndefined:
-            #Everything looks fine so set stretch and exit
-            #For greyscale layers there is only ever one band
-            band = layer.bandNumber( layer.grayBandName() )
-            extentMin = 0.0
-            extentMax = 0.0
-            generateLookupTableFlag = False
-            # compute the min and max for the current extent
-            extentMin, extentMax = \
-                             layer.computeMinimumMaximumFromLastExtent( band )
-            # set the layer min value for this band
-            layer.setMinimumValue( band, extentMin, generateLookupTableFlag )
-            # set the layer max value for this band
-            layer.setMaximumValue( band, extentMax, generateLookupTableFlag )
-            # ensure that stddev is set to zero
-            layer.setStandardDeviations( 0.0 );
-            # let the layer know that the min max are user defined
-            layer.setUserDefinedGrayMinimumMaximum( True )
-            # ensure any cached render data for this layer is cleared
-            layer.setCacheImage( None )
-            # make sure the layer is redrawn
-            layer.triggerRepaint()
-            #QMessageBox.information(None, 'Raster Scale', \
-            #  "Min %s : Max %s" % ( extentMin , extentMax ))
-            return
-      # One of our tests above failed - show and error message and exit
-      QMessageBox.information(None,"Raster Scale", \
-            "A single band raster layer must be selected")
-      return
     
     
     
