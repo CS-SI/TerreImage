@@ -26,16 +26,17 @@ from ui_qgiseducation import Ui_QGISEducation
 import OTBApplications
 from qgis.gui import QgsRubberBand, QgsMapToolPan, QgsMessageBar
 
-from qgis.core import QGis, QgsPoint, QgsRaster
+from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
 
 
 from working_layer import WorkingLayer
 from terre_image_task import TerreImageProcessing
 from terre_image_task import TerreImageDisplay
 import terre_image_utils
-from terre_image_histogram import TerreImageHistogram
+from terre_image_histogram import TerreImageHistogram_multiband
+from terre_image_histogram import TerreImageHistogram_monoband
 from processing_manager import ProcessingManager
-import manage_QGIS
+
 
 
 import datetime
@@ -46,6 +47,17 @@ from valuetool.valuewidget import ValueWidget
 from spectral_angle import SpectralAngle
 
 from DockableMirrorMap.dockableMirrorMapPlugin import DockableMirrorMapPlugin
+
+
+class Terre_Image_Dock_widget(QtGui.QDockWidget):
+    
+    def __init__(self, title, parent):
+        QtGui.QDockWidget.__init__(self, title, parent)
+        
+    def closeEvent(self, event):
+        self.emit( SIGNAL( "closed(PyQt_PyObject)" ), self )
+
+
 
 class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     def __init__(self, iface):
@@ -60,24 +72,30 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.qgis_education_manager = ProcessingManager( self.iface )
         self.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
         
-        self.value_tool = ValueWidget( self.iface ) #, self )
-        #creating a dock widget
-        # create the dockwidget with the correct parent and add the valuewidget
-        self.valuedockwidget = QtGui.QDockWidget("Values", self.iface.mainWindow() )
-        self.valuedockwidget.setObjectName("Values")
-        self.valuedockwidget.setWidget(self.value_tool)
-        self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
-        self.valuedockwidget.hide()
+        QtCore.QObject.connect(QgsMapLayerRegistry.instance(), QtCore.SIGNAL( "layerWillBeRemoved(QString)" ), self.layer_deleted)
+        
+        self.dock_histo_opened = False
         
         
-        print self.value_tool
         
-        self.layer = None
         
-        self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
-        self.mirror_map_tool.initGui()
         
-        self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
+#         self.value_tool = ValueWidget( self.iface ) #, self )
+#         #creating a dock widget
+#         # create the dockwidget with the correct parent and add the valuewidget
+#         self.valuedockwidget = QtGui.QDockWidget("Values", self.iface.mainWindow() )
+#         self.valuedockwidget.setObjectName("Values")
+#         self.valuedockwidget.setWidget(self.value_tool)
+#         self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
+#         self.valuedockwidget.hide()
+#         
+#         
+#         print self.value_tool
+#         
+#         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
+#         self.mirror_map_tool.initGui()
+#         
+#         #self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
 
 
      
@@ -92,35 +110,99 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             self.comboBox_processing.insertItem ( index, item )
         self.comboBox_processing.currentIndexChanged[str].connect(self.do_manage_processing)
         
+        #fill histograms
+        itemHistogrammes = [ "Histogrammes", "Image de travail" ]
+        for index in range(len(itemHistogrammes)):
+            item = itemHistogrammes[index]
+            self.comboBox_histogrammes.insertItem ( index, item )
+        self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
+        
         self.pushButton_kmeans.clicked.connect(self.kmeans)
         self.pushButton_profil_spectral.clicked.connect(self.display_values)
         self.pushButton_working_dir.clicked.connect(self.define_working_dir)
         self.pushButton_status.clicked.connect(self.status)
-        self.pushButton_histogramme.clicked.connect(self.histogram)
+        self.pushButton_histogramme.clicked.connect(self.main_histogram)
         
         
     def status(self):
         print self.qgis_education_manager
-        print "self.mirror_map_tool.dockableMirrors", self.mirror_map_tool.dockableMirrors
+        print "self.mirror_map_tool.dockableMirrors", self.qgis_education_manager.mirror_map_tool.dockableMirrors
         
-    def histogram(self):
         
-        self.hist = TerreImageHistogram(self.qgis_education_manager.layer) 
-        self.histodockwidget = QtGui.QDockWidget("Histogrammes", self.iface.mainWindow() )
-        self.histodockwidget.setObjectName("Histogrammes")
-        self.histodockwidget.setWidget(self.hist)
-        self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
-        QtCore.QObject.connect( self.hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), self.histogram_threshold )
-        QtCore.QObject.connect( self.hist, QtCore.SIGNAL( "valueChanged(PyQt_PyObject)" ), self.histogram_stretching )
+        
+        
+    def main_histogram(self):
+        self.set_working_message(True)
+        if not self.dock_histo_opened:
+            self.hist = TerreImageHistogram_multiband(self.qgis_education_manager.layer, self.canvas) 
+            self.histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow() )
+            self.histodockwidget.setObjectName("Histogrammes")
+            self.histodockwidget.setWidget(self.hist)
+            self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
+            QtCore.QObject.connect( self.hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), self.histogram_threshold )
+            QtCore.QObject.connect( self.histodockwidget, QtCore.SIGNAL( "closed(PyQt_PyObject)" ), self.histogram_closed )
+        self.dock_histo_opened = True
+        self.set_working_message(False)
+        
+        
+    def histogram_closed(self):
+        self.dock_histo_opened = False
+        
+        
+    def histogram(self, layer_source, processing=None, specific_band=-1):
+        self.set_working_message(True)
+        
+        hist = TerreImageHistogram_monoband(layer_source, self.canvas, processing, specific_band) 
+        histodockwidget = QtGui.QDockWidget("Histogrammes", self.iface.mainWindow() )
+        histodockwidget.setObjectName("Histogrammes")
+        histodockwidget.setWidget(hist)
+        histodockwidget.setFloating(True)
+        QtCore.QObject.connect( self.hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), lambda who=processing: self.histogram_threshold(who) )
+        self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, histodockwidget)
+        
+        
+        self.set_working_message(False)
+        return hist, histodockwidget
+        
+    def histogram_on_result(self, forms, who):
+        print "do processing args", args
+        
+        p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name=="Seuillage"]
+        if p:
+            process = p[0]
+            QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
+        self.set_working_message(True)
+        my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.who.output_working_layer, self.qgis_education_manager.mirror_map_tool, "Seuillage", forms )
+        #self.qgis_education_manager.add_processing(my_processing) # TODO : keep it ?
+        self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+        self.set_working_message(False)
+        
         
     def histogram_threshold(self, forms):
         print "educationwidget forms", forms
-        self.do_manage_processing("Threshold", args=forms)
+        self.do_manage_processing("Seuillage", args=forms)
         
-    def histogram_stretching(self, values):
-        print "histogram to stretch", values
-        manage_QGIS.custom_stretch(self.qgis_education_manager.layer.qgis_layer, values, self.canvas)
+#     def histogram_stretching(self, values):
+#         print "histogram to stretch", values
+#         manage_QGIS.custom_stretch(self.qgis_education_manager.layer.qgis_layer, values, self.canvas)
         
+    def do_manage_histograms(self, text_changed):
+        if text_changed == "Image de travail":
+            self.main_histogram()
+        elif text_changed != "Histogrammes" and text_changed != "":
+            # find the layer corresponding to the name
+            process = self.qgis_education_manager.name_to_processing[text_changed]
+            if process :
+                if not process.histogram:
+                    print "process", process, type(process)
+                    print "type(process.output_working_layer)", type(process.output_working_layer)
+                    print "histogram to display", process.output_working_layer.get_source()
+                    # display the histogram of the layer
+                    
+                    hist, histdockwidget = self.histogram( process.output_working_layer, process )
+                    process.histogram = hist
+        self.comboBox_histogrammes.setCurrentIndex( 0 )
+                    
         
     def define_working_dir(self):
         output_dir = terre_image_utils.getOutputDirectory(self)
@@ -128,23 +210,27 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         
     def do_manage_processing(self, text_changed, args=None):
+        do_it = True
         print "do processing args", args
         if text_changed:
-            widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
-            self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
-            self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
-            
-            self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
-            
-            print "text changed", text_changed
-            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, text_changed, args )
-            self.qgis_education_manager.add_processing(my_processing)
+            if text_changed in ["NDVI", "NDTI", "Indice de brillance"]:
+                if text_changed in [process.processing_name for process in self.qgis_education_manager.processings] :
+                    do_it = False
+            if text_changed in [ "Seuillage", "Angle Spectral" ]:
+                p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name==text_changed]
+                if p:
+                    process = p[0]
+                    QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
+            if do_it:
+                self.set_working_message(True)
+                print "text changed", text_changed
+                my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, text_changed, args )
+                self.qgis_education_manager.add_processing(my_processing)
+                self.set_combobox_histograms()
+                self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+                self.set_working_message(False)
             self.comboBox_processing.setCurrentIndex( 0 )
-            self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
             
-            self.iface.messageBar().clearWidgets()
-            self.iface.mainWindow().statusBar().clearMessage()
-        
         
         
     def set_comboBox_sprectral_band_display( self ):
@@ -167,33 +253,49 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             self.comboBox_sprectral_band_display.currentIndexChanged[str].connect(self.do_manage_sprectral_band_display)
             
             
+    def set_combobox_histograms(self):
+        if self.qgis_education_manager.layer:
+            process = ["Histogrammes", "Image de travail"] + [x.processing_name for x in self.qgis_education_manager.processings]
+            print "process", process 
+            
+            self.comboBox_histogrammes.clear()
+            
+            for i in range(len(process)):
+                self.comboBox_histogrammes.insertItem( i, process[i] )
+            self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
+            
+            
     def do_manage_sprectral_band_display(self, text_changed):
+        do_it = True
         if text_changed:
             band_to_display = None
             corres = { 'nat':"Afficher en couleurs naturelles", 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
+            corres_name_view = { 'nat':"Couleurs naturelles", 'red':"Bande rouge", 'green':"Bande verte", 'blue':"Bande bleue", 'pir':"Bande pir", 'mir':"Bande mir" }
             for key in corres:
                 if corres[key] == text_changed :
                     who = key
+                    print "who", who
+                    if who in [process.processing_name for process in self.qgis_education_manager.processings] :
+                        do_it = False
                     #band_to_display = self.qgis_education_manager.layer.bands[key]
                     #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
-                    my_processing = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, who )
-                    self.qgis_education_manager.add_processing(my_processing)
+                    if do_it :
+                        my_processing = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who )
+                        self.qgis_education_manager.add_processing(my_processing)
+                        self.set_combobox_histograms()
                     break
             self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
         
         
     def display_values(self):
-        self.valuedockwidget.show()
-        self.value_tool.changeActive( QtCore.Qt.Checked )
-        self.value_tool.cbxActive.setCheckState( QtCore.Qt.Checked )
-        self.value_tool.set_layers([self.qgis_education_manager.layer] + self.qgis_education_manager.get_process_to_display())
+        self.qgis_education_manager.display_values()
+#         self.valuedockwidget.show()
+#         self.qgis_education_manager.value_tool.changeActive( QtCore.Qt.Checked )
+#         self.qgis_education_manager.value_tool.cbxActive.setCheckState( QtCore.Qt.Checked )
+#         self.qgis_education_manager.value_tool.set_layers([self.qgis_education_manager.layer] + self.qgis_education_manager.get_process_to_display())
                  
     def kmeans(self):
-        widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
-        self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
-        self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
-        
-        self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
+        self.set_working_message(True)
         
         if self.qgis_education_manager.layer == None :
             print "Aucune layer selectionnée"
@@ -202,35 +304,52 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             print "nb_colass from spinbox", nb_class
             my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, "KMEANS", nb_class )
             self.qgis_education_manager.add_processing(my_processing)
+            self.set_combobox_histograms()
             
-            self.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+            self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
             #terre_image_processing.kmeans(self.qgis_education_manager.layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
-        self.iface.messageBar().clearWidgets()
-        self.iface.mainWindow().statusBar().clearMessage()
+            self.set_working_message(False)
+
     
 #     def spectral_angles( self ):
 #         self.angle_tool.get_point_for_angles(self.layer)
 
+
+    def layer_deleted(self, layer_id):
+        print layer_id, " deleted"
+        self.qgis_education_manager.removing_layer(layer_id)
+        self.set_combobox_histograms()
+
     def disconnect_interface(self):
         
-        #disconnect value tool
-        self.iface.mainWindow().statusBar().clearMessage()
-        self.value_tool.changeActive( QtCore.Qt.Unchecked )
-        self.value_tool.set_layers([])
-        self.value_tool.close()
-        self.value_tool.disconnect()
-        self.value_tool = None
+        self.qgis_education_manager.disconnect()
+        
+        #histograms
+        try :
+            self.hist.close()
+            self.hist = None
+        except AttributeError:
+            pass
+        
         #rubberband
         
         # remove the dockwidget from iface
-        self.iface.removeDockWidget(self.valuedockwidget)
-        
-        # disconnect dockable mirror map
-        self.mirror_map_tool.unload()
+        self.iface.removeDockWidget(self.histodockwidget)
+
         
         # disable working layer
         self.qgis_education_manager = None
         
+        
+    def set_working_message(self, set=True):
+        if set :
+            widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
+            self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
+            self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
+            self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
+        else :
+            self.iface.messageBar().clearWidgets()
+            self.iface.mainWindow().statusBar().clearMessage()
         
     def disconnectP(self):
         """
