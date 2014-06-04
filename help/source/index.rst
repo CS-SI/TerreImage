@@ -185,6 +185,14 @@ Le code de display est par contre dupliqué. La classe spectral angle se voit aj
 Reste à vérifier que ce mirror tool pointe vers le même mirror tool que les autres pour qu'on puisse gérer la vue du spectral angle depuis le plugin.
 
 
+Histogrammes
+============
+Le fichier ``terre_image_histograms`` contient 4 classes principales :
+* MyMplCanvas : contient le code matplotlib et gdal nécessaires à l'affichage d'un histogramme sur 1 bande
+* TerreImageHistogram : Classe mère des histogrammes
+* TerreImageHistogram_monoband : Classe qui va gérer les histogrammes d'images sur 1 bande. Va être utilisée lorsqu'on souhiate afficher l'histogramme d'un NDVI par exemple. De ce module, on pourra réaliser un seuillage sur le min max defini par l'utlisateur dans la figure matplotlib.
+* TerreImageHistogram_multiband : Classe qui gère les 3 histogrammes de l'image de travail
+
 
 
 Sauvegarde du projet courant

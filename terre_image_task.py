@@ -57,13 +57,15 @@ class TerreImageTask(object):
                 self.iface.mapCanvas().refresh()    
         
         
-class TerreImageProcessing(TerreImageTask):
+class TerreImageProcessing(TerreImageTask, QObject):
+    __pyqtSignals__ = ("display_ok()")
     
     def __init__(self, iface, working_dir, layer, mirror_map_tool, processing, arg=None):
         """
         processing_type : [processing/display]
         """
         super(TerreImageProcessing, self).__init__(iface, working_dir, layer, mirror_map_tool)
+        QObject.__init__(self)
         
         self.processing_name = processing
         self.mirror = None
@@ -124,6 +126,8 @@ class TerreImageProcessing(TerreImageTask):
         #result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
         result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, self.processing_name, self.iface )
         manage_QGIS.histogram_stretching( result_layer, self.iface.mapCanvas())
+        
+        print "defining self.output_working_layer"
         self.output_working_layer = WorkingLayer( output_filename, result_layer )
         # 2 ouvrir une nouvelle vue
         self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
@@ -146,6 +150,8 @@ class TerreImageProcessing(TerreImageTask):
         self.iface.mapCanvas().refresh()
         print ifaceLegend.isLayerVisible(result_layer)
         
+        self.emit( SIGNAL("display_ok()") )
+        print "signal emitted"
         # thaw the canvas
         self.freezeCanvas( False )
         
