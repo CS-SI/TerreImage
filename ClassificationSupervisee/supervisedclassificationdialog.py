@@ -99,12 +99,13 @@ class GenericThread(QtCore.QThread):
 '''
 
 class SupervisedClassificationDialog(QtGui.QDialog):
-    def __init__(self):
+    def __init__(self, iface):
         QtGui.QDialog.__init__(self)
         QtGui.QApplication.restoreOverrideCursor()
         
         self.output_dir = get_working_dir()
-        self.setupUi()
+        #self.setupUi()
+        QGisLayers.setInterface(iface)
         
         if not OSIdentifier.isWindows():
             QtGui.QMessageBox.critical( self, \

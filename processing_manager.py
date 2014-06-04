@@ -29,6 +29,7 @@ from qgis.core import QgsMapLayerRegistry
 
 from valuetool.valuewidget import ValueWidget
 from DockableMirrorMap.dockableMirrorMapPlugin import DockableMirrorMapPlugin
+from ClassificationSupervisee.supervisedclassificationdialog import SupervisedClassificationDialog
 
 
 
@@ -58,6 +59,8 @@ class ProcessingManager():
         QtCore.QObject.connect(self.mirror_map_tool, QtCore.SIGNAL( "mirrorClosed(PyQt_PyObject)" ), self.view_closed)
         
         #self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
+        
+        self.classif_tool = SupervisedClassificationDialog(self.iface)
         
         
     def add_processing(self, processing):
