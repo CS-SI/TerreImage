@@ -25,6 +25,10 @@ import os
 from PyQt4 import QtCore, QtGui
 import terre_image_utils
 from terre_image_task import TerreImageProcessing
+from qgis.core import QgsMapLayerRegistry
+
+from valuetool.valuewidget import ValueWidget
+from DockableMirrorMap.dockableMirrorMapPlugin import DockableMirrorMapPlugin
 
 
 
@@ -33,31 +37,45 @@ class ProcessingManager():
     def __init__(self, iface ):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
-        
-        
         self.layer = None
         self.working_directory = None #, _ = terre_image_utils.fill_default_directory()
-
         self.processings = []
-        
         self.layers_for_value_tool = [ ]
+        self.name_to_processing = {}
+        
+        self.value_tool = ValueWidget( self.iface ) #, self )
+        #creating a dock widget
+        # create the dockwidget with the correct parent and add the valuewidget
+        self.valuedockwidget = QtGui.QDockWidget("Values", self.iface.mainWindow() )
+        self.valuedockwidget.setObjectName("Values")
+        self.valuedockwidget.setWidget(self.value_tool)
+        self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
+        self.valuedockwidget.hide()
+        print self.value_tool
+        
+        self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
+        self.mirror_map_tool.initGui()
+        QtCore.QObject.connect(self.mirror_map_tool, QtCore.SIGNAL( "mirrorClosed(PyQt_PyObject)" ), self.view_closed)
+        
+        #self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
         
         
     def add_processing(self, processing):
         self.processings.append(processing)
         if isinstance(processing, TerreImageProcessing):
-            self.layers_for_value_tool.append(processing.output_layer)
-        print " adding", processing. processing_name
+            self.layers_for_value_tool.append(processing.output_working_layer.qgis_layer)
+        print " adding", processing.processing_name
+        self.name_to_processing[processing.processing_name] = processing
         print "self.layers_for_value_tool", self.layers_for_value_tool
         
         
     def get_process_to_display(self):
         for x in self.processings:
             print x
-            print x.output_layer
+            print x.output_working_layer.qgis_layer
         
         
-        temp = [x.output_layer for x in self.processings if isinstance(x, TerreImageProcessing) and x.output_layer is not None]
+        temp = [x.output_working_layer.qgis_layer for x in self.processings if isinstance(x, TerreImageProcessing) and x.output_working_layer.qgis_layer is not None]
         print temp
         return temp
         
@@ -90,5 +108,52 @@ class ProcessingManager():
         return self.layer, bands
         
         
+    def display_values(self):
+        
+        self.valuedockwidget.show()
+        self.value_tool.changeActive( QtCore.Qt.Checked )
+        self.value_tool.cbxActive.setCheckState( QtCore.Qt.Checked )
+        self.value_tool.set_layers([self.layer] + self.get_process_to_display())
         
         
+    def view_closed(self, name_of_the_closed_view):
+        print name_of_the_closed_view,  " has been closed"
+        process = self.name_to_processing[name_of_the_closed_view]
+        QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
+        self.remove_process(process)
+        
+        
+    def remove_process(self, process):
+        if process in self.processings :
+            self.processings.remove(process)
+            if isinstance(process, TerreImageProcessing):
+                self.layers_for_value_tool.remove(process.output_working_layer.qgis_layer)
+        self.name_to_processing[process.processing_name] = ""
+        
+        
+    def removing_layer(self, layer_id):
+        process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
+        print "process", process
+        if process :
+            process[0].mirror.close()
+            self.remove_process(process[0])
+        
+        
+    def disconnect(self):
+        #disconnect value tool
+        self.iface.mainWindow().statusBar().clearMessage()
+        try :
+            self.value_tool.changeActive( QtCore.Qt.Unchecked )
+            self.value_tool.set_layers([])
+            self.value_tool.close()
+            self.value_tool.disconnect()
+            self.value_tool = None
+        except AttributeError:
+            pass    
+        
+                
+        # disconnect dockable mirror map
+        self.mirror_map_tool.unload()
+        
+        # remove the dockwidget from iface
+        self.iface.removeDockWidget(self.valuedockwidget)
