@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_qgiseducation.ui'
 #
-# Created: Tue Jun  3 15:44:35 2014
+# Created: Wed Jun  4 18:29:22 2014
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -97,6 +97,9 @@ class Ui_QGISEducation(object):
         self.pushButton_working_dir.setObjectName(_fromUtf8("pushButton_working_dir"))
         self.horizontalLayout.addWidget(self.pushButton_working_dir)
         self.verticalLayout.addWidget(self.groupBox)
+        self.pushButton_kmz = QtGui.QPushButton(QGISEducation)
+        self.pushButton_kmz.setObjectName(_fromUtf8("pushButton_kmz"))
+        self.verticalLayout.addWidget(self.pushButton_kmz)
         self.pushButton_status = QtGui.QPushButton(QGISEducation)
         self.pushButton_status.setObjectName(_fromUtf8("pushButton_status"))
         self.verticalLayout.addWidget(self.pushButton_status)
@@ -119,5 +122,6 @@ class Ui_QGISEducation(object):
         self.pushButton_plugin_classification.setText(QtGui.QApplication.translate("QGISEducation", "Plugin de Classification", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox.setTitle(QtGui.QApplication.translate("QGISEducation", "Répertoire de sortie", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_working_dir.setText(QtGui.QApplication.translate("QGISEducation", "...", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButton_kmz.setText(QtGui.QApplication.translate("QGISEducation", "Export KMZ", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_status.setText(QtGui.QApplication.translate("QGISEducation", "Status", None, QtGui.QApplication.UnicodeUTF8))
 

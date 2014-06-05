@@ -150,6 +150,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="pushButton_kmz">
+     <property name="text">
+      <string>Export KMZ</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="pushButton_status">
      <property name="text">
       <string>Status</string>
