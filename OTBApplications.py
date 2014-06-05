@@ -26,8 +26,13 @@ import datetime
 import logging
 logger = logging.getLogger("TerreImage")
 logger.setLevel(logging.INFO)
- 
-import otbApplication
+
+
+currentOs = os.name
+if currentOs == "posix" :
+    prefix = ""
+else:
+    prefix = os.path.join( os.path.dirname(__file__),  "win32", "bin" )
 
 
 
@@ -43,7 +48,7 @@ def bandmath_cli( images, expression, output_filename ):
     """
     
     
-    command = "otbcli BandMath -il "
+    command = prefix + "otbcli BandMath -il "
     
     for image in images :
         command += image + " "
@@ -66,7 +71,7 @@ def concatenateImages_cli( listImagesIn, outputname ):
     """
     
     if listImagesIn and outputname :
-        command = "otbcli ConcatenateImages "
+        command = prefix + "otbcli ConcatenateImages "
         command += " -il " + " ".join(listImagesIn)
         command += " -out " + outputname
         
@@ -84,7 +89,7 @@ def kmeans_cli( image, nbClass, outputDirectory ):
     output = os.path.join( outputDirectory, filenameWithoutExtension + "_kmeans_" + str(nbClass) + ".tif" ) # + temp[index:]
     if not os.path.isfile(output):
         if image and nbClass and outputDirectory :
-            command = "otbcli KMeansClassification "
+            command = prefix + "otbcli KMeansClassification "
             command += " -in " + image
             command += " -out " + output
             command += " -nc " + str(nbClass)
@@ -101,7 +106,7 @@ def color_mapping_cli_ref_image( image_to_color, reference_image, working_dir):
     
     if not os.path.isfile(output_filename):
         print output_filename
-        command = "otbcli ColorMapping "
+        command = prefix + "otbcli ColorMapping "
         command += " -in " + image_to_color
         command += " -out " + output_filename
         command += " -method \"image\""
@@ -115,7 +120,7 @@ def color_mapping_cli_ref_image( image_to_color, reference_image, working_dir):
 def otbcli_export_kmz( filename, working_directory):
     output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + ".kmz" )
     if not os.path.isfile(output_kmz):
-        command = "otbcli KmzExport "
+        command = prefix + "otbcli KmzExport "
         command += " -in " + filename
         command += " -out " + output_kmz
         print command
