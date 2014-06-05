@@ -236,4 +236,8 @@ def get_sensor_id( image ):
         return sensor
     
     
-                
+def export_kmz( filenames, working_directory ):
+    kmzs = []
+    for image in filenames:
+        kmz_tmp = OTBApplications.otbcli_export_kmz(image, working_directory)      
+        kmzs.append(kmz_tmp)
