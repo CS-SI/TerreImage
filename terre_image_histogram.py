@@ -114,14 +114,21 @@ class MyMplCanvas(FigureCanvas):
             
             # catch the i where cum_hist(i) > nb_pixels_2 and nb_pixels_98
             hist_cum = 0
-            for i in range(len(histogram)):
+            
+            if decimal_values:
+                parcours = arange(0, len(histogram)/100, 0.01)
+            else:
+                parcours = arange(0, len(histogram))
+            cpt = 0
+            for i in parcours: #range(len(histogram)):
                 #print "i", i
                 if hist_cum > nb_pixels_2 and self.x_min == 0 :
                     self.x_min = i #+ rasterMin
                 if hist_cum > nb_pixels_98 :
                     self.x_max = i #+ rasterMin
                     break;
-                hist_cum += histogram[i]
+                hist_cum += histogram[cpt]
+                cpt += 1
             print "self.x_min, self.x_max", self.x_min, self.x_max
             self.two_min = self.x_min
             self.ninety_eight_max = self.x_max
@@ -139,6 +146,9 @@ class MyMplCanvas(FigureCanvas):
             self.t = arange(0, len(histogram)) #range(0, len(histogram))
         else:
             self.t = arange(0, len(histogram)/100, 0.01)
+            locs,labels = plt.yticks()
+            plt.yticks(locs, map(lambda x: "%.1f" % x, locs*1e9))
+            #ylabel('microseconds (1E-9)'
         self.s = histogram
         print "len s and len t", len(self.s), len(self.t)
         print "self.t", self.t
@@ -291,7 +301,7 @@ class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):
         print "value changed"
         values = [ (self.sc_1.x_min, self.sc_1.x_max ) ]
         print "values", values
-        manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas)
+        manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas, mono=True)
         #self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
            
            
