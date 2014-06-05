@@ -313,7 +313,7 @@ def show_clicked_point( point, name, iface, vl = None ):
     
     
     
-def custom_stretch( theRasterLayer, values, canvas ):
+def custom_stretch( theRasterLayer, values, canvas, mono=False ):
     """
     Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
     """
@@ -328,7 +328,7 @@ def custom_stretch( theRasterLayer, values, canvas ):
      
     # the layer has to be a raster layer
     if typeOfLayer == 1 :
-        if theRasterLayer.rasterType() == 0 and layerRenderer:
+        if (theRasterLayer.rasterType() == 0 or mono) and layerRenderer:
             min_layer, max_layer = values[0]
             #gray band
             #layerRenderer <qgis.core.QgsSingleBandGrayRenderer object at 0x514caf0>
