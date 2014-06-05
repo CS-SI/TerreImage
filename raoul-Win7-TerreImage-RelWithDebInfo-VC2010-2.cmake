@@ -6,7 +6,7 @@ SET (OTB_ARCH x86) # x86 / amd64
 
 SET (CTEST_BUILD_CONFIGURATION RelWithDebInfo)
 
-SET (CTEST_SOURCE_DIRECTORY "C:/Users/jmalik/.qgis2/python/plugins/qgisedu_plugin")
+SET (CTEST_SOURCE_DIRECTORY "C:/Users/jmalik/Dashboard/src/qgisedu_plugin")
 SET (CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/build/${OTB_PROJECT}-vc10-${OTB_ARCH}-${CTEST_BUILD_CONFIGURATION}-VC2010")
 
 SET (CTEST_CMAKE_GENERATOR  "Visual Studio 10")

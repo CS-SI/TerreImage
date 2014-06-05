@@ -24,7 +24,7 @@ import os
 import datetime
 
 import logging
-logger = logging.getLogger("Saterre_OTBApplications")
+logger = logging.getLogger("TerreImage")
 logger.setLevel(logging.INFO)
  
 import otbApplication
@@ -109,7 +109,7 @@ def bandmath_cli( images, expression, output_filename ):
     """
     
     
-    command = "otbcli_BandMath -il "
+    command = "otbcli BandMath -il "
     
     for image in images :
         command += image + " "
@@ -234,7 +234,7 @@ def concatenateImages_cli( listImagesIn, outputname ):
     """
     
     if listImagesIn and outputname :
-        command = "otbcli_ConcatenateImages "
+        command = "otbcli ConcatenateImages "
         command += " -il " + " ".join(listImagesIn)
         command += " -out " + outputname
         
@@ -305,7 +305,7 @@ def kmeans_cli( image, nbClass, outputDirectory ):
     output = os.path.join( outputDirectory, filenameWithoutExtension + "_kmeans_" + str(nbClass) + ".tif" ) # + temp[index:]
     if not os.path.isfile(output):
         if image and nbClass and outputDirectory :
-            command = "otbcli_KMeansClassification "
+            command = "otbcli KMeansClassification "
             command += " -in " + image
             command += " -out " + output
             command += " -nc " + str(nbClass)
@@ -322,7 +322,7 @@ def color_mapping_cli_ref_image( image_to_color, reference_image, working_dir):
     
     if not os.path.isfile(output_filename):
         print output_filename
-        command = "otbcli_ColorMapping "
+        command = "otbcli ColorMapping "
         command += " -in " + image_to_color
         command += " -out " + output_filename
         command += " -method \"image\""

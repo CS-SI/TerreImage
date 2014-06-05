@@ -1,5 +1,8 @@
 if(WIN32)
-set(BUNDLEDIR  ${CMAKE_CURRENT_BINARY_DIR}/zip)
+
+set(PLUGIN_NAME ${CMAKE_PROJECT_NAME})
+
+set(BUNDLEDIR  ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME})
 file(MAKE_DIRECTORY ${BUNDLEDIR})
 file(MAKE_DIRECTORY ${BUNDLEDIR}/win32)
 file(MAKE_DIRECTORY ${BUNDLEDIR}/win32/bin)
@@ -103,7 +106,7 @@ add_custom_command(TARGET qgis_BundlePlugin PRE_BUILD
                           -DBUNDLE:FILEPATH=${BUNDLEDIR}/win32/bin/otbApplicationLauncherCommandLine.exe
                           -DPLUGIN:FILEPATH=${BUNDLEDIR}/win32/plugin/otbapp_FullSVMClassificationChain.dll
                           -P ${CMAKE_CURRENT_SOURCE_DIR}/BundleFixing.cmake
-                   COMMAND ${ZIP_EXECUTABLE} -9r ${CMAKE_CURRENT_BINARY_DIR}/TerreImage.zip zip)
+                   COMMAND ${ZIP_EXECUTABLE} -9r ${CMAKE_CURRENT_BINARY_DIR}/TerreImage-${TerreImage_VERSION_FULL}.zip ${PLUGIN_NAME})
 
 # add_custom_target(qgis_BundlePlugin
                   # ALL
