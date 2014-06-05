@@ -36,7 +36,7 @@ import numpy.ma as ma
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 import manage_QGIS
 
@@ -146,8 +146,8 @@ class MyMplCanvas(FigureCanvas):
             self.t = arange(0, len(histogram)) #range(0, len(histogram))
         else:
             self.t = arange(0, len(histogram)/100, 0.01)
-            locs,labels = plt.yticks()
-            plt.yticks(locs, map(lambda x: "%.1f" % x, locs*1e9))
+            #locs,labels = plt.yticks()
+            #plt.yticks(locs, map(lambda x: "%.1f" % x, locs*1e9))
             #ylabel('microseconds (1E-9)'
         self.s = histogram
         print "len s and len t", len(self.s), len(self.t)
