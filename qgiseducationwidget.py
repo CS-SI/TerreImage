@@ -33,6 +33,7 @@ from working_layer import WorkingLayer
 from terre_image_task import TerreImageProcessing
 from terre_image_task import TerreImageDisplay
 import terre_image_utils
+import terre_image_processing
 from terre_image_histogram import TerreImageHistogram_multiband
 from terre_image_histogram import TerreImageHistogram_monoband
 from processing_manager import ProcessingManager
@@ -103,6 +104,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.pushButton_status.clicked.connect(self.status)
         self.pushButton_histogramme.clicked.connect(self.main_histogram)
         self.pushButton_plugin_classification.clicked.connect(self.plugin_classification)
+        self.pushButton_kmz.clicked.connect(self.export_kmz)
         
         
         
@@ -150,7 +152,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         return hist, histodockwidget
         
     def histogram_on_result(self, forms):
-        print "QObject.sender() ",QObject.sender() 
+        print "QObject.sender() ",QtCore.QObject.sender() 
         print "do processing args", args
         
         p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name=="Seuillage"]
@@ -310,6 +312,13 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             #terre_image_processing.kmeans(self.qgis_education_manager.layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
             self.set_working_message(False)
 
+
+    def export_kmz(self):
+        self.set_working_message(True)
+        files_to_export = [process.output_working_layer.get_source() for process in self.qgis_education_manager.processings]
+        print "files to export", files_to_export
+        kmz = terre_image_processing.export_kmz( files_to_export, self.qgis_education_manager.working_directory )
+        self.set_working_message(False)
     
 #     def spectral_angles( self ):
 #         self.angle_tool.get_point_for_angles(self.layer)
@@ -332,9 +341,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             pass
         
         #rubberband
-        
-        # remove the dockwidget from iface
-        self.iface.removeDockWidget(self.histodockwidget)
+        if self.dock_histo_opened:
+            # remove the dockwidget from iface
+            self.iface.removeDockWidget(self.histodockwidget)
 
         
         # disable working layer
