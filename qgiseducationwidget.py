@@ -33,6 +33,7 @@ from working_layer import WorkingLayer
 from terre_image_task import TerreImageProcessing
 from terre_image_task import TerreImageDisplay
 import terre_image_utils
+import terre_image_processing
 from terre_image_histogram import TerreImageHistogram_multiband
 from terre_image_histogram import TerreImageHistogram_monoband
 from processing_manager import ProcessingManager
@@ -103,6 +104,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.pushButton_status.clicked.connect(self.status)
         self.pushButton_histogramme.clicked.connect(self.main_histogram)
         self.pushButton_plugin_classification.clicked.connect(self.plugin_classification)
+        self.pushButton_kmz.clicked.connect(self.export_kmz)
         
         
         
@@ -150,15 +152,16 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         return hist, histodockwidget
         
     def histogram_on_result(self, forms):
-        print "QObject.sender() ",QObject.sender() 
-        print "do processing args", args
+        print "QObject.sender() ",QtCore.QObject.sender(self) 
+        print "do processing args", forms
+        who = QtCore.QObject.sender(self) 
         
         p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name=="Seuillage"]
         if p:
             process = p[0]
             QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
         self.set_working_message(True)
-        my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, who.output_working_layer, self.qgis_education_manager.mirror_map_tool, "Seuillage", forms )
+        my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, who.layer, self.qgis_education_manager.mirror_map_tool, "Seuillage", forms )
         #self.qgis_education_manager.add_processing(my_processing) # TODO : keep it ?
         self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
         self.set_working_message(False)
@@ -207,11 +210,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                 if p:
                     process = p[0]
                     QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
-            if do_it:
                 if text_changed == "Angle Spectral":
                     widget = self.iface.messageBar().createMessage("Terre Image", "Cliquez sur un point de l'image pour en obtenir son angle spectral...")
                     self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
-                self.set_working_message(True)
+            if do_it:
+                if not text_changed == "Angle Spectral":
+                    self.set_working_message(True)
+                
+                
                 print "text changed", text_changed
                 my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, text_changed, args )
                 if text_changed == "Angle Spectral":
@@ -302,7 +308,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         else :
             nb_class = self.spinBox_kmeans.value()
             print "nb_colass from spinbox", nb_class
-            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.mirror_map_tool, "KMEANS", nb_class )
+            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, "KMEANS", nb_class )
             self.qgis_education_manager.add_processing(my_processing)
             self.set_combobox_histograms()
             
@@ -310,6 +316,13 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             #terre_image_processing.kmeans(self.qgis_education_manager.layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
             self.set_working_message(False)
 
+
+    def export_kmz(self):
+        self.set_working_message(True)
+        files_to_export = [process.output_working_layer.get_source() for process in self.qgis_education_manager.processings]
+        print "files to export", files_to_export
+        kmz = terre_image_processing.export_kmz( files_to_export, self.qgis_education_manager.working_directory )
+        self.set_working_message(False)
     
 #     def spectral_angles( self ):
 #         self.angle_tool.get_point_for_angles(self.layer)
@@ -332,9 +345,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             pass
         
         #rubberband
-        
-        # remove the dockwidget from iface
-        self.iface.removeDockWidget(self.histodockwidget)
+        if self.dock_histo_opened:
+            # remove the dockwidget from iface
+            self.iface.removeDockWidget(self.histodockwidget)
 
         
         # disable working layer
