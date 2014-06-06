@@ -211,3 +211,15 @@ Elle de comprend pas :
 * La réouvertures des vues des traitements
 
 
+Packaging windows
+=================
+
+Sur une machine installée de manière particulière (***ajouter particularités Raoul***) :
+* Un OSGEO 32 bits
+* ...
+
+
+``cmake --build . --config RelWithDebInfo`` 
+Lance la génération du zip avec les dll embarquées.
+
+
