@@ -211,6 +211,21 @@ Elle de comprend pas :
 * La réouvertures des vues des traitements
 
 
+Plugin de classification
+========================
+
+Pour permettre (entre autre de renommer les bandes avec le nom de la bande spectrale, on a modifié les fichiers suivants :"
+
+* M ClassificationSupervisee/RasterLayerSelectorTable.py
+* M ClassificationSupervisee/supervisedclassificationdialog.py
+* M processing_manager.py
+* M qgiseducationwidget.py
+
+Dans le fichier ``ClassificationSupervisee/RasterLayerSelectorTable.py`` on adapte les la
+
+
+
+
 Packaging windows
 =================
 
