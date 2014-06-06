@@ -217,12 +217,17 @@ class QGISEducation:
         """
         Defines the unload of the plugin
         """
-        if self.qgisedudockwidget is not None:
-            self.qgisedudockwidget.close()
-            self.educationWidget.disconnectP()
+        self.unload_interface()
             # Remove the plugin menu item and icon
         self.iface.removePluginMenu(u"&QGISEducation", self.action)
         self.iface.removeToolBarIcon(self.action)
+
+    def unload_interface(self):
+        if self.qgisedudockwidget is not None:
+            self.qgisedudockwidget.close()
+            self.educationWidget.disconnectP()
+
+
 
     # run method that performs all the real work
     
@@ -253,6 +258,7 @@ class QGISEducation:
             if not self.dockOpened :
                 # create the widget to display information
                 self.educationWidget = QGISEducationWidget(self.iface)
+                QObject.connect( self.educationWidget, SIGNAL( "terminated()" ), self.unload_interface )
                 self.educationWidget.qgis_education_manager = self.qgis_education_manager
                 self.educationWidget.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
                 

@@ -60,13 +60,15 @@ class Terre_Image_Dock_widget(QtGui.QDockWidget):
 
 
 
-class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
+class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
+    __pyqtSignals__ = ("valueChanged()")
     def __init__(self, iface):
         
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
                 
         QtGui.QWidget.__init__(self)
+        QtCore.QObject.__init__(self)
         self.setupUi(self)
         self.setupUi_extra()
         
@@ -294,15 +296,16 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             
             
     def set_combobox_histograms(self):
-        if self.qgis_education_manager.layer:
-            process = ["Histogrammes", "Image de travail"] + [x.processing_name for x in self.qgis_education_manager.processings]
-            print "process", process 
-            
-            self.comboBox_histogrammes.clear()
-            
-            for i in range(len(process)):
-                self.comboBox_histogrammes.insertItem( i, process[i] )
-            self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
+        if self.qgis_education_manager:
+            if self.qgis_education_manager.layer:
+                process = ["Histogrammes", "Image de travail"] + [x.processing_name for x in self.qgis_education_manager.processings]
+                print "process", process 
+                
+                self.comboBox_histogrammes.clear()
+                
+                for i in range(len(process)):
+                    self.comboBox_histogrammes.insertItem( i, process[i] )
+                self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
             
             
     def do_manage_sprectral_band_display(self, text_changed):
@@ -366,7 +369,11 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         print layer_id, " deleted"
         
         if self.qgis_education_manager:
-            self.qgis_education_manager.removing_layer(layer_id)
+            print "self.qgis_education_manager.layer.get_qgis_layer().id()", self.qgis_education_manager.layer.get_qgis_layer().id()
+            if self.qgis_education_manager.layer.get_qgis_layer().id() == layer_id:
+                self.disconnect_interface()
+            else:
+                self.qgis_education_manager.removing_layer(layer_id)
         self.set_combobox_histograms()
 
     def disconnect_interface(self):
@@ -389,6 +396,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         
         # disable working layer
         self.qgis_education_manager = None
+        self.emit( QtCore.SIGNAL("terminated()") )
         
         
     def set_working_message(self, set=True):
