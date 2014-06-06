@@ -51,12 +51,12 @@ from DockableMirrorMap.dockableMirrorMapPlugin import DockableMirrorMapPlugin
 
 
 class Terre_Image_Dock_widget(QtGui.QDockWidget):
-    
+    __pyqtSignals__ = ("closed(PyQt_PyObject)")
     def __init__(self, title, parent):
         QtGui.QDockWidget.__init__(self, title, parent)
         
     def closeEvent(self, event):
-        self.emit( SIGNAL( "closed(PyQt_PyObject)" ), self )
+        self.emit( QtCore.SIGNAL( "closed(PyQt_PyObject)" ), self )
 
 
 
@@ -136,25 +136,35 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.dock_histo_opened = False
         
         
-    def histogram(self, layer_source, processing=None, specific_band=-1):
+    def histogram(self, layer_source, processing=None, specific_band=-1, hist=None):
         self.set_working_message(True)
         
-        hist = TerreImageHistogram_monoband(layer_source, self.canvas, processing, specific_band) 
-        histodockwidget = QtGui.QDockWidget("Histogrammes", self.iface.mainWindow() )
+        if hist == None:
+            hist = TerreImageHistogram_monoband(layer_source, self.canvas, processing, specific_band) 
+        histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow() )
         histodockwidget.setObjectName("Histogrammes")
         histodockwidget.setWidget(hist)
         histodockwidget.setFloating(True)
+        histodockwidget.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
         QtCore.QObject.connect( hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), self.histogram_on_result )
         self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, histodockwidget)
+        QtCore.QObject.connect( histodockwidget, QtCore.SIGNAL( "closed(PyQt_PyObject)" ), self.histogram_monoband_closed )
+        hist.dock_opened = True
         
         
         self.set_working_message(False)
         return hist, histodockwidget
+    
+    
+    def histogram_monoband_closed(self):
+        print "QObject.sender() ",QtCore.QObject.sender(self)
+        
+        
         
     def histogram_on_result(self, forms):
         print "QObject.sender() ",QtCore.QObject.sender(self) 
         print "do processing args", forms
-        who = QtCore.QObject.sender(self) 
+        who = QtCore.QObject.sender(self)
         
         p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name=="Seuillage"]
         if p:
@@ -175,21 +185,41 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
 #         print "histogram to stretch", values
 #         manage_QGIS.custom_stretch(self.qgis_education_manager.layer.qgis_layer, values, self.canvas)
         
+        
     def do_manage_histograms(self, text_changed):
+        print "text changed histogram", text_changed
         if text_changed == "Image de travail":
             self.main_histogram()
         elif text_changed != "Histogrammes" and text_changed != "":
             # find the layer corresponding to the name
             process = self.qgis_education_manager.name_to_processing[text_changed]
             if process :
+                specific_band = -1
+                print "working layer", 
+                bs = ["rouge", "verte", "bleue", "pir", "nir"]
+                corres = {"rouge":process.layer.red, "verte":process.layer.green, "bleue":process.layer.blue, "pir":process.layer.pir, "mir":process.layer.mir}
+                print "corres", corres
+                
+                for item in bs:
+                    if item in text_changed:
+                        print "bande à afficher : ", corres[item]
+                        specific_band = corres[item]
+                        
+                        
+                print "specific band", specific_band
+                
+                        
+                        
                 if not process.histogram:
                     print "process", process, type(process)
                     print "type(process.output_working_layer)", type(process.output_working_layer)
                     print "histogram to display", process.output_working_layer.get_source()
                     # display the histogram of the layer
                     
-                    hist, histdockwidget = self.histogram( process.output_working_layer, process )
+                    hist, histdockwidget = self.histogram( process.output_working_layer, process, specific_band )
                     process.histogram = hist
+                else :
+                    hist, histdockwidget = self.histogram( process.output_working_layer, process, specific_band,  process.histogram)
         self.comboBox_histogrammes.setCurrentIndex( 0 )
                     
         
@@ -330,12 +360,15 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
 
     def layer_deleted(self, layer_id):
         print layer_id, " deleted"
-        self.qgis_education_manager.removing_layer(layer_id)
+        
+        if self.qgis_education_manager:
+            self.qgis_education_manager.removing_layer(layer_id)
         self.set_combobox_histograms()
 
     def disconnect_interface(self):
         
-        self.qgis_education_manager.disconnect()
+        if self.qgis_education_manager:
+            self.qgis_education_manager.disconnect()
         
         #histograms
         try :
