@@ -179,7 +179,7 @@ def contrastForRasters( theRasterLayer, minLayer, maxLayer, band=None ):
             layerCE = layerRenderer.contrastEnhancement()
             # take the contrast enhancement of the layer threw the renderer
             if layerCE :
-                layerCE.setContrastEnhancementAlgorithm(2) #qgis 1.9
+                layerCE.setContrastEnhancementAlgorithm(3) #qgis 1.9
                 layerCE.setMinimumValue( minLayer )
                 layerCE.setMaximumValue( maxLayer )
         elif theRasterLayer.rasterType() == 2  and layerRenderer:
