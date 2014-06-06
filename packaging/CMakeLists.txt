@@ -78,6 +78,8 @@ add_custom_command(TARGET qgis_BundlePlugin PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy ${OSGEO4W_ROOT}/bin/msvcr71.dll ${BUNDLEDIR}/win32/bin
                    COMMAND ${CMAKE_COMMAND} -E copy ${MSVC10_CRT_DIR}/msvcp100.dll ${BUNDLEDIR}/win32/bin
                    COMMAND ${CMAKE_COMMAND} -E copy ${MSVC10_CRT_DIR}/msvcr100.dll ${BUNDLEDIR}/win32/bin
+                   COMMAND ${CMAKE_COMMAND} -E copy ${OSGEO4W_ROOT}/bin/libgcc_s_dw2-1.dll ${BUNDLEDIR}/win32/bin
+                   COMMAND ${CMAKE_COMMAND} -E copy ${OSGEO4W_ROOT}/bin/libiconv-2.dll ${BUNDLEDIR}/win32/bin
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${GDAL_DATA} ${BUNDLEDIR}/win32/share/gdal
                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cropvectortoimage.bat ${BUNDLEDIR}/win32/bin
                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/otbcli.bat ${BUNDLEDIR}/win32/bin
@@ -108,49 +110,7 @@ add_custom_command(TARGET qgis_BundlePlugin PRE_BUILD
                           -P ${CMAKE_CURRENT_SOURCE_DIR}/BundleFixing.cmake
                    COMMAND ${ZIP_EXECUTABLE} -9r ${CMAKE_CURRENT_BINARY_DIR}/TerreImage-${TerreImage_VERSION_FULL}.zip ${PLUGIN_NAME})
 
-# add_custom_target(qgis_BundlePlugin
-                  # ALL
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${FullSVMClassificationChain_OUTPUT_LOCATION} ${BUNDLEDIR}/win32/plugin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${otbCropVectorDataToImage_OUTPUT_LOCATION} ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OTB_DIR}/bin/RelWithDebInfo/otbapp_ConcatenateImages.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OTB_DIR}/bin/RelWithDebInfo/otbapp_KMeansClassification.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OTB_DIR}/bin/RelWithDebInfo/otbapp_ColorMapping.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OTB_DIR}/bin/RelWithDebInfo/otbapp_BandMath.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OTB_DIR}/bin/RelWithDebInfo/otbapp_ReadImageInfo.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OTB_APPLICATION_LAUNCHER} ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OSGEO4W_ROOT}/bin/msvcrt.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OSGEO4W_ROOT}/bin/msvcp60.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OSGEO4W_ROOT}/bin/msvcp70.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OSGEO4W_ROOT}/bin/msvcp71.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${OSGEO4W_ROOT}/bin/msvcr71.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${MSVC10_CRT_DIR}/msvcp100.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${MSVC10_CRT_DIR}/msvcr100.dll ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy_directory ${GDAL_DATA} ${BUNDLEDIR}/win32/share/gdal
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cropvectortoimage.bat ${BUNDLEDIR}/win32/bin
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/otbcli.bat ${BUNDLEDIR}/win32/bin
-                  
-                  # COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_PROJECT_DIR}/ClassificationSupervisee ${BUNDLEDIR}/ClassificationSupervisee
-                  # COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_PROJECT_DIR}/DockableMirrorMap ${BUNDLEDIR}/DockableMirrorMap
-                  # COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_PROJECT_DIR}/valuetool ${BUNDLEDIR}/valuetool
-                  
-                  # COMMAND ${CMAKE_COMMAND} -E copy ${PyFiles} ${BUNDLEDIR}
-                  # COMMAND ${CMAKE_COMMAND} -E copy  ${BUNDLEDIR}
-                  
-                  # COMMAND ${CMAKE_COMMAND}
-                          # -DBUNDLE:FILEPATH=${BUNDLEDIR}/win32/bin/otbApplicationLauncherCommandLine.exe
-                          # -DPLUGIN:FILEPATH=${BUNDLEDIR}/win32/plugin/otbapp_FullSVMClassificationChain.dll
-                          # -P ${CMAKE_CURRENT_SOURCE_DIR}/BundleFixing.cmake
-                  # COMMAND ${ZIP_EXECUTABLE} -9r ${CMAKE_CURRENT_BINARY_DIR}/ClassificationSupervisee.zip ClassificationSupervisee
-                  # COMMENT "Making bundle for QGIS classification plugin")
 add_dependencies(qgis_BundlePlugin otbapp_FullSVMClassificationChain otbCropVectorDataToImage)
 
-#add_custom_target(qgis_DeployPlugin
-#                  COMMAND ${UNZIP_EXECUTABLE} -o #${CMAKE_CURRENT_BINARY_DIR}/ClassificationSupervisee.zip -d $ENV{HOME}/.qgis2/python/plugins
-#	          COMMENT "Deploying QGIS plugin")
-#add_dependencies(qgis_DeployPlugin qgis_BundlePlugin)
-#
-#add_custom_target(qgis_DeployPlugin_PythonOnly
-#                  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/qgis #$ENV{HOME}/.qgis2/python/plugins/ClassificationSupervisee#
-#                  COMMENT "Deploying QGIS plugin python files")
 
 endif()
