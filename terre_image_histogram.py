@@ -83,21 +83,28 @@ class MyMplCanvas(FigureCanvas):
             print "Error : Opening file ", image
         else :
             band = dataset.GetRasterBand(band)
-            rasterMin, rasterMax = band.ComputeRasterMinMax()
-            print rasterMax, rasterMin
-            nbVal = rasterMax# - rasterMin
+            self.rasterMin, self.rasterMax = band.ComputeRasterMinMax()
+            print "self.rasterMax, self.rasterMin", self.rasterMax, self.rasterMin
+            #nbVal = max( self.rasterMax - self.rasterMin, self.rasterMax)
+            nbVal = self.rasterMax - self.rasterMin
             if nbVal < 1 :
                 print "nb val < 1", nbVal
                 if nbVal != 0:
-                    histogram = band.GetHistogram(rasterMin, rasterMax+1, int(nbVal+1)*100, approx_ok = 0)
+                    #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1)*100, approx_ok = 0)
+                    histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1)*1000, approx_ok = 0)
                     decimal_values = True
                 else:
                     return []
             else :
                 #get the histogram of the given raster
-                #histogram = band.GetHistogram(rasterMin, rasterMax+1, int(nbVal+1), approx_ok = 0)
-                histogram = band.GetHistogram(0, rasterMax+1, int(nbVal+1), approx_ok = 0)
+                #histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
+                #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1), approx_ok = 0)
+                histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
             print "histogram", histogram
+            
+            # removing 0 at the end of the histogram
+            while len(histogram) > 1 and histogram[-1] == 0 :
+                del histogram[-1]
             
             # get 2 - 98 %
             #taking the size of the raster
@@ -116,16 +123,17 @@ class MyMplCanvas(FigureCanvas):
             hist_cum = 0
             
             if decimal_values:
-                parcours = arange(0, len(histogram)/100, 0.01)
+                parcours = arange(0, len(histogram)/1000., 0.001)
             else:
                 parcours = arange(0, len(histogram))
             cpt = 0
             for i in parcours: #range(len(histogram)):
-                #print "i", i
+                print "i", i
+                print "hist_cum", hist_cum
                 if hist_cum > nb_pixels_2 and self.x_min == 0 :
-                    self.x_min = i #+ rasterMin
+                    self.x_min = i + self.rasterMin
                 if hist_cum > nb_pixels_98 :
-                    self.x_max = i #+ rasterMin
+                    self.x_max = i + self.rasterMin
                     break;
                 hist_cum += histogram[cpt]
                 cpt += 1
@@ -140,18 +148,21 @@ class MyMplCanvas(FigureCanvas):
         self.color = color
         self.name = name
         histogram, decimal_values = self.get_GDAL_histogram(filename, band)
-        print type(histogram)
-        print histogram
+        print "type(histogram)", type(histogram)
+        print "histogram", histogram
+        print "len(histogram)", len(histogram)
         if not decimal_values:
-            self.t = arange(0, len(histogram)) #range(0, len(histogram))
+            #print arange(0, len(histogram)) + self.rasterMin
+            self.t = arange(0, len(histogram)) + self.rasterMin #range(0, len(histogram))
         else:
-            self.t = arange(0, len(histogram)/100, 0.01)
+            #print arange(0, len(histogram)/1000., 0.001) + self.rasterMin
+            self.t = arange(0, len(histogram)/1000., 0.001) + self.rasterMin
             #locs,labels = plt.yticks()
             #plt.yticks(locs, map(lambda x: "%.1f" % x, locs*1e9))
             #ylabel('microseconds (1E-9)'
         self.s = histogram
         print "len s and len t", len(self.s), len(self.t)
-        print "self.t", self.t
+        #print "self.t", self.t
         self.draw_histogram()
         self.axes.figure.canvas.mpl_connect('button_press_event', self.on_press)
         self.axes.figure.canvas.mpl_connect('button_release_event', self.on_release)
@@ -249,6 +260,8 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
         QtCore.QObject.connect( self.sc_1, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
         self.l.addWidget(self.sc_1)
         
+        self.dock_opened = False
+        
 
     def set_buttons(self):
         b = QtGui.QPushButton("Remise à zéro")
@@ -287,10 +300,12 @@ class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):
         TerreImageHistogram.__init__( self, layer, 1 )
         self.canvas = processing.mirror.mainWidget.canvas
         
+        self.specific_band = specific_band
+        
         if specific_band == -1:
-            self.sc_1.display_histogram(self.layer.get_source(), 1, 'r', layer.name())
+            self.sc_1.display_histogram(self.layer.get_source(), 1, 'k', layer.name())
         else :
-            self.sc_1.display_histogram(self.layer.get_source(), specific_band, 'r', layer.name())
+            self.sc_1.display_histogram(self.layer.get_source(), specific_band, 'k', layer.name())
         self.set_buttons()
         
         seuil = QtGui.QPushButton("Seuillage")
@@ -303,6 +318,16 @@ class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):
         print "values", values
         manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas, mono=True)
         #self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
+           
+           
+    def seuillage(self):
+        forms = []
+        if self.specific_band == -1:
+            forms.append( "\"if(((im1b1>" + str(self.sc_1.x_min) + ") and (im1b1<" + str(self.sc_1.x_max) + ")), im1b1, 0)\"" )
+        else :
+            forms.append( "\"if(((im1b" + str(self.specific_band) +">" + str(self.sc_1.x_min) + ") and (im1b" + str(self.specific_band) +"<" + str(self.sc_1.x_max) + ")), im1b" + str(self.specific_band) +", 0)\"" )
+        #emit signal
+        self.emit( QtCore.SIGNAL("threshold(PyQt_PyObject)"), forms )
            
            
            
