@@ -85,8 +85,8 @@ add_custom_command(TARGET qgis_BundlePlugin PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/ClassificationSupervisee ${BUNDLEDIR}/ClassificationSupervisee
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/DockableMirrorMap ${BUNDLEDIR}/DockableMirrorMap
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/valuetool ${BUNDLEDIR}/valuetool
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory C:/OSGeo4W/apps/Python27/Lib/site-packages/matplotlib ${BUNDLEDIR}/matplotlib-32
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory C:/OSGeo4W64/apps/Python27/Lib/site-packages/matplotlib ${BUNDLEDIR}/matplotlib-64
+                   #COMMAND ${CMAKE_COMMAND} -E copy_directory C:/OSGeo4W/apps/Python27/Lib/site-packages/matplotlib ${BUNDLEDIR}/matplotlib-32
+                   #COMMAND ${CMAKE_COMMAND} -E copy_directory C:/OSGeo4W64/apps/Python27/Lib/site-packages/matplotlib ${BUNDLEDIR}/matplotlib-64
                    )
                    
 file(GLOB PyFiles  ${CMAKE_SOURCE_DIR}/*.py
