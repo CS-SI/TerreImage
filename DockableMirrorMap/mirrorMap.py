@@ -128,7 +128,6 @@ class MirrorMap(QWidget):
 			for lid in layerIds:
 				self.addLayer( lid )
 
-		self.refreshLayerButtons()
 		self.onExtentsChanged()
 		self.canvas.setRenderFlag( prevFlag )
 

@@ -105,11 +105,15 @@ class ProcessingManager():
         for pro in self.processings:
             sortie += str(pro) + "\n"
         sortie += "]"
+        sortie += "layers_for_value_tool" + str( self.layers_for_value_tool )
+        sortie += "layers_for_classif_tool" + str( self.layers_for_classif_tool )
+        
         return sortie
     
-    def restore_processing_manager(self, filename, bands, type):
+    def restore_processing_manager(self, filename, bands, type, working_dir):
         self.layer, bands  = terre_image_utils.restore_working_layer( filename, bands, type )
         self.layers_for_value_tool.append(self.layer )
+        self.working_directory = working_dir
         return self.layer, bands
         
         

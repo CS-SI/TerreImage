@@ -150,6 +150,7 @@ class QGISEducation:
 #           self.menu.addMenu( self.analysisMenu )
 
     def extra_menu_visu( self, bands ):
+        print "bands", bands
         corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
         
         self.visualization_menu.clear()
@@ -253,6 +254,10 @@ class QGISEducation:
         timeExec = timeEnd - timeBegin
         print "temps de chargement : ", timeExec
         
+        self.show_education_widget(bands)
+            
+    
+    def show_education_widget(self, bands):
         if self.qgis_education_manager.layer and bands:
 
             if not self.dockOpened :
@@ -276,7 +281,7 @@ class QGISEducation:
             
             self.qgisedudockwidget.show()
             self.educationWidget.set_comboBox_sprectral_band_display()
-            self.dockOpened = True
+            self.dockOpened = True        
             
             
     def newProject(self):
@@ -294,21 +299,51 @@ class QGISEducation:
         QgsProject.instance().writeEntry( "QGISEducation", "/working_layer", self.qgis_education_manager.layer.source_file )
         # write band orders
         QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_bands", str(self.qgis_education_manager.layer.bands) )
+        print str(self.qgis_education_manager.layer.bands)
         QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_type", self.qgis_education_manager.layer.type )
+        QgsProject.instance().writeEntry( "QGISEducation", "/working_directory", self.qgis_education_manager.working_directory )
+        p = []
+        for process in self.qgis_education_manager.processings:
+            p.append(process.processing_name)
+            
+        QgsProject.instance().writeEntry( "QGISEducation", "/process", str(p) )
         
 
     def onProjectLoaded(self):
         # restore mirrors?
-        wl, ok = QgsProject.instance().readNumEntry("QGISEducation", "/working_layer")
+        wl, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer")
         if not ok or wl is None:
             return
         
-        bands, ok = QgsProject.instance().readNumEntry("QGISEducation", "/working_layer_bands")
+        bands, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer_bands")
+        print "is ok", ok
+        print bands
+        
         # TODO interpreter bands
-        type, ok = QgsProject.instance().readNumEntry("QGISEducation", "/working_layer_type")
+        type, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer_type")
+        
+        working_dir, ok = QgsProject.instance().readEntry("QGISEducation", "/working_directory")
         
         self.qgis_education_manager = ProcessingManager( self.iface )
-        self.qgis_education_manager.restore_processing_manager(wl, eval(bands), type)
+        self.qgis_education_manager.restore_processing_manager(wl, eval(bands), type, working_dir)
+        
+        process, ok = QgsProject.instance().readEntry("QGISEducation", "/process")
+        print eval(process)
+        
+        self.show_education_widget(bands)
+        
+        for i in process:
+            if i in[ "NDVI", "NDTI", "Indice de brillance", "Kmeans" ]:
+                self.educationWidget.do_manage_processing( i )
+                
+            else:
+                self.educationWidget.do_manage_sprectral_band_display(i)
+        
+        
+        
+        
+        
+
         
         #restore all process ?
         
