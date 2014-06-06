@@ -1,0 +1,7 @@
+C:\Users\jmalik\Dashboard\src\qgisedu_plugin\packaging\CMakeLists.txt : modification npour matplotlib
+
+C:\Users\jmalik\Dashboard\src\qgisedu_plugin\raoul-Win7-TerreImage-RelWithDebInfo-VC2010-2.cmake fichier de test où activer le hg update
+
+Console shell osgeo:
+C:\Users\jmalik\Dashboard\build\TerreImage-vc10-x86-RelWithDebInfo-VC2010>
+cmake --build . --config RelWithDebInfo
