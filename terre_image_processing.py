@@ -225,9 +225,9 @@ def get_sensor_id( image ):
     currentOs = os.name
     
     if currentOs == "posix" :
-        command = "otbcli ReadImageInfo -in " + image + " | grep \"sensor:\""
+        command = "otbcli_ReadImageInfo -in " + image + " | grep \"sensor:\""
     else :
-        command = "otbcli ReadImageInfo -in " + image + " | findstr \"sensor:\""
+        commandgdal = "otbcli_ReadImageInfo -in " + image + " | findstr \"sensor:\""
     result_sensor = os.popen( command ).readlines()
     if result_sensor :
         sensor_line = result_sensor[0]
