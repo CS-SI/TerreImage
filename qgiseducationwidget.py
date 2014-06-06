@@ -106,6 +106,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.pushButton_status.clicked.connect(self.status)
         self.pushButton_histogramme.clicked.connect(self.main_histogram)
         self.pushButton_plugin_classification.clicked.connect(self.plugin_classification)
+        self.pushButton_kmz.hide()
         self.pushButton_kmz.clicked.connect(self.export_kmz)
         
         
