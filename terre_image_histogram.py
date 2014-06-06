@@ -100,7 +100,7 @@ class MyMplCanvas(FigureCanvas):
                 #histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
                 #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1), approx_ok = 0)
                 histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
-            print "histogram", histogram
+#             print "histogram", histogram
             
             # removing 0 at the end of the histogram
             while len(histogram) > 1 and histogram[-1] == 0 :
@@ -146,9 +146,9 @@ class MyMplCanvas(FigureCanvas):
         self.color = color
         self.name = name
         histogram, decimal_values = self.get_GDAL_histogram(filename, band)
-        print "type(histogram)", type(histogram)
-        print "histogram", histogram
-        print "len(histogram)", len(histogram)
+#         print "type(histogram)", type(histogram)
+#         print "histogram", histogram
+#         print "len(histogram)", len(histogram)
         if not decimal_values:
             #print arange(0, len(histogram)) + self.rasterMin
             self.t = arange(0, len(histogram)) + self.rasterMin #range(0, len(histogram))
