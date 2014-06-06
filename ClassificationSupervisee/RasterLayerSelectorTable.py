@@ -56,11 +56,14 @@ class Window(QtGui.QTreeWidget):
         
 class RasterLayerSelectorTable(QtGui.QWidget):
     itemChecked = QtCore.pyqtSignal(object, int)
-    def __init__(self, layers, working_directory, parent = None):
+    def __init__(self, layers, working_directory, the_layer, bands_order, parent = None):
         logger.debug( "RasterLayerSelectorTable" )
         super(RasterLayerSelectorTable, self).__init__(parent)
         
         self.layers = layers
+        self.the_layer = the_layer
+        self.the_layer_bands = bands_order
+        
         self.working_dir = working_directory
         
         self.verticalLayout = QtGui.QVBoxLayout()
@@ -112,11 +115,13 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                 child_temp.setCheckState(0, checked)
 
     def setTableContent(self):
+        corres = { 'red':"rouge", 'green':"verte", 'blue':"bleue", 'pir':"pir", 'mir':"mir" }
         #todo : get the layer[i] if the layer[i] is a multi band layer, add subchild for all bands
         # todo : connecgt the multiband layer check box to a function which checks/unchecks all children
         n = len(self.layers)
         #self.table.setRowCount(n)
         for i in range(n):
+            rename_bands = False
             layer = self.layers[i]
             #item = TreeWidgetItem( self.table )
             item = QtGui.QTreeWidgetItem( self.table )
@@ -124,11 +129,16 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             item.setCheckState(0, QtCore.Qt.Unchecked)
             item.setText( 0, layer.name() )
             item.setExpanded(True)
-
+            if layer == self.the_layer:
+                rename_bands = True
             if not layer.rasterType() == 0:
                 logger.debug( "multiband" + str(layer.bandCount()) )
                 for i in range(layer.bandCount() ):
-                    child_name = layer.name() + "_band" + str(i)
+                    if rename_bands :
+                        print self.the_layer_bands[i+1]
+                        child_name = layer.name() + "_band " + corres[self.the_layer_bands[i+1]]
+                    else:
+                        child_name = layer.name() + "_band " + str(i+1)
                     logger.debug(  "child_name" + str(child_name) )
                     item_child = QtGui.QTreeWidgetItem()
                     item_child.setFlags(item_child.flags()|QtCore.Qt.ItemIsUserCheckable)

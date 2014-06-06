@@ -107,6 +107,8 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         #self.setupUi()
         QGisLayers.setInterface(iface)
         
+
+        
         if not OSIdentifier.isWindows():
             QtGui.QMessageBox.critical( self, \
                                         u"Erreur", \
@@ -119,8 +121,9 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         
         self.mainlayout = QtGui.QVBoxLayout()
         
-        rasterlayers = QGisLayers.getRasterLayers()
-        self.rasterlayerselector = RasterLayerSelectorTable(rasterlayers, self.output_dir)
+        #rasterlayers = QGisLayers.getRasterLayers()
+        rasterlayers = self.layers
+        self.rasterlayerselector = RasterLayerSelectorTable(rasterlayers, self.output_dir, self.main_layer, self.main_layer_bands)
         
         vectorlayers = QGisLayers.getVectorLayers(QGisLayerType.POLYGON)
         self.vectorlayerselector = VectorLayerSelectorTable(vectorlayers)
@@ -165,6 +168,12 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancelPressed)
         
         QtCore.QObject.connect(self.outputdirselectorbutton, QtCore.SIGNAL("clicked()"), self.selectOutputDir)
+
+    def set_layers(self, layers, main_layer=None, main_layer_bands = None):
+        self.main_layer = main_layer
+        self.main_layer_bands = main_layer_bands
+        self.layers = [self.main_layer] + layers
+
 
     def cancelPressed(self):
         self.close()

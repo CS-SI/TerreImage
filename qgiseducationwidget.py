@@ -115,6 +115,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         print "self.mirror_map_tool.dockableMirrors", self.qgis_education_manager.mirror_map_tool.dockableMirrors
         
     def plugin_classification(self):
+        self.qgis_education_manager.classif_tool.set_layers(self.qgis_education_manager.layers_for_classif_tool, self.qgis_education_manager.layer.get_qgis_layer(), self.qgis_education_manager.layer.band_invert)
         self.qgis_education_manager.classif_tool.setupUi()
         self.qgis_education_manager.classif_tool.show()
         
@@ -245,7 +246,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                 p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name==text_changed]
                 if p:
                     process = p[0]
-                    QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
+                    QgsMapLayerRegistry.instance().removeMapLayer( process.get_output_working_layer().qgis_layer.id())
                 if text_changed == "Angle Spectral":
                     widget = self.iface.messageBar().createMessage("Terre Image", "Cliquez sur un point de l'image pour en obtenir son angle spectral...")
                     self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)

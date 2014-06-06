@@ -42,6 +42,7 @@ class ProcessingManager():
         self.working_directory = None #, _ = terre_image_utils.fill_default_directory()
         self.processings = []
         self.layers_for_value_tool = [ ]
+        self.layers_for_classif_tool = [ ]
         self.name_to_processing = {}
         
         self.value_tool = ValueWidget( self.iface ) #, self )
@@ -67,6 +68,7 @@ class ProcessingManager():
         self.processings.append(processing)
         if isinstance(processing, TerreImageProcessing):
             self.layers_for_value_tool.append(processing.output_working_layer.qgis_layer)
+            self.layers_for_classif_tool.append(processing.output_working_layer.get_qgis_layer())
         print " adding", processing.processing_name
         self.name_to_processing[processing.processing_name] = processing
         print "self.layers_for_value_tool", self.layers_for_value_tool
