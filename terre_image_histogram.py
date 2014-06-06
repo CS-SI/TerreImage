@@ -128,8 +128,6 @@ class MyMplCanvas(FigureCanvas):
                 parcours = arange(0, len(histogram))
             cpt = 0
             for i in parcours: #range(len(histogram)):
-                print "i", i
-                print "hist_cum", hist_cum
                 if hist_cum > nb_pixels_2 and self.x_min == 0 :
                     self.x_min = i + self.rasterMin
                 if hist_cum > nb_pixels_98 :
