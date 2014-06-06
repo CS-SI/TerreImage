@@ -139,25 +139,29 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     def histogram(self, layer_source, processing=None, specific_band=-1, hist=None):
         self.set_working_message(True)
         
+        
         if hist == None:
-            hist = TerreImageHistogram_monoband(layer_source, self.canvas, processing, specific_band) 
-        histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow() )
-        histodockwidget.setObjectName("Histogrammes")
-        histodockwidget.setWidget(hist)
-        histodockwidget.setFloating(True)
-        histodockwidget.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
-        QtCore.QObject.connect( hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), self.histogram_on_result )
-        self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, histodockwidget)
-        QtCore.QObject.connect( histodockwidget, QtCore.SIGNAL( "closed(PyQt_PyObject)" ), self.histogram_monoband_closed )
-        hist.dock_opened = True
+            hist = TerreImageHistogram_monoband(layer_source, self.canvas, processing, specific_band)
+        if hist.dock_opened == False:
+            histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow() )
+            histodockwidget.setObjectName("Histogrammes")
+            histodockwidget.setWidget(hist)
+            histodockwidget.setFloating(True)
+            histodockwidget.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
+            QtCore.QObject.connect( hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), self.histogram_on_result )
+            self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, histodockwidget)
+            QtCore.QObject.connect( histodockwidget, QtCore.SIGNAL( "closed(PyQt_PyObject)" ), self.histogram_monoband_closed )
+            hist.dock_opened = True
         
         
         self.set_working_message(False)
-        return hist, histodockwidget
+        return hist
     
     
     def histogram_monoband_closed(self):
         print "QObject.sender() ",QtCore.QObject.sender(self)
+        print QtCore.QObject.sender(self).widget()
+        QtCore.QObject.sender(self).widget().dock_opened = False
         
         
         
@@ -216,10 +220,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                     print "histogram to display", process.output_working_layer.get_source()
                     # display the histogram of the layer
                     
-                    hist, histdockwidget = self.histogram( process.output_working_layer, process, specific_band )
+                    hist = self.histogram( process.output_working_layer, process, specific_band )
                     process.histogram = hist
                 else :
-                    hist, histdockwidget = self.histogram( process.output_working_layer, process, specific_band,  process.histogram)
+                    hist = self.histogram( process.output_working_layer, process, specific_band,  process.histogram)
         self.comboBox_histogrammes.setCurrentIndex( 0 )
                     
         
