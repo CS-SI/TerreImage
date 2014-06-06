@@ -23,6 +23,8 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
+from qgis.gui import QgsMessageBar
+
 # Initialize Qt resources from file resources.py
 import resources_rc
 # Import the code for the dialog
@@ -68,7 +70,7 @@ class QGISEducation:
         # Add toolbar button and menu item
         self.iface.addToolBarIcon(self.action)
         self.iface.addPluginToMenu(u"&QGISEducation", self.action)
-        self.extra_menu()
+        #self.extra_menu()
         
         self.qgisedudockwidget = None
         self.dockOpened = False
@@ -230,15 +232,27 @@ class QGISEducation:
 
 
 
+    def set_working_message(self, set=True):
+        if set :
+            widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
+            self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
+            self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
+            self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
+        else :
+            self.iface.messageBar().clearWidgets()
+            self.iface.mainWindow().statusBar().clearMessage()
+
     # run method that performs all the real work
-    
-    
     
     def run(self):
         """
         Defines the behavior of the plugin
         """
+        
+
+        
         timeBegin = time.time()
+        self.set_working_message(True)
         
         self.iface.newProject( True )
         
@@ -255,6 +269,9 @@ class QGISEducation:
         print "temps de chargement : ", timeExec
         
         self.show_education_widget(bands)
+        
+        
+        self.set_working_message(False)
             
     
     def show_education_widget(self, bands):
@@ -277,7 +294,7 @@ class QGISEducation:
 
             text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
             self.educationWidget.textEdit.setText(text)
-            self.extra_menu_visu(bands)
+            #self.extra_menu_visu(bands)
             
             self.qgisedudockwidget.show()
             self.educationWidget.set_comboBox_sprectral_band_display()
