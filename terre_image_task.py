@@ -118,7 +118,19 @@ class TerreImageProcessing(TerreImageTask, QObject):
     def get_filename_result(self):
         return self.output_working_layer.source_file
     
-
+    def get_output_working_layer(self):
+        if not isinstance(self.output_working_layer, WorkingLayer):
+            #look for the file in the layers
+            print self.processing_name
+            raster_layers = manage_QGIS.get_raster_layers()
+            for layer in raster_layers:
+                if self.processing_name in layer.name:
+                    self.output_working_layer.qgis_layer = layer
+                    break
+                
+            
+        else:
+            return self.output_working_layer
     
     
     def display(self, output_filename):

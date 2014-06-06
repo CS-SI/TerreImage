@@ -374,7 +374,16 @@ def custom_stretch( theRasterLayer, values, canvas, mono=False ):
     
     
     
+def get_raster_layers():
+    canvas = TerreImageConstant().QGISCanvas
     
+    rasterlayers=[]
+    
+    for i in range(canvas.layerCount()):
+        layer = canvas.layer(i)
+        if (layer!=None and layer.isValid() and layer.type()==QgsMapLayer.RasterLayer):
+            rasterlayers.append(layer)
+    return rasterlayers
     
     
     
