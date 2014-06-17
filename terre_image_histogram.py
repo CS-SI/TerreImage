@@ -40,6 +40,13 @@ from matplotlib.patches import Rectangle
 
 import manage_QGIS
 
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'TerreImage_Histograms' )
+logger.setLevel(logging.DEBUG)
+
 
 
 class MyMplCanvas(FigureCanvas):
@@ -77,18 +84,18 @@ class MyMplCanvas(FigureCanvas):
         
         decimal_values = False
         
-        print "image", image
+        logger.debug( "image" + image + "band" + band )
         dataset = gdal.Open(str(image), gdal.GA_ReadOnly)
         if dataset is None:
             print "Error : Opening file ", image
         else :
             band = dataset.GetRasterBand(band)
             self.rasterMin, self.rasterMax = band.ComputeRasterMinMax()
-            print "self.rasterMax, self.rasterMin", self.rasterMax, self.rasterMin
+            logger.debug( "self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin) )
             #nbVal = max( self.rasterMax - self.rasterMin, self.rasterMax)
             nbVal = self.rasterMax - self.rasterMin
             if nbVal < 1 :
-                print "nb val < 1", nbVal
+                logger.debug( "nb val < 1" + str( nbVal) )
                 if nbVal != 0:
                     #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1)*100, approx_ok = 0)
                     histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1)*1000, approx_ok = 0)
@@ -110,14 +117,14 @@ class MyMplCanvas(FigureCanvas):
             #taking the size of the raster
             sizeX = dataset.RasterXSize
             sizeY = dataset.RasterYSize
-            print "sizeX, sizeY", sizeX, sizeY
+            logger.debug(  "sizeX, sizeY" + str(sizeX) + " " + str(sizeY))
             nb_pixels = sizeX * sizeY
-            print nb_pixels
+            logger.debug(nb_pixels)
             
             nb_pixels_2 = int(float(nb_pixels * 0.02))
             nb_pixels_98 = int(float(nb_pixels * 0.98))
             
-            print "nb_pixels_2, nb_pixels_98", nb_pixels_2, nb_pixels_98
+            logger.debug(  "nb_pixels_2, nb_pixels_98"  + str(nb_pixels_2) + " " + str(nb_pixels_98))
             
             # catch the i where cum_hist(i) > nb_pixels_2 and nb_pixels_98
             hist_cum = 0
@@ -135,12 +142,13 @@ class MyMplCanvas(FigureCanvas):
                     break;
                 hist_cum += histogram[cpt]
                 cpt += 1
-            print "self.x_min, self.x_max", self.x_min, self.x_max
+            logger.debug(  "self.x_min, self.x_max" + str(self.x_min) + " " + str(self.x_max))
             self.two_min = self.x_min
             self.ninety_eight_max = self.x_max
-            print "self.two_min, self.ninety_eight_max", self.two_min, self.ninety_eight_max
+            logger.debug(  "self.two_min, self.ninety_eight_max" + str(self.two_min) + " " + str(self.ninety_eight_max))
 
             return histogram, decimal_values
+        
         
     def display_histogram(self, filename, band, color, name):
         self.color = color
@@ -159,7 +167,7 @@ class MyMplCanvas(FigureCanvas):
             #plt.yticks(locs, map(lambda x: "%.1f" % x, locs*1e9))
             #ylabel('microseconds (1E-9)'
         self.s = histogram
-        print "len s and len t", len(self.s), len(self.t)
+        logger.debug(  "len s and len t"+ str(len(self.s)) + str(len(self.t)))
         #print "self.t", self.t
         self.draw_histogram()
         self.axes.figure.canvas.mpl_connect('button_press_event', self.on_press)
@@ -179,7 +187,7 @@ class MyMplCanvas(FigureCanvas):
         self.axes.clear()
         self.draw_histogram()
         if self.two_min and self.ninety_eight_max:
-             print "self.two_min, self.ninety_eight_max", self.two_min, self.ninety_eight_max
+             logger.debug(  "self.two_min, self.ninety_eight_max" + str(self.two_min) + str(self.ninety_eight_max))
              self.axes.axvline(x=self.two_min,c="red",linewidth=2,zorder=0, clip_on=False)
              self.axes.axvline(x=self.ninety_eight_max,c="red",linewidth=2,zorder=0, clip_on=False)
         self.axes.figure.canvas.draw()
@@ -190,7 +198,7 @@ class MyMplCanvas(FigureCanvas):
 
     def draw_min_max_percent(self):
         if self.x_min and self.x_max:
-            print "self.x_min, self.x_max", self.x_min, self.x_max
+            logger.debug( "self.x_min, self.x_max" + str(self.x_min) + str(self.x_max))
             self.axes.axvline(x=self.x_min,c="red",linewidth=2,zorder=0, clip_on=False)
             self.axes.axvline(x=self.x_max,c="red",linewidth=2,zorder=0, clip_on=False)
             
@@ -199,7 +207,7 @@ class MyMplCanvas(FigureCanvas):
         """
         Check if the clicked point is nearer from x_min than from x_max
         """
-        print 'press'
+        logger.debug( 'press')
         x = event.xdata
         # take x_min
         if abs(x-self.x_min) < abs(x-self.x_max):
@@ -215,7 +223,7 @@ class MyMplCanvas(FigureCanvas):
         """
         Check
         """
-        print 'release'
+        logger.debug( 'release')
         if self.change_min :
             self.x_min = event.xdata
         else:
@@ -232,7 +240,7 @@ class MyMplCanvas(FigureCanvas):
         
         self.axes.figure.canvas.draw()
         self.emit( QtCore.SIGNAL("valueChanged()") )
-        print self.x_min, self.x_max
+        logger.debug( str(self.x_min) + " " + str(self.x_max))
 
 
 
@@ -272,7 +280,7 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
         
         
     def reset(self):
-        print "resset"
+        logger.debug( "resset" )
         self.sc_1.draw_reset_percent()
         if self.nb_hist == 3 :
             self.sc_2.draw_reset_percent()
@@ -285,7 +293,7 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
         if self.nb_hist == 3 :
             forms.append( "\"if(((im1b2>" + str(self.sc_2.x_min) + ") and (im1b2<" + str(self.sc_2.x_max) + ")), im1b2, 0)\"" )
             forms.append( "\"if(((im1b3>" + str(self.sc_3.x_min) + ") and (im1b3<" + str(self.sc_3.x_max) + ")), im1b3, 0)\"" )
-        print forms
+        logger.debug( forms )
         #emit signal
         self.emit( QtCore.SIGNAL("threshold(PyQt_PyObject)"), forms )
         
@@ -311,9 +319,9 @@ class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):
         self.l.addWidget(seuil)
            
     def valueChanged(self):
-        print "value changed"
+        logger.debug( "value changed" )
         values = [ (self.sc_1.x_min, self.sc_1.x_max ) ]
-        print "values", values
+        logger.debug( "values" + str( values ))
         manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas, mono=True)
         #self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
            
@@ -331,10 +339,17 @@ class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):
            
 class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):    
       
-    def __init__(self, layer, canvas, nb_bands = 3):
+    def __init__(self, layer, canvas, nb_bands = 3, processing=None):
         #super(TerreImageHistogram_monoband, self).__init__(layer, nb_bands) 
         TerreImageHistogram.__init__( self, layer, nb_bands )  
-        self.canvas = canvas       
+        
+        print "processing", processing
+        if processing is None:
+            print "processing none"
+            self.canvas = canvas
+        else:
+            print "processing not none"
+            self.canvas = processing.mirror.mainWidget.canvas
         
         self.sc_2 = MyMplCanvas(self, width=5, height=4, dpi=100)
         QtCore.QObject.connect( self.sc_2, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
@@ -343,10 +358,14 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
         self.l.addWidget(self.sc_2)
         self.l.addWidget(self.sc_3)
         
-        
-        self.sc_1.display_histogram(self.layer.get_source(), self.layer.pir, 'r', "Plan R : BS PIR")
-        self.sc_2.display_histogram(self.layer.get_source(), self.layer.red, 'g', "Plan V : BS R")
-        self.sc_3.display_histogram(self.layer.get_source(), self.layer.green, 'b', "Plan B : BS V")
+        if processing is None:
+            self.sc_1.display_histogram(self.layer.get_source(), self.layer.pir, 'r', "Plan R : BS PIR")
+            self.sc_2.display_histogram(self.layer.get_source(), self.layer.red, 'g', "Plan V : BS R")
+            self.sc_3.display_histogram(self.layer.get_source(), self.layer.green, 'b', "Plan B : BS V")
+        else:
+            self.sc_1.display_histogram(self.layer.get_source(), self.layer.red, 'r', "Plan R : BS PIR")
+            self.sc_2.display_histogram(self.layer.get_source(), self.layer.green, 'g', "Plan V : BS R")
+            self.sc_3.display_histogram(self.layer.get_source(), self.layer.blue, 'b', "Plan B : BS V")
         self.set_buttons()
         
         
@@ -354,6 +373,7 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
     def valueChanged(self):
         values = [ (self.sc_1.x_min, self.sc_1.x_max ), (self.sc_2.x_min, self.sc_2.x_max ), (self.sc_3.x_min, self.sc_3.x_max )]
         print "values", values
+        print self.canvas
         manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas)
         #self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
            
