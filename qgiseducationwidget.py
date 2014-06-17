@@ -104,10 +104,12 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.pushButton_profil_spectral.clicked.connect(self.display_values)
         self.pushButton_working_dir.clicked.connect(self.define_working_dir)
         self.pushButton_status.clicked.connect(self.status)
+        self.pushButton_histogramme.hide()
         self.pushButton_histogramme.clicked.connect(self.main_histogram)
         self.pushButton_plugin_classification.clicked.connect(self.plugin_classification)
-        self.pushButton_kmz.hide()
+        #self.pushButton_kmz.hide()
         self.pushButton_kmz.clicked.connect(self.export_kmz)
+        
         
         
         
@@ -141,6 +143,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
     def histogram(self, layer_source, processing=None, specific_band=-1, hist=None):
+        print "self.histogram"
         self.set_working_message(True)
         
         
@@ -203,31 +206,40 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             process = self.qgis_education_manager.name_to_processing[text_changed]
             if process :
                 specific_band = -1
-                print "working layer", 
-                bs = ["rouge", "verte", "bleue", "pir", "nir"]
-                corres = {"rouge":process.layer.red, "verte":process.layer.green, "bleue":process.layer.blue, "pir":process.layer.pir, "mir":process.layer.mir}
-                print "corres", corres
                 
-                for item in bs:
-                    if item in text_changed:
-                        print "bande à afficher : ", corres[item]
-                        specific_band = corres[item]
-                        
-                        
-                print "specific band", specific_band
-                
-                        
-                        
-                if not process.histogram:
-                    print "process", process, type(process)
-                    print "type(process.output_working_layer)", type(process.output_working_layer)
-                    print "histogram to display", process.output_working_layer.get_source()
-                    # display the histogram of the layer
+                if text_changed == "Couleurs naturelles":
+                    print "text changed couleurs naturelles"
+                    self.set_working_message(True)
+                    if not process.histogram:
+                        hist = TerreImageHistogram_multiband(self.qgis_education_manager.layer, self.canvas, None, process)
+                        process.histogram = hist
+                        self.histogram(process.output_working_layer, process, specific_band, hist)
+                else:
+                    print "working layer", 
+                    bs = ["rouge", "verte", "bleue", "pir", "nir"]
+                    corres = {"rouge":process.layer.red, "verte":process.layer.green, "bleue":process.layer.blue, "pir":process.layer.pir, "mir":process.layer.mir}
+                    print "corres", corres
                     
-                    hist = self.histogram( process.output_working_layer, process, specific_band )
-                    process.histogram = hist
-                else :
-                    hist = self.histogram( process.output_working_layer, process, specific_band,  process.histogram)
+                    for item in bs:
+                        if item in text_changed:
+                            print "bande à afficher : ", corres[item]
+                            specific_band = corres[item]
+                            
+                            
+                    print "specific band", specific_band
+                    
+                            
+                            
+                    if not process.histogram:
+                        print "process", process, type(process)
+                        print "type(process.output_working_layer)", type(process.output_working_layer)
+                        print "histogram to display", process.output_working_layer.get_source()
+                        # display the histogram of the layer
+                        
+                        hist = self.histogram( process.output_working_layer, process, specific_band )
+                        process.histogram = hist
+                    else :
+                        hist = self.histogram( process.output_working_layer, process, specific_band,  process.histogram)
         self.comboBox_histogrammes.setCurrentIndex( 0 )
                     
         
