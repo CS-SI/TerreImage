@@ -9,9 +9,9 @@
 
 
 [general]
-name=QGISEducation
+name=TerreImage
 qgisMinimumVersion=2.0
-description=QGISEducation
+description=TerreImage
 version=0.1
 author=CS SI
 email=alexia.mondot@c-s.fr

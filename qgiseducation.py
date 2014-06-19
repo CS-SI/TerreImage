@@ -70,14 +70,14 @@ class QGISEducation:
         # Create action that will start plugin configuration
         self.action = QAction(
             QIcon(":/plugins/qgiseducation/icon.png"),
-            u"QGIS Education", self.iface.mainWindow())
-        self.action.setWhatsThis("QGIS_Education")
+            u"Terre Image", self.iface.mainWindow())
+        self.action.setWhatsThis("Terre Image")
         # connect the action to the run method
         self.action.triggered.connect(self.run)
 
         # Add toolbar button and menu item
         self.iface.addToolBarIcon(self.action)
-        self.iface.addPluginToMenu(u"&QGISEducation", self.action)
+        self.iface.addPluginToMenu(u"&TerreImage", self.action)
         #self.extra_menu()
         
         self.qgisedudockwidget = None
