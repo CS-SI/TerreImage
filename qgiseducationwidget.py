@@ -176,7 +176,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     
     
     def histogram_monoband_closed(self):
-        logger.debug( "QObject.sender() " + str(QtCore.QObject.sender(self)) )
+        logger.info( "QObject.sender() " + str(QtCore.QObject.sender(self)) )
         logger.debug( QtCore.QObject.sender(self).widget() )
         QtCore.QObject.sender(self).widget().dock_opened = False
         

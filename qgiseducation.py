@@ -271,7 +271,7 @@ class QGISEducation:
         
         
         _, bands  = self.qgis_education_manager.set_current_layer( )
-        logger.debug( "self.layer" + str(self.qgis_education_manager.layer))
+        logger.info( "self.layer" + str(self.qgis_education_manager.layer))
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
         logger.info( "temps de chargement : " +  str(timeExec) )

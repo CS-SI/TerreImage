@@ -37,7 +37,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_ProcessingManager' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 class ProcessingManager():
     
@@ -59,7 +59,7 @@ class ProcessingManager():
         self.valuedockwidget.setWidget(self.value_tool)
         self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
         self.valuedockwidget.hide()
-        logger.debug( self.value_tool )
+        logger.info( self.value_tool )
         
         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
         self.mirror_map_tool.initGui()
@@ -75,7 +75,7 @@ class ProcessingManager():
         if isinstance(processing, TerreImageProcessing):
             self.layers_for_value_tool.append(processing.output_working_layer.qgis_layer)
             self.layers_for_classif_tool.append(processing.output_working_layer.get_qgis_layer())
-        logger.debug( " adding" + str(processing.processing_name) )
+        logger.info( " adding" + str(processing.processing_name) )
         self.name_to_processing[processing.processing_name] = processing
         logger.debug( "self.layers_for_value_tool" + str(self.layers_for_value_tool) )
         

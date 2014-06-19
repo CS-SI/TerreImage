@@ -57,7 +57,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_manageQGIS' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 def addVectorLayerToQGIS( vectorLayer, layername, legendInterface ):
