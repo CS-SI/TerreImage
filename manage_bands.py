@@ -27,8 +27,15 @@ from PyQt4.QtCore import QObject, SIGNAL, Qt
 from ui_bands import Ui_Dialog
 
 
+
+#import loggin for debug messages
 import logging
-logger = logging.getLogger( 'manage_bands' )
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'TerreImage_manage_bands' )
+logger.setLevel(logging.DEBUG)
+
+
 
 class manage_bands:
     
@@ -73,28 +80,28 @@ class manage_bands:
         gray_other = False
         if type_image :
             if type_image == "Spot 5" or type_image == "spot":
-                print "define spot"
+                logger.info( "define spot" )
                 #self.define_spot(False)
                 self.bandsUi.radioButton_spot.setChecked(True)
                 self.bandsUi.radioButton_formosat.setEnabled(False)
                 self.bandsUi.radioButton_pleiades.setEnabled(False)
                 gray_other = True
             elif type_image == "PHR 1A":
-                print "define pleiade"
+                logger.info( "define pleiade" )
                 #self.define_pleiade()
                 self.bandsUi.radioButton_pleiades.setChecked(True)
                 self.bandsUi.radioButton_formosat.setEnabled(False)
                 self.bandsUi.radioButton_spot.setEnabled(False)
                 gray_other = True
             elif type_image == "Formosat 2":
-                print "define formosat"
+                logger.info( "define formosat" )
                 #self.define_formosat(False)
                 self.bandsUi.radioButton_formosat.setChecked(True)
                 self.bandsUi.radioButton_spot.setEnabled(False)
                 self.bandsUi.radioButton_pleiades.setEnabled(False)
                 gray_other = True
             else :
-                print "define others"
+                logger.info( "define others" )
                 self.bandsUi.radioButton_autre.setChecked(True)
                 self.set_spinbox_read_only(False)
             if gray_other:

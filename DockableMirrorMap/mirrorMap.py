@@ -27,6 +27,14 @@ from qgis.core import *
 from qgis.gui import *
 
 
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'DockableMirrorMap_mirrorMap' )
+logger.setLevel(logging.DEBUG)
+
+
 class MirrorMap(QWidget):
 
 	def __init__(self, parent, iface):
@@ -88,8 +96,8 @@ class MirrorMap(QWidget):
 		self.canvas.setRenderFlag( prevFlag )
 		
 	def mirror_extent_changed(self):
-		print self.canvas.extent()
-		print self.iface.mapCanvas().extent()
+		logger.debug(  self.canvas.extent() )
+		logger.debug(  self.iface.mapCanvas().extent() )
 		if self.canvas.extent() != self.iface.mapCanvas().extent():
 			self.emit(SIGNAL("extentChanged( QgsRectangle )"), self.canvas.extent() )
 

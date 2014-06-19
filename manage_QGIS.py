@@ -52,6 +52,14 @@ import terre_image_utils
 from terre_image_constant import TerreImageConstant
 
 
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'TerreImage_manageQGIS' )
+logger.setLevel(logging.DEBUG)
+
+
 def addVectorLayerToQGIS( vectorLayer, layername, legendInterface ):
     """
     Add a vector layer to QGIS
@@ -81,16 +89,16 @@ def get_raster_layer( raster, name ):
 
 def add_qgis_raser_layer( rasterLayer, canvas, bands=None):
     index_group = TerreImageConstant().index_group
-    print index_group
+    logger.debug( "index_group: " + str(index_group) )
     
     if bands:
-        print bands
+        logger.debug( bands )
         pir = bands['pir']
         red = bands['red']
         green = bands['green']
-        print 'pir', pir
-        print "red", red
-        print "green", green
+        logger.debug( 'pir: ' + str(pir))
+        logger.debug( "red: " + str(red))
+        logger.debug( "green: " + str(green))
         if pir and red and green:
             renderer = rasterLayer.renderer()
             #rasterLayer.setDrawingStyle("MultiBandColor")
@@ -116,7 +124,8 @@ def addRasterLayerToQGIS( raster, layername, iface = None ):
         indexGroup    --    index of the QGIS group where to move the layer
     """
     index_group = TerreImageConstant().index_group
-    print index_group
+    
+    logger.debug( "index_group: " + str(index_group) )
     
     if layername == None :
         layername = os.path.basename( raster )
@@ -141,7 +150,7 @@ def histogram_stretching(raster_layer, canvas):
 #   myRasterLayer->setCacheImage( NULL );
 #   mMapCanvas->refresh();
     theLimits = QgsRaster.ContrastEnhancementCumulativeCut
-    print "theLimits", theLimits
+    logger.debug( "theLimits " + str(theLimits))
     raster_layer.setContrastEnhancement( QgsContrastEnhancement.StretchToMinimumMaximum, theLimits )
     raster_layer.setCacheImage( None )
     canvas.refresh()
@@ -155,8 +164,8 @@ def get_min_max_via_qgis( theRasterLayer, num_band ):
     data_p = theRasterLayer.dataProvider()
     my_min, my_max = theRasterLayer.dataProvider().cumulativeCut( num_band, 0.2, 0.98 );
     min, max = data_p.cumulativeCut( num_band, 0.02, 0.98)    
-    print "qgis min max :", my_min, my_max
-    print "min max 2 : ",min, max
+    logger.debug( "qgis min max :" + str(my_min) + str(my_max))
+    logger.debug( "min max 2 : " + str(min) + str(max))
     return my_min, my_max
 
 
@@ -219,13 +228,13 @@ def contrastForRasters( theRasterLayer, minLayer, maxLayer, band=None ):
         
 def display_one_band( layer, keyword, iface ): 
     index_group = TerreImageConstant().index_group
-    print "keyword", keyword
+    logger.debug( "keyword " + str(keyword))
     corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir", "nat":"_couleurs_naturelles" }
     
     rasterLayer = QgsRasterLayer( layer.get_source(), layer.name() + corres[keyword] )
     
     if keyword == 'nat':
-        print "display on natural colors"
+        logger.debug( "display on natural colors" )
         band_red = layer.bands['red']
         band_green = layer.bands['green']
         band_blue = layer.bands['blue']
@@ -244,10 +253,10 @@ def display_one_band( layer, keyword, iface ):
         
         band = layer.bands[keyword]
         if band :
-            print "band num:", band
+            logger.debug( "band num: " + str(band))
             rasterLayer.setDrawingStyle("MultiBandSingleBandGray")
             renderer = rasterLayer.renderer()
-            print renderer
+            logger.debug( renderer )
             renderer.setGrayBand(band)
             
             #contrastForRasters( rasterLayer, 0, 0 )

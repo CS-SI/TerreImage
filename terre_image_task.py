@@ -31,6 +31,14 @@ from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
 from PyQt4.QtGui import QInputDialog
 from PyQt4.QtCore import QObject, SIGNAL
 import terre_image_processing
+
+
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'TerreImage_task' )
+logger.setLevel(logging.DEBUG)
         
         
 class TerreImageTask(object):
@@ -87,8 +95,8 @@ class TerreImageProcessing(TerreImageTask, QObject):
 
         
     def run(self):
-        print "run, processing name", self.processing_name
-        print "self.arg", self.arg
+        logger.debug( "run, processing name" + str(self.processing_name))
+        logger.debug( "self.arg" + str(self.arg))
         output_filename = ""
         if "NDVI" in self.processing_name:
             output_filename = terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
@@ -99,7 +107,7 @@ class TerreImageProcessing(TerreImageTask, QObject):
         if "Angle Spectral" in self.processing_name:
             from spectral_angle import SpectralAngle
             self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer, self.mirrormap_tool)
-            print "self.angle_tool", self.angle_tool
+            logger.debug( "self.angle_tool" + str(self.angle_tool))
             QObject.connect( self.angle_tool, SIGNAL( "anglesComputed(PyQt_PyObject)" ), self.display )
             self.angle_tool.get_point_for_angles(self.layer)
             #spectral_angles(self.layer, self.working_directory, self.iface)
@@ -109,10 +117,10 @@ class TerreImageProcessing(TerreImageTask, QObject):
             else :
                 output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.iface)
         if "Seuillage" in self.processing_name and self.arg:
-            print "this is thrshold"
+            logger.debug( "this is thrshold" )
             output_filename = terre_image_processing.threshold(self.layer, self.working_directory, self.arg)
         if output_filename:
-            print output_filename
+            logger.debug( output_filename )
             self.display(output_filename)
     
     def get_filename_result(self):
@@ -121,7 +129,7 @@ class TerreImageProcessing(TerreImageTask, QObject):
     def get_output_working_layer(self):
         if not isinstance(self.output_working_layer, WorkingLayer):
             #look for the file in the layers
-            print self.processing_name
+            logger.debug( self.processing_name )
             raster_layers = manage_QGIS.get_raster_layers()
             for layer in raster_layers:
                 if self.processing_name in layer.name:
@@ -139,11 +147,11 @@ class TerreImageProcessing(TerreImageTask, QObject):
         result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, self.processing_name, self.iface )
         manage_QGIS.histogram_stretching( result_layer, self.iface.mapCanvas())
         
-        print "defining self.output_working_layer"
+        logger.debug( "defining self.output_working_layer" )
         self.output_working_layer = WorkingLayer( output_filename, result_layer )
         # 2 ouvrir une nouvelle vue
         self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
-        print self.mirror
+        logger.debug( self.mirror )
         self.mirror.mainWidget.addLayer( result_layer.id() )
         self.mirror.mainWidget.onExtentsChanged()
         # 1 mettre image en queue
@@ -152,18 +160,18 @@ class TerreImageProcessing(TerreImageTask, QObject):
         
         ifaceLegend = self.iface.legendInterface()
         ifaceLayers = QgsMapLayerRegistry.instance().mapLayers()
-        print "ifacelayers", ifaceLayers
+        logger.debug( "ifacelayers" + str( ifaceLayers ) )
         id_layer = result_layer.id()
-        print "id_layer", id_layer
-        print "result layer", result_layer
+        logger.debug( "id_layer" + str(id_layer))
+        logger.debug( "result layer" + str(result_layer))
         #QgsMapLayerRegistry.instance().mapLayers()
         #{u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>, u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
         ifaceLegend.setLayerVisible( result_layer, False )
         self.iface.mapCanvas().refresh()
-        print ifaceLegend.isLayerVisible(result_layer)
+        logger.debug( ifaceLegend.isLayerVisible(result_layer) )
         
         self.emit( SIGNAL("display_ok()") )
-        print "signal emitted"
+        logger.debug( "signal emitted" )
         # thaw the canvas
         self.freezeCanvas( False )
         
@@ -192,26 +200,26 @@ class TerreImageDisplay(TerreImageTask):
         
     def run(self):
         self.freezeCanvas( True )
-        print "self.who", self.who
+        logger.debug( "self.who" + str( self.who ))
         result_layer = manage_QGIS.display_one_band(self.layer, self.who, self.iface)
         if result_layer:
             self.output_working_layer = WorkingLayer( self.layer.source_file, result_layer)
             self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
-            print self.mirror
+            logger.debug( self.mirror )
             self.mirror.mainWidget.addLayer( result_layer.id() )
             self.mirror.mainWidget.onExtentsChanged()
         
             ifaceLegend = self.iface.legendInterface()
             ifaceLayers = QgsMapLayerRegistry.instance().mapLayers()
-            print "ifacelayers", ifaceLayers
+            logger.debug( "ifacelayers" + str( ifaceLayers ))
             id_layer = result_layer.id()
-            print "id_layer", id_layer
-            print "result layer", result_layer
+            logger.debug( "id_layer" + str( id_layer ))
+            logger.debug( "result layer" + str( result_layer ))
             #QgsMapLayerRegistry.instance().mapLayers()
             #{u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>, u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
             ifaceLegend.setLayerVisible( result_layer, False )
             self.iface.mapCanvas().refresh()
-            print ifaceLegend.isLayerVisible(result_layer)
+            logger.debug( ifaceLegend.isLayerVisible(result_layer) )
             
             # thaw the canvas
             self.freezeCanvas( False )

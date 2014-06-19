@@ -21,6 +21,13 @@
 """
 
 
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'TerreImage_WorkingLayer' )
+logger.setLevel(logging.DEBUG)
+
 
 class WorkingLayer():
     def __init__(self, layer_file, qgis_layer, bands=None):
@@ -49,8 +56,8 @@ class WorkingLayer():
         self.pir    = bands['pir']
         self.mir    = bands['mir']
         self.band_invert = dict((v,k) for k, v in self.bands.iteritems())
-        print self.bands
-        print self.band_invert
+        logger.info( self.bands )
+        logger.info( self.band_invert )
         
         
         

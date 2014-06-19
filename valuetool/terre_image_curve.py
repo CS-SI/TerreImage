@@ -30,6 +30,12 @@ from ui_terre_image_curve import Ui_Form
 
 import random
 
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'TerreImage_Curve' )
+logger.setLevel(logging.DEBUG)
 
 class TerreImageCurve(QtGui.QWidget, Ui_Form):
     
@@ -45,7 +51,7 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
         self.name = name
         self.lineEdit_curve_name.setText(name)
         
-        print "from curve", x, y
+        logger.debug(  "from curve: " + str( x ) + " " + str( y) )
         self.coordinates = "[ x=" + str(x) + ", " + str(y) + "]"
         self.label_coordinates.setText(self.coordinates)
         
@@ -62,9 +68,9 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
         
         if color is None:
             colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
-            print "len(colors)", len(colors)
+            logger.debug( "len(colors): " + str(len(colors)))
             color = colors[ random.randint(0, len(colors)-1) ] 
-            print 'color from creation courbe', color
+            logger.debug( 'color from creation courbe: ' + str(color))
         self.color = color
         
         if abs:
@@ -94,18 +100,18 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
 #         testqt, ok = QtGui.QInputDialog.getItem(iface.mainWindow(), "Couleur", "Selection d'une couleur", self.lettersToQColor.keys(), False)
 #         if ok :
 #             couleur = self.nameColorsToLetters[testqt]
-#             print couleur
+#             logger.debug(couleur)
 #         else :
 #             couleur = "k"
 
         self.color = str(couleur.name())
-        print couleur.name()
+        logger.debug( couleur.name())
         
         pixmap = QtGui.QPixmap(self.pushButton_color.size())
         pixmap.fill(QColor(self.color))
         icon = QtGui.QIcon(pixmap)
         self.pushButton_color.setIcon(icon)
-        print QColor(self.color)
+        logger.debug(  QColor(self.color) )
         
         #self.pushButton_color.setStyleSheet("background-color: " + self.color )
  

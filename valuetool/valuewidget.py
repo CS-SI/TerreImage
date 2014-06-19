@@ -57,6 +57,13 @@ if hasmpl:
         hasmpl = False
 
 
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'ValueTool_valueWidget' )
+logger.setLevel(logging.DEBUG)
+
 class ValueWidget(QWidget, Ui_Widget):
 
     def __init__(self, iface):
@@ -744,7 +751,7 @@ class ValueWidget(QWidget, Ui_Widget):
         
         for curve in self.saved_curves:
             if curve.display_points():
-                print curve
+                logger.debug( curve )
                 
                 numvalues = curve.points
                 
@@ -799,9 +806,9 @@ class ValueWidget(QWidget, Ui_Widget):
             points = self.order_values(new_points)
             
             points_for_curve = [ t[1] for t in points ]
-            print "points_for_curve", points_for_curve
+            logger.debug( "points_for_curve: " + str(points_for_curve))
             abs = [ t[0] for t in points ]
-            print "abs", abs
+            logger.debug( "abs: " + str(abs))
             
     #         colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
     #         print "len(colors)", len(colors)

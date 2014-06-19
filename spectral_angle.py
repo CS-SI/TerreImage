@@ -35,6 +35,15 @@ import terre_image_processing
 import manage_QGIS
 
 
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'TerreImage_SpectralAngle' )
+logger.setLevel(logging.DEBUG)
+
+
+
 class SpectralAngle(QtCore.QObject):
     
     __pyqtSignals__ = ("anglesComputed(PyQt_PyObject)")
@@ -50,7 +59,7 @@ class SpectralAngle(QtCore.QObject):
             self.layer = layer
         
         self.tool = ProfiletoolMapTool(self.iface.mapCanvas())        #the mouselistener
-        print "self.tool", self.tool
+        logger.debug(  "self.tool" + str(self.tool))
         self.pointstoDraw = None    #Polyline in mapcanvas CRS analysed
         self.maptool = self.canvas.mapTool()
         #self.get_point_for_angles()
@@ -85,7 +94,7 @@ class SpectralAngle(QtCore.QObject):
         self.output_layer = result_layer
         # 2 ouvrir une nouvelle vue
         self.mirror = self.mirrormap_tool.runDockableMirror("Angle Spectral")
-        print self.mirror
+        logger.debug(  self.mirror )
         self.mirror.mainWidget.addLayer( result_layer.id() )
         # 1 mettre image en queue
         
@@ -93,15 +102,15 @@ class SpectralAngle(QtCore.QObject):
         
         ifaceLegend = self.iface.legendInterface()
         ifaceLayers = QgsMapLayerRegistry.instance().mapLayers()
-        print "ifacelayers", ifaceLayers
+        logger.debug(  "ifacelayers" + str( ifaceLayers))
         id_layer = result_layer.id()
-        print "id_layer", id_layer
-        print "result layer", result_layer
+        logger.debug(  "id_layer" + str(id_layer))
+        logger.debug(  "result layer" + str(result_layer))
         #QgsMapLayerRegistry.instance().mapLayers()
         #{u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>, u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
         ifaceLegend.setLayerVisible( result_layer, False )
         self.iface.mapCanvas().refresh()
-        print ifaceLegend.isLayerVisible(result_layer)
+        logger.debug( ifaceLegend.isLayerVisible(result_layer) )
         
         # thaw the canvas
         self.freezeCanvas( False )                
@@ -109,13 +118,13 @@ class SpectralAngle(QtCore.QObject):
     
     def get_point_for_angles(self, layer):
         self.layer = layer
-        print "get point for angles"
+        logger.debug(  "get point for angles" )
         QtCore.QObject.connect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
         
         #init the mouse listener comportement and save the classic to restore it on quit
         self.canvas.setMapTool(self.tool)
         
-        print "listener set"
+        logger.debug(  "listener set" )
         
         #init the temp layer where the polyline is draw
         self.polygon = False

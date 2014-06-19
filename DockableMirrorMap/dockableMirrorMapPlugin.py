@@ -28,6 +28,13 @@ from qgis.gui import *
 
 import resources_rc
 
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'DockableMirrorMap_plugin' )
+logger.setLevel(logging.DEBUG)
+
 class DockableMirrorMapPlugin(QObject):
 	__pyqtSignals__ = ("mirrorClosed(PyQt_PyObject)")
 	def __init__(self, iface):
@@ -56,6 +63,7 @@ class DockableMirrorMapPlugin(QObject):
 	
 	
 		QObject.connect(self.iface.mapCanvas(), SIGNAL( "extentsChanged()" ), self.onExtentsChanged)
+		QObject.connect(self.iface.mapCanvas(), SIGNAL( "scaleChanged(double)" ), self.onScaleChanged)
 	
 	def unload(self):
 		#QObject.disconnect(self.iface, SIGNAL("projectRead()"), self.onProjectLoaded)
@@ -107,10 +115,19 @@ class DockableMirrorMapPlugin(QObject):
 	
 			view.mainWidget.canvas.setExtent( self.iface.mapCanvas().extent() )
 	
+			view.mainWidget.canvas.setRenderFlag( prevFlag )	
+	
+	def onScaleChanged(self):
+		for view in self.dockableMirrors :
+			prevFlag = view.mainWidget.canvas.renderFlag()
+			view.mainWidget.canvas.setRenderFlag( False )
+	
+			view.mainWidget.canvas.setExtent( self.iface.mapCanvas().extent() )
+	
 			view.mainWidget.canvas.setRenderFlag( prevFlag )
 		
 	def extentChanged(self):
-		print "extent changed"
+		logger.debug(  "extent changed" )
 		for view in self.dockableMirrors :
 			view.mainWidget.canvas.setExtent( self.iface.mapCanvas().extent() )
 	

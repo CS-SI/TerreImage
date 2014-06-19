@@ -23,8 +23,12 @@
 import os
 import datetime
 
+
+#import loggin for debug messages
 import logging
-logger = logging.getLogger("TerreImage")
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'TerreImage_OTBApplications' )
 logger.setLevel(logging.INFO)
 
 
@@ -52,12 +56,12 @@ def bandmath_cli( images, expression, output_filename ):
     command += " BandMath -il "
     
     for image in images :
-        command += image + " "
+        command += "\"" + image + "\"" + " "
     
     command += " -exp " + str( expression )
     command += " -out " + str( output_filename ) 
     
-    print "command", command
+    logger.info( "command: " + "\"" + str(command)) + "\"" 
     os.system( command )
 
 
@@ -75,9 +79,9 @@ def concatenateImages_cli( listImagesIn, outputname ):
         command = os.path.join(prefix, "otbcli ")
         command += " ConcatenateImages "
         command += " -il " + " ".join(listImagesIn)
-        command += " -out " + outputname
+        command += " -out " + "\"" + outputname + "\"" 
         
-        print "concatenateImages_cli", command
+        logger.info( "command: " + str(command))
         
         os.system(command)
 
@@ -93,10 +97,12 @@ def kmeans_cli( image, nbClass, outputDirectory ):
         if image and nbClass and outputDirectory :
             command = os.path.join(prefix, "otbcli")
             command += " KMeansClassification "
-            command += " -in " + image
-            command += " -out " + output
+            command += " -in " + "\"" + image + "\""
+            command += " -out " + "\"" + output + "\""
             command += " -nc " + str(nbClass)
             command += " -rand " + str(42)
+            
+            logger.info( "command: " + str(command))
             
             os.system(command)
         
@@ -104,18 +110,17 @@ def kmeans_cli( image, nbClass, outputDirectory ):
 
 
 def color_mapping_cli_ref_image( image_to_color, reference_image, working_dir):
-    print "entering color mapping"
     output_filename = os.path.join( working_dir, os.path.splitext(os.path.basename(image_to_color))[0]) + "colored.tif"# + os.path.splitext(image_to_color)[0]
     
     if not os.path.isfile(output_filename):
-        print output_filename
+        logger.info( output_filename )
         command = os.path.join(prefix, "otbcli")
         command += " ColorMapping "
-        command += " -in " + image_to_color
-        command += " -out " + output_filename
+        command += " -in " + "\"" + image_to_color + "\""
+        command += " -out " + "\"" + output_filename + "\""
         command += " -method \"image\""
-        command += " -method.image.in " + reference_image
-        print command
+        command += " -method.image.in " + "\"" + reference_image + "\""
+        logger.info( "command: " + str(command))
         os.system(command)
     return output_filename
 
@@ -126,9 +131,9 @@ def otbcli_export_kmz( filename, working_directory):
     if not os.path.isfile(output_kmz):
         command = os.path.join(prefix, "otbcli ")
         command += "KmzExport "
-        command += " -in " + filename
-        command += " -out " + output_kmz
-        print command
+        command += " -in " + "\"" + filename + "\""
+        command += " -out " + "\"" + output_kmz + "\""
+        logger.info( "command: " + str(command))
         os.system( command )
     return output_kmz
     

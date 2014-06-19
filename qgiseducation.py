@@ -42,6 +42,14 @@ from terre_image_constant import TerreImageConstant
 #from supervisedclassification import SupervisedClassification
 
 
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'TerreImage_qgiseducation' )
+logger.setLevel(logging.DEBUG)
+
+
 class QGISEducation:
 
     def __init__(self, iface):
@@ -84,7 +92,7 @@ class QGISEducation:
         
         
         #self.classif_tool = SupervisedClassification()
-        #print self.classif_tool
+        #logger.debug( self.classif_tool )
 
     def extra_menu(self):
         # find the Raster menu
@@ -152,7 +160,7 @@ class QGISEducation:
 #           self.menu.addMenu( self.analysisMenu )
 
     def extra_menu_visu( self, bands ):
-        print "bands", bands
+        logger.debug( "bands" + str(bands))
         corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
         
         self.visualization_menu.clear()
@@ -201,7 +209,7 @@ class QGISEducation:
         pass
     
     def do_display_one_band(self, who):
-        print "who", who
+        logger.debug( "who" + str(who))
         #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
         my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.educationWidget.mirror_map_tool, who )
         self.qgis_education_manager.add_processing(my_process)
@@ -257,16 +265,16 @@ class QGISEducation:
         self.iface.newProject( True )
         
         self.constants.index_group = self.iface.legendInterface().addGroup( "Terre Image", True, None )
-        print self.constants.index_group
+        logger.debug( self.constants.index_group )
         
         self.qgis_education_manager = ProcessingManager(self.iface)
         
         
         _, bands  = self.qgis_education_manager.set_current_layer( )
-        print "self.layer", self.qgis_education_manager.layer
+        logger.debug( "self.layer" + str(self.qgis_education_manager.layer))
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
-        print "temps de chargement : ", timeExec
+        logger.info( "temps de chargement : " +  str(timeExec) )
         
         self.show_education_widget(bands)
         
@@ -310,13 +318,15 @@ class QGISEducation:
                 self.dockOpened = False
 
     def onWriteProject(self, domproject):
+        if self.qgis_education_manager is None:
+            return
         if self.qgis_education_manager.layer is None:
             return
 
         QgsProject.instance().writeEntry( "QGISEducation", "/working_layer", self.qgis_education_manager.layer.source_file )
         # write band orders
         QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_bands", str(self.qgis_education_manager.layer.bands) )
-        print str(self.qgis_education_manager.layer.bands)
+        logger.debug( str(self.qgis_education_manager.layer.bands) )
         QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_type", self.qgis_education_manager.layer.type )
         QgsProject.instance().writeEntry( "QGISEducation", "/working_directory", self.qgis_education_manager.working_directory )
         p = []
@@ -333,8 +343,8 @@ class QGISEducation:
             return
         
         bands, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer_bands")
-        print "is ok", ok
-        print bands
+        logger.debug( "is ok" + str(ok))
+        logger.debug( bands )
         
         # TODO interpreter bands
         type, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer_type")
@@ -345,7 +355,7 @@ class QGISEducation:
         self.qgis_education_manager.restore_processing_manager(wl, eval(bands), type, working_dir)
         
         process, ok = QgsProject.instance().readEntry("QGISEducation", "/process")
-        print eval(process)
+        logger.debug( eval(process))
         
         self.show_education_widget(bands)
         

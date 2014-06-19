@@ -135,7 +135,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                 logger.debug( "multiband" + str(layer.bandCount()) )
                 for i in range(layer.bandCount() ):
                     if rename_bands :
-                        print self.the_layer_bands[i+1]
+                        logger.debug( self.the_layer_bands[i+1] )
                         child_name = layer.name() + "_band " + corres[self.the_layer_bands[i+1]]
                     else:
                         child_name = layer.name() + "_band " + str(i+1)
@@ -149,7 +149,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
 
 
     def getSelectedOptions(self):
-        print "get selected options"
+        logger.debug( "get selected options")
         selectedLayers = []
         it = QtGui.QTreeWidgetItemIterator(self.table)
         index_layer = 0
@@ -269,7 +269,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
         
             totalXSize = ds.RasterXSize
             totalYSize = ds.RasterYSize
-        #    print "totalYSize from rasterToVRT:", totalYSize
+        #    logger.debug( "totalYSize from rasterToVRT:" + str(totalYSize))
             
             dataType = gdal.GetDataTypeName(band.DataType)
             

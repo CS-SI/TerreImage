@@ -107,7 +107,7 @@ class MyMplCanvas(FigureCanvas):
                 #histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
                 #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1), approx_ok = 0)
                 histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
-#             print "histogram", histogram
+#             logger.debug(  "histogram" + str(histogram))
             
             # removing 0 at the end of the histogram
             while len(histogram) > 1 and histogram[-1] == 0 :
@@ -183,7 +183,7 @@ class MyMplCanvas(FigureCanvas):
             self.axes.set_title(self.name)
             
     def draw_reset_percent(self):
-        print "draw reset"
+        logger.debug(  "draw reset" )
         self.axes.clear()
         self.draw_histogram()
         if self.two_min and self.ninety_eight_max:
@@ -343,12 +343,12 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
         #super(TerreImageHistogram_monoband, self).__init__(layer, nb_bands) 
         TerreImageHistogram.__init__( self, layer, nb_bands )  
         
-        print "processing", processing
+        logger.debug( "processing" + str(processing))
         if processing is None:
-            print "processing none"
+            logger.debug( "processing none")
             self.canvas = canvas
         else:
-            print "processing not none"
+            logger.debug( "processing not none")
             self.canvas = processing.mirror.mainWidget.canvas
         
         self.sc_2 = MyMplCanvas(self, width=5, height=4, dpi=100)
@@ -372,8 +372,8 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
            
     def valueChanged(self):
         values = [ (self.sc_1.x_min, self.sc_1.x_max ), (self.sc_2.x_min, self.sc_2.x_max ), (self.sc_3.x_min, self.sc_3.x_max )]
-        print "values", values
-        print self.canvas
+        logger.debug( "values" + str(values))
+        logger.debug( self.canvas )
         manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas)
         #self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
            

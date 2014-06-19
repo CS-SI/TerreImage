@@ -32,6 +32,12 @@ from DockableMirrorMap.dockableMirrorMapPlugin import DockableMirrorMapPlugin
 from ClassificationSupervisee.supervisedclassificationdialog import SupervisedClassificationDialog
 
 
+#import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger( 'TerreImage_ProcessingManager' )
+logger.setLevel(logging.DEBUG)
 
 class ProcessingManager():
     
@@ -53,7 +59,7 @@ class ProcessingManager():
         self.valuedockwidget.setWidget(self.value_tool)
         self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
         self.valuedockwidget.hide()
-        print self.value_tool
+        logger.debug( self.value_tool )
         
         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
         self.mirror_map_tool.initGui()
@@ -69,19 +75,19 @@ class ProcessingManager():
         if isinstance(processing, TerreImageProcessing):
             self.layers_for_value_tool.append(processing.output_working_layer.qgis_layer)
             self.layers_for_classif_tool.append(processing.output_working_layer.get_qgis_layer())
-        print " adding", processing.processing_name
+        logger.debug( " adding" + str(processing.processing_name) )
         self.name_to_processing[processing.processing_name] = processing
-        print "self.layers_for_value_tool", self.layers_for_value_tool
+        logger.debug( "self.layers_for_value_tool" + str(self.layers_for_value_tool) )
         
         
     def get_process_to_display(self):
         for x in self.processings:
-            print x
-            print x.output_working_layer.qgis_layer
+            logger.debug( x )
+            logger.debug( x.output_working_layer.qgis_layer )
         
         
         temp = [x.output_working_layer.qgis_layer for x in self.processings if isinstance(x, TerreImageProcessing) and x.output_working_layer.qgis_layer is not None]
-        print temp
+        logger.debug( temp )
         return temp
         
     
@@ -93,8 +99,8 @@ class ProcessingManager():
                 os.makedirs( self.working_directory )
                 
         self.layers_for_value_tool.append(self.layer ) #.get_qgis_layer())
-        print "set_current_layer: layers_for_value_tool", self.layers_for_value_tool
-        print "working directory"
+        logger.debug( "set_current_layer: layers_for_value_tool" + str(self.layers_for_value_tool))
+        logger.debug( "working directory" )
         return self.layer, bands
         
         
@@ -126,7 +132,7 @@ class ProcessingManager():
         
         
     def view_closed(self, name_of_the_closed_view):
-        print name_of_the_closed_view,  " has been closed"
+        logger.debug( str(name_of_the_closed_view) + " has been closed")
         process = self.name_to_processing[name_of_the_closed_view]
         QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
         self.remove_process(process)
@@ -142,7 +148,7 @@ class ProcessingManager():
         
     def removing_layer(self, layer_id):
         process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
-        print "process", process
+        logger.debug( "process" + str( process))
         if process :
             process[0].mirror.close()
             self.remove_process(process[0])
