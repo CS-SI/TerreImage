@@ -104,6 +104,10 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         QtGui.QApplication.restoreOverrideCursor()
         
         self.output_dir = get_working_dir()
+        
+        self.app_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)), "win32", "bin")
+        logger.debug( "self.app_dir" + str(self.app_dir) )
+        
         #self.setupUi()
         QGisLayers.setInterface(iface)
         
@@ -255,13 +259,13 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                 #preprocessedshpfile = os.path.join(vectordir, transform_spaces(os.path.basename(unicode(inputshpfilepath))))
                 preprocessedshpfile = os.path.join(vectordir, "preprocessed.shp")
                 
-                cropcommand = ('%s/win32/bin/cropvectortoimage.bat '
+                cropcommand = ('%s/cropvectortoimage.bat '
                              '"%s" '
                              '"%s" '
                              '"%s" '
                              '"%s" '
                              '"%s" '
-                             % ( os.path.dirname(__file__),
+                             % ( self.app_dir,
                                  inputshpfilepath,
                                  selectedrasterlayers[0].source(),
                                  os.path.join(vectordir,"imageenveloppe.shp"),
@@ -318,7 +322,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
             outputclassification = os.path.join(outputdir, 'classification.tif')
             outputresults = os.path.join(outputdir, 'classification.resultats.txt')
             
-            launcher = "%s/win32/bin/classification.bat" % os.path.dirname(__file__)
+            launcher = "%s/classification.bat" % self.app_dir
             classifcommand = (  '%s '
                                 '-io.il %s '
                                 '-io.vd %s '
