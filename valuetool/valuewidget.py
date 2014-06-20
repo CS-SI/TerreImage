@@ -37,7 +37,7 @@ from ptmaptool import ProfiletoolMapTool
 from osgeo import osr, gdal
 import gdalconst
 
-hasqwt=True
+hasqwt=False
 try:
     from PyQt4.Qwt5 import QwtPlot,QwtPlotCurve,QwtScaleDiv,QwtSymbol
 except:
@@ -110,6 +110,15 @@ class ValueWidget(QWidget, Ui_Widget):
 
 
     def setupUi_extra(self):
+
+        #make interface easier
+        self.cbxActive.hide()
+        self.plotSelector.hide()
+        self.groupBox_saved_layers.hide()
+        self.graphControls.hide()
+        self.graphControls.setVisible(False)
+    
+
 
         # checkboxes
         #self.changeActive(Qt.Checked)
@@ -246,9 +255,9 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def changePage(self,state):
         if (state==Qt.Checked):
-            self.plotSelector.setVisible( True )
-            self.cbxStats.setVisible( True )
-            self.graphControls.setVisible( True )
+            #self.plotSelector.setVisible( True )
+            #self.cbxStats.setVisible( True )
+            #self.graphControls.setVisible( True )
             self.groupBox_saved_layers.setVisible( True )
             self.checkBox_hide_current.setVisible( True )
             self.pushButton_get_point.show()
