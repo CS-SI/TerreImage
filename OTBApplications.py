@@ -61,7 +61,7 @@ def bandmath_cli( images, expression, output_filename ):
     command += " -exp " + str( expression )
     command += " -out " + str( output_filename ) 
     
-    logger.info( "command: " + "\"" + str(command)) + "\"" 
+    logger.info( "command: "+ str(command) ) 
     os.system( command )
 
 

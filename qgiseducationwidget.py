@@ -228,7 +228,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     logger.debug("working layer" )
                     bs = ["rouge", "verte", "bleue", "pir", "nir"]
                     corres = {"rouge":process.layer.red, "verte":process.layer.green, "bleue":process.layer.blue, "pir":process.layer.pir, "mir":process.layer.mir}
-                    logger.debug( "corres: " + corres )
+                    logger.debug( "corres: " + str(corres) )
                     
                     for item in bs:
                         if item in text_changed:

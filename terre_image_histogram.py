@@ -84,7 +84,7 @@ class MyMplCanvas(FigureCanvas):
         
         decimal_values = False
         
-        logger.debug( "image" + image + "band" + band )
+        logger.debug( "image: " + str(image) + " band: " + str(band) )
         dataset = gdal.Open(str(image), gdal.GA_ReadOnly)
         if dataset is None:
             print "Error : Opening file ", image
