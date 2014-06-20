@@ -876,9 +876,9 @@ class ValueWidget(QWidget, Ui_Widget):
     def extra_plot(self):
         if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
             t = range(1, len(self.temp_values)+1)
-            line = "self.axes.plot(" + str(t) + "," + str(self.temp_values) + ", \"ko-\""
+            line = 'self.axes.plot(' + str(t) + ',' + str(self.temp_values) + ', "ko-"'
         else:
-            line="self.axes.plot("
+            line='self.axes.plot('
         
         i=0
         for curve in self.saved_curves:
@@ -894,10 +894,10 @@ class ValueWidget(QWidget, Ui_Widget):
                 
                 t = range(1, len(numvalues)+1)
                 self.sc_1.plot( t, numvalues, color_curve, 'o-' )
-                line += "," + str(t) + "," + str(numvalues) + ", \"\"" + color_curve + "\"o-\""
+                line += ',' + str(t) + ',' + str(numvalues) + ', "' + color_curve + 'o-"'
             i+=1
             
-        line += ")"
+        line += ')'
                 
         print "line", line
         self.sc_1.plot_line(line)
