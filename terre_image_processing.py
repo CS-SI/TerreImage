@@ -112,21 +112,18 @@ def threshold(layer, working_directory, forms):
     if len(forms) == 1 :
         output_filename = os.path.join( working_directory, 
                                             os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + os.path.splitext(image_in)[1] )
-        if not os.path.isfile(output_filename):
-            OTBApplications.bandmath_cli( [image_in], formula, output_filename  )
+        OTBApplications.bandmath_cli( [image_in], forms[0], output_filename  )
     else:
         for formula in forms :
             output_filename = os.path.join( working_directory, 
                                                 os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + str(i) + os.path.splitext(image_in)[1]
                                               )
-            if not os.path.isfile(output_filename):
-                OTBApplications.bandmath_cli( [image_in], formula, output_filename  )
+            OTBApplications.bandmath_cli( [image_in], formula, output_filename  )
             i+=1
             temp.append(output_filename)
         output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + os.path.splitext(image_in)[1] )
             
-        if not os.path.isfile(output_filename):
-            OTBApplications.concatenateImages_cli( temp, output_filename )
+        OTBApplications.concatenateImages_cli( temp, output_filename )
     
     return output_filename
     
