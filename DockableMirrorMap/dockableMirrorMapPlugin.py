@@ -112,19 +112,21 @@ class DockableMirrorMapPlugin(QObject):
 		for view in self.dockableMirrors :
 			prevFlag = view.mainWidget.canvas.renderFlag()
 			view.mainWidget.canvas.setRenderFlag( False )
-	
+ 	
 			view.mainWidget.canvas.setExtent( self.iface.mapCanvas().extent() )
-	
+ 	
 			view.mainWidget.canvas.setRenderFlag( prevFlag )	
 	
 	def onScaleChanged(self):
-		for view in self.dockableMirrors :
-			prevFlag = view.mainWidget.canvas.renderFlag()
-			view.mainWidget.canvas.setRenderFlag( False )
-	
-			view.mainWidget.canvas.setExtent( self.iface.mapCanvas().extent() )
-	
-			view.mainWidget.canvas.setRenderFlag( prevFlag )
+		pass
+# 		print "on scale changed"
+# 		for view in self.dockableMirrors :
+# 			prevFlag = view.mainWidget.canvas.renderFlag()
+# 			view.mainWidget.canvas.setRenderFlag( False )
+# 	
+# 			view.mainWidget.canvas.zoomScale( 1.0 / self.iface.mapCanvas().scale() )
+# 	
+# 			view.mainWidget.canvas.setRenderFlag( prevFlag )
 		
 	def extentChanged(self):
 		logger.debug(  "extent changed" )
