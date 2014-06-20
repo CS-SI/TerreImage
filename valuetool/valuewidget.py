@@ -29,6 +29,8 @@ from PyQt4.QtGui import *
 from qgis.core import *
 import qgis.gui
 
+from numpy import arange
+
 from ui_valuewidgetbase import Ui_ValueWidgetBase as Ui_Widget
 from terre_image_curve import TerreImageCurve
 import random
@@ -47,9 +49,11 @@ except:
 hasmpl=True
 try:
     import matplotlib
-    import matplotlib.pyplot as plt 
+    #import matplotlib.pyplot as plt 
     import matplotlib.ticker as ticker
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
+    from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+    from matplotlib.figure import Figure
 except:
     hasmpl=False
 if hasmpl:
@@ -63,6 +67,96 @@ logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'ValueTool_valueWidget' )
 logger.setLevel(logging.DEBUG)
+
+
+class ValueWidgetGraph(FigureCanvas):
+    
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+   
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        # We want the axes cleared every time plot() is called
+    
+        self.axes.hold(False)
+    
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+    
+        FigureCanvas.setSizePolicy(self,
+                                   QtGui.QSizePolicy.Expanding,
+                                   QtGui.QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+    
+        self.two_min = 0
+        self.ninety_eight_max = 0
+        self.x_min = 0
+        self.x_max = 0
+        self.change_min = True
+        
+    def display_histogram(self, filename, band, color, name):
+        self.color = color
+        self.name = name
+        histogram, decimal_values = self.get_GDAL_histogram(filename, band)
+#         print "type(histogram)", type(histogram)
+#         print "histogram", histogram
+#         print "len(histogram)", len(histogram)
+        if not decimal_values:
+            #print arange(0, len(histogram)) + self.rasterMin
+            self.t = arange(0, len(histogram)) + self.rasterMin #range(0, len(histogram))
+        else:
+            #print arange(0, len(histogram)/1000., 0.001) + self.rasterMin
+            self.t = arange(0, len(histogram)/1000., 0.001) + self.rasterMin
+            #locs,labels = plt.yticks()
+            #plt.yticks(locs, map(lambda x: "%.1f" % x, locs*1e9))
+            #ylabel('microseconds (1E-9)'
+        self.s = histogram
+        logger.debug(  "len s and len t"+ str(len(self.s)) + str(len(self.t)))
+        #print "self.t", self.t
+        self.draw_histogram()
+        self.axes.figure.canvas.mpl_connect('button_press_event', self.on_press)
+        self.axes.figure.canvas.mpl_connect('button_release_event', self.on_release)
+        self.draw_min_max_percent()
+        
+        
+    def draw_histogram(self):
+        if self.t.any() and self.s and self.color and self.name:
+            self.axes.plot(self.t, self.s, self.color)
+            xtext = self.axes.set_xlabel('Valeur') # returns a Text instance
+            ytext = self.axes.set_ylabel('Nombre')
+            self.axes.set_title(self.name)
+            
+    def draw_reset_percent(self):
+        logger.debug(  "draw reset" )
+        self.axes.clear()
+        self.draw_histogram()
+        
+    def clear(self):
+       self.axes.clear()
+       
+    def plot(self, x, y, color, marker='o'):
+        print "x", x
+        print "y", y
+        options = '"' + color + marker +'"'
+        print options
+        self.axes.plot(x, y, color + marker)
+        xtext = self.axes.set_xlabel('Bande') # returns a Text instance
+        ytext = self.axes.set_ylabel('Valeur')
+        self.axes.figure.canvas.draw()
+        
+    def update_plot(self):
+        self.axes.figure.canvas.draw()
+        
+    def plot_line(self, line):
+        eval(line)
+        xtext = self.axes.set_xlabel('Bande') # returns a Text instance
+        ytext = self.axes.set_ylabel('Valeur')
+        self.axes.figure.canvas.draw()
+        
+    #def plot_extra(self, xs, ys, colors, markers):
+    #    if len(xs)   ==  len(ys)   ==  len(colors)   ==  len(markers) :
+            
+    
+        
 
 class ValueWidget(QWidget, Ui_Widget):
 
@@ -106,7 +200,7 @@ class ValueWidget(QWidget, Ui_Widget):
         QObject.connect(self.canvas, SIGNAL( "keyPressed( QKeyEvent * )" ), self.pauseDisplay )
         QObject.connect(self.plotSelector, SIGNAL( "currentIndexChanged ( int )" ), self.changePlot )
         QObject.connect(self.pushButton_get_point, SIGNAL( "clicked()" ), self.on_get_point_button )
-        
+        numvalues = None
 
 
     def setupUi_extra(self):
@@ -174,30 +268,38 @@ class ValueWidget(QWidget, Ui_Widget):
         if self.hasmpl:
             # mpl stuff
             # should make figure light gray
-            self.mplBackground = None #http://www.scipy.org/Cookbook/Matplotlib/Animations
-            self.mplFig = plt.Figure(facecolor='w', edgecolor='w')
-            self.mplFig.subplots_adjust(left=0.1, right=0.975, bottom=0.13, top=0.95)
-            self.mplPlt = self.mplFig.add_subplot(111)   
-            self.mplPlt.tick_params(axis='both', which='major', labelsize=12)
-            self.mplPlt.tick_params(axis='both', which='minor', labelsize=10)                           
-            # qt stuff
-            self.pltCanvas = FigureCanvasQTAgg(self.mplFig)
-            self.pltCanvas.setParent(self.stackedWidget)
-            self.pltCanvas.setAutoFillBackground(False)
-            self.pltCanvas.setObjectName("mplPlot")
-            self.mplPlot = self.pltCanvas
-            self.mplPlot.setVisible(False)
+            self.sc_1 = ValueWidgetGraph(self, width=5, height=4, dpi=100)
+            
+            
+            
+            
+            
+#             self.mplBackground = None #http://www.scipy.org/Cookbook/Matplotlib/Animations
+#             
+#             
+#             self.mplFig = plt.Figure(facecolor='w', edgecolor='w')
+#             self.mplFig.subplots_adjust(left=0.1, right=0.975, bottom=0.13, top=0.95)
+#             self.mplPlt = self.mplFig.add_subplot(111)   
+#             self.mplPlt.tick_params(axis='both', which='major', labelsize=12)
+#             self.mplPlt.tick_params(axis='both', which='minor', labelsize=10)                           
+#             # qt stuff
+#             self.pltCanvas = FigureCanvasQTAgg(self.mplFig)
+#             self.pltCanvas.setParent(self.stackedWidget)
+#             self.pltCanvas.setAutoFillBackground(False)
+#             self.pltCanvas.setObjectName("mplPlot")
+#             self.mplPlot = self.pltCanvas
+#             self.mplPlot.setVisible(False)
         else:
             self.mplPlot = QtGui.QLabel("Need Qwt >= 5.0 or matplotlib >= 1.0 !")
 
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.mplPlot.sizePolicy().hasHeightForWidth())
-        self.mplPlot.setSizePolicy(sizePolicy)
-        self.qwtPlot.setObjectName("qwtPlot")
-        self.mplPlot.updateGeometry()
-        self.stackedWidget.addWidget(self.mplPlot)
+#         sizePolicy.setHeightForWidth(self.mplPlot.sizePolicy().hasHeightForWidth())
+#         self.mplPlot.setSizePolicy(sizePolicy)
+#         self.qwtPlot.setObjectName("qwtPlot")
+#         self.mplPlot.updateGeometry()
+        self.stackedWidget.addWidget(self.sc_1)
         self.stackedWidget.setCurrentIndex(0)
 
 
@@ -548,11 +650,13 @@ class ValueWidget(QWidget, Ui_Widget):
         if self.cbxGraph.isChecked():
             #TODO don't plot if there is no data to plot...
             if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
+                print "show values self.values", self.values
                 self.plot()
             else:
-                self.mplPlt.clear()
+                self.sc_1.clear()
             if self.saved_curves :
                 self.extra_plot()
+            self.sc_1.update_plot()
         else:
             self.printInTable()
 
@@ -662,6 +766,7 @@ class ValueWidget(QWidget, Ui_Widget):
     def plot(self):
         items = self.values
         new_items = self.order_values(items)
+        print "items", new_items
 
         pixel = 0
         ligne = 0
@@ -676,7 +781,10 @@ class ValueWidget(QWidget, Ui_Widget):
                     numvalues.append(float(value))
                 except:
                     numvalues.append(0)
-                    
+        
+        print numvalues
+        
+        
         if self.memorize_curve:
             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), pixel, ligne, numvalues)
             QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
@@ -705,13 +813,22 @@ class ValueWidget(QWidget, Ui_Widget):
 
         elif ( self.hasmpl and (self.plotSelector.currentText()=='mpl') ):
 
-            self.mplPlt.clear()
-            self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color='k', mfc='b', mec='b')
-            self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-            self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-            self.mplPlt.set_xlim( (1-0.25,len(new_items)+0.25 ) )
-            self.mplPlt.set_ylim( (ymin, ymax) ) 
-            self.mplFig.canvas.draw()
+            self.sc_1.clear()
+            
+            t = range(1, len(numvalues)+1)
+            self.sc_1.plot( t, numvalues, 'k', 'o-' )
+            
+            self.temp_values = numvalues
+            
+            #line = "self.axes.plot(" + str(t) + ", " + str(numvalues) +", ko-)"
+            #self.sc_1.plot_line(line)
+            
+#             self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color='k', mfc='b', mec='b')
+#             self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+#             self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+#             self.mplPlt.set_xlim( (1-0.25,len(new_items)+0.25 ) )
+#             self.mplPlt.set_ylim( (ymin, ymax) ) 
+#             self.mplFig.canvas.draw()
 
             #disable optimizations - too many bugs, depending on mpl version!
 #             if self.mplLine is None:
@@ -757,7 +874,13 @@ class ValueWidget(QWidget, Ui_Widget):
 
 
     def extra_plot(self):
+        if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
+            t = range(1, len(self.temp_values)+1)
+            line = "self.axes.plot(" + str(t) + "," + str(self.temp_values) + ", \"ko-\""
+        else:
+            line="self.axes.plot("
         
+        i=0
         for curve in self.saved_curves:
             if curve.display_points():
                 logger.debug( curve )
@@ -769,12 +892,24 @@ class ValueWidget(QWidget, Ui_Widget):
                 
                 color_curve = curve.color
                 
-                self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color=color_curve, mfc='b', mec='b')
-                self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-                self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-                self.mplPlt.set_xlim( (1-0.25,len(numvalues)+0.25 ) )
-                self.mplPlt.set_ylim( (ymin, ymax) ) 
-                self.mplFig.canvas.draw()
+                t = range(1, len(numvalues)+1)
+                self.sc_1.plot( t, numvalues, color_curve, 'o-' )
+                line += "," + str(t) + "," + str(numvalues) + ", \"\"" + color_curve + "\"o-\""
+            i+=1
+            
+        line += ")"
+                
+        print "line", line
+        self.sc_1.plot_line(line)
+                
+                
+                
+#                 self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color=color_curve, mfc='b', mec='b')
+#                 self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+#                 self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+#                 self.mplPlt.set_xlim( (1-0.25,len(numvalues)+0.25 ) )
+#                 self.mplPlt.set_ylim( (ymin, ymax) ) 
+#                 self.mplFig.canvas.draw()
 
     def on_get_point_button(self):
         if self.pushButton_get_point.isFlat() == False:
