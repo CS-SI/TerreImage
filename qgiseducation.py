@@ -230,7 +230,7 @@ class QGISEducation:
         """
         self.unload_interface()
             # Remove the plugin menu item and icon
-        self.iface.removePluginMenu(u"&QGISEducation", self.action)
+        self.iface.removePluginMenu(u"&TerreImage", self.action)
         self.iface.removeToolBarIcon(self.action)
 
     def unload_interface(self):
@@ -293,8 +293,8 @@ class QGISEducation:
                 self.educationWidget.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
                 
                 # create the dockwidget with the correct parent and add the valuewidget
-                self.qgisedudockwidget = QDockWidget("QGIS Education", self.iface.mainWindow() )
-                self.qgisedudockwidget.setObjectName("QGIS Education")
+                self.qgisedudockwidget = QDockWidget("Terre Image", self.iface.mainWindow() )
+                self.qgisedudockwidget.setObjectName("Terre Image")
                 self.qgisedudockwidget.setWidget(self.educationWidget)
                 
                 # add the dockwidget to iface
