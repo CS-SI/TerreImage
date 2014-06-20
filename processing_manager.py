@@ -133,9 +133,13 @@ class ProcessingManager():
         
     def view_closed(self, name_of_the_closed_view):
         logger.debug( str(name_of_the_closed_view) + " has been closed")
-        process = self.name_to_processing[name_of_the_closed_view]
-        QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
-        self.remove_process(process)
+        try:
+            process = self.name_to_processing[name_of_the_closed_view]
+            QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
+            self.remove_process(process)
+        except KeyError:
+            pass
+                
         
         
     def remove_process(self, process):
