@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_qgiseducation.ui'
 #
-# Created: Wed Jun  4 18:29:22 2014
+# Created: Fri Jun 20 12:18:30 2014
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -20,13 +20,6 @@ class Ui_QGISEducation(object):
         QGISEducation.resize(421, 816)
         self.verticalLayout = QtGui.QVBoxLayout(QGISEducation)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.label_working_layer = QtGui.QLabel(QGISEducation)
-        self.label_working_layer.setText(_fromUtf8(""))
-        self.label_working_layer.setObjectName(_fromUtf8("label_working_layer"))
-        self.verticalLayout.addWidget(self.label_working_layer)
-        self.label = QtGui.QLabel(QGISEducation)
-        self.label.setObjectName(_fromUtf8("label"))
-        self.verticalLayout.addWidget(self.label)
         self.groupBox_2 = QtGui.QGroupBox(QGISEducation)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
@@ -111,7 +104,6 @@ class Ui_QGISEducation(object):
 
     def retranslateUi(self, QGISEducation):
         QGISEducation.setWindowTitle(QtGui.QApplication.translate("QGISEducation", "QGISEducation", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("QGISEducation", "Layer courrante :", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_2.setTitle(QtGui.QApplication.translate("QGISEducation", "Bandes spectrales affichées", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_3.setTitle(QtGui.QApplication.translate("QGISEducation", "Affichage des bandes spectrales", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_4.setTitle(QtGui.QApplication.translate("QGISEducation", "Traitements", None, QtGui.QApplication.UnicodeUTF8))
