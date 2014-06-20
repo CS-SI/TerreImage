@@ -90,6 +90,10 @@ class MyMplCanvas(FigureCanvas):
             print "Error : Opening file ", image
         else :
             band = dataset.GetRasterBand(band)
+            
+            #band_overview = band.GetOverview()
+            
+            
             self.rasterMin, self.rasterMax = band.ComputeRasterMinMax()
             logger.debug( "self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin) )
             #nbVal = max( self.rasterMax - self.rasterMin, self.rasterMax)
@@ -318,6 +322,7 @@ class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):
         seuil.clicked.connect(self.seuillage)
         self.l.addWidget(seuil)
            
+           
     def valueChanged(self):
         logger.debug( "value changed" )
         values = [ (self.sc_1.x_min, self.sc_1.x_max ) ]
@@ -343,13 +348,18 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
         #super(TerreImageHistogram_monoband, self).__init__(layer, nb_bands) 
         TerreImageHistogram.__init__( self, layer, nb_bands )  
         
+        
         logger.debug( "processing" + str(processing))
         if processing is None:
             logger.debug( "processing none")
             self.canvas = canvas
+            self.processing=None
         else:
+            print "canvas", canvas
+            print "processing.mirror.mainWidget.canvas", processing.mirror.mainWidget.canvas
             logger.debug( "processing not none")
             self.canvas = processing.mirror.mainWidget.canvas
+            self.processing = processing
         
         self.sc_2 = MyMplCanvas(self, width=5, height=4, dpi=100)
         QtCore.QObject.connect( self.sc_2, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
@@ -363,9 +373,9 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
             self.sc_2.display_histogram(self.layer.get_source(), self.layer.red, 'g', "Plan V : BS R")
             self.sc_3.display_histogram(self.layer.get_source(), self.layer.green, 'b', "Plan B : BS V")
         else:
-            self.sc_1.display_histogram(self.layer.get_source(), self.layer.red, 'r', "Plan R : BS PIR")
-            self.sc_2.display_histogram(self.layer.get_source(), self.layer.green, 'g', "Plan V : BS R")
-            self.sc_3.display_histogram(self.layer.get_source(), self.layer.blue, 'b', "Plan B : BS V")
+            self.sc_1.display_histogram(self.processing.output_working_layer.get_source(), self.layer.red, 'r', "Plan R : BS PIR")
+            self.sc_2.display_histogram(self.processing.output_working_layer.get_source(), self.layer.green, 'g', "Plan V : BS R")
+            self.sc_3.display_histogram(self.processing.output_working_layer.get_source(), self.layer.blue, 'b', "Plan B : BS V")
         self.set_buttons()
         
         
@@ -374,7 +384,10 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
         values = [ (self.sc_1.x_min, self.sc_1.x_max ), (self.sc_2.x_min, self.sc_2.x_max ), (self.sc_3.x_min, self.sc_3.x_max )]
         logger.debug( "values" + str(values))
         logger.debug( self.canvas )
-        manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas)
+        if self.processing:
+            manage_QGIS.custom_stretch(self.processing.output_working_layer.get_qgis_layer(), values, self.canvas)
+        else:
+            manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas)
         #self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
            
 
