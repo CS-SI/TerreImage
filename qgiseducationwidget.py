@@ -96,7 +96,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         Initialize the interface
         """
         
-        itemProcessing = [ "", "NDVI", "NDTI", "Indice de brillance", "Angle Spectral" ]
+        itemProcessing = [ "Traitements...", "NDVI", "NDTI", "Indice de brillance", "Angle Spectral" ]
         for index in range(len(itemProcessing)):
             item = itemProcessing[index]
             self.comboBox_processing.insertItem ( index, item )
@@ -262,32 +262,33 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         do_it = True
         logger.debug( "do processing args: " + str(args))
         if text_changed:
-            if text_changed in ["NDVI", "NDTI", "Indice de brillance"]:
-                if text_changed in [process.processing_name for process in self.qgis_education_manager.processings] :
-                    do_it = False
-            if text_changed in [ "Seuillage", "Angle Spectral" ]:
-                p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name==text_changed]
-                if p:
-                    process = p[0]
-                    QgsMapLayerRegistry.instance().removeMapLayer( process.get_output_working_layer().qgis_layer.id())
-                if text_changed == "Angle Spectral":
-                    widget = self.iface.messageBar().createMessage("Terre Image", "Cliquez sur un point de l'image pour en obtenir son angle spectral...")
-                    self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
-            if do_it:
-                if not text_changed == "Angle Spectral":
-                    self.set_working_message(True)
-                
-                
-                logger.debug( "text changed: " + text_changed)
-                my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, text_changed, args )
-                if text_changed == "Angle Spectral":
-                    self.set_working_message(True)
-                    QtCore.QObject.connect( my_processing, QtCore.SIGNAL( "display_ok()" ), lambda who=my_processing: self.processing_end_display(who) )
-                if not text_changed == "Angle Spectral":
-                    self.qgis_education_manager.add_processing(my_processing)
-                    self.set_combobox_histograms()
-                    self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
-                    self.set_working_message(False)
+            if not text_changed == "Traitements...":
+                if text_changed in ["NDVI", "NDTI", "Indice de brillance"]:
+                    if text_changed in [process.processing_name for process in self.qgis_education_manager.processings] :
+                        do_it = False
+                if text_changed in [ "Seuillage", "Angle Spectral" ]:
+                    p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name==text_changed]
+                    if p:
+                        process = p[0]
+                        QgsMapLayerRegistry.instance().removeMapLayer( process.get_output_working_layer().qgis_layer.id())
+                    if text_changed == "Angle Spectral":
+                        widget = self.iface.messageBar().createMessage("Terre Image", "Cliquez sur un point de l'image pour en obtenir son angle spectral...")
+                        self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
+                if do_it:
+                    if not text_changed == "Angle Spectral":
+                        self.set_working_message(True)
+                    
+                    
+                    logger.debug( "text changed: " + text_changed)
+                    my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, text_changed, args )
+                    if text_changed == "Angle Spectral":
+                        self.set_working_message(True)
+                        QtCore.QObject.connect( my_processing, QtCore.SIGNAL( "display_ok()" ), lambda who=my_processing: self.processing_end_display(who) )
+                    if not text_changed == "Angle Spectral":
+                        self.qgis_education_manager.add_processing(my_processing)
+                        self.set_combobox_histograms()
+                        self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+                        self.set_working_message(False)
             self.comboBox_processing.setCurrentIndex( 0 )
             
         
@@ -305,7 +306,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
         
             self.comboBox_sprectral_band_display.clear()
-            self.comboBox_sprectral_band_display.insertItem( 0, "" )
+            self.comboBox_sprectral_band_display.insertItem( 0, "Affichage des bandes spectrales..." )
             
             if self.qgis_education_manager.layer.has_natural_colors():
                 logger.debug( "couleurs naturelles")
@@ -334,7 +335,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             
     def do_manage_sprectral_band_display(self, text_changed):
         do_it = True
-        if text_changed:
+        if text_changed and text_changed != "Affichage des bandes spectrales...":
             band_to_display = None
             corres = { 'nat':"Afficher en couleurs naturelles", 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
             corres_name_view = { 'nat':"Couleurs naturelles", 'red':"Bande rouge", 'green':"Bande verte", 'blue':"Bande bleue", 'pir':"Bande pir", 'mir':"Bande mir" }
