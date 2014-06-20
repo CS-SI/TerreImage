@@ -38,7 +38,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_task' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
         
         
 class TerreImageTask(object):
