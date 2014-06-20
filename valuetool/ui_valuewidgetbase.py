@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_valuewidgetbase.ui'
 #
-# Created: Tue May 27 17:13:41 2014
+# Created: Fri Jun 20 19:41:56 2014
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,6 +27,9 @@ class Ui_ValueWidgetBase(object):
         self.verticalLayout_curves = QtGui.QVBoxLayout()
         self.verticalLayout_curves.setObjectName(_fromUtf8("verticalLayout_curves"))
         self.verticalLayout_3.addLayout(self.verticalLayout_curves)
+        self.pushButton_csv = QtGui.QPushButton(self.groupBox_saved_layers)
+        self.pushButton_csv.setObjectName(_fromUtf8("pushButton_csv"))
+        self.verticalLayout_3.addWidget(self.pushButton_csv)
         self.gridLayout.addWidget(self.groupBox_saved_layers, 0, 0, 3, 1)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
@@ -106,6 +109,7 @@ class Ui_ValueWidgetBase(object):
     def retranslateUi(self, ValueWidgetBase):
         ValueWidgetBase.setWindowTitle(QtGui.QApplication.translate("ValueWidgetBase", "Valeurs", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_saved_layers.setTitle(QtGui.QApplication.translate("ValueWidgetBase", "Courbes mémorisées", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButton_csv.setText(QtGui.QApplication.translate("ValueWidgetBase", "Export CSV", None, QtGui.QApplication.UnicodeUTF8))
         self.cbxActive.setToolTip(QtGui.QApplication.translate("ValueWidgetBase", "(Shift+A) to toggle", None, QtGui.QApplication.UnicodeUTF8))
         self.cbxActive.setText(QtGui.QApplication.translate("ValueWidgetBase", "Actif", None, QtGui.QApplication.UnicodeUTF8))
         self.cbxGraph.setText(QtGui.QApplication.translate("ValueWidgetBase", "Graphe", None, QtGui.QApplication.UnicodeUTF8))

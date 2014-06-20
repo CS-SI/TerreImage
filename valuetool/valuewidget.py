@@ -86,49 +86,7 @@ class ValueWidgetGraph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-    
-        self.two_min = 0
-        self.ninety_eight_max = 0
-        self.x_min = 0
-        self.x_max = 0
-        self.change_min = True
-        
-    def display_histogram(self, filename, band, color, name):
-        self.color = color
-        self.name = name
-        histogram, decimal_values = self.get_GDAL_histogram(filename, band)
-#         print "type(histogram)", type(histogram)
-#         print "histogram", histogram
-#         print "len(histogram)", len(histogram)
-        if not decimal_values:
-            #print arange(0, len(histogram)) + self.rasterMin
-            self.t = arange(0, len(histogram)) + self.rasterMin #range(0, len(histogram))
-        else:
-            #print arange(0, len(histogram)/1000., 0.001) + self.rasterMin
-            self.t = arange(0, len(histogram)/1000., 0.001) + self.rasterMin
-            #locs,labels = plt.yticks()
-            #plt.yticks(locs, map(lambda x: "%.1f" % x, locs*1e9))
-            #ylabel('microseconds (1E-9)'
-        self.s = histogram
-        logger.debug(  "len s and len t"+ str(len(self.s)) + str(len(self.t)))
-        #print "self.t", self.t
-        self.draw_histogram()
-        self.axes.figure.canvas.mpl_connect('button_press_event', self.on_press)
-        self.axes.figure.canvas.mpl_connect('button_release_event', self.on_release)
-        self.draw_min_max_percent()
-        
-        
-    def draw_histogram(self):
-        if self.t.any() and self.s and self.color and self.name:
-            self.axes.plot(self.t, self.s, self.color)
-            xtext = self.axes.set_xlabel('Valeur') # returns a Text instance
-            ytext = self.axes.set_ylabel('Nombre')
-            self.axes.set_title(self.name)
-            
-    def draw_reset_percent(self):
-        logger.debug(  "draw reset" )
-        self.axes.clear()
-        self.draw_histogram()
+           
         
     def clear(self):
        self.axes.clear()
@@ -200,6 +158,7 @@ class ValueWidget(QWidget, Ui_Widget):
         QObject.connect(self.canvas, SIGNAL( "keyPressed( QKeyEvent * )" ), self.pauseDisplay )
         QObject.connect(self.plotSelector, SIGNAL( "currentIndexChanged ( int )" ), self.changePlot )
         QObject.connect(self.pushButton_get_point, SIGNAL( "clicked()" ), self.on_get_point_button )
+        QObject.connect(self.pushButton_csv, SIGNAL( "clicked()" ), self.export_csv )
         numvalues = None
 
 
@@ -894,7 +853,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 
                 t = range(1, len(numvalues)+1)
                 self.sc_1.plot( t, numvalues, color_curve, 'o-' )
-                line += ',' + str(t) + ',' + str(numvalues) + ', "' + color_curve + 'o-"'
+                line += ',' + str(t) + ',' + str(numvalues) + ', \'' + color_curve + 'o-\''
             i+=1
             
         line += ')'
@@ -966,6 +925,20 @@ class ValueWidget(QWidget, Ui_Widget):
             self.verticalLayout_curves.addWidget( curve_temp )
             self.groupBox_saved_layers.show()
         
+     
+    def export_csv(self):
+        csv = QFileDialog.getSaveFileName( None, str( "Fichier CSV") )
+        csv_file = open( csv, "w")
+        if csv :
+            for curve in self.saved_curves:
+                print "save curve", curve
+                csv_file.write( str(curve.name) + ";Coordonnées pixel " + curve.coordinates + "\n" )
+                csv_file.write( "Bande spectrale; Intensité \n" )
+                for i in range(1,len(curve.points)+1):
+                    csv_file.write( str(i) + ";" + str(int(curve.points[i-1])) + "\n" )
+                    
+                csv_file.write( "\n\n\n")
+                
         
 
     def statsNeedChecked(self, indx):

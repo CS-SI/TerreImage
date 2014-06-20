@@ -52,14 +52,20 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
         self.lineEdit_curve_name.setText(name)
         
         logger.debug(  "from curve: " + str( x ) + " " + str( y) )
-        self.coordinates = "[ x=" + str(x) + ", " + str(y) + "]"
+        self.coordinates = "[ x=" + str(x) + ", y=" + str(y) + "]"
         self.label_coordinates.setText(self.coordinates)
         
         
-        self.lettersToQColor = {"b": QColor(0, 132, 255), "green": QColor(148, 255, 69),\
-        "red": QColor(255, 30, 0), "cyan": QColor(0, 255, 204),\
-        "magenta": QColor(255, 0, 255), "yellow": QColor(255, 255, 0),\
-        "black": QColor(0, 0, 0), "white": QColor(255, 255, 255)}
+        self.lettersToQColor = {"bleu": QColor(0, 132, 255), "vert": QColor(148, 255, 69),\
+        "rouge": QColor(255, 30, 0), "cyan": QColor(0, 255, 204),\
+        "magenta": QColor(255, 0, 255), "jaune": QColor(255, 255, 0),\
+        "noir": QColor(0, 0, 0), "blanc": QColor(255, 255, 255)}
+        
+        self.frenchToLetter = {"bleu": 'b', "vert": 'g',\
+        "rouge": 'r', "cyan": 'c',\
+        "magenta": 'm', "jaune": 'y',\
+        "noir": 'k', "blanc": 'w'}
+        
         
         self.lettersToNameColor = {"b": "blue", "g": "green", "r": "red",\
         "c": "cyan", "m": "magenta", "y": "yellow", "k": "black", "w": "white"}
@@ -96,22 +102,31 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
         return self.checkBox_curve_visible.checkState() == Qt.Checked
     
     def set_color(self):
-        couleur = QtGui.QColorDialog.getColor(QtCore.Qt.white)
-#         testqt, ok = QtGui.QInputDialog.getItem(iface.mainWindow(), "Couleur", "Selection d'une couleur", self.lettersToQColor.keys(), False)
-#         if ok :
-#             couleur = self.nameColorsToLetters[testqt]
-#             logger.debug(couleur)
-#         else :
-#             couleur = "k"
+        #couleur = QtGui.QColorDialog.getColor(QtCore.Qt.white)
+        
+        
+        testqt, ok = QtGui.QInputDialog.getItem(None, "Couleur", "Selection d'une couleur", self.lettersToQColor.keys(), False)
+        if ok :
+            #couleur = self.nameColorsToLetters[testqt]
+            couleur = self.lettersToQColor[testqt]
+            logger.debug(couleur)
+            self.color = self.frenchToLetter[testqt]
+        else :
+            couleur = self.lettersToQColor['noir']
+            self.color = 'b'
 
-        self.color = str(couleur.name())
-        logger.debug( couleur.name())
+        
+        #self.color = str(couleur.name())
+        #logger.debug( couleur.name())
+        
+        #self.color = self.lettersToNameColor[testqt]
         
         pixmap = QtGui.QPixmap(self.pushButton_color.size())
-        pixmap.fill(QColor(self.color))
+        #pixmap.fill(QColor(self.color))
+        pixmap.fill(couleur)
         icon = QtGui.QIcon(pixmap)
         self.pushButton_color.setIcon(icon)
-        logger.debug(  QColor(self.color) )
+        #logger.debug(  QColor(self.color) )
         
         #self.pushButton_color.setStyleSheet("background-color: " + self.color )
  

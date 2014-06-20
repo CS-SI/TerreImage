@@ -23,6 +23,13 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_curves"/>
       </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_csv">
+        <property name="text">
+         <string>Export CSV</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
