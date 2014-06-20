@@ -66,7 +66,7 @@ def bandmath_cli( images, expression, output_filename ):
 
 
 
-def concatenateImages_cli( listImagesIn, outputname ):
+def concatenateImages_cli( listImagesIn, outputname, options=None ):
     """
     Runs the ConcatenateImages OTB application.
     
@@ -79,7 +79,9 @@ def concatenateImages_cli( listImagesIn, outputname ):
         command = os.path.join(prefix, "otbcli ")
         command += " ConcatenateImages "
         command += " -il " + " ".join(listImagesIn)
-        command += " -out " + "\"" + outputname + "\"" 
+        command += " -out " + "\"" + outputname + "\""
+        if options:
+            command += " uint16 " 
         
         logger.info( "command: " + str(command))
         
@@ -117,7 +119,7 @@ def color_mapping_cli_ref_image( image_to_color, reference_image, working_dir):
         command = os.path.join(prefix, "otbcli")
         command += " ColorMapping "
         command += " -in " + "\"" + image_to_color + "\""
-        command += " -out " + "\"" + output_filename + "\""
+        command += " -out " + "\"" + output_filename + "\" uint8"
         command += " -method \"image\""
         command += " -method.image.in " + "\"" + reference_image + "\""
         logger.info( "command: " + str(command))

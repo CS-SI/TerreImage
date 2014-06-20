@@ -108,18 +108,25 @@ def threshold(layer, working_directory, forms):
     image_in = layer.get_source()
     temp = []
     i=1
-    for formula in forms :
+    
+    if len(forms) == 1 :
         output_filename = os.path.join( working_directory, 
-                                            os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + str(i) + os.path.splitext(image_in)[1]
-                                          )
+                                            os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + os.path.splitext(image_in)[1] )
         if not os.path.isfile(output_filename):
             OTBApplications.bandmath_cli( [image_in], formula, output_filename  )
-        i+=1
-        temp.append(output_filename)
-    output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + os.path.splitext(image_in)[1] )
-        
-    if not os.path.isfile(output_filename):
-        OTBApplications.concatenateImages_cli( temp, output_filename )
+    else:
+        for formula in forms :
+            output_filename = os.path.join( working_directory, 
+                                                os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + str(i) + os.path.splitext(image_in)[1]
+                                              )
+            if not os.path.isfile(output_filename):
+                OTBApplications.bandmath_cli( [image_in], formula, output_filename  )
+            i+=1
+            temp.append(output_filename)
+        output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + os.path.splitext(image_in)[1] )
+            
+        if not os.path.isfile(output_filename):
+            OTBApplications.concatenateImages_cli( temp, output_filename )
     
     return output_filename
     
@@ -209,7 +216,7 @@ def recompose_image( layer, working_directory ):
     output_filename = os.path.join( working_directory, os.path.splitext(os.path.basename(image_in))[0] + "pir_red_green" + os.path.splitext(os.path.basename(image_in))[1] )
     logger.debug( "recomposed image" + str(output_filename))
     if not os.path.isfile(output_filename):
-        OTBApplications.concatenateImages_cli( [band_pir, band_red, band_green], output_filename )
+        OTBApplications.concatenateImages_cli( [band_pir, band_red, band_green], output_filename, "uint16" )
     return output_filename
     
     
