@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>421</width>
-    <height>816</height>
+    <width>323</width>
+    <height>502</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,75 +15,26 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QComboBox" name="comboBox_sprectral_band_display"/>
+   </item>
+   <item>
+    <widget class="QComboBox" name="comboBox_processing"/>
+   </item>
+   <item>
+    <widget class="QComboBox" name="comboBox_histogrammes"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton_histogramme">
+     <property name="text">
+      <string>Histogramme</string>
      </property>
-     <property name="title">
-      <string>Bandes spectrales affichées</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QTextEdit" name="textEdit">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>100</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="title">
-      <string>Affichage des bandes spectrales</string>
+    <widget class="QPushButton" name="pushButton_profil_spectral">
+     <property name="text">
+      <string>Profil spectral</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_6">
-      <item>
-       <widget class="QComboBox" name="comboBox_sprectral_band_display"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_4">
-     <property name="title">
-      <string>Traitements</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="3" column="0">
-       <widget class="QPushButton" name="pushButton_profil_spectral">
-        <property name="text">
-         <string>Profil spectral</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QComboBox" name="comboBox_processing"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="pushButton_histogramme">
-        <property name="text">
-         <string>Histogramme</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QComboBox" name="comboBox_histogrammes"/>
-      </item>
-     </layout>
     </widget>
    </item>
    <item>
@@ -91,25 +42,29 @@
      <property name="title">
       <string>Classification</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QPushButton" name="pushButton_kmeans">
-        <property name="text">
-         <string>Classification non supervisée</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="spinBox_kmeans">
-        <property name="value">
-         <number>5</number>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QPushButton" name="pushButton_kmeans">
+          <property name="text">
+           <string>Classification non supervisée</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinBox_kmeans">
+          <property name="value">
+           <number>5</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QPushButton" name="pushButton_plugin_classification">
         <property name="text">
-         <string>Plugin de Classification</string>
+         <string>Classification supervisée</string>
         </property>
        </widget>
       </item>

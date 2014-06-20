@@ -301,7 +301,6 @@ class QGISEducation:
                 self.iface.addDockWidget(Qt.RightDockWidgetArea, self.qgisedudockwidget)
 
             text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
-            self.educationWidget.textEdit.setText(text)
             #self.extra_menu_visu(bands)
             
             self.qgisedudockwidget.show()
