@@ -150,9 +150,9 @@ class TerreImageProcessing(TerreImageTask, QObject):
     
     
     def display(self, output_filename):
-        if "Angle Spectral" in self.processing_name:
-            print self.rubberband
-            print self.rubberband.getPoint(0)
+#         if "Angle Spectral" in self.processing_name:
+#             print self.rubberband
+#             print self.rubberband.getPoint(0)
         self.freezeCanvas( True )
         #result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
         result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, self.processing_name, self.iface )

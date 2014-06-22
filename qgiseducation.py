@@ -284,7 +284,7 @@ class QGISEducation:
     
     def show_education_widget(self, bands):
         if self.qgis_education_manager:
-            print "education manager"
+            #print "education manager"
             if self.qgis_education_manager.layer and bands:
     
                 if not self.dockOpened :
@@ -390,7 +390,7 @@ class QGISEducation:
         for qgis_layer in self.iface.legendInterface().layers():
             if qgis_layer.name() in [ "NDVI", "NDTI", "Indice de brillance", "Kmeans", "Angle Spectral" ]:
                 process = TerreImageProcessing( self.iface, working_dir, self.qgis_education_manager.layer,  self.qgis_education_manager.mirror_map_tool, qgis_layer.name() )
-                print "process", process
+                #print "process", process
                 process.output_working_layer = qgis_layer.source()
                 
                 process.output_working_layer = WorkingLayer( qgis_layer.source(), qgis_layer )
@@ -407,9 +407,9 @@ class QGISEducation:
             else:
                 corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir", "nat":"_couleurs_naturelles" }
                 result = [x for x in corres if qgis_layer.name().endswith(corres[x])]
-                print result
+                #print result
                 if result:
-                    print "the couleur", result[0]
+                    #print "the couleur", result[0]
                     self.do_display_one_band(result[0])
                     
                     

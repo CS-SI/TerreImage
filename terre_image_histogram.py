@@ -126,7 +126,7 @@ class MyMplCanvas(FigureCanvas):
             # removing 0 at the end of the histogram
             while len(histogram) > 1 and histogram[-1] == 0 :
                 del histogram[-1]
-            print "histogram", histogram
+            #print "histogram", histogram
             
             # get 2 - 98 %
             #taking the size of the raster
@@ -150,10 +150,10 @@ class MyMplCanvas(FigureCanvas):
                 parcours = arange(0, len(histogram)/1000., 0.001)
             else:
                 parcours = arange(0, len(histogram))
-            print "parcours", parcours
+            #print "parcours", parcours
             cpt = 0
             for i in parcours: #range(len(histogram)):
-                print "i , hist cum", i, hist_cum
+                #print "i , hist cum", i, hist_cum
                 if hist_cum > nb_pixels_2 and self.x_min == 0 :
                     self.x_min = i + self.rasterMin
                 if hist_cum > nb_pixels_98 :
@@ -382,8 +382,8 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
             self.canvas = canvas
             self.processing=None
         else:
-            print "canvas", canvas
-            print "processing.mirror.mainWidget.canvas", processing.mirror.mainWidget.canvas
+            #print "canvas", canvas
+            #print "processing.mirror.mainWidget.canvas", processing.mirror.mainWidget.canvas
             logger.debug( "processing not none")
             self.canvas = processing.mirror.mainWidget.canvas
             self.processing = processing

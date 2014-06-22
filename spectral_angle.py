@@ -154,7 +154,7 @@ class SpectralAngle(QtCore.QObject):
 
         #self.rubberband.reset(self.polygon)
         #self.rubberband.reset(QGis.Point)
-        print "setting rubberband", mapPos.x(),mapPos.y()
+        #print "setting rubberband", mapPos.x(),mapPos.y()
         self.rubberband.addPoint(QgsPoint(mapPos.x(),mapPos.y()))
         self.toolPan = QgsMapToolPan( self.canvas )
         self.canvas.setMapTool( self.toolPan )

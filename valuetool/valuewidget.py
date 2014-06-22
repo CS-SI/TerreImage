@@ -92,10 +92,10 @@ class ValueWidgetGraph(FigureCanvas):
        self.axes.clear()
        
     def plot(self, x, y, color, marker='o'):
-        print "x", x
-        print "y", y
+        #print "x", x
+        #print "y", y
         options = '"' + color + marker +'"'
-        print options
+        #print options
         self.axes.plot(x, y, color + marker)
         xtext = self.axes.set_xlabel('Bande') # returns a Text instance
         ytext = self.axes.set_ylabel('Valeur')
@@ -609,7 +609,7 @@ class ValueWidget(QWidget, Ui_Widget):
         if self.cbxGraph.isChecked():
             #TODO don't plot if there is no data to plot...
             if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
-                print "show values self.values", self.values
+                #print "show values self.values", self.values
                 self.plot()
             else:
                 self.sc_1.clear()
@@ -725,7 +725,7 @@ class ValueWidget(QWidget, Ui_Widget):
     def plot(self):
         items = self.values
         new_items = self.order_values(items)
-        print "items", new_items
+        #print "items", new_items
 
         pixel = 0
         ligne = 0
@@ -741,7 +741,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 except:
                     numvalues.append(0)
         
-        print numvalues
+        #print numvalues
         
         
         if self.memorize_curve:
@@ -858,7 +858,7 @@ class ValueWidget(QWidget, Ui_Widget):
             
         line += ')'
                 
-        print "line", line
+        #print "line", line
         self.sc_1.plot_line(line)
                 
                 
@@ -931,7 +931,7 @@ class ValueWidget(QWidget, Ui_Widget):
         csv_file = open( csv, "w")
         if csv :
             for curve in self.saved_curves:
-                print "save curve", curve
+                #print "save curve", curve
                 csv_file.write( str(curve.name) + ";Coordonnées pixel " + curve.coordinates + "\n" )
                 csv_file.write( "Bande spectrale; Intensité \n" )
                 for i in range(1,len(curve.points)+1):

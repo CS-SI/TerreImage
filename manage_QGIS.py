@@ -329,7 +329,7 @@ def custom_stretch( theRasterLayer, values, canvas, mono=False ):
     Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
     """
 
-    print canvas
+    #print canvas
     # type of layer : raster, vector, other
     typeOfLayer = theRasterLayer.type()
      

@@ -87,13 +87,16 @@ class MirrorMap(QWidget):
 		self.canvas.setRenderFlag( enabled )
 
 	def onExtentsChanged(self):
-		prevFlag = self.canvas.renderFlag()
-		self.canvas.setRenderFlag( False )
- 
-		self.canvas.setExtent( self.iface.mapCanvas().extent() )
-		#self.canvas.zoomByFactor( self.scaleFactor.value() )
- 
-		self.canvas.setRenderFlag( prevFlag )
+		try :
+			prevFlag = self.canvas.renderFlag()
+			self.canvas.setRenderFlag( False )
+	 
+			self.canvas.setExtent( self.iface.mapCanvas().extent() )
+			#self.canvas.zoomByFactor( self.scaleFactor.value() )
+	 
+			self.canvas.setRenderFlag( prevFlag )
+		except Exception:
+			pass
 		
 	def mirror_extent_changed(self):
 		logger.debug(  self.canvas.extent() )
