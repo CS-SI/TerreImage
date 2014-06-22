@@ -70,6 +70,7 @@ class ProcessingManager():
         self.classif_tool = SupervisedClassificationDialog(self.iface)
         
         
+        
     def add_processing(self, processing):
         self.processings.append(processing)
         if isinstance(processing, TerreImageProcessing):

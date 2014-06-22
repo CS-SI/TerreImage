@@ -98,17 +98,17 @@ class MyMplCanvas(FigureCanvas):
             nbVal = self.rasterMax - self.rasterMin
             
             overview = 2
-            if overview < band.GetOverviewCount() or nbVal > 1 :
+            if overview < band.GetOverviewCount() :#or nbVal > 1 :
                 band_overview = band.GetOverview(overview)
-            elif overview < band.GetOverviewCount() or nbVal > 1 :
-                band_overview = band.GetOverview(1)
+            #elif overview < band.GetOverviewCount() or nbVal > 1 :
+            #    band_overview = band.GetOverview(1)
             else :
                 band_overview = band
                 
             logger.debug("band_overview, xsize" + str(band_overview.XSize))
             
             
-            if nbVal < 1 :
+            if nbVal < 10 :
                 logger.debug( "nb val < 1" + str( nbVal) )
                 if nbVal != 0:
                     #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1)*100, approx_ok = 0)

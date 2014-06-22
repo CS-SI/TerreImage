@@ -31,9 +31,10 @@ import terre_image_processing
 
 
 from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
+from qgis.gui import QgsRubberBand
 
-from PyQt4.QtGui import QInputDialog
-from PyQt4.QtCore import QObject, SIGNAL
+from PyQt4.QtGui import QInputDialog, QColor
+from PyQt4.QtCore import QObject, SIGNAL, Qt
 
 
 #import loggin for debug messages
@@ -108,8 +109,11 @@ class TerreImageProcessing(TerreImageTask, QObject):
         if "Indice de brillance" in self.processing_name:
             output_filename = terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
         if "Angle Spectral" in self.processing_name:
+            self.rubberband = QgsRubberBand(self.canvas, QGis.Point)
+            self.rubberband.setWidth(10)
+            self.rubberband.setColor(QColor(Qt.yellow))
             from spectral_angle import SpectralAngle
-            self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer, self.mirrormap_tool)
+            self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer, self.mirrormap_tool, self.rubberband)
             logger.debug( "self.angle_tool" + str(self.angle_tool))
             QObject.connect( self.angle_tool, SIGNAL( "anglesComputed(PyQt_PyObject)" ), self.display )
             self.angle_tool.get_point_for_angles(self.layer)
@@ -147,7 +151,8 @@ class TerreImageProcessing(TerreImageTask, QObject):
     
     def display(self, output_filename):
         if "Angle Spectral" in self.processing_name:
-            print self.angle_tool.rubberband
+            print self.rubberband
+            print self.rubberband.getPoint(0)
         self.freezeCanvas( True )
         #result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
         result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, self.processing_name, self.iface )

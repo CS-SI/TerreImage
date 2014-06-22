@@ -48,7 +48,7 @@ class SpectralAngle(QtCore.QObject):
     
     __pyqtSignals__ = ("anglesComputed(PyQt_PyObject)")
     
-    def __init__(self, iface, working_dir, layer, mirror_map):
+    def __init__(self, iface, working_dir, layer, mirror_map, rubberband):
         QtCore.QObject.__init__(self)
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
@@ -63,15 +63,22 @@ class SpectralAngle(QtCore.QObject):
         self.pointstoDraw = None    #Polyline in mapcanvas CRS analysed
         self.maptool = self.canvas.mapTool()
         #self.get_point_for_angles()
+        
+        self.rubberband = rubberband
+#         self.polygon = False
+#         self.rubberband = QgsRubberBand(self.canvas, self.polygon)
+#         self.rubberband.setWidth(10)
+#         self.rubberband.setColor(QtGui.QColor(QtCore.Qt.yellow))
 
 
     def angles(self, x, y):
         if self.layer :
             image_output = terre_image_processing.angles(self.layer, self.working_directory, self.iface, x, y)
-        self.tool.deactivate()
-        self.deactivate()
+        #self.tool.deactivate()
+        #self.deactivate()
         self.canvas.setMapTool(self.maptool)
         if image_output:
+            #self.rubberband.addPoint(QgsPoint(mapPos.x(),mapPos.y()))
             self.emit( QtCore.SIGNAL("anglesComputed(PyQt_PyObject)"), image_output )
             #self.display(image_output)
                     
@@ -127,10 +134,10 @@ class SpectralAngle(QtCore.QObject):
         logger.debug(  "listener set" )
         
         #init the temp layer where the polyline is draw
-        self.polygon = False
-        self.rubberband = QgsRubberBand(self.canvas, self.polygon)
-        self.rubberband.setWidth(10)
-        self.rubberband.setColor(QtGui.QColor(QtCore.Qt.yellow))
+#         self.polygon = False
+#         self.rubberband = QgsRubberBand(self.canvas, self.polygon)
+#         self.rubberband.setWidth(10)
+#         self.rubberband.setColor(QtGui.QColor(QtCore.Qt.yellow))
         #init the table where is saved the poyline
         self.pointstoDraw = []
         self.pointstoCal = []
@@ -145,11 +152,12 @@ class SpectralAngle(QtCore.QObject):
         newPoints = [[mapPos.x(), mapPos.y()]]
         #if newPoints == self.lastClicked: return # sometimes a strange "double click" is given
 
-        self.rubberband.reset(self.polygon)
-        self.rubberband.reset(QGis.Point)
+        #self.rubberband.reset(self.polygon)
+        #self.rubberband.reset(QGis.Point)
+        print "setting rubberband", mapPos.x(),mapPos.y()
         self.rubberband.addPoint(QgsPoint(mapPos.x(),mapPos.y()))
-        #create new vlayer ???
-        self.angles(mapPos.x(),mapPos.y())
         self.toolPan = QgsMapToolPan( self.canvas )
         self.canvas.setMapTool( self.toolPan )
+        #create new vlayer ???
+        self.angles(mapPos.x(),mapPos.y())
  

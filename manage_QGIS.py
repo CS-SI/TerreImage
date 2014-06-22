@@ -124,6 +124,8 @@ def addRasterLayerToQGIS( raster, layername, iface = None ):
         indexGroup    --    index of the QGIS group where to move the layer
     """
     index_group = TerreImageConstant().index_group
+    if not index_group:
+        index_group=0
     
     logger.debug( "index_group: " + str(index_group) )
     
@@ -327,7 +329,7 @@ def custom_stretch( theRasterLayer, values, canvas, mono=False ):
     Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
     """
 
-    
+    print canvas
     # type of layer : raster, vector, other
     typeOfLayer = theRasterLayer.type()
      
@@ -373,7 +375,7 @@ def custom_stretch( theRasterLayer, values, canvas, mono=False ):
             layerRenderer.setBlueContrastEnhancement( blueEnhancement)#, QgsRaster.ContrastEnhancementCumulativeCut  )
         theRasterLayer.setCacheImage( None )    
 
-        #theRasterLayer.triggerRepaint()
+        theRasterLayer.triggerRepaint()
     canvas.refresh()
     
     
