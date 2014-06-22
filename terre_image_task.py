@@ -21,16 +21,19 @@
 """
 
 import os
+import re
+
 import OTBApplications
 import manage_QGIS
 from working_layer import WorkingLayer
-import re
+import terre_image_utils
+import terre_image_processing
+
 
 from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
 
 from PyQt4.QtGui import QInputDialog
 from PyQt4.QtCore import QObject, SIGNAL
-import terre_image_processing
 
 
 #import loggin for debug messages
@@ -120,6 +123,7 @@ class TerreImageProcessing(TerreImageTask, QObject):
             logger.debug( "this is thrshold" )
             output_filename = terre_image_processing.threshold(self.layer, self.working_directory, self.arg)
         if output_filename:
+            terre_image_utils.compute_overviews(output_filename)
             logger.debug( output_filename )
             self.display(output_filename)
     
@@ -142,6 +146,8 @@ class TerreImageProcessing(TerreImageTask, QObject):
     
     
     def display(self, output_filename):
+        if "Angle Spectral" in self.processing_name:
+            print self.angle_tool.rubberband
         self.freezeCanvas( True )
         #result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
         result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, self.processing_name, self.iface )

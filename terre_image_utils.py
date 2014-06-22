@@ -129,6 +129,7 @@ def get_workinglayer_on_opening(iface):
                 
                 logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
                 manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
+                compute_overviews(fileOpened)
                 return layer, bands
     else:
         return None, None
@@ -179,6 +180,14 @@ def computeStatistics( OneFeature, i, j=None, nodata=True ):
     dataset = None
     return None    
     
+    
+def compute_overviews(filename):
+    command = "gdaladdo "
+    command += " -ro "
+    command += filename
+    command += " 2 4 8 16"
+    logger.debug( "command to run" + command)
+    os.system(command)
     
     
         

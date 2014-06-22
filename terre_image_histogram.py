@@ -91,7 +91,13 @@ class MyMplCanvas(FigureCanvas):
         else :
             band = dataset.GetRasterBand(band)
             
-            #band_overview = band.GetOverview()
+            overview = 2
+            if overview < band.GetOverviewCount():
+                band_overview = band.GetOverview(overview)
+            else :
+                band_overview = band
+                
+            logger.debug("band_overview, xsize" + str(band_overview.XSize))
             
             
             self.rasterMin, self.rasterMax = band.ComputeRasterMinMax()
@@ -102,7 +108,7 @@ class MyMplCanvas(FigureCanvas):
                 logger.debug( "nb val < 1" + str( nbVal) )
                 if nbVal != 0:
                     #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1)*100, approx_ok = 0)
-                    histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1)*1000, approx_ok = 0)
+                    histogram = band_overview.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1)*1000, approx_ok = 0)
                     decimal_values = True
                 else:
                     return []
@@ -110,8 +116,8 @@ class MyMplCanvas(FigureCanvas):
                 #get the histogram of the given raster
                 #histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
                 #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1), approx_ok = 0)
-                histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
-#             logger.debug(  "histogram" + str(histogram))
+                histogram = band_overview.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
+            logger.debug(  "histogram" + str(histogram))
             
             # removing 0 at the end of the histogram
             while len(histogram) > 1 and histogram[-1] == 0 :
@@ -119,16 +125,18 @@ class MyMplCanvas(FigureCanvas):
             
             # get 2 - 98 %
             #taking the size of the raster
-            sizeX = dataset.RasterXSize
-            sizeY = dataset.RasterYSize
+            #sizeX = dataset.RasterXSize
+            sizeX = float(band_overview.XSize)
+            #sizeY = dataset.RasterYSize
+            sizeY = float(band_overview.YSize)
             logger.debug(  "sizeX, sizeY" + str(sizeX) + " " + str(sizeY))
             nb_pixels = sizeX * sizeY
-            logger.debug(nb_pixels)
+            logger.debug("nb_pixels: " + str(nb_pixels))
             
             nb_pixels_2 = int(float(nb_pixels * 0.02))
             nb_pixels_98 = int(float(nb_pixels * 0.98))
             
-            logger.debug(  "nb_pixels_2, nb_pixels_98"  + str(nb_pixels_2) + " " + str(nb_pixels_98))
+            logger.debug(  "nb_pixels_2, nb_pixels_98: "  + str(nb_pixels_2) + " " + str(nb_pixels_98))
             
             # catch the i where cum_hist(i) > nb_pixels_2 and nb_pixels_98
             hist_cum = 0
@@ -137,8 +145,10 @@ class MyMplCanvas(FigureCanvas):
                 parcours = arange(0, len(histogram)/1000., 0.001)
             else:
                 parcours = arange(0, len(histogram))
+            print "parcours", parcours
             cpt = 0
             for i in parcours: #range(len(histogram)):
+                print "i , hist cum", i, hist_cum
                 if hist_cum > nb_pixels_2 and self.x_min == 0 :
                     self.x_min = i + self.rasterMin
                 if hist_cum > nb_pixels_98 :
