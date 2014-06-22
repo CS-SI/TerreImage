@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_qgiseducation.ui'
 #
-# Created: Fri Jun 20 14:22:14 2014
+# Created: Sun Jun 22 01:33:22 2014
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -70,6 +70,16 @@ class Ui_QGISEducation(object):
         self.pushButton_status = QtGui.QPushButton(QGISEducation)
         self.pushButton_status.setObjectName(_fromUtf8("pushButton_status"))
         self.verticalLayout.addWidget(self.pushButton_status)
+        self.horizontalLayout_3 = QtGui.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
+        self.label_a_s = QtGui.QLabel(QGISEducation)
+        self.label_a_s.setObjectName(_fromUtf8("label_a_s"))
+        self.horizontalLayout_3.addWidget(self.label_a_s)
+        self.label_a_s_img = QtGui.QLabel(QGISEducation)
+        self.label_a_s_img.setText(_fromUtf8(""))
+        self.label_a_s_img.setObjectName(_fromUtf8("label_a_s_img"))
+        self.horizontalLayout_3.addWidget(self.label_a_s_img)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
 
@@ -87,4 +97,5 @@ class Ui_QGISEducation(object):
         self.pushButton_working_dir.setText(QtGui.QApplication.translate("QGISEducation", "...", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_kmz.setText(QtGui.QApplication.translate("QGISEducation", "Export KMZ", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_status.setText(QtGui.QApplication.translate("QGISEducation", "Status", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_a_s.setText(QtGui.QApplication.translate("QGISEducation", "Légende de l\'angle spectral:", None, QtGui.QApplication.UnicodeUTF8))
 

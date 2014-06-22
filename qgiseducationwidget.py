@@ -119,12 +119,16 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         #self.pushButton_kmz.hide()
         self.pushButton_kmz.clicked.connect(self.export_kmz)
         
+        self.label_a_s.hide()
+        self.label_a_s_img.hide()
+        self.label_a_s_img.setPixmap(QtGui.QPixmap(":/plugins/qgiseducation/legende.png"))
+        
         
         
         
     def status(self):
-        logger.debug( self.qgis_education_manager )
-        logger.debug( "self.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors) )
+        print( self.qgis_education_manager )
+        print( "self.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors) )
         
         
     def plugin_classification(self):
@@ -283,6 +287,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, text_changed, args )
                     if text_changed == "Angle Spectral":
                         self.set_working_message(True)
+                        self.label_a_s.show()
+                        self.label_a_s_img.show()
                         QtCore.QObject.connect( my_processing, QtCore.SIGNAL( "display_ok()" ), lambda who=my_processing: self.processing_end_display(who) )
                     if not text_changed == "Angle Spectral":
                         self.qgis_education_manager.add_processing(my_processing)
