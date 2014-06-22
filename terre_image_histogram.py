@@ -76,7 +76,7 @@ class MyMplCanvas(FigureCanvas):
         self.change_min = True
 
 
-    def get_GDAL_histogram( self, image, band ):
+    def get_GDAL_histogram( self, image, band_number, qgis_layer ):
         """
         From the given binary image, compute histogram and return the number of 1
         """
@@ -84,26 +84,30 @@ class MyMplCanvas(FigureCanvas):
         
         decimal_values = False
         
-        logger.debug( "image: " + str(image) + " band: " + str(band) )
+        logger.debug( "image: " + str(image) + " band: " + str(band_number) )
         dataset = gdal.Open(str(image), gdal.GA_ReadOnly)
         if dataset is None:
             print "Error : Opening file ", image
         else :
-            band = dataset.GetRasterBand(band)
-            
-            overview = 2
-            if overview < band.GetOverviewCount():
-                band_overview = band.GetOverview(overview)
-            else :
-                band_overview = band
-                
-            logger.debug("band_overview, xsize" + str(band_overview.XSize))
+            band = dataset.GetRasterBand(band_number)
             
             
             self.rasterMin, self.rasterMax = band.ComputeRasterMinMax()
             logger.debug( "self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin) )
             #nbVal = max( self.rasterMax - self.rasterMin, self.rasterMax)
             nbVal = self.rasterMax - self.rasterMin
+            
+            overview = 2
+            if overview < band.GetOverviewCount() or nbVal > 1 :
+                band_overview = band.GetOverview(overview)
+            elif overview < band.GetOverviewCount() or nbVal > 1 :
+                band_overview = band.GetOverview(1)
+            else :
+                band_overview = band
+                
+            logger.debug("band_overview, xsize" + str(band_overview.XSize))
+            
+            
             if nbVal < 1 :
                 logger.debug( "nb val < 1" + str( nbVal) )
                 if nbVal != 0:
@@ -117,11 +121,12 @@ class MyMplCanvas(FigureCanvas):
                 #histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
                 #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1), approx_ok = 0)
                 histogram = band_overview.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
-            logger.debug(  "histogram" + str(histogram))
+            
             
             # removing 0 at the end of the histogram
             while len(histogram) > 1 and histogram[-1] == 0 :
                 del histogram[-1]
+            print "histogram", histogram
             
             # get 2 - 98 %
             #taking the size of the raster
@@ -159,15 +164,26 @@ class MyMplCanvas(FigureCanvas):
             logger.debug(  "self.x_min, self.x_max" + str(self.x_min) + " " + str(self.x_max))
             self.two_min = self.x_min
             self.ninety_eight_max = self.x_max
+            if qgis_layer :
+                my_min, my_max = qgis_layer.dataProvider().cumulativeCut( band_number, 0, 0.98 );
+                #self.two_min = my_min
+                self.ninety_eight_max = my_max
+                #self.x_min = my_min
+                self.x_max = my_max
+                
             logger.debug(  "self.two_min, self.ninety_eight_max" + str(self.two_min) + " " + str(self.ninety_eight_max))
 
             return histogram, decimal_values
         
         
-    def display_histogram(self, filename, band, color, name):
+    def display_histogram(self, filename, band, color, name, qgis_layer):
         self.color = color
         self.name = name
-        histogram, decimal_values = self.get_GDAL_histogram(filename, band)
+        
+        if name == "NDVI":
+            histogram, decimal_values = self.get_GDAL_histogram(filename, band, qgis_layer)
+        else :
+            histogram, decimal_values = self.get_GDAL_histogram(filename, band, qgis_layer)
 #         print "type(histogram)", type(histogram)
 #         print "histogram", histogram
 #         print "len(histogram)", len(histogram)
@@ -270,6 +286,7 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
         #self.setupUi(self)
         
         self.layer = layer
+        
         if nb_bands >= 3:
             self.nb_hist = 3
         else :
@@ -323,9 +340,9 @@ class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):
         self.specific_band = specific_band
         
         if specific_band == -1:
-            self.sc_1.display_histogram(self.layer.get_source(), 1, 'k', layer.name())
+            self.sc_1.display_histogram(self.layer.get_source(), 1, 'k', layer.name(), layer.get_qgis_layer())
         else :
-            self.sc_1.display_histogram(self.layer.get_source(), specific_band, 'k', layer.name())
+            self.sc_1.display_histogram(self.layer.get_source(), specific_band, 'k', layer.name(), layer.get_qgis_layer())
         self.set_buttons()
         
         seuil = QtGui.QPushButton("Seuillage")
@@ -379,13 +396,13 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
         self.l.addWidget(self.sc_3)
         
         if processing is None:
-            self.sc_1.display_histogram(self.layer.get_source(), self.layer.pir, 'r', "Plan R : BS PIR")
-            self.sc_2.display_histogram(self.layer.get_source(), self.layer.red, 'g', "Plan V : BS R")
-            self.sc_3.display_histogram(self.layer.get_source(), self.layer.green, 'b', "Plan B : BS V")
+            self.sc_1.display_histogram(self.layer.get_source(), self.layer.pir, 'r', "Plan R : BS PIR", layer.get_qgis_layer())
+            self.sc_2.display_histogram(self.layer.get_source(), self.layer.red, 'g', "Plan V : BS R", layer.get_qgis_layer())
+            self.sc_3.display_histogram(self.layer.get_source(), self.layer.green, 'b', "Plan B : BS V", layer.get_qgis_layer())
         else:
-            self.sc_1.display_histogram(self.processing.output_working_layer.get_source(), self.layer.red, 'r', "Plan R : BS PIR")
-            self.sc_2.display_histogram(self.processing.output_working_layer.get_source(), self.layer.green, 'g', "Plan V : BS R")
-            self.sc_3.display_histogram(self.processing.output_working_layer.get_source(), self.layer.blue, 'b', "Plan B : BS V")
+            self.sc_1.display_histogram(self.processing.output_working_layer.get_source(), self.layer.red, 'r', "Plan R : BS PIR", layer.get_qgis_layer())
+            self.sc_2.display_histogram(self.processing.output_working_layer.get_source(), self.layer.green, 'g', "Plan V : BS R", layer.get_qgis_layer())
+            self.sc_3.display_histogram(self.processing.output_working_layer.get_source(), self.layer.blue, 'b', "Plan B : BS V", layer.get_qgis_layer())
         self.set_buttons()
         
         
