@@ -23,7 +23,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
-from qgis.gui import QgsMessageBar
+from qgis.gui import QgsMessageBar, QgsRubberBand
 
 # Initialize Qt resources from file resources.py
 import resources_rc
@@ -311,6 +311,9 @@ class QGISEducation:
             
             
     def newProject(self):
+        for item in self.iface.mapCanvas().scene().items():
+            if isinstance(item, QgsRubberBand):
+                item.reset(QGis.Point)
         if self.educationWidget is not None:
             self.educationWidget.disconnect_interface()
             if self.qgisedudockwidget is not None:
