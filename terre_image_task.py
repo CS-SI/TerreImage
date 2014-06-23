@@ -28,6 +28,7 @@ import manage_QGIS
 from working_layer import WorkingLayer
 import terre_image_utils
 import terre_image_processing
+from processing_manager import ProcessingManager
 
 
 from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
@@ -55,6 +56,8 @@ class TerreImageTask(object):
         self.histogram = None
         self.output_working_layer = None
         
+        
+        
     def get_mirror_map(self):
         return self.mirrormap
         
@@ -66,7 +69,10 @@ class TerreImageTask(object):
         else:
             if self.iface.mapCanvas().isFrozen():
                 self.iface.mapCanvas().freeze( False )
-                self.iface.mapCanvas().refresh()    
+                self.iface.mapCanvas().refresh()
+                
+    def end(self):
+        pass
         
         
 class TerreImageProcessing(TerreImageTask, QObject):
@@ -180,6 +186,9 @@ class TerreImageProcessing(TerreImageTask, QObject):
         ifaceLegend.setLayerVisible( result_layer, False )
         self.iface.mapCanvas().refresh()
         logger.debug( ifaceLegend.isLayerVisible(result_layer) )
+        
+        
+        ProcessingManager().add_processing( self )
         
         self.emit( SIGNAL("display_ok()") )
         logger.debug( "signal emitted" )

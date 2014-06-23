@@ -37,7 +37,7 @@ import terre_image_processing
 from terre_image_histogram import TerreImageHistogram_multiband
 from terre_image_histogram import TerreImageHistogram_monoband
 from terre_image_manager import TerreImageManager
-
+from processing_manager import ProcessingManager
 
 
 import datetime
@@ -129,10 +129,11 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def status(self):
         print( self.qgis_education_manager )
         print( "self.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors) )
+        print ProcessingManager()
         
         
     def plugin_classification(self):
-        self.qgis_education_manager.classif_tool.set_layers(self.qgis_education_manager.layers_for_classif_tool, self.qgis_education_manager.layer.get_qgis_layer(), self.qgis_education_manager.layer.band_invert)
+        self.qgis_education_manager.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), self.qgis_education_manager.layer.get_qgis_layer(), self.qgis_education_manager.layer.band_invert)
         self.qgis_education_manager.classif_tool.setupUi()
         self.qgis_education_manager.classif_tool.show()
         
@@ -169,7 +170,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             histodockwidget.setWidget(hist)
             histodockwidget.setFloating(True)
             histodockwidget.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
-            QtCore.QObject.connect( hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), self.histogram_on_result )
+            QtCore.QObject.connect( hist, QtCore.SIGNAL( "threshold(PyQt_PyObject)" ), self.threshold_on_histogram )
             self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, histodockwidget)
             QtCore.QObject.connect( histodockwidget, QtCore.SIGNAL( "closed(PyQt_PyObject)" ), self.histogram_monoband_closed )
             hist.dock_opened = True
@@ -186,23 +187,30 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
         
-    def histogram_on_result(self, forms):
+    def threshold_on_histogram(self, forms):
         logger.debug( "QObject.sender() " + str(QtCore.QObject.sender(self))) 
         logger.debug( "do processing args " + str(forms))
         who = QtCore.QObject.sender(self)
         
-        p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name=="Seuillage"]
-        if p:
-            process = p[0]
-            QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
+        print "############################################"
+        print ProcessingManager().get_processings_name()
+        if "Seuillage" in ProcessingManager().get_processings_name():
+            print "seuillage in processing manager"
+            processings_seuillage=ProcessingManager().processing_from_name("Seuillage")
+            print "processings_seuillage", processings_seuillage
+            if processings_seuillage:
+                processings_seuillage[0].mirror.close()
+                QgsMapLayerRegistry.instance().removeMapLayer( processings_seuillage[0].output_working_layer.qgis_layer.id())
+                
         self.set_working_message(True)
         my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, who.layer, self.qgis_education_manager.mirror_map_tool, "Seuillage", forms )
         #self.qgis_education_manager.add_processing(my_processing) # TODO : keep it ?
-        self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+        self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
         self.set_working_message(False)
         
         
     def histogram_threshold(self, forms):
+        print "histogram threshold"
         logger.debug( "educationwidget forms: " +  str(forms))
         self.do_manage_processing("Seuillage", args=forms)
         
@@ -263,24 +271,32 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
     def do_manage_processing(self, text_changed, args=None):
+        print "text_changed", text_changed
         if text_changed  == "Angle Spectral":
             for item in self.iface.mapCanvas().scene().items():
                 if isinstance(item, QgsRubberBand):
                     item.reset(QGis.Point)
             if self.qgis_education_manager.has_spectral_angle:
-                processings_spectral_angle=[x for x in self.qgis_education_manager.processings if x.processing_name == "Angle Spectral"]
+                processings_spectral_angle=ProcessingManager().processing_from_name("Angle Spectral")
                 if processings_spectral_angle:
                     processings_spectral_angle[0].mirror.close()
                 self.qgis_education_manager.has_spectral_angle = False
+        if text_changed  == "Seuillage":
+            print "text changed == seuillage"
+            if "Seuillage" in ProcessingManager().get_processings_name():
+                print "seuillage in processing manager"
+                processings_seuillage=ProcessingManager().processing_from_name("Seuillage")
+                if processings_seuillage:
+                    processings_seuillage[0].mirror.close()
         do_it = True
         logger.debug( "do processing args: " + str(args))
         if text_changed:
             if not text_changed == "Traitements...":
                 if text_changed in ["NDVI", "NDTI", "Indice de brillance"]:
-                    if text_changed in [process.processing_name for process in self.qgis_education_manager.processings] :
+                    if text_changed in ProcessingManager().get_processings_name() :
                         do_it = False
                 if text_changed in [ "Seuillage", "Angle Spectral" ]:
-                    p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name==text_changed]
+                    p = [process.processing_name for process in ProcessingManager().processings if process.processing_name==text_changed]
                     if p:
                         process = p[0]
                         try:
@@ -306,7 +322,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     if not text_changed == "Angle Spectral":
                         self.qgis_education_manager.add_processing(my_processing)
                         self.set_combobox_histograms()
-                        self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+                        self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
                         self.set_working_message(False)
             self.comboBox_processing.setCurrentIndex( 0 )
             
@@ -315,7 +331,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         logger.debug( "processing_end_display" )
         self.qgis_education_manager.add_processing(my_processing)
         self.set_combobox_histograms()
-        self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+        self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
         self.set_working_message(False)
         
         
@@ -342,7 +358,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def set_combobox_histograms(self):
         if self.qgis_education_manager:
             if self.qgis_education_manager.layer:
-                process = ["Histogrammes", "Image de travail"] + [x.processing_name for x in self.qgis_education_manager.processings]
+                process = ["Histogrammes", "Image de travail"] + ProcessingManager().get_processings_name()
                 logger.debug( "process: " + str(process)) 
                 
                 self.comboBox_histogrammes.clear()
@@ -362,7 +378,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                 if corres[key] == text_changed :
                     who = key
                     logger.debug( "do_manage_sprectral_band_display who: " + str(who))
-                    if corres_name_view[who] in [process.processing_name for process in self.qgis_education_manager.processings] :
+                    if corres_name_view[who] in get_processings_name() :
                         do_it = False
                     #band_to_display = self.qgis_education_manager.layer.bands[key]
                     #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
@@ -376,10 +392,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
     def display_values(self):
         self.qgis_education_manager.display_values()
-#         self.valuedockwidget.show()
-#         self.qgis_education_manager.value_tool.changeActive( QtCore.Qt.Checked )
-#         self.qgis_education_manager.value_tool.cbxActive.setCheckState( QtCore.Qt.Checked )
-#         self.qgis_education_manager.value_tool.set_layers([self.qgis_education_manager.layer] + self.qgis_education_manager.get_process_to_display())
+
                  
     def kmeans(self):
         self.set_working_message(True)
@@ -393,14 +406,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             self.qgis_education_manager.add_processing(my_processing)
             self.set_combobox_histograms()
             
-            self.qgis_education_manager.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+            self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
             #terre_image_processing.kmeans(self.qgis_education_manager.layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
             self.set_working_message(False)
 
 
     def export_kmz(self):
         self.set_working_message(True)
-        files_to_export = [process.output_working_layer.get_source() for process in self.qgis_education_manager.processings]
+        files_to_export = [process.output_working_layer.get_source() for process in ProcessingManager().get_processings]
         logger.debug( "files to export" + str(files_to_export))
         kmz = terre_image_processing.export_kmz( files_to_export, self.qgis_education_manager.working_directory )
         self.set_working_message(False)

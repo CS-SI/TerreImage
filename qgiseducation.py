@@ -192,7 +192,7 @@ class QGISEducation:
             self.qgisedudockwidget.set_combobox_histograms()
             
         
-        self.educationWidget.value_tool.set_layers(self.qgis_education_manager.layers_for_value_tool)
+        self.educationWidget.value_tool.set_layers(ProcessingManager().get_working_layers())
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
         print "temps du " + str(name) + "  : " + str(timeExec)
@@ -334,7 +334,7 @@ class QGISEducation:
         QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_type", self.qgis_education_manager.layer.type )
         QgsProject.instance().writeEntry( "QGISEducation", "/working_directory", self.qgis_education_manager.working_directory )
         p = []
-        for process in self.qgis_education_manager.processings:
+        for process in ProcessingManager().get_processings():
             p.append((process.processing_name, process.output_working_layer.get_source()))
             
         QgsProject.instance().writeEntry( "QGISEducation", "/process", str(p) )

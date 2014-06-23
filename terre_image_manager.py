@@ -26,6 +26,7 @@ from PyQt4 import QtCore, QtGui
 import terre_image_utils
 from terre_image_task import TerreImageProcessing
 from qgis.core import QgsMapLayerRegistry
+from processing_manager import ProcessingManager
 
 from valuetool.valuewidget import ValueWidget
 from DockableMirrorMap.dockableMirrorMapPlugin import DockableMirrorMapPlugin
@@ -47,7 +48,7 @@ class TerreImageManager():
         self.layer = None
         self.working_directory = None #, _ = terre_image_utils.fill_default_directory()
         self.processings = []
-        self.layers_for_value_tool = [ ]
+        #self.layers_for_value_tool = [ ]
         self.layers_for_classif_tool = [ ]
         self.name_to_processing = {}
         self.has_spectral_angle = False
@@ -76,22 +77,21 @@ class TerreImageManager():
     def add_processing(self, processing):
         self.processings.append(processing)
         if isinstance(processing, TerreImageProcessing):
-            self.layers_for_value_tool.append(processing.output_working_layer.qgis_layer)
+            #self.layers_for_value_tool.append(processing.output_working_layer.qgis_layer)
             self.layers_for_classif_tool.append(processing.output_working_layer.get_qgis_layer())
         logger.info( " adding" + str(processing.processing_name) )
         self.name_to_processing[processing.processing_name] = processing
-        logger.debug( "self.layers_for_value_tool" + str(self.layers_for_value_tool) )
         
         
-    def get_process_to_display(self):
-        for x in self.processings:
-            logger.debug( x )
-            logger.debug( x.output_working_layer.qgis_layer )
-        
-        
-        temp = [x.output_working_layer.qgis_layer for x in self.processings if isinstance(x, TerreImageProcessing) and x.output_working_layer.qgis_layer is not None]
-        logger.debug( temp )
-        return temp
+#     def get_process_to_display(self):
+#         for x in self.processings:
+#             logger.debug( x )
+#             logger.debug( x.output_working_layer.qgis_layer )
+#         
+#         
+#         temp = [x.output_working_layer.qgis_layer for x in self.processings if isinstance(x, TerreImageProcessing) and x.output_working_layer.qgis_layer is not None]
+#         logger.debug( temp )
+#         return temp
         
     
     def set_current_layer(self):
@@ -100,9 +100,9 @@ class TerreImageManager():
             self.working_directory = os.path.join(os.path.dirname(self.layer.source_file), "working_directory")
             if not os.path.exists( self.working_directory ):
                 os.makedirs( self.working_directory )
+            ProcessingManager().working_layer = self.layer
                 
-        self.layers_for_value_tool.append(self.layer ) #.get_qgis_layer())
-        logger.debug( "set_current_layer: layers_for_value_tool" + str(self.layers_for_value_tool))
+        #self.layers_for_value_tool.append(self.layer ) #.get_qgis_layer())
         logger.debug( "working directory" )
         return self.layer, bands
         
@@ -114,14 +114,13 @@ class TerreImageManager():
         for pro in self.processings:
             sortie += str(pro) + "\n"
         sortie += "]"
-        sortie += "layers_for_value_tool" + str( self.layers_for_value_tool )
         sortie += "layers_for_classif_tool" + str( self.layers_for_classif_tool )
         
         return sortie
     
     def restore_processing_manager(self, filename, bands, type, working_dir):
         self.layer, bands  = terre_image_utils.restore_working_layer( filename, bands, type )
-        self.layers_for_value_tool.append(self.layer )
+        #self.layers_for_value_tool.append(self.layer )
         self.working_directory = working_dir
         return self.layer, bands
         
@@ -131,7 +130,7 @@ class TerreImageManager():
         self.valuedockwidget.show()
         self.value_tool.changeActive( QtCore.Qt.Checked )
         self.value_tool.cbxActive.setCheckState( QtCore.Qt.Checked )
-        self.value_tool.set_layers([self.layer] + self.get_process_to_display())
+        self.value_tool.set_layers(ProcessingManager().get_working_layers())
         
         
     def view_closed(self, name_of_the_closed_view):
@@ -148,17 +147,21 @@ class TerreImageManager():
     def remove_process(self, process):
         if process in self.processings :
             self.processings.remove(process)
-            if isinstance(process, TerreImageProcessing):
-                self.layers_for_value_tool.remove(process.output_working_layer.qgis_layer)
+            #if isinstance(process, TerreImageProcessing):
+            #    self.layers_for_value_tool.remove(process.output_working_layer.qgis_layer)
         self.name_to_processing[process.processing_name] = ""
         
         
     def removing_layer(self, layer_id):
-        process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
-        logger.debug( "process" + str( process))
-        if process :
-            process[0].mirror.close()
-            self.remove_process(process[0])
+        ProcessingManager().remove_process_from_layer_id(layer_id)
+#         process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
+#         logger.debug( "process" + str( process))
+#         if process :
+#             process[0].mirror.close()
+#             self.remove_process(process[0])
+            
+            
+    
         
         
     def disconnect(self):
