@@ -297,19 +297,26 @@ class ValueWidget(QWidget, Ui_Widget):
 
 
     def set_layers(self, list_of_layers_to_display):
+        print "list_of_layers_to_display", list_of_layers_to_display
         temp_list = []
         nrow = 0
         if list_of_layers_to_display:
+            self.the_layer_to_display = list_of_layers_to_display[0]
             for layer in list_of_layers_to_display:
+                print "layer", layer
                 if layer is not None :
+                    
+                    
                     try:
                         layer_temp = layer.get_qgis_layer()
-                        self.the_layer_to_display = layer
                         temp_list.append(layer_temp)
                         nrow += layer_temp.bandCount()
                     except:
-                        temp_list.append(layer)
-                        nrow += layer.bandCount()
+                        try:
+                            temp_list.append(layer)
+                            nrow += layer.bandCount()
+                        except AttributeError:
+                            pass
             self.layers_to_display = temp_list
             self.tableWidget.setRowCount(nrow)
             
@@ -453,17 +460,24 @@ class ValueWidget(QWidget, Ui_Widget):
             is_the_working_layer = False
             if self.the_layer_to_display is not None:
                 if layer == self.the_layer_to_display.get_qgis_layer():
+                    print "is the working layer"
                     is_the_working_layer = True
             
-            if not is_the_working_layer:
-                layername=unicode(layer.name())
-            else :
-                layername=""
-                
-            if QGis.QGIS_VERSION_INT >= 10900:
-                layerSrs = layer.crs()
-            else:
-                layerSrs = layer.srs()
+            try:
+                if not is_the_working_layer:
+                    layername=unicode(layer.name())
+                else :
+                    layername=""
+            except Exception:
+                pass
+            
+            try:
+                if QGis.QGIS_VERSION_INT >= 10900:
+                    layerSrs = layer.crs()
+                else:
+                    layerSrs = layer.srs()
+            except Exception:
+                pass
 
             pos = position         
 
