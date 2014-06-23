@@ -35,9 +35,9 @@ class WorkingLayer():
         self.source_file = layer_file
         self.qgis_layer = qgis_layer
         
-        if bands :
-            self.bands = bands
-            self.set_bands(bands)
+        
+        self.bands = bands
+        self.set_bands(bands)
             
         self.type = None
         
@@ -49,15 +49,16 @@ class WorkingLayer():
     
         
     def set_bands(self, bands):
-        self.bands = bands
-        self.red    = bands['red']
-        self.green  = bands['green']
-        self.blue   = bands['blue']
-        self.pir    = bands['pir']
-        self.mir    = bands['mir']
-        self.band_invert = dict((v,k) for k, v in self.bands.iteritems())
-        logger.info( self.bands )
-        logger.info( self.band_invert )
+        if bands :
+            self.bands = bands
+            self.red    = bands['red']
+            self.green  = bands['green']
+            self.blue   = bands['blue']
+            self.pir    = bands['pir']
+            self.mir    = bands['mir']
+            self.band_invert = dict((v,k) for k, v in self.bands.iteritems())
+            logger.info( self.bands )
+            logger.info( self.band_invert )
         
         
         
