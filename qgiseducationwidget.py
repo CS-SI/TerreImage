@@ -36,7 +36,7 @@ import terre_image_utils
 import terre_image_processing
 from terre_image_histogram import TerreImageHistogram_multiband
 from terre_image_histogram import TerreImageHistogram_monoband
-from processing_launcher import ProcessingLauncher
+from terre_image_manager import TerreImageManager
 
 
 
@@ -81,7 +81,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.setupUi(self)
         self.setupUi_extra()
         
-        self.qgis_education_manager = ProcessingLauncher( self.iface )
+        self.qgis_education_manager = TerreImageManager( self.iface )
         self.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
         
         QtCore.QObject.connect(QgsMapLayerRegistry.instance(), QtCore.SIGNAL( "layerWillBeRemoved(QString)" ), self.layer_deleted)
