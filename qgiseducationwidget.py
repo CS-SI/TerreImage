@@ -263,6 +263,15 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
     def do_manage_processing(self, text_changed, args=None):
+        if text_changed  == "Angle Spectral":
+            for item in self.iface.mapCanvas().scene().items():
+                if isinstance(item, QgsRubberBand):
+                    item.reset(QGis.Point)
+            if self.qgis_education_manager.has_spectral_angle:
+                processings_spectral_angle=[x for x in self.qgis_education_manager.processings if x.processing_name == "Angle Spectral"]
+                if processings_spectral_angle:
+                    processings_spectral_angle[0].mirror.close()
+                self.qgis_education_manager.has_spectral_angle = False
         do_it = True
         logger.debug( "do processing args: " + str(args))
         if text_changed:
@@ -274,7 +283,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     p = [process.processing_name for process in self.qgis_education_manager.processings if process.processing_name==text_changed]
                     if p:
                         process = p[0]
-                        QgsMapLayerRegistry.instance().removeMapLayer( process.get_output_working_layer().qgis_layer.id())
+                        try:
+                            QgsMapLayerRegistry.instance().removeMapLayer( process.get_output_working_layer().qgis_layer.id())
+                        except AttributeError:
+                            print 'Failed to delete ', process
                     if text_changed == "Angle Spectral":
                         widget = self.iface.messageBar().createMessage("Terre Image", "Cliquez sur un point de l'image pour en obtenir son angle spectral...")
                         self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
@@ -289,6 +301,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                         self.set_working_message(True)
                         self.label_a_s.show()
                         self.label_a_s_img.show()
+                        self.qgis_education_manager.has_spectral_angle = True
                         QtCore.QObject.connect( my_processing, QtCore.SIGNAL( "display_ok()" ), lambda who=my_processing: self.processing_end_display(who) )
                     if not text_changed == "Angle Spectral":
                         self.qgis_education_manager.add_processing(my_processing)
