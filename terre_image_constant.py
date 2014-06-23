@@ -32,13 +32,10 @@ class TerreImageConstant(object):
     """
     This class allow to manage constants of the catalog.
     It manages:
-        temporaryFolder            --    temporary folder for temporary file. Directory to delete at the unload
-        catalogueInterface         --    the ui to access components of the catalog interface
-        catalogueWindowDialogue    --    dlg to get the windows properties
-        QGISInterface              --    iface to link the catalog to qgis (adding layers, acces to canvas...)
-        QGISCanvas                 --    mapCanvas of qgis == self.QGISInterface.mapCanvas() 
-        QGISLegendInterface        --    acces from qgis to symbols, layers ...
-        progressValue              --    variable common to all project.
+        iface                  --    iface to link the catalog to qgis (adding layers, acces to canvas...)
+        canvas                 --    mapCanvas of qgis == self.iface.mapCanvas() 
+        legendInterface        --    acces from qgis to symbols, layers ...
+        index_group            --    qgis group of terre_image.
     """
     instance = None
     def __new__(cls, *args, **kwargs): # __new__ always a classmethod
@@ -51,9 +48,9 @@ class TerreImageConstant(object):
         """
         Init to have constant values
         """
-        self.QGISInterface = None   # iface
-        self.QGISCanvas = None  # canvas
-        self.QGISLegendInterface = None
+        self.iface = None   # iface
+        self.canvas = None  # canvas
+        self.legendInterface = None
         self.index_group = None
         
 

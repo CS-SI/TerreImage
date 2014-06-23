@@ -46,6 +46,9 @@ class TerreImageManager():
         self.canvas = self.iface.mapCanvas()
         self.layer = None
         self.working_directory = None #, _ = terre_image_utils.fill_default_directory()
+        self.processings = []
+        self.layers_for_value_tool = [ ]
+        self.layers_for_classif_tool = [ ]
         self.name_to_processing = {}
         self.has_spectral_angle = False
         self.has_seuillage = False
