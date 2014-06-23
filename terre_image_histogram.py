@@ -400,9 +400,9 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
             self.sc_2.display_histogram(self.layer.get_source(), self.layer.red, 'g', "Plan V : BS R", layer.get_qgis_layer())
             self.sc_3.display_histogram(self.layer.get_source(), self.layer.green, 'b', "Plan B : BS V", layer.get_qgis_layer())
         else:
-            self.sc_1.display_histogram(self.processing.output_working_layer.get_source(), self.layer.red, 'r', "Plan R", layer.get_qgis_layer())
-            self.sc_2.display_histogram(self.processing.output_working_layer.get_source(), self.layer.green, 'g', "Plan V", layer.get_qgis_layer())
-            self.sc_3.display_histogram(self.processing.output_working_layer.get_source(), self.layer.blue, 'b', "Plan B", layer.get_qgis_layer())
+            self.sc_1.display_histogram(self.processing.output_working_layer.get_source(), self.layer.red, 'r', "Plan R : BS R", layer.get_qgis_layer())
+            self.sc_2.display_histogram(self.processing.output_working_layer.get_source(), self.layer.green, 'g', "Plan V : BS V", layer.get_qgis_layer())
+            self.sc_3.display_histogram(self.processing.output_working_layer.get_source(), self.layer.blue, 'b', "Plan B : BS B", layer.get_qgis_layer())
         self.set_buttons()
         
         
