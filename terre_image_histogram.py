@@ -45,7 +45,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_Histograms' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 
