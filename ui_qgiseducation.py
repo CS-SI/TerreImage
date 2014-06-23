@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_qgiseducation.ui'
 #
-# Created: Sun Jun 22 01:33:22 2014
+# Created: Mon Jun 23 11:09:38 2014
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,9 +17,12 @@ except AttributeError:
 class Ui_QGISEducation(object):
     def setupUi(self, QGISEducation):
         QGISEducation.setObjectName(_fromUtf8("QGISEducation"))
-        QGISEducation.resize(323, 502)
+        QGISEducation.resize(323, 504)
         self.verticalLayout = QtGui.QVBoxLayout(QGISEducation)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.label = QtGui.QLabel(QGISEducation)
+        self.label.setObjectName(_fromUtf8("label"))
+        self.verticalLayout.addWidget(self.label)
         self.comboBox_sprectral_band_display = QtGui.QComboBox(QGISEducation)
         self.comboBox_sprectral_band_display.setObjectName(_fromUtf8("comboBox_sprectral_band_display"))
         self.verticalLayout.addWidget(self.comboBox_sprectral_band_display)
@@ -76,6 +79,7 @@ class Ui_QGISEducation(object):
         self.label_a_s.setObjectName(_fromUtf8("label_a_s"))
         self.horizontalLayout_3.addWidget(self.label_a_s)
         self.label_a_s_img = QtGui.QLabel(QGISEducation)
+        self.label_a_s_img.setMaximumSize(QtCore.QSize(400, 16777215))
         self.label_a_s_img.setText(_fromUtf8(""))
         self.label_a_s_img.setObjectName(_fromUtf8("label_a_s_img"))
         self.horizontalLayout_3.addWidget(self.label_a_s_img)
@@ -88,6 +92,9 @@ class Ui_QGISEducation(object):
 
     def retranslateUi(self, QGISEducation):
         QGISEducation.setWindowTitle(QtGui.QApplication.translate("QGISEducation", "QGISEducation", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("QGISEducation", "Plan R <- BS_PIR \n"
+"Plan V <- BS_R \n"
+"Plan B <- BS_V", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_histogramme.setText(QtGui.QApplication.translate("QGISEducation", "Histogramme", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_profil_spectral.setText(QtGui.QApplication.translate("QGISEducation", "Profil spectral", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_5.setTitle(QtGui.QApplication.translate("QGISEducation", "Classification", None, QtGui.QApplication.UnicodeUTF8))

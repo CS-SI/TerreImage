@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_bands.ui'
 #
-# Created: Thu May 22 11:54:57 2014
+# Created: Mon Jun 23 10:47:52 2014
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!

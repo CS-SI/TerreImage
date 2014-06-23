@@ -7,13 +7,22 @@
     <x>0</x>
     <y>0</y>
     <width>323</width>
-    <height>502</height>
+    <height>504</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>QGISEducation</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Plan R &lt;- BS_PIR 
+Plan V &lt;- BS_R 
+Plan B &lt;- BS_V</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QComboBox" name="comboBox_sprectral_band_display"/>
    </item>
@@ -115,6 +124,12 @@
      </item>
      <item>
       <widget class="QLabel" name="label_a_s_img">
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="text">
         <string/>
        </property>
