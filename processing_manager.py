@@ -50,6 +50,7 @@ class ProcessingManager():
         self.layers_for_value_tool = [ ]
         self.layers_for_classif_tool = [ ]
         self.name_to_processing = {}
+        self.has_spectral_angle = False
         
         self.value_tool = ValueWidget( self.iface ) #, self )
         #creating a dock widget
