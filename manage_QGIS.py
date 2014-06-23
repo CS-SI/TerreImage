@@ -111,7 +111,7 @@ def add_qgis_raser_layer( rasterLayer, canvas, bands=None):
     
     
     QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
-    TerreImageConstant().QGISLegendInterface.moveLayer( rasterLayer, index_group )
+    TerreImageConstant().legendInterface.moveLayer( rasterLayer, index_group )
       
       
 def addRasterLayerToQGIS( raster, layername, iface = None ):
@@ -136,7 +136,7 @@ def addRasterLayerToQGIS( raster, layername, iface = None ):
     histogram_stretching(rasterLayer, iface.mapCanvas())
     
     QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
-    TerreImageConstant().QGISLegendInterface.moveLayer( rasterLayer, index_group )
+    TerreImageConstant().legendInterface.moveLayer( rasterLayer, index_group )
     return rasterLayer
         
 
@@ -249,7 +249,7 @@ def display_one_band( layer, keyword, iface ):
         #contrastForRasters( rasterLayer, 0, 0, [pir, red, green] )
         histogram_stretching(rasterLayer, iface.mapCanvas())
         QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
-        TerreImageConstant().QGISLegendInterface.moveLayer( rasterLayer, index_group )
+        TerreImageConstant().legendInterface.moveLayer( rasterLayer, index_group )
         return rasterLayer
     else:
         
@@ -264,7 +264,7 @@ def display_one_band( layer, keyword, iface ):
             #contrastForRasters( rasterLayer, 0, 0 )
             histogram_stretching(rasterLayer, iface.mapCanvas())
             QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
-            TerreImageConstant().QGISLegendInterface.moveLayer( rasterLayer, index_group )
+            TerreImageConstant().legendInterface.moveLayer( rasterLayer, index_group )
             return rasterLayer
     
     
