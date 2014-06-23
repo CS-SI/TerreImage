@@ -36,10 +36,10 @@ from ClassificationSupervisee.supervisedclassificationdialog import SupervisedCl
 import logging
 logging.basicConfig()
 # create logger
-logger = logging.getLogger( 'TerreImage_ProcessingManager' )
+logger = logging.getLogger( 'TerreImage_ProcessingLauncher' )
 logger.setLevel(logging.INFO)
 
-class ProcessingManager():
+class ProcessingLauncher():
     
     def __init__(self, iface ):
         self.iface = iface

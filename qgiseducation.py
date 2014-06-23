@@ -35,7 +35,7 @@ from manage_bands import manage_bands
 from working_layer import WorkingLayer
 from terre_image_task import TerreImageProcessing
 from terre_image_task import TerreImageDisplay
-from processing_manager import ProcessingManager
+from processing_launcher import ProcessingLauncher
 import terre_image_utils
 import time
 from terre_image_constant import TerreImageConstant
@@ -267,7 +267,7 @@ class QGISEducation:
         self.constants.index_group = self.iface.legendInterface().addGroup( "Terre Image", True, None )
         logger.debug( self.constants.index_group )
         
-        self.qgis_education_manager = ProcessingManager(self.iface)
+        self.qgis_education_manager = ProcessingLauncher(self.iface)
         
         
         _, bands  = self.qgis_education_manager.set_current_layer( )
@@ -358,7 +358,7 @@ class QGISEducation:
         
         working_dir, ok = QgsProject.instance().readEntry("QGISEducation", "/working_directory")
         
-        self.qgis_education_manager = ProcessingManager( self.iface )
+        self.qgis_education_manager = ProcessingLauncher( self.iface )
         self.qgis_education_manager.restore_processing_manager(wl, eval(bands), type, working_dir)
         self.show_education_widget(bands)
         
