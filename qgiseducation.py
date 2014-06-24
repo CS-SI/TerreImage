@@ -39,6 +39,7 @@ from terre_image_manager import TerreImageManager
 import terre_image_utils
 import time
 from terre_image_constant import TerreImageConstant
+from processing_manager import ProcessingManager
 #from supervisedclassification import SupervisedClassification
 
 
@@ -336,9 +337,22 @@ class QGISEducation:
         p = []
         for process in ProcessingManager().get_processings():
             p.append((process.processing_name, process.output_working_layer.get_source()))
+        print "process", p
             
         QgsProject.instance().writeEntry( "QGISEducation", "/process", str(p) )
         QgsProject.instance().writeEntry( "QGISEducation", "/index_group", self.constants.index_group )
+        
+        if "Angle Spectral" in ProcessingManager().get_processings_name():
+            #delete rubberband
+            for item in self.iface.mapCanvas().scene().items():
+                #item is a rubberband
+                if isinstance(item, QgsRubberBand):
+                    #get point
+                    if item.size() > 0:
+                        point = item.getPoint(0)
+                        QgsProject.instance().writeEntry( "QGISEducation", "/angle_spectral_point_x", point.x() )
+                        QgsProject.instance().writeEntry( "QGISEducation", "/angle_spectral_point_y", point.y() )
+                
 
     def onProjectLoaded(self):
         # restore mirrors?
@@ -360,7 +374,8 @@ class QGISEducation:
         
         self.qgis_education_manager = TerreImageManager( self.iface )
         self.qgis_education_manager.restore_processing_manager(wl, eval(bands), type, working_dir)
-        self.show_education_widget(bands)
+        if self.qgis_education_manager:
+            self.show_education_widget(bands)
         
         process, ok = QgsProject.instance().readEntry("QGISEducation", "/process")
         logger.debug( eval(process))
@@ -414,62 +429,17 @@ class QGISEducation:
                     
                     
                     
+        angle_spectral_point_x, ok_x = QgsProject.instance().readDoubleEntry("QGISEducation", "/angle_spectral_point_x")      
+        angle_spectral_point_y, ok_y = QgsProject.instance().readDoubleEntry("QGISEducation", "/angle_spectral_point_y")
+        print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
+        if ok_x and ok_y:
+            print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
+            p = ProcessingManager().processing_from_name("Angle Spectral")
+            if p:
+                QgsRubberBand(self.iface.mapCanvas(), QGis.Point)
+                rubberband.setWidth(10)
+                rubberband.setColor(QColor(Qt.yellow))
+                rubberband.addPoint(QgsPoint(float(angle_spectral_point_x),float(angle_spectral_point_y)))
+              
                     
-        #restore all process ?
-        
 
-#         # remove all mirrors
-#         self.removeDockableMirrors()
-# 
-#         mirror2lids = {}
-#         # load mirrors
-#         for i in range(num):
-#             if num >= 2:
-#                 if i == 0: 
-#                     prevFlag = self.iface.mapCanvas().renderFlag()
-#                     self.iface.mapCanvas().setRenderFlag(False)
-#                 elif i == num-1:
-#                     self.iface.mapCanvas().setRenderFlag(True)
-# 
-#             from dockableMirrorMap import DockableMirrorMap
-#             dockwidget = DockableMirrorMap(self.iface.mainWindow(), self.iface)
-# 
-#             minsize = dockwidget.minimumSize()
-#             maxsize = dockwidget.maximumSize()
-# 
-#             # restore position
-#             floating, ok = QgsProject.instance().readBoolEntry("DockableMirrorMap", "/mirror%s/floating" % i)
-#             if ok: 
-#                 dockwidget.setFloating( floating )
-#                 position, ok = QgsProject.instance().readEntry("DockableMirrorMap", "/mirror%s/position" % i)
-#                 if ok: 
-#                     try:
-#                         if floating:
-#                             parts = position.split(" ")
-#                             if len(parts) >= 2:
-#                                 dockwidget.move( int(parts[0]), int(parts[1]) )
-#                         else:
-#                             dockwidget.setLocation( int(position) )
-#                     except ValueError:
-#                         pass
-# 
-#             # restore geometry
-#             dockwidget.setFixedSize( dockwidget.geometry().width(), dockwidget.geometry().height() )
-#             size, ok = QgsProject.instance().readEntry("DockableMirrorMap", "/mirror%s/size" % i)
-#             if ok:
-#                 try:
-#                     parts = size.split(" ")
-#                     dockwidget.setFixedSize( int(parts[0]), int(parts[1]) )
-#                 except ValueError:
-#                     pass                
-# 
-#             scaleFactor, ok = QgsProject.instance().readDoubleEntry("DockableMirrorMap", "/mirror%s/scaleFactor" % i, 1.0)
-#             if ok: dockwidget.getMirror().scaleFactor.setValue( scaleFactor )
-# 
-#             # get layer list
-#             layerIds, ok = QgsProject.instance().readListEntry("DockableMirrorMap", "/mirror%s/layers" % i)
-#             if ok: dockwidget.getMirror().setLayerSet( layerIds )
-# 
-#             self.addDockWidget( dockwidget )
-#             dockwidget.setMinimumSize(minsize)
-#             dockwidget.setMaximumSize(maxsize)
