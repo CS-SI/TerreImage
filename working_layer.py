@@ -59,6 +59,8 @@ class WorkingLayer():
             self.band_invert = dict((v,k) for k, v in self.bands.iteritems())
             logger.info( self.bands )
             logger.info( self.band_invert )
+            trad = {'blue':'bleu', 'green':'vert', 'red':'rouge', 'pir':'pir', 'mir':'mir'}
+            self.band_invert_french = dict((k, trad[v] ) for k, v in self.band_invert.iteritems())
         
         
         

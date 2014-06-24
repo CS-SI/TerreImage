@@ -140,7 +140,7 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
         
         
     def __str__(self):
-        return self.name + " " + str(self.coordinates) + " " + str(self.color) 
+        return self.name + " " + str(self.coordinates) + " " + str(self.color) + " " + str(self.points)
         
     
     def has_abs(self):

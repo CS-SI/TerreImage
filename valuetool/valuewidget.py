@@ -105,10 +105,14 @@ class ValueWidgetGraph(FigureCanvas):
         self.axes.figure.canvas.draw()
         
     def plot_line(self, line):
-        eval(line)
-        xtext = self.axes.set_xlabel('Bande') # returns a Text instance
-        ytext = self.axes.set_ylabel('Valeur')
-        self.axes.figure.canvas.draw()
+        try:
+            eval(line)
+        except SyntaxError:
+            print "Erreur display"
+        else:
+            xtext = self.axes.set_xlabel('Bande') # returns a Text instance
+            ytext = self.axes.set_ylabel('Valeur')
+            self.axes.figure.canvas.draw()
         
     #def plot_extra(self, xs, ys, colors, markers):
     #    if len(xs)   ==  len(ys)   ==  len(colors)   ==  len(markers) :
@@ -305,18 +309,13 @@ class ValueWidget(QWidget, Ui_Widget):
             for layer in list_of_layers_to_display:
                 print "layer", layer
                 if layer is not None :
-                    
-                    
                     try:
                         layer_temp = layer.get_qgis_layer()
                         temp_list.append(layer_temp)
                         nrow += layer_temp.bandCount()
                     except:
-                        try:
-                            temp_list.append(layer)
-                            nrow += layer.bandCount()
-                        except AttributeError:
-                            pass
+                        temp_list.append(layer)
+                        nrow += layer.bandCount()
             self.layers_to_display = temp_list
             self.tableWidget.setRowCount(nrow)
             
@@ -460,9 +459,7 @@ class ValueWidget(QWidget, Ui_Widget):
             is_the_working_layer = False
             if self.the_layer_to_display is not None:
                 if layer == self.the_layer_to_display.get_qgis_layer():
-                    print "is the working layer"
                     is_the_working_layer = True
-            
             try:
                 if not is_the_working_layer:
                     layername=unicode(layer.name())
@@ -506,7 +503,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 if not layer.dataProvider().extent().contains( pos ):
                   ident = dict()
                   for iband in range(1,layer.bandCount()+1):
-                    ident[iband] = str(self.tr('out of extent'))
+                    ident[iband] = str(self.tr('En dehors de l\'image'))
                 # we can only use context if layer is not projected
                 elif canvas.hasCrsTransformEnabled() and layer.dataProvider().crs() != canvas.mapRenderer().destinationCrs():
                   ident = layer.dataProvider().identify(pos, QgsRaster.IdentifyFormatValue ).results()
@@ -530,7 +527,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 layernamewithband=layername
                 if ident is not None and len(ident)>1:
                     if is_the_working_layer:
-                        layernamewithband+=' '+self.the_layer_to_display.band_invert[iband]
+                        layernamewithband+=' '+self.the_layer_to_display.band_invert_french[iband]
                     else:
                         layernamewithband+=' '+layer.bandName(iband)
 
@@ -609,8 +606,8 @@ class ValueWidget(QWidget, Ui_Widget):
                     
             if not layer.dataProvider().extent().contains( pos ):
     #        if coordx < 0 or coordx > layer.width() or coordy < 0 or coordy > layer.height() :
-                coordx = "Out of image"
-                coordy = "Out of image"
+                coordx = 'En dehors de l\'image'
+                coordy = 'En dehors de l\'image'
             else :
     #            coordx = QgsRasterBlock.printValue( coordx )#QString(pos.x())
                 coordx = str( coordx )#QString(pos.x())
@@ -621,6 +618,7 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def showValues(self):
         if self.cbxGraph.isChecked():
+            print "self.saved_curves", self.saved_curves
             #TODO don't plot if there is no data to plot...
             if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
                 #print "show values self.values", self.values
@@ -702,6 +700,18 @@ class ValueWidget(QWidget, Ui_Widget):
                     values.remove(item)
         new_values = new_values +values 
         return new_values
+    
+    def order_values_from_attr(self, values):
+        ordre = ["blue", "green", "red", "pir", "mir"]
+        new_values = []
+        #attr {1: -14144.0, 2: -4984.0, 3: -13252.0, 4: 15707.0}
+        #self.the_layer_to_display.bands:{'blue': 3, 'pir': 4, 'mir': -1, 'green': 2, 'red': 1}
+        
+        for color in ordre:
+            # check if one of the items is concerned
+            if self.the_layer_to_display.bands[color] in values.keys():
+                new_values.append( (self.the_layer_to_display.bands[color], values[self.the_layer_to_display.bands[color]]))
+        return new_values
             
             
     def printInTable(self):
@@ -759,12 +769,14 @@ class ValueWidget(QWidget, Ui_Widget):
         
         
         if self.memorize_curve:
+            print "num values curve temp", numvalues
             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), pixel, ligne, numvalues)
             QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
             self.saved_curves.append(curve_temp)
             self.memorize_curve = False
             self.verticalLayout_curves.addWidget( curve_temp )
             self.groupBox_saved_layers.show()
+            print curve_temp
                     
         ymin = self.ymin
         ymax = self.ymax
@@ -789,6 +801,7 @@ class ValueWidget(QWidget, Ui_Widget):
             self.sc_1.clear()
             
             t = range(1, len(numvalues)+1)
+            print "num values", numvalues
             self.sc_1.plot( t, numvalues, 'k', 'o-' )
             
             self.temp_values = numvalues
@@ -913,18 +926,21 @@ class ValueWidget(QWidget, Ui_Widget):
         ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.y()), QgsRaster.IdentifyFormatValue )
         if ident is not None :
             attr = ident.results()
+            print "attr", attr
+            
+            new_points = self.order_values_from_attr(attr)
         
         #ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.x()), QgsRaster.IdentifyFormatValue ).results()
         
             #TODO : put values in right order
-            new_points=[]
-            for i in range(1, len(attr)+1):
-                new_points.append( (self.the_layer_to_display.band_invert[i], attr[i] ))
-            points = self.order_values(new_points)
+#             new_points=[]
+#             for i in range(1, len(attr)+1):
+#                 new_points.append( (self.the_layer_to_display.band_invert[i], attr[i] ))
+#             points = self.order_values(new_points)
             
-            points_for_curve = [ t[1] for t in points ]
+            points_for_curve = [ t[1] for t in new_points ]
             logger.debug( "points_for_curve: " + str(points_for_curve))
-            abs = [ t[0] for t in points ]
+            abs = [ t[0] for t in new_points ]
             logger.debug( "abs: " + str(abs))
             
     #         colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
@@ -938,6 +954,8 @@ class ValueWidget(QWidget, Ui_Widget):
             self.memorize_curve = False
             self.verticalLayout_curves.addWidget( curve_temp )
             self.groupBox_saved_layers.show()
+            
+        self.on_get_point_button()
         
      
     def export_csv(self):
