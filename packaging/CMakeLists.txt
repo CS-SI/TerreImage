@@ -82,6 +82,7 @@ add_custom_command(TARGET qgis_BundlePlugin PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy ${OSGEO4W_ROOT}/bin/libiconv-2.dll ${BUNDLEDIR}/win32/bin
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${GDAL_DATA} ${BUNDLEDIR}/win32/share/gdal
                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cropvectortoimage.bat ${BUNDLEDIR}/win32/bin
+                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/classification.bat ${BUNDLEDIR}/win32/bin
                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/otbcli.bat ${BUNDLEDIR}/win32/bin
                   
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/ClassificationSupervisee ${BUNDLEDIR}/ClassificationSupervisee
