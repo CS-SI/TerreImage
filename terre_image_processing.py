@@ -155,7 +155,7 @@ def angles(layer, working_directory, iface, x, y):
                     fact.append(current_band + "*" + current_band)
                 
                 
-                formula = "\"if(((" + "+".join(fact) + ") != 0),"
+                formula = "if(((" + "+".join(fact) + ") != 0),"
                 
                 formula += "acos("
                 formula += "(" + "+".join(num) + ")/"
@@ -163,15 +163,18 @@ def angles(layer, working_directory, iface, x, y):
                 formula += "(" + "+".join(denom) + ")*"
                 formula += "(" + "+".join(fact) + ")"
                 formula += "))"
-                formula += "), 0)\""
+                formula += "), 0)"
+                
+                formule_ = "\"if( " + formula + ">0.0001, 1/" + formula + ", 0)\""
                 
                 logger.debug( "num" + str(num))
                 logger.debug( "denom" + str(denom))
                 logger.debug( "fact" + str(fact))
                 logger.debug( "formula" + str(formula))
+                print formule_
                 
                 
-                OTBApplications.bandmath_cli( [image_in], formula, output_filename )
+                OTBApplications.bandmath_cli( [image_in], formule_, output_filename )
                 #rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
                 #manage_QGIS.histogram_stretching( rlayer, iface.mapCanvas())
             return output_filename
