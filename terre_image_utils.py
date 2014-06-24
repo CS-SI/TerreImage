@@ -182,12 +182,13 @@ def computeStatistics( OneFeature, i, j=None, nodata=True ):
     
     
 def compute_overviews(filename):
-    command = "gdaladdo "
-    command += " -ro "
-    command += filename
-    command += " 2 4 8 16"
-    logger.debug( "command to run" + command)
-    os.system(command)
+    if not os.path.isfile(filename + "ovr"):
+        command = "gdaladdo "
+        command += " -ro "
+        command += filename
+        command += " 2 4 8 16"
+        logger.debug( "command to run" + command)
+        os.system(command)
     
     
         
