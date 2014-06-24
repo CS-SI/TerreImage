@@ -425,6 +425,16 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def layer_deleted(self, layer_id):
         logger.debug( str(layer_id) + " deleted")
         
+        if "Angle_Spectral" in str(layer_id):
+            #delete rubberband
+            for item in self.iface.mapCanvas().scene().items():
+                if isinstance(item, QgsRubberBand):
+                    item.reset(QGis.Point)
+            #hide legend
+            self.label_a_s.hide()
+            self.label_a_s_img.hide()
+        
+        
         if self.qgis_education_manager:
             logger.debug( "self.qgis_education_manager.layer.get_qgis_layer().id(): " +  str(self.qgis_education_manager.layer.get_qgis_layer().id()))
             if self.qgis_education_manager.layer.get_qgis_layer().id() == layer_id:
@@ -463,6 +473,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
             self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
         else :
+            self.iface.messageBar().popWidget()
             self.iface.messageBar().clearWidgets()
             self.iface.mainWindow().statusBar().clearMessage()
         
