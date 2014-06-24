@@ -113,11 +113,11 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         
 
         
-        if not OSIdentifier.isWindows():
-            QtGui.QMessageBox.critical( self, \
-                                        u"Erreur", \
-                                        u"Système d'exploitation non supporté" )
-            return
+#         if not OSIdentifier.isWindows():
+#             QtGui.QMessageBox.critical( self, \
+#                                         u"Erreur", \
+#                                         u"Système d'exploitation non supporté" )
+#             return
 
 
     def setupUi(self):

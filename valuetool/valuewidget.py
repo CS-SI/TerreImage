@@ -273,13 +273,11 @@ class ValueWidget(QWidget, Ui_Widget):
 
 
     def set_layers(self, list_of_layers_to_display):
-        print "list_of_layers_to_display", list_of_layers_to_display
         temp_list = []
         nrow = 0
         if list_of_layers_to_display:
             self.the_layer_to_display = list_of_layers_to_display[0]
             for layer in list_of_layers_to_display:
-                print "layer", layer
                 if layer is not None :
                     try:
                         layer_temp = layer.get_qgis_layer()
@@ -592,7 +590,6 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def showValues(self):
         if self.cbxGraph.isChecked():
-            print "self.saved_curves", self.saved_curves
             #TODO don't plot if there is no data to plot...
             if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
                 #print "show values self.values", self.values
@@ -862,13 +859,12 @@ class ValueWidget(QWidget, Ui_Widget):
                 self.sc_1.plot( t, numvalues, color_curve, 'o-' )
                 line += str(t) + ',' + str(numvalues) + ', \'' + color_curve + 'o-\''
                 if i+1 < len( self.saved_curves ):
-                    print "i, len self.savedcurves", i,  len( self.saved_curves )
                     line += ","
             i+=1
             
         line += ')'
                 
-        print "line", line
+        #print "line", line
         self.sc_1.plot_line(line)
                 
                 
@@ -909,8 +905,6 @@ class ValueWidget(QWidget, Ui_Widget):
         ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.y()), QgsRaster.IdentifyFormatValue )
         if ident is not None :
             attr = ident.results()
-            print "attr", attr
-            
             new_points = self.order_values_from_attr(attr)
         
         #ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.x()), QgsRaster.IdentifyFormatValue ).results()

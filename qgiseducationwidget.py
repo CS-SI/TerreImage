@@ -192,12 +192,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         logger.debug( "do processing args " + str(forms))
         who = QtCore.QObject.sender(self)
         
-        print "############################################"
-        print ProcessingManager().get_processings_name()
         if "Seuillage" in ProcessingManager().get_processings_name():
-            print "seuillage in processing manager"
             processings_seuillage=ProcessingManager().processing_from_name("Seuillage")
-            print "processings_seuillage", processings_seuillage
             if processings_seuillage:
                 processings_seuillage[0].mirror.close()
                 QgsMapLayerRegistry.instance().removeMapLayer( processings_seuillage[0].output_working_layer.qgis_layer.id())
@@ -210,7 +206,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
     def histogram_threshold(self, forms):
-        print "histogram threshold"
         logger.debug( "educationwidget forms: " +  str(forms))
         self.do_manage_processing("Seuillage", args=forms)
         

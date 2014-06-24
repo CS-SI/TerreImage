@@ -337,7 +337,7 @@ class QGISEducation:
         p = []
         for process in ProcessingManager().get_processings():
             p.append((process.processing_name, process.output_working_layer.get_source()))
-        print "process", p
+        #print "process", p
             
         QgsProject.instance().writeEntry( "QGISEducation", "/process", str(p) )
         QgsProject.instance().writeEntry( "QGISEducation", "/index_group", self.constants.index_group )
@@ -431,9 +431,9 @@ class QGISEducation:
                     
         angle_spectral_point_x, ok_x = QgsProject.instance().readDoubleEntry("QGISEducation", "/angle_spectral_point_x")      
         angle_spectral_point_y, ok_y = QgsProject.instance().readDoubleEntry("QGISEducation", "/angle_spectral_point_y")
-        print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
+        #print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
         if ok_x and ok_y:
-            print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
+            #print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
             p = ProcessingManager().processing_from_name("Angle Spectral")
             if p:
                 QgsRubberBand(self.iface.mapCanvas(), QGis.Point)

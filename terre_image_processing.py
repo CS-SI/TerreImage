@@ -171,8 +171,6 @@ def angles(layer, working_directory, iface, x, y):
                 logger.debug( "denom" + str(denom))
                 logger.debug( "fact" + str(fact))
                 logger.debug( "formula" + str(formula))
-                print formule_
-                
                 
                 OTBApplications.bandmath_cli( [image_in], formule_, output_filename )
                 #rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
