@@ -662,11 +662,10 @@ class ValueWidget(QWidget, Ui_Widget):
 
 
     def order_values(self, values):
-        print "order_values values", values
-        #ordre = ["blue", "green", "red", "pir", "mir"]
+        #values [(u'toulouse_2_5m_l93 green', '49.0', '2690.09944444', '7962.55055556'), (u'toulouse_2_5m_l93 red', '107.0', '2690.09944444', '7962.55055556'), (u'toulouse_2_5m_l93 pir', '100.0', '2690.09944444', '7962.55055556')]
+        
         ordre = ["bleu", "vert", "rouge", "pir", "mir"]
         new_values = []
-        #items [(u'toulouse_2_5m_l93 green', '49.0', '2690.09944444', '7962.55055556'), (u'toulouse_2_5m_l93 red', '107.0', '2690.09944444', '7962.55055556'), (u'toulouse_2_5m_l93 pir', '100.0', '2690.09944444', '7962.55055556')]
         # for each color
         for color in ordre:
             # check if one of the items is concerned
@@ -674,25 +673,21 @@ class ValueWidget(QWidget, Ui_Widget):
                 #if yes, add to the ordered list
                 if color in item[0]:
                     new_values.append(item)
-                    print "order_values new_values", new_values
                     values.remove(item)
         new_values = new_values + values 
-        print "order_values new_values", new_values
         return new_values
     
     def order_values_from_attr(self, values):
-        print "values", values
-        ordre = ["blue", "green", "red", "pir", "mir"]
-        new_values = []
         #attr {1: -14144.0, 2: -4984.0, 3: -13252.0, 4: 15707.0}
         #self.the_layer_to_display.bands:{'blue': 3, 'pir': 4, 'mir': -1, 'green': 2, 'red': 1}
+        
+        ordre = ["blue", "green", "red", "pir", "mir"]
+        new_values = []
         
         for color in ordre:
             # check if one of the items is concerned
             if self.the_layer_to_display.bands[color] in values.keys():
                 new_values.append( (self.the_layer_to_display.bands[color], values[self.the_layer_to_display.bands[color]]))
-                
-        print "new values order_values_from_attr", new_values
         return new_values
             
             
@@ -783,7 +778,6 @@ class ValueWidget(QWidget, Ui_Widget):
             self.sc_1.clear()
             
             t = range(1, len(numvalues)+1)
-            print "num values", numvalues
             self.sc_1.plot( t, numvalues, 'k', 'o-' )
             
             self.temp_values = numvalues
@@ -845,10 +839,14 @@ class ValueWidget(QWidget, Ui_Widget):
         if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
             t = range(1, len(self.temp_values)+1)
             line = 'self.axes.plot(' + str(t) + ',' + str(self.temp_values) + ', "ko-"'
+            if self.saved_curves:
+                line += ","
         else:
             line='self.axes.plot('
         
         i=0
+        
+        
         for curve in self.saved_curves:
             if curve.display_points():
                 logger.debug( curve )
@@ -862,12 +860,15 @@ class ValueWidget(QWidget, Ui_Widget):
                 
                 t = range(1, len(numvalues)+1)
                 self.sc_1.plot( t, numvalues, color_curve, 'o-' )
-                line += ',' + str(t) + ',' + str(numvalues) + ', \'' + color_curve + 'o-\''
+                line += str(t) + ',' + str(numvalues) + ', \'' + color_curve + 'o-\''
+                if i+1 < len( self.saved_curves ):
+                    print "i, len self.savedcurves", i,  len( self.saved_curves )
+                    line += ","
             i+=1
             
         line += ')'
                 
-        #print "line", line
+        print "line", line
         self.sc_1.plot_line(line)
                 
                 
