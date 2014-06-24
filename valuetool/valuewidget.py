@@ -105,14 +105,18 @@ class ValueWidgetGraph(FigureCanvas):
         self.axes.figure.canvas.draw()
         
     def plot_line(self, line):
-        try:
-            eval(line)
-        except SyntaxError:
-            print "Erreur display"
-        else:
-            xtext = self.axes.set_xlabel('Bande') # returns a Text instance
-            ytext = self.axes.set_ylabel('Valeur')
-            self.axes.figure.canvas.draw()
+#         try:
+#             eval(line)
+#         except SyntaxError:
+#             print "Erreur display"
+#         else:
+#             xtext = self.axes.set_xlabel('Bande') # returns a Text instance
+#             ytext = self.axes.set_ylabel('Valeur')
+#             self.axes.figure.canvas.draw()
+        eval(line)
+        xtext = self.axes.set_xlabel('Bande') # returns a Text instance
+        ytext = self.axes.set_ylabel('Valeur')
+        self.axes.figure.canvas.draw()
         
     #def plot_extra(self, xs, ys, colors, markers):
     #    if len(xs)   ==  len(ys)   ==  len(colors)   ==  len(markers) :
@@ -139,7 +143,6 @@ class ValueWidget(QWidget, Ui_Widget):
         self.layers_to_display = None
         self.the_layer_to_display = None
         self.saved_curves = []
-        self.memorize_curve = False
         
 
 
@@ -175,13 +178,6 @@ class ValueWidget(QWidget, Ui_Widget):
         self.graphControls.hide()
         self.graphControls.setVisible(False)
     
-
-
-        # checkboxes
-        #self.changeActive(Qt.Checked)
-        #set inactive by default - should save last state in user config
-        self.cbxActive.setCheckState(Qt.Unchecked)
-
         # plot
         self.plotSelector.setVisible( False )
         self.cbxStats.setVisible( False )
@@ -234,9 +230,6 @@ class ValueWidget(QWidget, Ui_Widget):
             self.sc_1 = ValueWidgetGraph(self, width=5, height=4, dpi=100)
             
             
-            
-            
-            
 #             self.mplBackground = None #http://www.scipy.org/Cookbook/Matplotlib/Animations
 #             
 #             
@@ -272,32 +265,11 @@ class ValueWidget(QWidget, Ui_Widget):
     
     
     def pauseDisplay(self,e):
-      print(e.text()) # Label pour afficher la touche presser
- 
-      if(e.key() == QtCore.Qt.Key_Escape): # si c'est echape on quitte
-          print "escape !"
-      if(e.key() == QtCore.Qt.Key_A):
-          print "A !"   
-          self.memorize_curve = True
-      if ( e.modifiers() == Qt.ShiftModifier or e.modifiers() == Qt.MetaModifier ) and e.key() == Qt.Key_A:
-
-        self.cbxActive.toggle()
-        return True
-      return False
+        pass
 
 
     def keyPressEvent( self, e ):
-      if ( e.modifiers() == Qt.ControlModifier or e.modifiers() == Qt.MetaModifier ) and e.key() == Qt.Key_C:
-        items = ''
-        for rec in range( self.tableWidget.rowCount() ):
-          items += '"' + self.tableWidget.item( rec, 0 ).text() + '",' + self.tableWidget.item( rec, 1 ).text() + "\n"
-        if not items == '':
-          clipboard = QApplication.clipboard()
-          clipboard.setText( items )
-      elif (self.pauseDisplay(e)):
         pass
-      else:
-        QWidget.keyPressEvent( self, e )
 
 
     def set_layers(self, list_of_layers_to_display):
@@ -343,8 +315,10 @@ class ValueWidget(QWidget, Ui_Widget):
             self.pushButton_get_point.hide()
             self.stackedWidget.setCurrentIndex(0)
 
+
     def changePlot(self):
         self.changePage(self.cbxActive.checkState())
+
 
     def changeActive(self,state):
         if (state==Qt.Checked):
@@ -625,6 +599,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 self.plot()
             else:
                 self.sc_1.clear()
+                self.sc_1.update_plot()
             if self.saved_curves :
                 self.extra_plot()
             self.sc_1.update_plot()
@@ -687,7 +662,9 @@ class ValueWidget(QWidget, Ui_Widget):
 
 
     def order_values(self, values):
-        ordre = ["blue", "green", "red", "pir", "mir"]
+        print "order_values values", values
+        #ordre = ["blue", "green", "red", "pir", "mir"]
+        ordre = ["bleu", "vert", "rouge", "pir", "mir"]
         new_values = []
         #items [(u'toulouse_2_5m_l93 green', '49.0', '2690.09944444', '7962.55055556'), (u'toulouse_2_5m_l93 red', '107.0', '2690.09944444', '7962.55055556'), (u'toulouse_2_5m_l93 pir', '100.0', '2690.09944444', '7962.55055556')]
         # for each color
@@ -697,11 +674,14 @@ class ValueWidget(QWidget, Ui_Widget):
                 #if yes, add to the ordered list
                 if color in item[0]:
                     new_values.append(item)
+                    print "order_values new_values", new_values
                     values.remove(item)
-        new_values = new_values +values 
+        new_values = new_values + values 
+        print "order_values new_values", new_values
         return new_values
     
     def order_values_from_attr(self, values):
+        print "values", values
         ordre = ["blue", "green", "red", "pir", "mir"]
         new_values = []
         #attr {1: -14144.0, 2: -4984.0, 3: -13252.0, 4: 15707.0}
@@ -711,6 +691,8 @@ class ValueWidget(QWidget, Ui_Widget):
             # check if one of the items is concerned
             if self.the_layer_to_display.bands[color] in values.keys():
                 new_values.append( (self.the_layer_to_display.bands[color], values[self.the_layer_to_display.bands[color]]))
+                
+        print "new values order_values_from_attr", new_values
         return new_values
             
             
@@ -768,15 +750,15 @@ class ValueWidget(QWidget, Ui_Widget):
         #print numvalues
         
         
-        if self.memorize_curve:
-            print "num values curve temp", numvalues
-            curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), pixel, ligne, numvalues)
-            QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
-            self.saved_curves.append(curve_temp)
-            self.memorize_curve = False
-            self.verticalLayout_curves.addWidget( curve_temp )
-            self.groupBox_saved_layers.show()
-            print curve_temp
+#         if self.memorize_curve:
+#             print "num values curve temp", numvalues
+#             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), pixel, ligne, numvalues)
+#             QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
+#             self.saved_curves.append(curve_temp)
+#             self.memorize_curve = False
+#             self.verticalLayout_curves.addWidget( curve_temp )
+#             self.groupBox_saved_layers.show()
+#             print curve_temp
                     
         ymin = self.ymin
         ymax = self.ymax
@@ -951,7 +933,6 @@ class ValueWidget(QWidget, Ui_Widget):
             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), x, y, points_for_curve)
             QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
             self.saved_curves.append(curve_temp)
-            self.memorize_curve = False
             self.verticalLayout_curves.addWidget( curve_temp )
             self.groupBox_saved_layers.show()
             
