@@ -378,7 +378,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                 if corres[key] == text_changed :
                     who = key
                     logger.debug( "do_manage_sprectral_band_display who: " + str(who))
-                    if corres_name_view[who] in get_processings_name() :
+                    if corres_name_view[who] in ProcessingManager().get_processings_name() :
                         do_it = False
                     #band_to_display = self.qgis_education_manager.layer.bands[key]
                     #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
