@@ -241,6 +241,7 @@ class TerreImageDisplay(TerreImageTask):
             self.iface.mapCanvas().refresh()
             logger.debug( ifaceLegend.isLayerVisible(result_layer) )
             
+            ProcessingManager().add_display( self )
             # thaw the canvas
             self.freezeCanvas( False )
             
