@@ -21,6 +21,9 @@
 // Statistics computation
 #include "otbStreamingStatisticsVectorImageFilter.h"
 
+// Statistics computation on label image
+#include "otbStreamingStatisticsMapFromLabelImageFilter.h"
+
 // ListSample
 #include "itkVariableLengthVector.h"
 #include "otbListSampleGenerator.h"
@@ -114,10 +117,7 @@ typedef MultiToMonoChannelExtractROI<FloatVectorImageType::InternalPixelType,
 typedef ObjectList<ExtractROIFilterType>                                      ExtractROIFilterListType;
 
 
-
-typedef otb::StreamingHistogramVectorImageFilter<UInt8VectorImageType> HistogramFilterType;
-typedef HistogramFilterType::HistogramType HistogramType;
-typedef HistogramFilterType::InternalFilterType::MeasurementVectorType HistoMeasurementVectorType;
+typedef otb::StreamingStatisticsMapFromLabelImageFilter<FloatVectorImageType, UInt8ImageType> StatisticsFilterType;
 
 class FullSVMClassificationChain: public Application
 {
@@ -314,52 +314,51 @@ private:
 
   void WriteStatistics(TiXmlElement * elem)
   {
-    typedef otb::ImageFileReader<UInt8VectorImageType> ClassifReaderType;
+    typedef otb::ImageFileReader<UInt8ImageType> LabelClassifReaderType;
+    typedef otb::ImageFileReader<FloatVectorImageType> ClassifReaderType;
+    
     ClassifReaderType::Pointer reader = ClassifReaderType::New();
     reader->SetFileName(GetParameterAsString("io.out"));
     reader->UpdateOutputInformation();
+    LabelClassifReaderType::Pointer labelReader = LabelClassifReaderType::New();
+    labelReader->SetFileName(GetParameterAsString("io.out"));
+    labelReader->UpdateOutputInformation();
+
     otbAppLogINFO("Reading classification output");
-
-    HistogramFilterType::Pointer histofilter = HistogramFilterType::New();
-    histofilter->SetInput(reader->GetOutput());
-
-    size_t nbClass = GetParameterVectorDataList("io.vd")->Size();
-
-    HistoMeasurementVectorType histoMin, histoMax;
-    histoMin.SetSize(1);
-    histoMin.Fill(0);
-    histoMax.SetSize(1);
-    histoMax.Fill(nbClass);
-
-    histofilter->GetFilter()->SetHistogramMin(histoMin);
-    histofilter->GetFilter()->SetHistogramMax(histoMax);
-    histofilter->GetFilter()->SetNumberOfBins(nbClass);
-    histofilter->Update();
-    otbAppLogINFO("Histogram computed");
-
-    HistogramFilterType::HistogramListType::Pointer histolist = histofilter->GetHistogramList();
-    HistogramType::Pointer histo = histolist->GetNthElement(0);
-
-    HistogramType::TotalFrequencyType total = histo->GetTotalFrequency();
-
+    
+    StatisticsFilterType::Pointer statistics = StatisticsFilterType::New();
+    statistics->SetInput(reader->GetOutput());
+    statistics->SetInputLabelImage(labelReader->GetOutput());
+    statistics->Update();
+    otbAppLogINFO("Statistics on label image computed");
+    
+    StatisticsFilterType::LabelPopulationMapType populationMap = statistics->GetLabelPopulationMap();
 
     TiXmlElement * stats = new TiXmlElement("Statistiques");
     elem->LinkEndChild(stats);
 
-    // Iterate through the input
-    for (unsigned int i = 0; i < nbClass; ++i)
-      {
-      // get percentage
-      double percent = histo->GetFrequency(i, 0) / total * 100;
+    //StatisticsFilterType::LabelPopulationMapType::const_iterator it;
+    
+    FloatVectorImageType::SizeType size = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
+    unsigned int total = size[0] * size[1];
+    
+    for (StatisticsFilterType::LabelPopulationMapType::const_iterator it = populationMap.begin(); it !=populationMap.end() ; ++it)
+    {
+        //std::cout << "label : " << it->first << " , ";
+         //         << "mean value : " << it->second << std::endl;
+        // get percentage
+      double percent =  (it->second / total) * 100;
       // round to nearest 0.1 %
       percent = static_cast<double>(itk::Math::Round( percent * 10 )) / 10;
-
+      
       // The current statistic
       TiXmlElement * classpercentage = new TiXmlElement("Class");
-      classpercentage->SetAttribute("label", i);
+      classpercentage->SetAttribute("label", it->first);
       classpercentage->SetDoubleAttribute("pourcentage", percent);
       stats->LinkEndChild( classpercentage );
-      }
+         
+    }
+   
   }
 
   void DoExecute()
