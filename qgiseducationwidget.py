@@ -266,7 +266,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
     def do_manage_processing(self, text_changed, args=None):
-        print "text_changed", text_changed
+        #print "text_changed", text_changed
         if text_changed  == "Angle Spectral":
             for item in self.iface.mapCanvas().scene().items():
                 if isinstance(item, QgsRubberBand):
@@ -277,9 +277,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     processings_spectral_angle[0].mirror.close()
                 self.qgis_education_manager.has_spectral_angle = False
         if text_changed  == "Seuillage":
-            print "text changed == seuillage"
             if "Seuillage" in ProcessingManager().get_processings_name():
-                print "seuillage in processing manager"
                 processings_seuillage=ProcessingManager().processing_from_name("Seuillage")
                 if processings_seuillage:
                     processings_seuillage[0].mirror.close()
@@ -353,7 +351,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def set_combobox_histograms(self):
         if self.qgis_education_manager:
             if self.qgis_education_manager.layer:
-                process = ["Histogrammes", "Image de travail"] + ProcessingManager().get_processings_name()
+                process = ["Histogrammes", "Image de travail"] + [x for x in ProcessingManager().get_processings_name() if x not in ["KMEANS", "Seuillage"]]
                 logger.debug( "process: " + str(process)) 
                 
                 self.comboBox_histogrammes.clear()
