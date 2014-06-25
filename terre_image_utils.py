@@ -182,7 +182,7 @@ def computeStatistics( OneFeature, i, j=None, nodata=True ):
     
     
 def compute_overviews(filename):
-    if not os.path.isfile(filename + "ovr"):
+    if not os.path.isfile(filename + ".ovr"):
         command = "gdaladdo "
         command += " -ro "
         command += filename
