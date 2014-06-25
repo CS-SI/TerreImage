@@ -177,6 +177,17 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.main_layer = main_layer
         self.main_layer_bands = main_layer_bands
         self.layers = [self.main_layer] + layers
+        
+        
+    def update_layers(self, layers):
+        print "update layers"
+        self.layers = layers
+        for layer in self.layers:
+            print layer.name()
+        vectorlayers = QGisLayers.getVectorLayers(QGisLayerType.POLYGON)
+        self.vectorlayerselector.set_layers(vectorlayers)
+        rasterlayers = layers
+        self.rasterlayerselector.set_layers(rasterlayers)
 
 
     def cancelPressed(self):

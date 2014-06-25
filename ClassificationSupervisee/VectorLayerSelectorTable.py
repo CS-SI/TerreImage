@@ -87,4 +87,10 @@ class VectorLayerSelectorTable(QtGui.QWidget):
             if widget.isChecked():
                 selectedLayers.append( (self.layers[i], widget.getColor(), widget.getLabel()) )
         return selectedLayers
+    
+    
+    def set_layers(self, layers):
+        self.table.clear()
+        self.layers = layers
+        self.setTableContent()
         

@@ -308,3 +308,9 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             layer = QgsRasterLayer( vrt_name, os.path.basename(filename) + "_b" + str(band_number) )
             
             return layer #stringToReturn
+        
+        
+    def set_layers(self, layers):
+        self.table.clear()
+        self.layers = layers
+        self.setTableContent()
