@@ -57,8 +57,8 @@ class TerreImageManager():
         self.value_tool = ValueWidget( self.iface ) #, self )
         #creating a dock widget
         # create the dockwidget with the correct parent and add the valuewidget
-        self.valuedockwidget = QtGui.QDockWidget("Values", self.iface.mainWindow() )
-        self.valuedockwidget.setObjectName("Values")
+        self.valuedockwidget = QtGui.QDockWidget("Valeurs spectrales", self.iface.mainWindow() )
+        self.valuedockwidget.setObjectName("Valeurs spectrales")
         self.valuedockwidget.setWidget(self.value_tool)
         self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
         self.valuedockwidget.hide()
