@@ -55,13 +55,14 @@ class ProcessingManager(object):
         """
         self.working_layer = None
         self.processings = []
+        self.displays = []
         
     def get_processings_name(self):
-        return [x.processing_name for x in self.processings]
+        return [x.processing_name for x in self.processings] + [x.processing_name for x in self.displays]
     
     
     def get_layers(self):
-        return [self.working_layer] + [x.output_working_layer for x in self.processings]
+        return [self.working_layer] + [x.output_working_layer for x in self.processings] + [x.output_working_layer for x in self.displays]
             
     def get_working_layers(self):
         return [self.working_layer] + [x.output_working_layer for x in self.processings] # if isinstance(x, TerreImageProcessing)]
@@ -76,6 +77,14 @@ class ProcessingManager(object):
     
     def add_processing(self, processing):
         self.processings.append(processing)
+        
+        
+    def get_displays(self):
+        return self.displays
+    
+    
+    def add_display(self, processing):
+        self.displays.append(processing)
     
     
     def remove_processing(self, process):
@@ -84,6 +93,19 @@ class ProcessingManager(object):
             process.end()
             
     def remove_process_from_layer_id(self, layer_id):
+        process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
+        logger.debug( "process" + str( process))
+        if process :
+            process[0].mirror.close()
+            self.remove_processing(process[0])
+            
+    
+    def remove_display(self, process):
+        if process in self.processings :
+            self.processings.remove(process)
+            process.end()
+            
+    def remove_displays_from_layer_id(self, layer_id):
         process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
         logger.debug( "process" + str( process))
         if process :
@@ -101,6 +123,7 @@ class ProcessingManager(object):
         
     def has_seuillage(self):
         return "Seuillage" in [x.processing_name for x in self.processings]
+        
         
     def processing_from_name(self, name):
         return [x for x in self.processings if x.processing_name == name]
