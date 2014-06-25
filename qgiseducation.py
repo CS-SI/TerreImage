@@ -357,8 +357,9 @@ class QGISEducation:
                     #get point
                     if item.size() > 0:
                         point = item.getPoint(0)
-                        QgsProject.instance().writeEntry( "QGISEducation", "/angle_spectral_point_x", point.x() )
-                        QgsProject.instance().writeEntry( "QGISEducation", "/angle_spectral_point_y", point.y() )
+                        print point
+                        QgsProject.instance().writeEntryDouble( "QGISEducation", "/angle_spectral_point_x", point.x() )
+                        QgsProject.instance().writeEntryDouble( "QGISEducation", "/angle_spectral_point_y", point.y() )
                 
 
     def onProjectLoaded(self):
@@ -410,22 +411,26 @@ class QGISEducation:
         
         
         for qgis_layer in self.iface.legendInterface().layers():
-            if qgis_layer.name() in [ "NDVI", "NDTI", "Indice de brillance", "Kmeans", "Angle Spectral" ]:
-                process = TerreImageProcessing( self.iface, working_dir, self.qgis_education_manager.layer,  self.qgis_education_manager.mirror_map_tool, qgis_layer.name() )
+            print "layer loading ", qgis_layer.name()
+            if qgis_layer.name() in [ "NDVI", "NDTI", "Indice de brillance", "Kmeans" ]:
+                process = TerreImageProcessing( self.iface, working_dir, self.qgis_education_manager.layer,  self.qgis_education_manager.mirror_map_tool, qgis_layer.name(), None, qgis_layer )
                 #print "process", process
-                process.output_working_layer = qgis_layer.source()
-                
-                process.output_working_layer = WorkingLayer( qgis_layer.source(), qgis_layer )
-                # 2 ouvrir une nouvelle vue
-                process.mirror = process.mirrormap_tool.runDockableMirror(qgis_layer.name())
-                logger.debug( process.mirror )
-                process.mirror.mainWidget.addLayer( qgis_layer.id() )
-                process.mirror.mainWidget.onExtentsChanged()
-                
-                
-                self.qgis_education_manager.add_processing(process)
+#                 process.output_working_layer = qgis_layer.source()
+#                 
+#                 process.output_working_layer = WorkingLayer( qgis_layer.source(), qgis_layer )
+#                 # 2 ouvrir une nouvelle vue
+#                 process.mirror = process.mirrormap_tool.runDockableMirror(qgis_layer.name())
+#                 logger.debug( process.mirror )
+#                 process.mirror.mainWidget.addLayer( qgis_layer.id() )
+#                 process.mirror.mainWidget.onExtentsChanged()
+                #ProcessingManager().add_processing(process)
+            elif "Angle Spectral" in qgis_layer.name() :
+                process = TerreImageProcessing( self.iface, working_dir, self.qgis_education_manager.layer,  self.qgis_education_manager.mirror_map_tool, qgis_layer.name(), qgis_layer.source(), qgis_layer )
+                #ProcessingManager().add_processing(process)
             elif "couleur_naturelles" in  qgis_layer.name():
                 self.do_display_one_band('nat')
+                #ProcessingManager().add_display( process )
+                
             else:
                 corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir", "nat":"_couleurs_naturelles" }
                 result = [x for x in corres if qgis_layer.name().endswith(corres[x])]
@@ -433,6 +438,7 @@ class QGISEducation:
                 if result:
                     #print "the couleur", result[0]
                     self.do_display_one_band(result[0])
+                #ProcessingManager().add_display( process )
                     
                     
                     
@@ -443,10 +449,10 @@ class QGISEducation:
             #print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
             p = ProcessingManager().processing_from_name("Angle Spectral")
             if p:
-                QgsRubberBand(self.iface.mapCanvas(), QGis.Point)
+                rubberband = p[0].rubberband
                 rubberband.setWidth(10)
                 rubberband.setColor(QColor(Qt.yellow))
                 rubberband.addPoint(QgsPoint(float(angle_spectral_point_x),float(angle_spectral_point_y)))
               
-                    
+        self.educationWidget.set_combobox_histograms()          
 
