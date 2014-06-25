@@ -59,21 +59,21 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
         self.lettersToQColor = {"bleu": QColor(0, 132, 255), "vert": QColor(148, 255, 69),\
         "rouge": QColor(255, 30, 0), "cyan": QColor(0, 255, 204),\
         "magenta": QColor(255, 0, 255), "jaune": QColor(255, 255, 0),\
-        "noir": QColor(0, 0, 0), "blanc": QColor(255, 255, 255)}
+        "noir": QColor(0, 0, 0)}
         
         self.frenchToLetter = {"bleu": 'b', "vert": 'g',\
         "rouge": 'r', "cyan": 'c',\
         "magenta": 'm', "jaune": 'y',\
-        "noir": 'k', "blanc": 'w'}
+        "noir": 'k'}
         
         
         self.lettersToNameColor = {"b": "blue", "g": "green", "r": "red",\
-        "c": "cyan", "m": "magenta", "y": "yellow", "k": "black", "w": "white"}
+        "c": "cyan", "m": "magenta", "y": "yellow", "k": "black"}
         
         self.nameColorsToLetters = dict((v,k) for k, v in self.lettersToNameColor.iteritems())
         
         if color is None:
-            colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
+            colors=['b', 'r', 'g', 'c', 'm', 'y', 'k']
             logger.debug( "len(colors): " + str(len(colors)))
             color = colors[ random.randint(0, len(colors)-1) ] 
             logger.debug( 'color from creation courbe: ' + str(color))

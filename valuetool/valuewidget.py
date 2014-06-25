@@ -97,7 +97,7 @@ class ValueWidgetGraph(FigureCanvas):
         options = '"' + color + marker +'"'
         #print options
         self.axes.plot(x, y, color + marker)
-        xtext = self.axes.set_xlabel('Bande') # returns a Text instance
+        xtext = self.axes.set_xlabel('Bandes') # returns a Text instance
         ytext = self.axes.set_ylabel('Valeur')
         self.axes.figure.canvas.draw()
         
@@ -114,7 +114,7 @@ class ValueWidgetGraph(FigureCanvas):
 #             ytext = self.axes.set_ylabel('Valeur')
 #             self.axes.figure.canvas.draw()
         eval(line)
-        xtext = self.axes.set_xlabel('Bande') # returns a Text instance
+        xtext = self.axes.set_xlabel('Bandes') # returns a Text instance
         ytext = self.axes.set_ylabel('Valeur')
         self.axes.figure.canvas.draw()
         
@@ -304,6 +304,7 @@ class ValueWidget(QWidget, Ui_Widget):
             else:
                 self.stackedWidget.setCurrentIndex(1)
         else:
+            self.groupBox_saved_layers.setVisible( False )
             self.plotSelector.setVisible( False )
             if QGis.QGIS_VERSION_INT < 10900:
               self.cbxStats.setVisible( False )
