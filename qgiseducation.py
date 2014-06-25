@@ -29,6 +29,7 @@ from qgis.gui import QgsMessageBar, QgsRubberBand
 import resources_rc
 # Import the code for the dialog
 from qgiseducationwidget import QGISEducationWidget
+from qgiseducationwidget import Terre_Image_Dock_widget
 import os.path
 
 from manage_bands import manage_bands
@@ -296,9 +297,10 @@ class QGISEducation:
                     self.educationWidget.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
                     
                     # create the dockwidget with the correct parent and add the valuewidget
-                    self.qgisedudockwidget = QDockWidget("Terre Image", self.iface.mainWindow() )
+                    self.qgisedudockwidget = Terre_Image_Dock_widget("Terre Image", self.iface.mainWindow() )
                     self.qgisedudockwidget.setObjectName("Terre Image")
                     self.qgisedudockwidget.setWidget(self.educationWidget)
+                    QObject.connect( self.qgisedudockwidget, SIGNAL( "closed(PyQt_PyObject)" ), self.close_dock )
                     
                     # add the dockwidget to iface
                     self.iface.addDockWidget(Qt.RightDockWidgetArea, self.qgisedudockwidget)
@@ -309,7 +311,12 @@ class QGISEducation:
                 self.qgisedudockwidget.show()
                 self.educationWidget.set_comboBox_sprectral_band_display()
                 self.dockOpened = True        
-            
+    
+    
+    
+    def close_dock(self, object):
+        self.iface.newProject( True )
+    
             
     def newProject(self):
         for item in self.iface.mapCanvas().scene().items():
