@@ -70,6 +70,14 @@ class manage_bands:
         self.bandsUi.radioButton_spot.toggled.connect(self.define_spot)
         self.bandsUi.radioButton_autre.toggled.connect(self.define_other)
         
+        QObject.connect( self.bandsUi.spinBox_blue, SIGNAL( "valueChanged(int)" ), self.update_blue)
+        QObject.connect( self.bandsUi.spinBox_red, SIGNAL( "valueChanged(int)" ), self.update_red)
+        QObject.connect( self.bandsUi.spinBox_green, SIGNAL( "valueChanged(int)" ), self.update_green)
+        QObject.connect( self.bandsUi.spinBox_pir, SIGNAL( "valueChanged(int)" ), self.update_pir)
+        QObject.connect( self.bandsUi.spinBox_mir, SIGNAL( "valueChanged(int)" ), self.update_mir)
+        #QObject.connect( spinBox_mir, SIGNAL( "valueChanged(int)" ), lambda x:self.mir = x)
+        
+        
         if nb_bands:
             self.nb_bands = nb_bands
             self.custom_from_nb_of_bands(nb_bands)
@@ -109,6 +117,26 @@ class manage_bands:
                 
         #execute the dialog
         Dialog.exec_()
+    
+    
+    def update_red(self, value):
+        self.red = value
+      
+    def update_green(self, value):
+        self.green = value
+     
+         
+    def update_blue(self, value):
+        self.blue = value
+         
+         
+    def update_pir(self, value):
+        self.red = value
+         
+         
+    def update_mir(self, value):
+        self.red = value       
+    
     
     
     def custom_from_nb_of_bands(self, number_of_bands):
@@ -272,6 +300,14 @@ class manage_bands:
      
          
     def get_values(self):
+#         self.red = self.bandsUi.spinBox_red.value()
+#         self.green = self.bandsUi.spinBox_green.value()
+#         self.blue = self.bandsUi.spinBox_blue.value()
+#         self.pir = self.bandsUi.spinBox_pir.value()
+#         self.mir = self.bandsUi.spinBox_mir.value()
+        
+        
+        
         return self.red, self.green, self.blue, self.pir, self.mir
         
         
