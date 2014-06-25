@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_qgiseducation.ui'
 #
-# Created: Mon Jun 23 11:09:38 2014
+# Created: Wed Jun 25 18:01:55 2014
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -73,17 +73,17 @@ class Ui_QGISEducation(object):
         self.pushButton_status = QtGui.QPushButton(QGISEducation)
         self.pushButton_status.setObjectName(_fromUtf8("pushButton_status"))
         self.verticalLayout.addWidget(self.pushButton_status)
-        self.horizontalLayout_3 = QtGui.QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
+        self.verticalLayout_2 = QtGui.QVBoxLayout()
+        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.label_a_s = QtGui.QLabel(QGISEducation)
         self.label_a_s.setObjectName(_fromUtf8("label_a_s"))
-        self.horizontalLayout_3.addWidget(self.label_a_s)
+        self.verticalLayout_2.addWidget(self.label_a_s)
         self.label_a_s_img = QtGui.QLabel(QGISEducation)
         self.label_a_s_img.setMaximumSize(QtCore.QSize(400, 16777215))
         self.label_a_s_img.setText(_fromUtf8(""))
         self.label_a_s_img.setObjectName(_fromUtf8("label_a_s_img"))
-        self.horizontalLayout_3.addWidget(self.label_a_s_img)
-        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.verticalLayout_2.addWidget(self.label_a_s_img)
+        self.verticalLayout.addLayout(self.verticalLayout_2)
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
 

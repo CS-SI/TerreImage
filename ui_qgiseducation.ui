@@ -114,7 +114,7 @@ Plan B &lt;- BS_V</string>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QLabel" name="label_a_s">
        <property name="text">
