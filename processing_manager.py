@@ -65,11 +65,11 @@ class ProcessingManager(object):
         return [self.working_layer] + [x.output_working_layer for x in self.processings] + [x.output_working_layer for x in self.displays]
             
     def get_working_layers(self):
-        return [self.working_layer] + [x.output_working_layer for x in self.processings] # if isinstance(x, TerreImageProcessing)]
+        return [self.working_layer] + [x.output_working_layer for x in self.processings if not x.processing_name == 'KMEANS'] # if isinstance(x, TerreImageProcessing)]
     
     def get_qgis_working_layers(self):
         #return [self.working_layer.get_qgis_layer()] + 
-        return [x.output_working_layer.get_qgis_layer() for x in self.processings] # if isinstance(x, TerreImageProcessing)]
+        return [self.working_layer.get_qgis_layer()] + [x.output_working_layer.get_qgis_layer() for x in self.processings if not x.processing_name == 'KMEANS'] # if isinstance(x, TerreImageProcessing)]
     
     def get_processings(self):
         return self.processings
