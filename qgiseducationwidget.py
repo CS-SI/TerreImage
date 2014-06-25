@@ -130,12 +130,13 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         print( self.qgis_education_manager )
         print( "self.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors) )
         print ProcessingManager()
+        print ProcessingManager().get_processings_name()
         
         
     def plugin_classification(self):
-        self.qgis_education_manager.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), self.qgis_education_manager.layer.get_qgis_layer(), self.qgis_education_manager.layer.band_invert)
-        self.qgis_education_manager.classif_tool.setupUi()
         self.qgis_education_manager.classif_tool.show()
+        self.qgis_education_manager.classif_tool.update_layers( ProcessingManager().get_qgis_working_layers() )
+        
         
         
         

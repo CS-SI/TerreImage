@@ -74,6 +74,7 @@ class TerreImageManager():
         
         
         
+        
     def add_processing(self, processing):
         self.processings.append(processing)
         if isinstance(processing, TerreImageProcessing):
@@ -104,6 +105,13 @@ class TerreImageManager():
                 
         #self.layers_for_value_tool.append(self.layer ) #.get_qgis_layer())
         logger.debug( "working directory" )
+        
+        
+        
+        self.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), self.layer.get_qgis_layer(), self.layer.band_invert)
+        self.classif_tool.setupUi()
+        
+        
         return self.layer, bands
         
         
