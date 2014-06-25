@@ -281,11 +281,12 @@ class ValueWidget(QWidget, Ui_Widget):
                 if layer is not None :
                     try:
                         layer_temp = layer.get_qgis_layer()
-                        temp_list.append(layer_temp)
-                        nrow += layer_temp.bandCount()
                     except:
                         temp_list.append(layer)
                         nrow += layer.bandCount()
+                    else:
+                        temp_list.append(layer_temp)
+                        nrow += layer_temp.bandCount()
             self.layers_to_display = temp_list
             self.tableWidget.setRowCount(nrow)
             
