@@ -56,7 +56,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_qgiseducationwidget' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 class Terre_Image_Dock_widget(QtGui.QDockWidget):
@@ -269,19 +269,20 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def do_manage_processing(self, text_changed, args=None):
         #print "text_changed", text_changed
         if text_changed  == "Angle Spectral":
+            print "text changed angle spectral"
             for item in self.iface.mapCanvas().scene().items():
                 if isinstance(item, QgsRubberBand):
                     item.reset(QGis.Point)
-            if self.qgis_education_manager.has_spectral_angle:
-                processings_spectral_angle=ProcessingManager().processing_from_name("Angle Spectral")
-                if processings_spectral_angle:
-                    processings_spectral_angle[0].mirror.close()
-                self.qgis_education_manager.has_spectral_angle = False
+            processings_spectral_angle=ProcessingManager().processing_from_name("Angle Spectral")
+            if processings_spectral_angle:
+                processings_spectral_angle[0].mirror.close()
+                ProcessingManager().remove_processing(processings_spectral_angle) 
         if text_changed  == "Seuillage":
             if "Seuillage" in ProcessingManager().get_processings_name():
                 processings_seuillage=ProcessingManager().processing_from_name("Seuillage")
                 if processings_seuillage:
                     processings_seuillage[0].mirror.close()
+                    ProcessingManager().remove_processing(processings_seuillage) 
         do_it = True
         logger.debug( "do processing args: " + str(args))
         if text_changed:
@@ -417,7 +418,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
 
     def layer_deleted(self, layer_id):
-        logger.debug( str(layer_id) + " deleted")
+        #logger.debug( str(layer_id) + " deleted")
         
         if "Angle_Spectral" in str(layer_id):
             #delete rubberband
@@ -435,6 +436,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                 self.disconnect_interface()
             else:
                 self.qgis_education_manager.removing_layer(layer_id)
+                
+        ProcessingManager().remove_process_from_layer_id(layer_id)   
         self.set_combobox_histograms()
 
     def disconnect_interface(self):
