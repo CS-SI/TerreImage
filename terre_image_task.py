@@ -78,7 +78,7 @@ class TerreImageTask(object):
 class TerreImageProcessing(TerreImageTask, QObject):
     __pyqtSignals__ = ("display_ok()")
     
-    def __init__(self, iface, working_dir, layer, mirror_map_tool, processing, arg=None):
+    def __init__(self, iface, working_dir, layer, mirror_map_tool, processing, arg=None, rlayer=None):
         """
         processing_type : [processing/display]
         """
@@ -88,8 +88,12 @@ class TerreImageProcessing(TerreImageTask, QObject):
         self.processing_name = processing
         self.mirror = None
         
+        self.r_layer = rlayer
+        
         self.arg=None
+        print "arg", arg
         if arg:
+            print processing, "gave ", arg
             self.arg = arg
         
         self.run()
@@ -118,12 +122,15 @@ class TerreImageProcessing(TerreImageTask, QObject):
             self.rubberband = QgsRubberBand(self.canvas, QGis.Point)
             self.rubberband.setWidth(10)
             self.rubberband.setColor(QColor(Qt.yellow))
-            from spectral_angle import SpectralAngle
-            self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer, self.mirrormap_tool, self.rubberband)
-            logger.debug( "self.angle_tool" + str(self.angle_tool))
-            QObject.connect( self.angle_tool, SIGNAL( "anglesComputed(PyQt_PyObject)" ), self.display )
-            self.angle_tool.get_point_for_angles(self.layer)
-            #spectral_angles(self.layer, self.working_directory, self.iface)
+            if not self.arg:
+                from spectral_angle import SpectralAngle
+                self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer, self.mirrormap_tool, self.rubberband)
+                logger.debug( "self.angle_tool" + str(self.angle_tool))
+                QObject.connect( self.angle_tool, SIGNAL( "anglesComputed(PyQt_PyObject)" ), self.display )
+                self.angle_tool.get_point_for_angles(self.layer)
+                #spectral_angles(self.layer, self.working_directory, self.iface)
+            else:
+                output_filename = self.arg
         if "KMEANS" in self.processing_name:
             if self.arg:
                 output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.iface, self.arg)
@@ -156,12 +163,17 @@ class TerreImageProcessing(TerreImageTask, QObject):
     
     
     def display(self, output_filename):
+        print "display"
 #         if "Angle Spectral" in self.processing_name:
 #             print self.rubberband
 #             print self.rubberband.getPoint(0)
         self.freezeCanvas( True )
         #result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
-        result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, self.processing_name, self.iface )
+        if self.r_layer:
+            result_layer = self.r_layer
+        else:
+            result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, self.processing_name, self.iface )
+            self.r_layer = result_layer
         manage_QGIS.histogram_stretching( result_layer, self.iface.mapCanvas())
         
         logger.debug( "defining self.output_working_layer" )
