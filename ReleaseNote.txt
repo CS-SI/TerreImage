@@ -2,3 +2,7 @@ Version 2.3.4
 - Export KMZ sur les bons fichiers
 - Gestion des bandes spectrales affichées
 - Mise à jour de la liste des histogrammes disponibles
+
+Version 2.3.5
+- Correction de la régression de la version précédente
+- Gestion des chargements des projets
