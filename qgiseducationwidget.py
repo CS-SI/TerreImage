@@ -127,9 +127,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
     def status(self):
-        print( self.qgis_education_manager )
-        print( "self.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors) )
+        #print( self.qgis_education_manager )
+        print( "self.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors) ) + "\n"
         print ProcessingManager()
+        print "\n"
         print ProcessingManager().get_processings_name()
         
         
@@ -419,6 +420,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
     def layer_deleted(self, layer_id):
         #logger.debug( str(layer_id) + " deleted")
+        #print str(layer_id) + " deleted"
         
         if "Angle_Spectral" in str(layer_id):
             #delete rubberband
@@ -437,7 +439,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             else:
                 self.qgis_education_manager.removing_layer(layer_id)
                 
-        ProcessingManager().remove_process_from_layer_id(layer_id)   
+        ProcessingManager().remove_process_from_layer_id(layer_id)
+        ProcessingManager().remove_displays_from_layer_id(layer_id)
         self.set_combobox_histograms()
 
     def disconnect_interface(self):

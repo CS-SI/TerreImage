@@ -101,16 +101,19 @@ class ProcessingManager(object):
             
     
     def remove_display(self, process):
-        if process in self.processings :
-            self.processings.remove(process)
+        if process in self.displays :
+            self.displays.remove(process)
             process.end()
             
     def remove_displays_from_layer_id(self, layer_id):
-        process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
+        for p in self.displays:
+            print p.output_working_layer.qgis_layer.id()
+        process = [ p for p in self.displays if p.output_working_layer.qgis_layer.id() == layer_id ]
         logger.debug( "process" + str( process))
         if process :
+            print "process trouvé"
             process[0].mirror.close()
-            self.remove_processing(process[0])
+            self.remove_display(process[0])
                                 
     
     def remove_all(self):
@@ -143,6 +146,8 @@ class ProcessingManager(object):
     def __str__(self):
         sortie = "processings : ["
         for pro in self.processings:
+            sortie += str(pro) + "\n"
+        for pro in self.displays:
             sortie += str(pro) + "\n"
         sortie += "]"
         sortie += "layers" + str( self.get_layers() )
