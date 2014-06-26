@@ -67,6 +67,9 @@ class ProcessingManager(object):
     def get_working_layers(self):
         return [self.working_layer] + [x.output_working_layer for x in self.processings if not x.processing_name == 'KMEANS'] # if isinstance(x, TerreImageProcessing)]
     
+    def get_layers_for_kmz(self):
+        return [self.working_layer.get_source()] + [x.output_working_layer.get_source() for x in self.processings]
+    
     def get_qgis_working_layers(self):
         #return [self.working_layer.get_qgis_layer()] + 
         return [self.working_layer.get_qgis_layer()] + [x.output_working_layer.get_qgis_layer() for x in self.processings if not x.processing_name == 'KMEANS'] # if isinstance(x, TerreImageProcessing)]

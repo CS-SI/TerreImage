@@ -409,8 +409,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
     def export_kmz(self):
         self.set_working_message(True)
-        files_to_export = [process.output_working_layer.get_source() for process in ProcessingManager().get_processings()]
-        logger.debug( "files to export" + str(files_to_export))
+#         files_to_export = [process.output_working_layer.get_source() for process in ProcessingManager().get_processings()]
+#         logger.debug( "files to export" + str(files_to_export))
+        files_to_export = ProcessingManager().get_layers_for_kmz()
         kmz = terre_image_processing.export_kmz( files_to_export, self.qgis_education_manager.working_directory )
         self.set_working_message(False)
     
