@@ -35,6 +35,9 @@ logging.basicConfig()
 logger = logging.getLogger( 'TerreImage_manage_bands' )
 logger.setLevel(logging.DEBUG)
 
+import sys
+sys.path.append("/home/amondot/.eclipse/org.eclipse.platform_3.7.0_155965261/plugins/org.python.pydev_2.8.2.2013090511/pysrc/")
+from pydevd import *
 
 
 class manage_bands:
@@ -77,6 +80,7 @@ class manage_bands:
         QObject.connect( self.bandsUi.spinBox_mir, SIGNAL( "valueChanged(int)" ), self.update_mir)
         #QObject.connect( spinBox_mir, SIGNAL( "valueChanged(int)" ), lambda x:self.mir = x)
         
+        #settrace()
         
         if nb_bands:
             self.nb_bands = nb_bands
@@ -120,22 +124,30 @@ class manage_bands:
     
     
     def update_red(self, value):
-        self.red = value
-      
+        if self.bandsUi.radioButton_autre.isChecked() == True:
+            print "update red"
+            print "value", value
+            self.red = value
+            print self.red
+       
+       
     def update_green(self, value):
-        self.green = value
-     
-         
+        if self.bandsUi.radioButton_autre.isChecked() == True:
+            self.green = value
+      
+          
     def update_blue(self, value):
-        self.blue = value
-         
-         
+        if self.bandsUi.radioButton_autre.isChecked() == True:
+            self.blue = value
+          
+          
     def update_pir(self, value):
-        self.red = value
-         
-         
+        if self.bandsUi.radioButton_autre.isChecked() == True:
+            self.red = value
+          
     def update_mir(self, value):
-        self.red = value       
+        if self.bandsUi.radioButton_autre.isChecked() == True:
+            self.mir = value       
     
     
     
@@ -242,6 +254,7 @@ class manage_bands:
              
          
     def update_spin_box(self):
+        print self.red
         self.bandsUi.spinBox_red.setValue(self.red)
         if self.red == -1:
             self.bandsUi.spinBox_red.setEnabled(False)
@@ -287,6 +300,7 @@ class manage_bands:
          
     
     def define_spot(self):
+        print "define spot"
         #spot 4-5
         self.blue = -1
         self.green = 3
@@ -307,7 +321,7 @@ class manage_bands:
 #         self.mir = self.bandsUi.spinBox_mir.value()
         
         
-        
+        print self.red
         return self.red, self.green, self.blue, self.pir, self.mir
         
         
