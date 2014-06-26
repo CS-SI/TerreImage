@@ -35,9 +35,6 @@ logging.basicConfig()
 logger = logging.getLogger( 'TerreImage_manage_bands' )
 logger.setLevel(logging.DEBUG)
 
-import sys
-sys.path.append("/home/amondot/.eclipse/org.eclipse.platform_3.7.0_155965261/plugins/org.python.pydev_2.8.2.2013090511/pysrc/")
-from pydevd import *
 
 
 class manage_bands:
