@@ -1,0 +1,4 @@
+Version 2.3.4
+- Export KMZ sur les bons fichiers
+- Gestion des bandes spectrales affichées
+- Mise à jour de la liste des histogrammes disponibles
