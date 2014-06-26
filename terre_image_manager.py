@@ -142,13 +142,16 @@ class TerreImageManager():
         
         
     def view_closed(self, name_of_the_closed_view):
+        print str(name_of_the_closed_view) + " has been closed"
         logger.debug( str(name_of_the_closed_view) + " has been closed")
-        try:
-            process = self.name_to_processing[name_of_the_closed_view]
-            QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
-            self.remove_process(process)
-        except KeyError:
-            pass
+        process = ProcessingManager().processing_from_name(name_of_the_closed_view)
+        print process
+        if process :
+            try:
+                QgsMapLayerRegistry.instance().removeMapLayer( process[0].output_working_layer.qgis_layer.id())
+                self.remove_process(process[0])
+            except KeyError:
+                pass
                 
         
         
