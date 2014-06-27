@@ -6,3 +6,8 @@ Version 2.3.4
 Version 2.3.5
 - Correction de la régression de la version précédente
 - Gestion des chargements des projets
+
+Version 2.3.6
+- Correction de l'erreur à l'installation
+- Correction de l'affichage du grope de travail Terre Image dans QGIS lorsque aucune layer n'est chargée
+- Centralisation et réorganisation des répertoires de travail
