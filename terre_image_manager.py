@@ -70,7 +70,7 @@ class TerreImageManager():
         
         #self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
         
-        self.classif_tool = SupervisedClassificationDialog(self.iface, self.working_directory)
+        self.classif_tool = SupervisedClassificationDialog(self.iface)
         
         
         
@@ -104,6 +104,7 @@ class TerreImageManager():
                 os.makedirs( self.working_directory )
             ProcessingManager().working_layer = self.layer
             self.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), self.layer.get_qgis_layer(), self.layer.band_invert)
+            self.classif_tool.set_directory(self.working_directory)
             self.classif_tool.setupUi()
         #self.layers_for_value_tool.append(self.layer ) #.get_qgis_layer())
         logger.debug( "working directory" )

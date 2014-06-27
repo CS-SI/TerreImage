@@ -103,18 +103,13 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         QtGui.QDialog.__init__(self)
         QtGui.QApplication.restoreOverrideCursor()
         
-        if working_dir is not None:
-            self.output_dir = os.path.join( working_dir, "Classification" )
-            ensure_dir_exists( self.output_dir )
-        else:
-            self.output_dir = get_working_dir()
-        
+       
         self.app_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)), "win32", "bin")
         logger.debug( "self.app_dir" + str(self.app_dir) )
         
         #self.setupUi()
         QGisLayers.setInterface(iface)
-        
+        self.output_dir = None
 
         
 #         if not OSIdentifier.isWindows():
@@ -181,7 +176,16 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.main_layer = main_layer
         self.main_layer_bands = main_layer_bands
         self.layers = [self.main_layer] + layers
-        
+    
+    def set_directory(self, working_dir):
+        print "working dir", working_dir
+        if working_dir is not None:
+            self.output_dir = os.path.join( working_dir, "Classification" )
+            ensure_dir_exists( self.output_dir )
+        else:
+            self.output_dir = get_working_dir()
+        print self.output_dir
+    
         
     def update_layers(self, layers):
         print "update layers"
