@@ -110,7 +110,7 @@ add_custom_command(TARGET qgis_BundlePlugin PRE_BUILD
                           -DBUNDLE:FILEPATH=${BUNDLEDIR}/win32/bin/otbApplicationLauncherCommandLine.exe
                           -DPLUGIN:FILEPATH=${BUNDLEDIR}/win32/plugin/otbapp_FullSVMClassificationChain.dll
                           -P ${CMAKE_CURRENT_SOURCE_DIR}/BundleFixing.cmake
-                   COMMAND ${ZIP_EXECUTABLE} -9r ${CMAKE_CURRENT_BINARY_DIR}/TerreImage-${TerreImage_VERSION_FULL}.zip ${PLUGIN_NAME})
+                   COMMAND ${ZIP_EXECUTABLE} -9r ${CMAKE_CURRENT_BINARY_DIR}/TerreImage.${TerreImage_VERSION_FULL}.zip ${PLUGIN_NAME})
 
 add_dependencies(qgis_BundlePlugin otbapp_FullSVMClassificationChain otbCropVectorDataToImage)
 
