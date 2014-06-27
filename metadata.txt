@@ -12,7 +12,7 @@
 name=TerreImage
 qgisMinimumVersion=2.0
 description=TerreImage
-version=2.3.5
+version=2.3.6
 author=CS SI
 email=alexia.mondot@c-s.fr
 
