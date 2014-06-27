@@ -76,10 +76,14 @@ class QGISEducation:
         self.action.setWhatsThis("Terre Image")
         # connect the action to the run method
         self.action.triggered.connect(self.run)
+        
+        self.aboutAction = QAction(QIcon(":/plugins/DockableMirrorMap/icons/about.png"), "About", self.iface.mainWindow())
+        QObject.connect(self.aboutAction, SIGNAL("triggered()"), self.about)
 
         # Add toolbar button and menu item
         self.iface.addToolBarIcon(self.action)
         self.iface.addPluginToMenu(u"&TerreImage", self.action)
+        self.iface.addPluginToMenu("TerreImage", self.aboutAction)
         #self.extra_menu()
         
         self.qgisedudockwidget = None
@@ -312,6 +316,9 @@ class QGISEducation:
                 self.educationWidget.set_comboBox_sprectral_band_display()
                 self.dockOpened = True        
     
+    def about(self):
+        from terre_image_about import DlgAbout
+        DlgAbout(self.iface.mainWindow()).exec_()
     
     
     def close_dock(self, object):

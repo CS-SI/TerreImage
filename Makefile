@@ -25,7 +25,7 @@ QGISDIR=.qgis2
 # Makefile for a PyQGIS plugin
 
 # translation
-SOURCES = qgiseducation.py ui_qgiseducation.py ui_bands.py __init__.py qgiseducationdialog.py
+SOURCES = qgiseducation.py ui_qgiseducation.py ui_bands.py ui_dlg.py __init__.py qgiseducationdialog.py
 #TRANSLATIONS = i18n/qgiseducation_en.ts
 TRANSLATIONS =
 
@@ -37,7 +37,7 @@ PY_FILES = qgiseducation.py qgiseducationdialog.py __init__.py
 
 EXTRAS = icon.png metadata.txt
 
-UI_FILES = ui_qgiseducation.py ui_bands.py
+UI_FILES = ui_qgiseducation.py ui_bands.py ui_dlg.py
 
 RESOURCE_FILES = resources_rc.py
 
