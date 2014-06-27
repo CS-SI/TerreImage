@@ -93,7 +93,7 @@ add_custom_command(TARGET qgis_BundlePlugin PRE_BUILD
 file(GLOB PyFiles  ${CMAKE_SOURCE_DIR}/*.py
                    ${CMAKE_SOURCE_DIR}/*.ui
                    ${CMAKE_SOURCE_DIR}/*.qrc
-                   ${CMAKE_SOURCE_DIR}/*.png
+                   ${CMAKE_SOURCE_DIR}/img/*.png
                    ${CMAKE_SOURCE_DIR}/metadata.txt
                    ${CMAKE_SOURCE_DIR}/ReleaseNote.txt)
                    
