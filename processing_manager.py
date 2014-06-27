@@ -109,12 +109,12 @@ class ProcessingManager(object):
             process.end()
             
     def remove_displays_from_layer_id(self, layer_id):
-        for p in self.displays:
-            print p.output_working_layer.qgis_layer.id()
+        #for p in self.displays:
+        #    print p.output_working_layer.qgis_layer.id()
         process = [ p for p in self.displays if p.output_working_layer.qgis_layer.id() == layer_id ]
         logger.debug( "process" + str( process))
         if process :
-            print "process trouvé"
+            #print "process trouvé"
             process[0].mirror.close()
             self.remove_display(process[0])
                                 

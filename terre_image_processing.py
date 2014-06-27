@@ -270,7 +270,6 @@ def export_kmz( filenames, working_directory ):
         
     for kmz in kmzs:
         new_path = os.path.join( working_directory, os.path.basename(kmz) )
-        print new_path
         shutil.copy(kmz, new_path)
         
         

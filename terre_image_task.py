@@ -91,9 +91,9 @@ class TerreImageProcessing(TerreImageTask, QObject):
         self.r_layer = rlayer
         
         self.arg=None
-        print "arg", arg
+        #print "arg", arg
         if arg:
-            print processing, "gave ", arg
+            #print processing, "gave ", arg
             self.arg = arg
         
         self.run()
@@ -163,7 +163,6 @@ class TerreImageProcessing(TerreImageTask, QObject):
     
     
     def display(self, output_filename):
-        print "display"
 #         if "Angle Spectral" in self.processing_name:
 #             print self.rubberband
 #             print self.rubberband.getPoint(0)

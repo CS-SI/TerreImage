@@ -147,10 +147,8 @@ def get_workinglayer_on_opening(iface):
                 
                 logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
                 
-                print "1"
                 cst = TerreImageConstant()
                 cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
-                print "2", TerreImageConstant().index_group
                 
                 
                 manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)

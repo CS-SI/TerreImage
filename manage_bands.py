@@ -122,10 +122,10 @@ class manage_bands:
     
     def update_red(self, value):
         if self.bandsUi.radioButton_autre.isChecked() == True:
-            print "update red"
-            print "value", value
+            #print "update red"
+           # print "value", value
             self.red = value
-            print self.red
+            #print self.red
        
        
     def update_green(self, value):
@@ -251,7 +251,7 @@ class manage_bands:
              
          
     def update_spin_box(self):
-        print self.red
+        #print self.red
         self.bandsUi.spinBox_red.setValue(self.red)
         if self.red == -1:
             self.bandsUi.spinBox_red.setEnabled(False)
@@ -297,7 +297,7 @@ class manage_bands:
          
     
     def define_spot(self):
-        print "define spot"
+        #print "define spot"
         #spot 4-5
         self.blue = -1
         self.green = 3
@@ -318,7 +318,7 @@ class manage_bands:
 #         self.mir = self.bandsUi.spinBox_mir.value()
         
         
-        print self.red
+        #print self.red
         return self.red, self.green, self.blue, self.pir, self.mir
         
         

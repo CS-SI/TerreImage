@@ -178,20 +178,17 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.layers = [self.main_layer] + layers
     
     def set_directory(self, working_dir):
-        print "working dir", working_dir
         if working_dir is not None:
             self.output_dir = os.path.join( working_dir, "Classification" )
             ensure_dir_exists( self.output_dir )
         else:
             self.output_dir = get_working_dir()
-        print self.output_dir
     
         
     def update_layers(self, layers):
-        print "update layers"
         self.layers = layers
-        for layer in self.layers:
-            print layer.name()
+        #for layer in self.layers:
+        #    print layer.name()
         vectorlayers = QGisLayers.getVectorLayers(QGisLayerType.POLYGON)
         self.vectorlayerselector.set_layers(vectorlayers)
         rasterlayers = layers

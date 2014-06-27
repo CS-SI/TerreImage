@@ -270,7 +270,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def do_manage_processing(self, text_changed, args=None):
         #print "text_changed", text_changed
         if text_changed  == "Angle Spectral":
-            print "text changed angle spectral"
+            #print "text changed angle spectral"
             for item in self.iface.mapCanvas().scene().items():
                 if isinstance(item, QgsRubberBand):
                     item.reset(QGis.Point)
