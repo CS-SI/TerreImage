@@ -24,6 +24,7 @@ import os
 import OTBApplications
 import manage_QGIS
 import re
+import shutil
 
 from qgis.core import QGis, QgsPoint, QgsRaster
 
@@ -251,7 +252,18 @@ def get_sensor_id( image ):
     
     
 def export_kmz( filenames, working_directory ):
+    internal_working_directory = os.path.join(working_directory, "Internal")
+    
+    
     kmzs = []
     for image in filenames:
-        kmz_tmp = OTBApplications.otbcli_export_kmz(image, working_directory)      
+        kmz_tmp = OTBApplications.otbcli_export_kmz(image, internal_working_directory)  
         kmzs.append(kmz_tmp)
+        
+        
+    for kmz in kmzs:
+        new_path = os.path.join( working_directory, os.path.basename(kmz) )
+        print new_path
+        shutil.copy(kmz, new_path)
+        
+        

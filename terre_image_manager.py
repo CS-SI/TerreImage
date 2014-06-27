@@ -99,6 +99,7 @@ class TerreImageManager():
         self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
         if self.layer:
             self.working_directory = os.path.join(os.path.dirname(self.layer.source_file), "working_directory")
+            terre_image_utils.update_subdirectories(self.working_directory)
             if not os.path.exists( self.working_directory ):
                 os.makedirs( self.working_directory )
             ProcessingManager().working_layer = self.layer
@@ -128,6 +129,7 @@ class TerreImageManager():
     
     def restore_processing_manager(self, filename, bands, type, working_dir):
         self.layer, bands  = terre_image_utils.restore_working_layer( filename, bands, type )
+        ProcessingManager().working_layer = self.layer
         #self.layers_for_value_tool.append(self.layer )
         self.working_directory = working_dir
         return self.layer, bands
