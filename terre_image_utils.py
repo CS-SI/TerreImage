@@ -29,6 +29,7 @@ from working_layer import WorkingLayer
 from manage_bands import manage_bands
 import manage_QGIS
 import terre_image_processing
+from terre_image_constant import TerreImageConstant
 
 from PyQt4.QtGui import QFileDialog
 from PyQt4.QtCore import QDir, QSettings
@@ -145,6 +146,13 @@ def get_workinglayer_on_opening(iface):
                 layer.set_bands(bands)
                 
                 logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+                
+                print "1"
+                cst = TerreImageConstant()
+                cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
+                print "2", TerreImageConstant().index_group
+                
+                
                 manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
                 compute_overviews(fileOpened)
                 return layer, bands

@@ -269,9 +269,7 @@ class QGISEducation:
         self.set_working_message(True)
         
         self.iface.newProject( True )
-        
-        self.constants.index_group = self.iface.legendInterface().addGroup( "Terre Image", True, None )
-        logger.debug( self.constants.index_group )
+
         
         self.qgis_education_manager = TerreImageManager(self.iface)
         
@@ -395,7 +393,7 @@ class QGISEducation:
         process, ok = QgsProject.instance().readEntry("QGISEducation", "/process")
         logger.debug( eval(process))
         
-        index_group, ok = QgsProject.instance().readEntry("QGISEducation", "/index_group")
+        index_group, ok = QgsProject.instance().readEntryDouble("QGISEducation", "/index_group")
         self.constants.index_group = int(float(index_group))
         
         process = eval(process)
