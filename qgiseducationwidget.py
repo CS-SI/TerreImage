@@ -121,7 +121,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         self.label_a_s.hide()
         self.label_a_s_img.hide()
-        self.label_a_s_img.setPixmap(QtGui.QPixmap(":/plugins/qgiseducation/legende.png"))
+        self.label_a_s_img.setPixmap(QtGui.QPixmap(":/plugins/qgiseducation/img/legende.png"))
         
         
         

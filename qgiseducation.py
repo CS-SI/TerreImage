@@ -71,7 +71,7 @@ class QGISEducation:
         """
         # Create action that will start plugin configuration
         self.action = QAction(
-            QIcon(":/plugins/qgiseducation/icon.png"),
+            QIcon(":/plugins/qgiseducation/img/icon.png"),
             u"Terre Image", self.iface.mainWindow())
         self.action.setWhatsThis("Terre Image")
         # connect the action to the run method
