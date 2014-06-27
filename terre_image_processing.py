@@ -184,6 +184,11 @@ def kmeans( layer, working_directory, iface, nb_class=None ):
     """
     WARNING: nb_valid_pixels à calculer ?
     """
+    internal_working_directory = os.path.join(working_directory, "Internal")
+    if not os.path.exists( internal_working_directory ):
+        os.makedirs( internal_working_directory )
+    
+    
     logger.debug( "enntree dans le kmeans" )
     bands = []
     if nb_class == None:
@@ -191,8 +196,8 @@ def kmeans( layer, working_directory, iface, nb_class=None ):
         if ok:
             nb_class = testqt
     #mask = OTBApplications.bandmath([layer.get_source()], "if(im1b1>0,1,0)", working_directory, "mask")
-    output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, working_directory)
-    image_ref = recompose_image(layer, working_directory)
+    output = OTBApplications.kmeans_cli(layer.get_source(), nb_class, internal_working_directory)
+    image_ref = recompose_image(layer, internal_working_directory)
     #if not os.path.isfile(output_colored):
     output_colored = OTBApplications.color_mapping_cli_ref_image( output, image_ref, working_directory)
     return output_colored
@@ -253,6 +258,8 @@ def get_sensor_id( image ):
     
 def export_kmz( filenames, working_directory ):
     internal_working_directory = os.path.join(working_directory, "Internal")
+    if not os.path.exists( internal_working_directory ):
+        os.makedirs( internal_working_directory )
     
     
     kmzs = []

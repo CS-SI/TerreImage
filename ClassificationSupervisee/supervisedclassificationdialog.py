@@ -99,11 +99,15 @@ class GenericThread(QtCore.QThread):
 '''
 
 class SupervisedClassificationDialog(QtGui.QDialog):
-    def __init__(self, iface):
+    def __init__(self, iface, working_dir=None):
         QtGui.QDialog.__init__(self)
         QtGui.QApplication.restoreOverrideCursor()
         
-        self.output_dir = get_working_dir()
+        if working_dir is not None:
+            self.output_dir = os.path.join( working_dir, "Classification" )
+            ensure_dir_exists( self.output_dir )
+        else:
+            self.output_dir = get_working_dir()
         
         self.app_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)), "win32", "bin")
         logger.debug( "self.app_dir" + str(self.app_dir) )
