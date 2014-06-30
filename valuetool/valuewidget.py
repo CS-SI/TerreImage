@@ -18,10 +18,8 @@
  ***************************************************************************/
  This script initializes the plugin, making it known to QGIS.
 """
+#from __future__ import unicode_literals
 
-import logging
-# change the level back to logging.WARNING(the default) before releasing
-logging.basicConfig(level=logging.DEBUG)
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import *
@@ -67,6 +65,8 @@ logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'ValueTool_valueWidget' )
 logger.setLevel(logging.DEBUG)
+
+
 
 
 class ValueWidgetGraph(FigureCanvas):
@@ -942,8 +942,8 @@ class ValueWidget(QWidget, Ui_Widget):
         if csv :
             for curve in self.saved_curves:
                 #print "save curve", curve
-                csv_file.write( str(curve.name) + ";Coordonnées pixel " + curve.coordinates + "\n" )
-                csv_file.write( "Bande spectrale; Intensité \n" )
+                csv_file.write( str(curve.name) + u';Coordonnées pixel '.encode('utf8') + curve.coordinates + "\n" )
+                csv_file.write( u'Bande spectrale; Intensité \n'.encode('utf8') )
                 for i in range(1,len(curve.points)+1):
                     csv_file.write( str(i) + ";" + str(int(curve.points[i-1])) + "\n" )
                     
