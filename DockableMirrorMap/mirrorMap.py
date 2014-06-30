@@ -6,6 +6,7 @@ Name                 : Dockable MirrorMap
 Description          : Creates a dockable map canvas
 Date                 : February 1, 2011 
 copyright            : (C) 2011 by Giuseppe Sucameli (Faunalia)
+                     : (C) 2014 by CNES
 email                : brush.tyler@gmail.com
 
  ***************************************************************************/
