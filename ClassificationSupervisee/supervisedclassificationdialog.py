@@ -135,16 +135,16 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.layerlayout.addWidget(self.rasterlayerselector)
         self.layerlayout.addWidget(self.vectorlayerselector)
         
-        self.outputlayout = QtGui.QHBoxLayout()
-        
-        self.outputdirwidget = QtGui.QLineEdit()
-        self.outputdirselectorbutton = QtGui.QPushButton("...")
-        #self.setOutputDir( tempfile.mkdtemp(prefix='ClassificationSupervisee_', dir=None) )
-        self.setOutputDir( self.output_dir )
-
-        self.outputlayout.addWidget( QtGui.QLabel(u"Répertoire de sortie") )
-        self.outputlayout.addWidget( self.outputdirwidget )
-        self.outputlayout.addWidget( self.outputdirselectorbutton )
+#         self.outputlayout = QtGui.QHBoxLayout()
+#         
+#         self.outputdirwidget = QtGui.QLineEdit()
+#         self.outputdirselectorbutton = QtGui.QPushButton("...")
+#         #self.setOutputDir( tempfile.mkdtemp(prefix='ClassificationSupervisee_', dir=None) )
+#         self.setOutputDir( self.output_dir )
+# 
+#         self.outputlayout.addWidget( QtGui.QLabel(u"Répertoire de sortie") )
+#         self.outputlayout.addWidget( self.outputdirwidget )
+#         self.outputlayout.addWidget( self.outputdirselectorbutton )
         
         self.buttonBox = QtGui.QDialogButtonBox()
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -161,7 +161,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.bottomLayout.addWidget(self.buttonBox)
         
         self.mainlayout.addLayout(self.layerlayout)
-        self.mainlayout.addLayout(self.outputlayout)
+        #self.mainlayout.addLayout(self.outputlayout)
         self.mainlayout.addLayout(self.bottomLayout)
         self.setLayout(self.mainlayout)
         
@@ -170,7 +170,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancelPressed)
         
-        QtCore.QObject.connect(self.outputdirselectorbutton, QtCore.SIGNAL("clicked()"), self.selectOutputDir)
+        #QtCore.QObject.connect(self.outputdirselectorbutton, QtCore.SIGNAL("clicked()"), self.selectOutputDir)
 
     def set_layers(self, layers, main_layer=None, main_layer_bands = None):
         self.main_layer = main_layer
