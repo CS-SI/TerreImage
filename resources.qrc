@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/plugins/qgiseducation">
-        <file>img/icon.png</file>
         <file>img/legende.png</file>
         <file>img/splash.jpg</file>
+        <file>img/icon.png</file>
     </qresource>
 </RCC>
