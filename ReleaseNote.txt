@@ -1,13 +1,20 @@
-Version 2.3.4
-- Export KMZ sur les bons fichiers
-- Gestion des bandes spectrales affichées
-- Mise à jour de la liste des histogrammes disponibles
-
-Version 2.3.5
-- Correction de la régression de la version précédente
-- Gestion des chargements des projets
+Version 2.3.7
+- Changement du logo du plugin
+- Ajout des indications bandes spectrales Fausses couleurs/Couleurs naturelles
+- Suppression de la personnalisation du répertoire de classification
+- Correction de la gestion des accents dans l'export CSV
 
 Version 2.3.6
 - Correction de l'erreur à l'installation
 - Correction de l'affichage du grope de travail Terre Image dans QGIS lorsque aucune layer n'est chargée
 - Centralisation et réorganisation des répertoires de travail
+
+Version 2.3.5
+- Correction de la régression de la version précédente
+- Gestion des chargements des projets
+
+Version 2.3.4
+- Export KMZ sur les bons fichiers
+- Gestion des bandes spectrales affichées
+- Mise à jour de la liste des histogrammes disponibles
+
