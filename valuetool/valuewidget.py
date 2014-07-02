@@ -939,6 +939,8 @@ class ValueWidget(QWidget, Ui_Widget):
      
     def export_csv(self):
         csv = QFileDialog.getSaveFileName( None, str( "Fichier CSV") )
+        if not csv.endswith( ".csv"):
+            csv += ".csv"
         csv_file = open( csv, "w")
         if csv :
             for curve in self.saved_curves:
