@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_qgiseducation.ui'
 #
-# Created: Wed Jun 25 18:01:55 2014
+# Created: Wed Jul  2 10:49:00 2014
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,7 +17,7 @@ except AttributeError:
 class Ui_QGISEducation(object):
     def setupUi(self, QGISEducation):
         QGISEducation.setObjectName(_fromUtf8("QGISEducation"))
-        QGISEducation.resize(323, 504)
+        QGISEducation.resize(323, 561)
         self.verticalLayout = QtGui.QVBoxLayout(QGISEducation)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.label = QtGui.QLabel(QGISEducation)
@@ -92,9 +92,10 @@ class Ui_QGISEducation(object):
 
     def retranslateUi(self, QGISEducation):
         QGISEducation.setWindowTitle(QtGui.QApplication.translate("QGISEducation", "QGISEducation", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("QGISEducation", "Plan R <- BS_PIR \n"
-"Plan V <- BS_R \n"
-"Plan B <- BS_V", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("QGISEducation", "Fausses couleurs:            Couleurs naturelles:\n"
+"Plan R <- BS_PIR              Plan R <- BS_R \n"
+"Plan V <- BS_R                  Plan V <- BS_V \n"
+"Plan B <- BS_V                  Plan B <- BS_B", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_histogramme.setText(QtGui.QApplication.translate("QGISEducation", "Histogramme", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_profil_spectral.setText(QtGui.QApplication.translate("QGISEducation", "Profil spectral", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_5.setTitle(QtGui.QApplication.translate("QGISEducation", "Classification", None, QtGui.QApplication.UnicodeUTF8))
