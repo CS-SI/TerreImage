@@ -78,7 +78,7 @@ def concatenateImages_cli( listImagesIn, outputname, options=None ):
     if listImagesIn and outputname :
         command = os.path.join(prefix, "otbcli ")
         command += " ConcatenateImages "
-        command += " -il " + " ".join(listImagesIn)
+        command += " -il " + " ".join(["\"" + f + "\"" for f in listImagesIn])
         command += " -out " + "\"" + outputname + "\""
         if options:
             command += " uint16 " 
