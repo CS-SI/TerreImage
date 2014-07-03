@@ -4,6 +4,7 @@ Version 2.3.7
 - Suppression de la personnalisation du répertoire de classification
 - Correction de la gestion des accents dans l'export CSV
 - Correction de l'ouverture d'un projet
+- Correction du comportement de la fenêtre de selection des bandes
 
 Version 2.3.6
 - Correction de l'erreur à l'installation
