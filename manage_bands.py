@@ -76,6 +76,7 @@ class manage_bands:
         QObject.connect( self.bandsUi.spinBox_pir, SIGNAL( "valueChanged(int)" ), self.update_pir)
         QObject.connect( self.bandsUi.spinBox_mir, SIGNAL( "valueChanged(int)" ), self.update_mir)
         #QObject.connect( spinBox_mir, SIGNAL( "valueChanged(int)" ), lambda x:self.mir = x)
+        QObject.connect( self.bandsUi.buttonBox, SIGNAL( "rejected()" ), self.cancel)
         
         #settrace()
         
@@ -118,6 +119,14 @@ class manage_bands:
                 
         #execute the dialog
         Dialog.exec_()
+    
+    def cancel(self):
+        self.blue = None
+        self.green = None 
+        self.red = None
+        self.pir = None
+        self.mir = None
+        return None
     
     
     def update_red(self, value):

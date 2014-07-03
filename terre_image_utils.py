@@ -31,7 +31,7 @@ import manage_QGIS
 import terre_image_processing
 from terre_image_constant import TerreImageConstant
 
-from PyQt4.QtGui import QFileDialog
+from PyQt4.QtGui import QFileDialog, QMessageBox
 from PyQt4.QtCore import QDir, QSettings
 
 from osgeo import gdal
@@ -125,6 +125,9 @@ def get_workinglayer_on_opening(iface):
     settings.sync()
     
     if fileOpened:
+        if fileOpened.find(" ") != -1:
+            QMessageBox.warning( None , "Attention", u'L\'image que vous essayez d\'ouvrir contient un ou plusieurs espaces. Les traitements sur cette image provoqueront une erreur.'.encode('utf8'), QMessageBox.Ok )
+        
         if fileOpened.endswith( ".qgs" ):
             #open new qgis project
             pass
@@ -142,18 +145,22 @@ def get_workinglayer_on_opening(iface):
                 #self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
                 red, green, blue, pir, mir = manage_bands(type_image, layer.get_band_number()).get_values()
                 
-                bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
-                layer.set_bands(bands)
+                if red and green and blue and pir and mir:
                 
-                logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
-                
-                cst = TerreImageConstant()
-                cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
-                
-                
-                manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
-                compute_overviews(fileOpened)
-                return layer, bands
+                    bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
+                    layer.set_bands(bands)
+                    
+                    logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+                    
+                    cst = TerreImageConstant()
+                    cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
+                    
+                    
+                    manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
+                    compute_overviews(fileOpened)
+                    return layer, bands
+                else:
+                    return None, None
     else:
         return None, None
     
