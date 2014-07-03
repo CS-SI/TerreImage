@@ -393,7 +393,7 @@ class QGISEducation:
         process, ok = QgsProject.instance().readEntry("QGISEducation", "/process")
         logger.debug( eval(process))
         
-        index_group, ok = QgsProject.instance().readEntryDouble("QGISEducation", "/index_group")
+        index_group, ok = QgsProject.instance().readDoubleEntry("QGISEducation", "/index_group")
         self.constants.index_group = int(float(index_group))
         
         process = eval(process)
