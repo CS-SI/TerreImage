@@ -306,12 +306,12 @@ class QGISEducation:
                     
                     # add the dockwidget to iface
                     self.iface.addDockWidget(Qt.RightDockWidgetArea, self.qgisedudockwidget)
+                    self.educationWidget.set_comboBox_sprectral_band_display()
     
                 text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
                 #self.extra_menu_visu(bands)
                 
                 self.qgisedudockwidget.show()
-                self.educationWidget.set_comboBox_sprectral_band_display()
                 self.dockOpened = True        
     
     def about(self):
