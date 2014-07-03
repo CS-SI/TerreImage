@@ -54,7 +54,7 @@ def ndvi(layer, working_directory, iface):
             if not os.path.isfile(output_filename) : 
                 layer_pir = "im1b" + str(layer.pir)
                 layer_red = "im1b" + str(layer.red)
-                expression = "\"if((" + layer_pir + "+" + layer_red + ")!=0,(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "), 0)\""
+                expression = "\"if((" + layer_pir + "+" + layer_red + ")!=0,(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "), -1)\""
                 logger.debug( expression )
                 logger.debug( "image_in" + str(image_in))
                 OTBApplications.bandmath_cli( [image_in], expression, output_filename )
