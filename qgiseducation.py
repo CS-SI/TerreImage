@@ -214,10 +214,13 @@ class QGISEducation:
     def do_export_kmz(self):
         pass
     
-    def do_display_one_band(self, who):
+    def do_display_one_band(self, who, qgis_layer=None):
         logger.debug( "who" + str(who))
         #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
-        my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who )
+        if qgis_layer:
+            my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who, None, qgis_layer )
+        else:
+            my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who )
         self.qgis_education_manager.add_processing(my_process)
         self.educationWidget.set_combobox_histograms()
         
@@ -434,7 +437,7 @@ class QGISEducation:
                 process = TerreImageProcessing( self.iface, working_dir, self.qgis_education_manager.layer,  self.qgis_education_manager.mirror_map_tool, qgis_layer.name(), qgis_layer.source(), qgis_layer )
                 #ProcessingManager().add_processing(process)
             elif "couleur_naturelles" in  qgis_layer.name():
-                self.do_display_one_band('nat')
+                self.do_display_one_band('nat', qgis_layer)
                 #ProcessingManager().add_display( process )
                 
             else:
@@ -443,7 +446,7 @@ class QGISEducation:
                 #print result
                 if result:
                     #print "the couleur", result[0]
-                    self.do_display_one_band(result[0])
+                    self.do_display_one_band(result[0], qgis_layer)
                 #ProcessingManager().add_display( process )
                     
                     

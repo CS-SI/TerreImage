@@ -55,7 +55,7 @@ class TerreImageTask(object):
         self.mirrormap_tool = mirror_map_tool
         self.histogram = None
         self.output_working_layer = None
-        
+        self.mirror = None
         
         
     def get_mirror_map(self):
@@ -72,7 +72,9 @@ class TerreImageTask(object):
                 self.iface.mapCanvas().refresh()
                 
     def end(self):
-        pass
+        if self.mirror:
+            if self.mirror in self.mirrormap_tool.dockableMirrors:
+                self.mirrormap_tool.dockableMirrors.remove( self.mirror )
         
         
 class TerreImageProcessing(TerreImageTask, QObject):
@@ -209,7 +211,7 @@ class TerreImageProcessing(TerreImageTask, QObject):
         
 class TerreImageDisplay(TerreImageTask):
     
-    def __init__(self, iface, working_dir, layer, mirror_map_tool, who, arg=None):
+    def __init__(self, iface, working_dir, layer, mirror_map_tool, who, arg=None, rlayer=None):
         """
         processing_type : [processing/display]
         """
@@ -224,6 +226,8 @@ class TerreImageDisplay(TerreImageTask):
         self.arg=None
         if arg:
             self.arg = arg
+            
+        self.r_layer = rlayer
         
         self.run()
         
@@ -232,7 +236,10 @@ class TerreImageDisplay(TerreImageTask):
     def run(self):
         self.freezeCanvas( True )
         logger.debug( "self.who" + str( self.who ))
-        result_layer = manage_QGIS.display_one_band(self.layer, self.who, self.iface)
+        if not self.r_layer:
+            result_layer = manage_QGIS.display_one_band(self.layer, self.who, self.iface)
+        else:
+            result_layer = self.r_layer
         if result_layer:
             self.output_working_layer = WorkingLayer( self.layer.source_file, result_layer)
             self.mirror = self.mirrormap_tool.runDockableMirror(self.processing_name)
