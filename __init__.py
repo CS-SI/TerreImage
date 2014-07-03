@@ -28,13 +28,13 @@ def description():
     return ""
 
 def version():
-    return "2.3.6"
+    return "2.3.7"
 
 def qgisMinimumVersion():
     return "2.0"
 
 def icon():
-    return "icon.png"
+    return "img/icon.png"
 
 def authorName():
     return "CS SI (alexia.mondot@c-s.fr)"
