@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dlg.ui'
 #
-# Created: Fri Jun 27 12:33:28 2014
+# Created: Thu Jul  3 11:10:34 2014
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -60,10 +60,10 @@ class Ui_DlgAbout(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Sans\'; font-size:10pt;\">La version actuelle de $PLUGIN_NAME$ est : $PLUGIN_VERSION$.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Sans\'; font-size:10pt;\">Ce travail est disponible sous les licences </span><a href=\"http://www.gnu.org/copyleft/gpl.html\"><span style=\" text-decoration: underline; color:#0000ff;\">GPL</span></a><span style=\" font-family:\'Sans\'; font-size:10pt;\"> et </span><a href=\"http://www.cecill.info/licences/Licence_CeCILL_V2-fr.html\"><span style=\" text-decoration: underline; color:#0000ff;\">CeCILL</span></a><span style=\" font-family:\'Sans\'; font-size:10pt;\">. </span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Sans\'; font-size:10pt;\">Ce travail est disponible sous les licences </span><a href=\"http://www.gnu.org/copyleft/gpl.html\"><span style=\" text-decoration: underline; color:#0000ff;\">GPL</span></a><span style=\" font-family:\'Sans\'; font-size:10pt;\"> et </span><a href=\"http://www.cecill.info/licences/Licence_CeCILL_V2-fr.html\"><span style=\" text-decoration: underline; color:#0000ff;\">CeCILL v2</span></a><span style=\" font-family:\'Sans\'; font-size:10pt;\">. </span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Sans\'; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Sans\'; font-size:10pt;\">$PLUGIN_NAME$ s\'appuie sur les plugins suivants:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Sans\'; font-size:10pt;\">  - DockableMirrorMap (</span><a href=\"http://github.com/faunalia/dockablemirrormap\"><span style=\" text-decoration: underline; color:#0000ff;\">Dépôt du plugin</span></a>) <img src=\":/plugins/DockableMirrorMap/icons/dockablemirrormap.png\" /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">   - ValueTool (<a href=\"http://hub.qgis.org/projects/valuetool\"><span style=\" text-decoration: underline; color:#0000ff;\">Page d\'accueil</span></a>)</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Sans\'; font-size:10pt;\">$PLUGIN_NAME$ s\'appuie sur la librairie </span><a href=\"http://orfeo-toolbox.org/otb/\"><span style=\" text-decoration: underline; color:#0000ff;\">Orfeo Toolbox</span></a><span style=\" font-family:\'Sans\'; font-size:10pt;\"> et sur les plugins suivants:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Sans\'; font-size:10pt;\">- </span><a href=\"https://github.com/faunalia/dockablemirrormap\"><span style=\" text-decoration: underline; color:#0000ff;\">DockableMirrorMap</span></a></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">- <a href=\"http://hub.qgis.org/projects/valuetool\"><span style=\" text-decoration: underline; color:#0000ff;\">ValueTool</span></a></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
 
 import resources_rc
