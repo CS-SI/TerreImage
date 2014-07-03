@@ -320,8 +320,9 @@ class QGISEducation:
     
     
     def close_dock(self, object):
-        self.iface.newProject( True )
-    
+        if self.iface.legendInterface().layers():
+            self.iface.newProject( True )
+        
             
     def newProject(self):
         for item in self.iface.mapCanvas().scene().items():
