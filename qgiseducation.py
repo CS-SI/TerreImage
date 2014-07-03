@@ -63,7 +63,7 @@ class QGISEducation:
         self.constants.iface = self.iface
         self.constants.canvas = self.iface.mapCanvas()
         self.constants.legendInterface = self.iface.legendInterface()
-
+        self.qgis_education_manager=None
 
     def initGui(self):
         """
