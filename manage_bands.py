@@ -121,11 +121,11 @@ class manage_bands:
         Dialog.exec_()
     
     def cancel(self):
-        self.blue = None
-        self.green = None 
-        self.red = None
-        self.pir = None
-        self.mir = None
+        self.blue = -1
+        self.green = -1 
+        self.red = -1
+        self.pir = -1
+        self.mir = -1
         return None
     
     
