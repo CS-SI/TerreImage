@@ -38,31 +38,27 @@ logger.setLevel(logging.DEBUG)
 
 class MirrorMap(QWidget):
 
-    def __init__(self, parent, iface):
-        QWidget.__init__(self, parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+	def __init__(self, parent, iface):
+		QWidget.__init__(self, parent)
+		self.setAttribute(Qt.WA_DeleteOnClose)
 
-        self.iface = iface
-        self.layerId2canvasLayer = {}
-        self.canvasLayers = []
- 
-        self.setupUi()
+		self.iface = iface
+		self.layerId2canvasLayer = {}
+		self.canvasLayers = []
 
-    def closeEvent(self, event):
-        #self.scaleFactor.valueChanged.disconnect(self.onExtentsChanged)
-        self.disconnect()
-        self.emit( SIGNAL( "closed(PyQt_PyObject)" ), self )
-        return QWidget.closeEvent(self, event)
+		self.setupUi()
 
-    def disconnect(self):
-        QObject.disconnect(self.iface.mapCanvas(), SIGNAL( "extentsChanged()" ), self.onExtentsChanged)
-        QObject.disconnect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "destinationCrsChanged()" ), self.onCrsChanged)
-        QObject.disconnect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "mapUnitsChanged()" ), self.onMapUnitsChanged)
-        QObject.disconnect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "hasCrsTransformEnabled(bool)" ), self.onCrsTransformEnabled)
-        QObject.disconnect(QgsMapLayerRegistry.instance(), SIGNAL( "layerWillBeRemoved(QString)" ), self.delLayer)
-        QObject.disconnect(self.iface, SIGNAL( "currentLayerChanged(QgsMapLayer *)" ), self.refreshLayerButtons)
-        
+	def closeEvent(self, event):
+		#self.scaleFactor.valueChanged.disconnect(self.onExtentsChanged)
+		QObject.disconnect(self.iface.mapCanvas(), SIGNAL( "extentsChanged()" ), self.onExtentsChanged)
+		QObject.disconnect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "destinationCrsChanged()" ), self.onCrsChanged)
+		QObject.disconnect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "mapUnitsChanged()" ), self.onMapUnitsChanged)
+		QObject.disconnect(self.iface.mapCanvas().mapRenderer(), SIGNAL( "hasCrsTransformEnabled(bool)" ), self.onCrsTransformEnabled)
+		QObject.disconnect(QgsMapLayerRegistry.instance(), SIGNAL( "layerWillBeRemoved(QString)" ), self.delLayer)
+		QObject.disconnect(self.iface, SIGNAL( "currentLayerChanged(QgsMapLayer *)" ), self.refreshLayerButtons)
 
+		self.emit( SIGNAL( "closed(PyQt_PyObject)" ), self )
+		return QWidget.closeEvent(self, event)
 
 	def setupUi(self):
 		self.setObjectName( "dockablemirrormap_mirrormap" )

@@ -99,7 +99,6 @@ class ProcessingManager(object):
         process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
         logger.debug( "process" + str( process))
         if process :
-            process[0].mirror.disconnect()
             process[0].mirror.close()
             self.remove_processing(process[0])
             
@@ -116,7 +115,6 @@ class ProcessingManager(object):
         logger.debug( "process" + str( process))
         if process :
             #print "process trouvé"
-            process[0].mirror.disconnect()
             process[0].mirror.close()
             self.remove_display(process[0])
                                 
