@@ -132,7 +132,7 @@ class ProcessingManager(object):
         
         
     def processing_from_name(self, name):
-        return [x for x in self.processings if x.processing_name == name]
+        return [x for x in self.processings if x.processing_name == name] + [x for x in self.displays if x.processing_name == name]
         
         
 #     def get_process_to_display(self):
