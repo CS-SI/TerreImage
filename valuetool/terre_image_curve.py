@@ -52,7 +52,7 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
         self.lineEdit_curve_name.setText(name)
         
         logger.debug(  "from curve: " + str( x ) + " " + str( y) )
-        self.coordinates = "[ x=" + str(x) + ", y=" + str(y) + "]"
+        self.coordinates = "[x=" + str(x) + ", y=" + str(y) + "]"
         self.label_coordinates.setText(self.coordinates)
         
         
