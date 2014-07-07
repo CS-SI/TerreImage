@@ -221,6 +221,11 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.statusLabel.setText("")
     
     def classify(self):
+        dirDest = QtGui.QFileDialog.getExistingDirectory( None, str( "Répertoire de destination des fichiers de la classification" ) )
+        if dirDest :
+            self.output_dir = dirDest
+        
+        
         logger.debug( "classify" )
         simulation = False
         
