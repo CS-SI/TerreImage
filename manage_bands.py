@@ -135,25 +135,30 @@ class manage_bands:
            # print "value", value
             self.red = value
             #print self.red
+            #self.debug("update red")
        
        
     def update_green(self, value):
         if self.bandsUi.radioButton_autre.isChecked() == True:
             self.green = value
+            #self.debug("update green")
       
           
     def update_blue(self, value):
         if self.bandsUi.radioButton_autre.isChecked() == True:
             self.blue = value
+            #self.debug("update blue")
           
           
     def update_pir(self, value):
         if self.bandsUi.radioButton_autre.isChecked() == True:
-            self.red = value
+            self.pir = value
+            #self.debug("update pir")
           
     def update_mir(self, value):
         if self.bandsUi.radioButton_autre.isChecked() == True:
-            self.mir = value       
+            self.mir = value    
+            #self.debug("update mir")   
     
     
     
@@ -193,6 +198,18 @@ class manage_bands:
             self.update_blue_mir("blue")
         else:
             QMessageBox.critical( None , "Erreur", "L'image en entrée doit avoir 1, 3 ou 4 bandes !", QMessageBox.Ok )
+        #print "define by bands"
+        #self.debug()
+        
+        
+        
+    def debug(self, message=""):
+        print message
+        print "self.blue", self.blue
+        print "self.green", self.green
+        print "self.red", self.red
+        print "self.pir", self.pir
+        print "self.mir", self.mir
      
      
     def set_spinbox_read_only(self, state):
