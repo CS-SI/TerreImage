@@ -25,6 +25,7 @@ import OTBApplications
 import manage_QGIS
 import re
 import shutil
+import subprocess
 
 from qgis.core import QGis, QgsPoint, QgsRaster
 
@@ -245,15 +246,34 @@ def get_sensor_id( image ):
         command = "otbcli_ReadImageInfo -in " + image + " | grep \"sensor:\""
     else :
         command = "otbcli_ReadImageInfo -in " + image + " | findstr \"sensor:\""
-    result_sensor = os.popen( command ).readlines()
-    if result_sensor :
-        sensor_line = result_sensor[0]
-        sensor = re.search("sensor: ([a-zA-Z \d]+)$", sensor_line)
         
+    result_sensor = subprocess.Popen(command.encode('utf-8'),
+                                      shell=True,
+                                      stdout=subprocess.PIPE,
+                                      stdin=subprocess.PIPE,
+                                      stderr=subprocess.STDOUT,
+                                      universal_newlines=False) 
+    
+    loglines = []
+    for line in iter(result_sensor.stdout.readline, ""):
+        sensor_line = line
+        sensor = re.search("sensor: ([a-zA-Z \d]+)$", sensor_line)
         if sensor:
             #group 1 parce qu'on a demande qqchose de particulier a la regexpr a cause des ()
             sensor = sensor.group(1)
-        return sensor
+            print "subprocess popen sensor", sensor
+            return sensor
+    
+    
+#     result_sensor = os.popen( command ).readlines()
+#     if result_sensor :
+#         sensor_line = result_sensor[0]
+#         sensor = re.search("sensor: ([a-zA-Z \d]+)$", sensor_line)
+#         
+#         if sensor:
+#             #group 1 parce qu'on a demande qqchose de particulier a la regexpr a cause des ()
+#             sensor = sensor.group(1)
+#         return sensor
     
     
 def export_kmz( filenames, working_directory ):
