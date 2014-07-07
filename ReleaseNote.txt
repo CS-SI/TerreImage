@@ -1,3 +1,8 @@
+Version 2.3.8
+- Correction de la sélection du canal pir de l'image
+- Remise à 0 de la valeur du NDVI pour un dénominateur nul
+- Demande à l'utilisateur d'un répertoire de sortie pour la classification supervisée
+
 Version 2.3.7
 - Changement du logo du plugin
 - Ajout des indications bandes spectrales Fausses couleurs/Couleurs naturelles
@@ -5,6 +10,7 @@ Version 2.3.7
 - Correction de la gestion des accents dans l'export CSV
 - Correction de l'ouverture d'un projet
 - Correction du comportement de la fenêtre de selection des bandes
+- Ajout d'une fenêtre d'information lors de l'ouverture d'une donnée dont le chemin contient un espace
 
 Version 2.3.6
 - Correction de l'erreur à l'installation
