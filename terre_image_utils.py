@@ -24,14 +24,12 @@
 import os
 import datetime
 import shutil
-import subprocess
 
 from working_layer import WorkingLayer
 from manage_bands import manage_bands
 import manage_QGIS
 import terre_image_processing
 from terre_image_constant import TerreImageConstant
-
 
 from PyQt4.QtGui import QFileDialog, QMessageBox
 from PyQt4.QtCore import QDir, QSettings
@@ -220,14 +218,7 @@ def compute_overviews(filename):
         command += filename
         command += " 2 4 8 16"
         logger.debug( "command to run" + command)
-        
-        subprocess.Popen(command.encode('utf-8'),
-                                      shell=True,
-                                      stdout=subprocess.PIPE,
-                                      stdin=subprocess.PIPE,
-                                      stderr=subprocess.STDOUT,
-                                      universal_newlines=False) 
-        #os.system(command)
+        os.system(command)
     
     
         
