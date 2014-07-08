@@ -25,6 +25,7 @@ import OTBApplications
 import manage_QGIS
 import re
 import shutil
+import glob
 
 from qgis.core import QGis, QgsPoint, QgsRaster
 
@@ -264,10 +265,11 @@ def export_kmz( filenames, working_directory ):
     
     kmzs = []
     for image in filenames:
-        kmz_tmp = OTBApplications.otbcli_export_kmz(image, internal_working_directory)  
+        kmz_tmp = OTBApplications.otbcli_export_kmz(image, internal_working_directory) 
         kmzs.append(kmz_tmp)
         
-        
+    #attention rustine
+    #kmzs = glob.glob( os.path.join(internal_working_directory, "*.kmz"))
     for kmz in kmzs:
         new_path = os.path.join( working_directory, os.path.basename(kmz) )
         shutil.copy(kmz, new_path)

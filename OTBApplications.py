@@ -137,5 +137,6 @@ def otbcli_export_kmz( filename, working_directory):
         command += " -out " + "\"" + output_kmz + "\""
         logger.info( "command: " + str(command))
         os.system( command )
+    output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + "xt.kmz" )
     return output_kmz
     
