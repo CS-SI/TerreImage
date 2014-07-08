@@ -2,6 +2,7 @@ Version 2.3.8
 - Correction de la sélection du canal pir de l'image
 - Remise à 0 de la valeur du NDVI pour un dénominateur nul
 - Demande à l'utilisateur d'un répertoire de sortie pour la classification supervisée
+- Correction des bugs liés aux accents dans les noms de fichiers
 
 Version 2.3.7
 - Changement du logo du plugin
