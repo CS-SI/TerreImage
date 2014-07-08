@@ -366,7 +366,7 @@ class QGISEducation:
                     #get point
                     if item.size() > 0:
                         point = item.getPoint(0)
-                        print point
+                        #print point
                         QgsProject.instance().writeEntryDouble( "QGISEducation", "/angle_spectral_point_x", point.x() )
                         QgsProject.instance().writeEntryDouble( "QGISEducation", "/angle_spectral_point_y", point.y() )
                 
@@ -420,7 +420,7 @@ class QGISEducation:
         
         
         for qgis_layer in self.iface.legendInterface().layers():
-            print "layer loading ", qgis_layer.name()
+            #print "layer loading ", qgis_layer.name()
             if qgis_layer.name() in [ "NDVI", "NDTI", "Indice de brillance", "Kmeans" ]:
                 process = TerreImageProcessing( self.iface, working_dir, self.qgis_education_manager.layer,  self.qgis_education_manager.mirror_map_tool, qgis_layer.name(), None, qgis_layer )
                 #print "process", process
