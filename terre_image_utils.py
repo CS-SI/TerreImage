@@ -124,43 +124,51 @@ def get_workinglayer_on_opening(iface):
     settings.setValue("terre_image_lastFolder", os.path.dirname(fileOpened))
     settings.sync()
     
+
     if fileOpened:
-        if fileOpened.find(" ") != -1:
-            QMessageBox.warning( None , "Attention", u'L\'image que vous essayez d\'ouvrir contient un ou plusieurs espaces. Les traitements sur cette image provoqueront une erreur.'.encode('utf8'), QMessageBox.Ok )
-        
-        if fileOpened.endswith( ".qgs" ):
-            #open new qgis project
-            pass
-        else :
-            raster_layer = manage_QGIS.get_raster_layer(fileOpened, os.path.splitext(os.path.basename(fileOpened))[0])
-             
-            type_image = terre_image_processing.get_sensor_id(fileOpened)
-            logger.debug( "type_image " + str(type_image) )
-            layer = WorkingLayer( fileOpened, raster_layer )
-            layer.set_type(type_image)
-            #self.layer = self.canvas.currentLayer()
-            if layer :
-                #self.define_bands(self.layer)
-                #manage_bands()
-                #self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
-                red, green, blue, pir, mir = manage_bands(type_image, layer.get_band_number()).get_values()
-                
-                if red != -1 or green != -1 or blue != -1 or pir != -1 or mir != -1:
-                
-                    bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
-                    layer.set_bands(bands)
+        try:
+            str(fileOpened)
+        except UnicodeEncodeError:
+            QMessageBox.warning( None , "Erreur", u'L\'image que vous essayez d\'ouvrir contient un ou caractères spéciaux. La version actuelle du plugin ne gère pas ce type de fichiers.', QMessageBox.Ok )
+            return None, None
+        else:
+#             if fileOpened.find(" ") != -1:
+#                 QMessageBox.warning( None , "Attention", u'L\'image que vous essayez d\'ouvrir contient un ou plusieurs espaces. Les traitements sur cette image provoqueront une erreur.'.encode('utf8'), QMessageBox.Ok )
+            
+            
+            if fileOpened.endswith( ".qgs" ):
+                #open new qgis project
+                pass
+            else :
+                raster_layer = manage_QGIS.get_raster_layer(fileOpened, os.path.splitext(os.path.basename(fileOpened))[0])
+                 
+                type_image = terre_image_processing.get_sensor_id(fileOpened)
+                logger.debug( "type_image " + str(type_image) )
+                layer = WorkingLayer( fileOpened, raster_layer )
+                layer.set_type(type_image)
+                #self.layer = self.canvas.currentLayer()
+                if layer :
+                    #self.define_bands(self.layer)
+                    #manage_bands()
+                    #self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
+                    red, green, blue, pir, mir = manage_bands(type_image, layer.get_band_number()).get_values()
                     
-                    logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+                    if red != -1 or green != -1 or blue != -1 or pir != -1 or mir != -1:
                     
-                    cst = TerreImageConstant()
-                    cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
-                    
-                    
-                    manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
-                    compute_overviews(fileOpened)
-                    return layer, bands
-                else:
-                    return None, None
+                        bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
+                        layer.set_bands(bands)
+                        
+                        logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+                        
+                        cst = TerreImageConstant()
+                        cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
+                        
+                        
+                        manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
+                        compute_overviews(fileOpened)
+                        return layer, bands
+                    else:
+                        return None, None
     else:
         return None, None
     
