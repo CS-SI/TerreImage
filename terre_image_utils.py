@@ -129,7 +129,7 @@ def get_workinglayer_on_opening(iface):
         try:
             str(fileOpened)
         except UnicodeEncodeError:
-            QMessageBox.warning( None , "Erreur", u'L\'image que vous essayez d\'ouvrir contient un ou caractères spéciaux. La version actuelle du plugin ne gère pas ce type de fichiers.', QMessageBox.Ok )
+            QMessageBox.warning( None , "Erreur", u'L\'image que vous essayez d\'ouvrir contient un ou des caractères spéciaux. La version actuelle du plugin ne gère pas ce type de fichiers.', QMessageBox.Ok )
             return None, None
         else:
 #             if fileOpened.find(" ") != -1:
@@ -223,7 +223,7 @@ def compute_overviews(filename):
     if not os.path.isfile(filename + ".ovr"):
         command = "gdaladdo "
         command += " -ro "
-        command += filename
+        command += "\"" + filename + "\""
         command += " 2 4 8 16"
         logger.debug( "command to run" + command)
         os.system(command)
