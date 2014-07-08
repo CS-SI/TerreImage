@@ -221,7 +221,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.statusLabel.setText("")
     
     def classify(self):
-        dirDest = QtGui.QFileDialog.getExistingDirectory( None, str( "Répertoire de destination des fichiers de la classification" ) )
+        dirDest = QtGui.QFileDialog.getExistingDirectory( None, str( "Répertoire de destination des fichiers de la classification" ), self.output_dir )
         if dirDest :
             self.output_dir = dirDest
         
