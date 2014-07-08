@@ -232,7 +232,7 @@ def gdal_translate_get_one_band(image_in, band_number, working_dir):
     """
     output_image_one_band = os.path.join(working_dir, os.path.splitext(os.path.basename(image_in))[0] + "-b" + str(band_number) + os.path.splitext(image_in)[1])
     if not os.path.isfile(output_image_one_band):
-        command_gdal = "gdal_translate -b " + str(band_number) + " " + image_in + " " + output_image_one_band
+        command_gdal = "gdal_translate -b " + str(band_number) + " " + "\"" +  image_in + "\""  + " " +  "\"" + output_image_one_band + "\"" 
         logger.debug( "command_gdal" + str(command_gdal))
         os.system(command_gdal)
     return output_image_one_band
