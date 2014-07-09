@@ -175,7 +175,10 @@ class TerreImageProcessing(TerreImageTask, QObject):
         else:
             result_layer = manage_QGIS.addRasterLayerToQGIS( output_filename, self.processing_name, self.iface )
             self.r_layer = result_layer
-        manage_QGIS.histogram_stretching( result_layer, self.iface.mapCanvas())
+        if self.processing_name == "Seuillage":
+            manage_QGIS.histogram_stretching_for_threshold( result_layer, self.iface.mapCanvas())
+        else:
+            manage_QGIS.histogram_stretching( result_layer, self.iface.mapCanvas())
         
         logger.debug( "defining self.output_working_layer" )
         self.output_working_layer = WorkingLayer( output_filename, result_layer )

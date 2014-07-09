@@ -156,7 +156,24 @@ def histogram_stretching(raster_layer, canvas):
     raster_layer.setContrastEnhancement( QgsContrastEnhancement.StretchToMinimumMaximum, theLimits )
     raster_layer.setCacheImage( None )
     canvas.refresh()
+        
 
+def histogram_stretching_for_threshold(raster_layer, canvas):
+#histogramStretch( true, QgsRaster::ContrastEnhancementCumulativeCut );
+# theLimits =QgsRaster::ContrastEnhancementCumulativeCut
+#   QgsRectangle myRectangle;
+#   if ( visibleAreaOnly )
+#     myRectangle = mMapCanvas->mapRenderer()->outputExtentToLayerExtent( myRasterLayer, mMapCanvas->extent() );
+# 
+#   myRasterLayer->setContrastEnhancement( QgsContrastEnhancement::StretchToMinimumMaximum, theLimits, myRectangle );
+# 
+#   myRasterLayer->setCacheImage( NULL );
+#   mMapCanvas->refresh();
+    theLimits = QgsRaster. ContrastEnhancementMinMax
+    logger.debug( "theLimits " + str(theLimits))
+    raster_layer.setContrastEnhancement( QgsContrastEnhancement.StretchToMinimumMaximum, theLimits )
+    raster_layer.setCacheImage( None )
+    canvas.refresh()
 
 def get_min_max_via_qgis( theRasterLayer, num_band ):
 #     my_raster_stats = theRasterLayer.dataProvider().bandStatistics( num_band )#, 2, 98  )
