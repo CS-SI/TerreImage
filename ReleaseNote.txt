@@ -1,3 +1,11 @@
+Version 2.3.9
+- Amélioration de la robustesse des changements de min/max sur l'histogramme
+- Correction de la formule du NDTI
+- Ajout d'un test sur la sélection des bandes spectrales
+- Mise en place d'une valeur de nodata pour l'affichage des histogrammes de l'image de travail, son image en couleurs naturelles et chacune des bandes spectrales
+- Correction du bug lié à l'écrasement d'un seuillage par un autre
+
+
 Version 2.3.8
 - Correction de la sélection du canal pir de l'image
 - Remise à 0 de la valeur du NDVI pour un dénominateur nul
