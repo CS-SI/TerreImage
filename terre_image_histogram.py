@@ -265,7 +265,7 @@ class MyMplCanvas(FigureCanvas):
         """
         Check
         """
-        if self.do_change:
+        if self.do_change and event.xdata:
             logger.debug( 'release')
             # classic case
             last_min = self.x_min
