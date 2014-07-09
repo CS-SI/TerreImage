@@ -148,7 +148,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def main_histogram(self):
         self.set_working_message(True)
         if not self.dock_histo_opened:
-            self.hist = TerreImageHistogram_multiband(self.qgis_education_manager.layer, self.canvas) 
+            self.hist = TerreImageHistogram_multiband(ProcessingManager().working_layer, self.canvas) 
             self.histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow() )
             self.histodockwidget.setObjectName("Histogrammes")
             self.histodockwidget.setWidget(self.hist)
@@ -220,7 +220,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
 #     def histogram_stretching(self, values):
 #         logger.debug( "histogram to stretch" + str(values))
-#         manage_QGIS.custom_stretch(self.qgis_education_manager.layer.qgis_layer, values, self.canvas)
+#         manage_QGIS.custom_stretch(ProcessingManager().working_layer.qgis_layer, values, self.canvas)
         
         
     def do_manage_histograms(self, text_changed):
@@ -239,7 +239,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     logger.debug( "text changed couleurs naturelles" )
                     self.set_working_message(True)
                     if not process.histogram:
-                        hist = TerreImageHistogram_multiband(self.qgis_education_manager.layer, self.canvas, None, process)
+                        hist = TerreImageHistogram_multiband(ProcessingManager().working_layer, self.canvas, None, process)
                         process.histogram = hist
                         self.histogram(process.output_working_layer, process, specific_band, hist)
                 else:
@@ -317,7 +317,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     
                     
                     logger.debug( "text changed: " + text_changed)
-                    my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, text_changed, args )
+                    my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, ProcessingManager().working_layer, self.qgis_education_manager.mirror_map_tool, text_changed, args )
                     if text_changed == "Angle Spectral":
                         self.set_working_message(True)
                         self.label_a_s.show()
@@ -340,18 +340,18 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
     def set_comboBox_sprectral_band_display( self ):
-        if self.qgis_education_manager.layer:
-            bands = self.qgis_education_manager.layer.bands
+        if ProcessingManager().working_layer:
+            bands = ProcessingManager().working_layer.bands
             corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
         
             self.comboBox_sprectral_band_display.clear()
             self.comboBox_sprectral_band_display.insertItem( 0, "Affichage des bandes spectrales..." )
             
-            if self.qgis_education_manager.layer.has_natural_colors():
+            if ProcessingManager().working_layer.has_natural_colors():
                 logger.debug( "couleurs naturelles")
                 self.comboBox_sprectral_band_display.insertItem( 1, "Afficher en couleurs naturelles" )
             
-            for i in range(self.qgis_education_manager.layer.get_band_number()):
+            for i in range(ProcessingManager().working_layer.get_band_number()):
                 y=[x for x in bands if bands[x]==i+1]
                 if y :
                     text = corres[y[0]]
@@ -361,7 +361,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             
     def set_combobox_histograms(self):
         if self.qgis_education_manager:
-            if self.qgis_education_manager.layer:
+            if ProcessingManager().working_layer:
                 process = ["Histogrammes", "Image de travail"] + [x for x in ProcessingManager().get_processings_name() if x not in ["KMEANS", "Seuillage"]]
                 logger.debug( "process: " + str(process)) 
                 
@@ -384,10 +384,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     logger.debug( "do_manage_sprectral_band_display who: " + str(who))
                     if corres_name_view[who] in ProcessingManager().get_processings_name() :
                         do_it = False
-                    #band_to_display = self.qgis_education_manager.layer.bands[key]
-                    #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
+                    #band_to_display = ProcessingManager().working_layer.bands[key]
+                    #manage_QGIS.display_one_band(ProcessingManager().working_layer, who, self.iface)
                     if do_it :
-                        my_processing = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who )
+                        my_processing = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, ProcessingManager().working_layer, self.qgis_education_manager.mirror_map_tool, who )
                         #ProcessingManager().add_display(my_processing)
                         self.set_combobox_histograms()
                     break
@@ -401,17 +401,17 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def kmeans(self):
         self.set_working_message(True)
         
-        if self.qgis_education_manager.layer == None :
+        if ProcessingManager().working_layer == None :
             logger.debug( "Aucune layer selectionnée" )
         else :
             nb_class = self.spinBox_kmeans.value()
             logger.debug( "nb_colass from spinbox: " + str(nb_class))
-            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, "KMEANS", nb_class )
+            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, ProcessingManager().working_layer, self.qgis_education_manager.mirror_map_tool, "KMEANS", nb_class )
             #ProcessingManager().add_processing(my_processing)
             self.set_combobox_histograms()
             
             self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
-            #terre_image_processing.kmeans(self.qgis_education_manager.layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
+            #terre_image_processing.kmeans(ProcessingManager().working_layer, self.qgis_education_manager.working_directory, self.iface, nb_class)
             self.set_working_message(False)
 
 
@@ -443,8 +443,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
         if self.qgis_education_manager:
-            logger.debug( "self.qgis_education_manager.layer.get_qgis_layer().id(): " +  str(self.qgis_education_manager.layer.get_qgis_layer().id()))
-            if self.qgis_education_manager.layer.get_qgis_layer().id() == layer_id:
+            logger.debug( "ProcessingManager().working_layer.get_qgis_layer().id(): " +  str(ProcessingManager().working_layer.get_qgis_layer().id()))
+            if ProcessingManager().working_layer.get_qgis_layer().id() == layer_id:
                 self.disconnect_interface()
             #else:
             #    self.qgis_education_manager.removing_layer(layer_id)

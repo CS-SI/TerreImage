@@ -63,7 +63,6 @@ class QGISEducation:
         self.constants.iface = self.iface
         self.constants.canvas = self.iface.mapCanvas()
         self.constants.legendInterface = self.iface.legendInterface()
-        self.qgis_education_manager=None
 
     def initGui(self):
         """
@@ -95,13 +94,13 @@ class QGISEducation:
         QObject.connect(self.iface, SIGNAL("newProjectCreated()"), self.newProject)        
     
     
-    def do_display_one_band(self, who, qgis_layer=None):
+    def do_display_one_band(self, who, qgis_layer, working_directory, mirror_tool):
         logger.debug( "who" + str(who))
         #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
         if qgis_layer:
-            my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who, None, qgis_layer )
+            my_process = TerreImageDisplay( self.iface, working_directory, ProcessingManager().working_layer, mirror_tool, who, None, qgis_layer )
         else:
-            my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who )
+            my_process = TerreImageDisplay( self.iface, working_directory, ProcessingManager().working_layer, mirror_tool, who )
         ProcessingManager().add_processing(my_process)
         self.educationWidget.set_combobox_histograms()
 
@@ -147,47 +146,48 @@ class QGISEducation:
         self.iface.newProject( True )
 
         
-        self.qgis_education_manager = TerreImageManager(self.iface)
+        #self.qgis_education_manager = TerreImageManager(self.iface)
+        #_, bands  = self.qgis_education_manager.set_current_layer( )
         
+        _, bands, working_dir  = terre_image_utils.set_current_layer( self.iface )
         
-        _, bands  = self.qgis_education_manager.set_current_layer( )
-        logger.info( "self.layer" + str(self.qgis_education_manager.layer))
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
         logger.info( "temps de chargement : " +  str(timeExec) )
         
-        self.show_education_widget(bands)
+        self.show_education_widget(bands, working_dir)
         
         
         self.set_working_message(False)
             
     
-    def show_education_widget(self, bands):
-        if self.qgis_education_manager:
-            #print "education manager"
-            if self.qgis_education_manager.layer and bands:
-    
-                if not self.dockOpened :
-                    # create the widget to display information
-                    self.educationWidget = QGISEducationWidget(self.iface)
-                    QObject.connect( self.educationWidget, SIGNAL( "terminated()" ), self.unload_interface )
-                    self.educationWidget.qgis_education_manager = self.qgis_education_manager
-                    self.educationWidget.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
-                    
-                    # create the dockwidget with the correct parent and add the valuewidget
-                    self.qgisedudockwidget = Terre_Image_Dock_widget("Terre Image", self.iface.mainWindow() )
-                    self.qgisedudockwidget.setObjectName("Terre Image")
-                    self.qgisedudockwidget.setWidget(self.educationWidget)
-                    QObject.connect( self.qgisedudockwidget, SIGNAL( "closed(PyQt_PyObject)" ), self.close_dock )
-                    
-                    # add the dockwidget to iface
-                    self.iface.addDockWidget(Qt.RightDockWidgetArea, self.qgisedudockwidget)
-                    self.educationWidget.set_comboBox_sprectral_band_display()
-    
-                text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
+    def show_education_widget(self, bands, working_dir):
+        if ProcessingManager().working_layer and bands:
+
+            if not self.dockOpened :
+                print "not self.dock opened"
+                # create the widget to display information
+                self.educationWidget = QGISEducationWidget(self.iface)
+                QObject.connect( self.educationWidget, SIGNAL( "terminated()" ), self.unload_interface )
+                #self.educationWidget.qgis_education_manager = self.qgis_education_manager
+                self.educationWidget.qgis_education_manager = TerreImageManager(self.iface)
+                self.educationWidget.qgis_education_manager.working_directory = working_dir
+                self.educationWidget.lineEdit_working_dir.setText(working_dir)
                 
-                self.qgisedudockwidget.show()
-                self.dockOpened = True        
+                # create the dockwidget with the correct parent and add the valuewidget
+                self.qgisedudockwidget = Terre_Image_Dock_widget("Terre Image", self.iface.mainWindow() )
+                self.qgisedudockwidget.setObjectName("Terre Image")
+                self.qgisedudockwidget.setWidget(self.educationWidget)
+                QObject.connect( self.qgisedudockwidget, SIGNAL( "closed(PyQt_PyObject)" ), self.close_dock )
+                
+                # add the dockwidget to iface
+                self.iface.addDockWidget(Qt.RightDockWidgetArea, self.qgisedudockwidget)
+                self.educationWidget.set_comboBox_sprectral_band_display()
+
+            text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
+            
+            self.qgisedudockwidget.show()
+            self.dockOpened = True        
     
     def about(self):
         from terre_image_about import DlgAbout
@@ -204,24 +204,30 @@ class QGISEducation:
             if isinstance(item, QgsRubberBand):
                 item.reset(QGis.Point)
         if self.educationWidget is not None:
+            print "self.educationwidget not none"
             self.educationWidget.disconnect_interface()
             if self.qgisedudockwidget is not None:
+                print "self.qgisedudockwidget not none"
                 self.qgisedudockwidget.close()
                 self.educationWidget.disconnectP()
                 self.dockOpened = False
 
     def onWriteProject(self, domproject):
-        if self.qgis_education_manager is None:
-            return
-        if self.qgis_education_manager.layer is None:
+        if ProcessingManager().working_layer is None:
             return
 
-        QgsProject.instance().writeEntry( "QGISEducation", "/working_layer", self.qgis_education_manager.layer.source_file )
+#         QgsProject.instance().writeEntry( "QGISEducation", "/working_layer", self.qgis_education_manager.layer.source_file )
+#         # write band orders
+#         QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_bands", str(self.qgis_education_manager.layer.bands) )
+#         logger.debug( str(self.qgis_education_manager.layer.bands) )
+#         QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_type", self.qgis_education_manager.layer.type )
+#         QgsProject.instance().writeEntry( "QGISEducation", "/working_directory", self.qgis_education_manager.working_directory )
+        QgsProject.instance().writeEntry( "QGISEducation", "/working_layer", ProcessingManager().working_layer.source_file )
         # write band orders
-        QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_bands", str(self.qgis_education_manager.layer.bands) )
-        logger.debug( str(self.qgis_education_manager.layer.bands) )
-        QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_type", self.qgis_education_manager.layer.type )
-        QgsProject.instance().writeEntry( "QGISEducation", "/working_directory", self.qgis_education_manager.working_directory )
+        QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_bands", str(ProcessingManager().working_layer.bands) )
+        logger.debug( str(ProcessingManager().working_layer.bands) )
+        QgsProject.instance().writeEntry( "QGISEducation", "/working_layer_type", ProcessingManager().working_layer.type )
+        QgsProject.instance().writeEntry( "QGISEducation", "/working_directory", self.educationWidget.qgis_education_manager.working_directory )
         p = []
         for process in ProcessingManager().get_processings():
             p.append((process.processing_name, process.output_working_layer.get_source()))
@@ -261,10 +267,14 @@ class QGISEducation:
         
         working_dir, ok = QgsProject.instance().readEntry("QGISEducation", "/working_directory")
         
-        self.qgis_education_manager = TerreImageManager( self.iface )
-        self.qgis_education_manager.restore_processing_manager(wl, eval(bands), type, working_dir)
-        if self.qgis_education_manager:
-            self.show_education_widget(bands)
+        layer, bands  = terre_image_utils.restore_working_layer( wl, eval(bands), type )
+        ProcessingManager().working_layer = layer
+        
+        self.show_education_widget(bands, working_dir)
+#         self.qgis_education_manager = TerreImageManager( self.iface )
+#         self.qgis_education_manager.restore_processing_manager(wl, eval(bands), type, working_dir)
+#         if self.qgis_education_manager:
+            
         
         process, ok = QgsProject.instance().readEntry("QGISEducation", "/process")
         logger.debug( eval(process))
@@ -274,42 +284,15 @@ class QGISEducation:
         
         process = eval(process)
         
-        
-#         for i in process:
-#             print "process loading :", i
-#             if i[0] in[ "NDVI", "NDTI", "Indice de brillance", "Kmeans" ]:
-#                 process = TerreImageProcessing( self.iface, working_dir, self.qgis_education_manager.layer,  self.qgis_education_manager.mirror_map_tool, i[0] )
-#                 print "process", process
-#                 process.output_working_layer = i[1]
-#                 process.display(i[1])
-#                 ProcessingManager().add_processing(my_processing)
-#                 #self.educationWidget.do_manage_processing( i )
-#             else:
-#                 self.educationWidget.do_manage_sprectral_band_display(i)
-#                 
-#         self.set_combobox_histograms()        
-#         self.show_education_widget(bands)
-        
-        
         for qgis_layer in self.iface.legendInterface().layers():
             #print "layer loading ", qgis_layer.name()
-            if qgis_layer.name() in [ "NDVI", "NDTI", "Indice de brillance", "Kmeans" ]:
-                process = TerreImageProcessing( self.iface, working_dir, self.qgis_education_manager.layer,  self.qgis_education_manager.mirror_map_tool, qgis_layer.name(), None, qgis_layer )
-                #print "process", process
-#                 process.output_working_layer = qgis_layer.source()
-#                 
-#                 process.output_working_layer = WorkingLayer( qgis_layer.source(), qgis_layer )
-#                 # 2 ouvrir une nouvelle vue
-#                 process.mirror = process.mirrormap_tool.runDockableMirror(qgis_layer.name())
-#                 logger.debug( process.mirror )
-#                 process.mirror.mainWidget.addLayer( qgis_layer.id() )
-#                 process.mirror.mainWidget.onExtentsChanged()
-                #ProcessingManager().add_processing(process)
+            if qgis_layer.name() in [ "NDVI", "NDTI", "Indice de brillance", "KMEANS" ]:
+                process = TerreImageProcessing( self.iface, working_dir, ProcessingManager().working_layer,  self.educationWidget.qgis_education_manager.mirror_map_tool, qgis_layer.name(), None, qgis_layer )
             elif "Angle Spectral" in qgis_layer.name() :
-                process = TerreImageProcessing( self.iface, working_dir, self.qgis_education_manager.layer,  self.qgis_education_manager.mirror_map_tool, qgis_layer.name(), qgis_layer.source(), qgis_layer )
+                process = TerreImageProcessing( self.iface, working_dir, ProcessingManager().working_layer,  self.educationWidget.qgis_education_manager.mirror_map_tool, qgis_layer.name(), qgis_layer.source(), qgis_layer )
                 #ProcessingManager().add_processing(process)
             elif "couleur_naturelles" in  qgis_layer.name():
-                self.do_display_one_band('nat', qgis_layer)
+                self.do_display_one_band('nat', qgis_layer, working_dir,  self.educationWidget.qgis_education_manager.mirror_map_tool)
                 #ProcessingManager().add_display( process )
                 
             else:
@@ -318,7 +301,7 @@ class QGISEducation:
                 #print result
                 if result:
                     #print "the couleur", result[0]
-                    self.do_display_one_band(result[0], qgis_layer)
+                    self.do_display_one_band(result[0], qgis_layer, working_dir,  self.educationWidget.qgis_education_manager.mirror_map_tool)
                 #ProcessingManager().add_display( process )
                     
                     

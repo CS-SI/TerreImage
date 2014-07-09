@@ -30,6 +30,8 @@ from manage_bands import manage_bands
 import manage_QGIS
 import terre_image_processing
 from terre_image_constant import TerreImageConstant
+from processing_manager import ProcessingManager
+
 
 from PyQt4.QtGui import QFileDialog, QMessageBox
 from PyQt4.QtCore import QDir, QSettings
@@ -107,7 +109,21 @@ def working_layer(canvas):
         logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
         return layer
         
-        
+def set_current_layer(iface):
+    layer, bands  = get_workinglayer_on_opening( iface )
+    if layer:
+        working_directory = os.path.join(os.path.dirname(layer.source_file), "working_directory")
+        update_subdirectories(working_directory)
+        if not os.path.exists( working_directory ):
+            os.makedirs( working_directory )
+        ProcessingManager().working_layer = layer
+        #self.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), self.layer.get_qgis_layer(), self.layer.band_invert)
+        #self.classif_tool.set_directory(self.working_directory)
+        #self.classif_tool.setupUi()
+    #layers_for_value_tool.append(layer ) #.get_qgis_layer())
+    logger.debug( "working directory" + working_directory )
+    
+    return layer, bands, working_directory
         
 def get_workinglayer_on_opening(iface):
     settings = QSettings()
