@@ -76,7 +76,7 @@ class MyMplCanvas(FigureCanvas):
         self.change_min = True
 
 
-    def get_GDAL_histogram( self, image, band_number, qgis_layer ):
+    def get_GDAL_histogram( self, image, band_number, qgis_layer, no_data=-1 ):
         """
         From the given binary image, compute histogram and return the number of 1
         """
@@ -90,7 +90,9 @@ class MyMplCanvas(FigureCanvas):
             print "Error : Opening file ", image
         else :
             band = dataset.GetRasterBand(band_number)
-            
+            if no_data != -1:
+                print "setting no data for histogram :", no_data
+                band.SetNoDataValue(no_data)
             
             self.rasterMin, self.rasterMax = band.ComputeRasterMinMax()
             logger.debug( "self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin) )
@@ -104,7 +106,7 @@ class MyMplCanvas(FigureCanvas):
             #    band_overview = band.GetOverview(1)
             else :
                 band_overview = band
-                
+            
             logger.debug("band_overview, xsize" + str(band_overview.XSize))
             
             
@@ -176,14 +178,14 @@ class MyMplCanvas(FigureCanvas):
             return histogram, decimal_values
         
         
-    def display_histogram(self, filename, band, color, name, qgis_layer):
+    def display_histogram(self, filename, band, color, name, qgis_layer, no_data=-1):
         self.color = color
         self.name = name
         
         if name == "NDVI":
             histogram, decimal_values = self.get_GDAL_histogram(filename, band, qgis_layer)
         else :
-            histogram, decimal_values = self.get_GDAL_histogram(filename, band, qgis_layer)
+            histogram, decimal_values = self.get_GDAL_histogram(filename, band, qgis_layer, no_data)
 #         print "type(histogram)", type(histogram)
 #         print "histogram", histogram
 #         print "len(histogram)", len(histogram)
@@ -342,7 +344,7 @@ class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):
         if specific_band == -1:
             self.sc_1.display_histogram(self.layer.get_source(), 1, 'k', layer.name(), layer.get_qgis_layer())
         else :
-            self.sc_1.display_histogram(self.layer.get_source(), specific_band, 'k', layer.name(), layer.get_qgis_layer())
+            self.sc_1.display_histogram(self.layer.get_source(), specific_band, 'k', layer.name(), layer.get_qgis_layer(), 0)
         self.set_buttons()
         
         seuil = QtGui.QPushButton("Seuillage")
@@ -396,13 +398,13 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
         self.l.addWidget(self.sc_3)
         
         if processing is None:
-            self.sc_1.display_histogram(self.layer.get_source(), self.layer.pir, 'r', "Plan R : BS PIR", layer.get_qgis_layer())
-            self.sc_2.display_histogram(self.layer.get_source(), self.layer.red, 'g', "Plan V : BS R", layer.get_qgis_layer())
-            self.sc_3.display_histogram(self.layer.get_source(), self.layer.green, 'b', "Plan B : BS V", layer.get_qgis_layer())
+            self.sc_1.display_histogram(self.layer.get_source(), self.layer.pir, 'r', "Plan R : BS PIR", layer.get_qgis_layer(), 0)
+            self.sc_2.display_histogram(self.layer.get_source(), self.layer.red, 'g', "Plan V : BS R", layer.get_qgis_layer(), 0)
+            self.sc_3.display_histogram(self.layer.get_source(), self.layer.green, 'b', "Plan B : BS V", layer.get_qgis_layer(), 0)
         else:
-            self.sc_1.display_histogram(self.processing.output_working_layer.get_source(), self.layer.red, 'r', "Plan R : BS R", layer.get_qgis_layer())
-            self.sc_2.display_histogram(self.processing.output_working_layer.get_source(), self.layer.green, 'g', "Plan V : BS V", layer.get_qgis_layer())
-            self.sc_3.display_histogram(self.processing.output_working_layer.get_source(), self.layer.blue, 'b', "Plan B : BS B", layer.get_qgis_layer())
+            self.sc_1.display_histogram(self.processing.output_working_layer.get_source(), self.layer.red, 'r', "Plan R : BS R", layer.get_qgis_layer(), 0)
+            self.sc_2.display_histogram(self.processing.output_working_layer.get_source(), self.layer.green, 'g', "Plan V : BS V", layer.get_qgis_layer(), 0)
+            self.sc_3.display_histogram(self.processing.output_working_layer.get_source(), self.layer.blue, 'b', "Plan B : BS B", layer.get_qgis_layer(), 0)
         self.set_buttons()
         
         
