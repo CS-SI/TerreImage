@@ -65,6 +65,7 @@ def ndvi(layer, working_directory, iface):
     
 def ndti(layer, working_directory, iface):
     #SQRT(R+0.5)
+    #NDTI= (R-G)/(R+G)
     if not layer :
         logger.debug( "Aucune layer selectionnée" )
     else :
@@ -75,7 +76,9 @@ def ndti(layer, working_directory, iface):
             logger.debug( output_filename )
             if not os.path.isfile(output_filename) : 
                 layer_red = "im1b" + str(layer.red)
-                expression = "\"sqrt(" + layer_red + "+0.5)\""
+                layer_green = "im1b" + str(layer.green)
+                #expression = "\"sqrt(" + layer_red + "+0.5)\""
+                expression = "\"if((" + layer_red + "+" + layer_green + ")!=0,(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "),0)\""
                 logger.debug( expression )
                 logger.debug( "image_in" + str(image_in))
                 OTBApplications.bandmath_cli( [image_in], expression, output_filename )
