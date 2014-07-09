@@ -128,8 +128,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
     def status(self):
-        #print( self.qgis_education_manager )
-        print( "self.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors) ) + "\n"
+        print( self.qgis_education_manager )
+        print( "self.qgis_education_manager.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors) ) + "\n"
         print ProcessingManager()
         print "\n"
         print ProcessingManager().get_processings_name()

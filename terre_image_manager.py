@@ -120,7 +120,7 @@ class TerreImageManager():
         if process :
             try:
                 QgsMapLayerRegistry.instance().removeMapLayer( process[0].output_working_layer.qgis_layer.id())
-                ProcessingManager().remove_process(process[0])
+                ProcessingManager().remove_processing(process[0])
                 ProcessingManager().remove_display(process[0])
             except KeyError:
                 pass

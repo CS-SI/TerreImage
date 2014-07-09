@@ -170,7 +170,7 @@ class ProcessingManager(object):
 #         try:
 #             process = self.name_to_processing[name_of_the_closed_view]
 #             QgsMapLayerRegistry.instance().removeMapLayer( process.output_working_layer.qgis_layer.id())
-#             self.remove_process(process)
+#             self.remove_processing(process)
 #         except KeyError:
 #             pass
 #                 
@@ -182,5 +182,5 @@ class ProcessingManager(object):
 #         logger.debug( "process" + str( process))
 #         if process :
 #             process[0].mirror.close()
-#             self.remove_process(process[0])
+#             self.remove_processing(process[0])
         
