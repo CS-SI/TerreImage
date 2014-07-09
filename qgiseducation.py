@@ -200,6 +200,7 @@ class QGISEducation:
         
             
     def newProject(self):
+        print "new project"
         for item in self.iface.mapCanvas().scene().items():
             if isinstance(item, QgsRubberBand):
                 item.reset(QGis.Point)
@@ -250,6 +251,11 @@ class QGISEducation:
                 
 
     def onProjectLoaded(self):
+        
+        #does not work stops the project reading.
+        #should desactivate all interface and read the project again
+        #self.newProject( True )
+            
         # restore mirrors?
         wl, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer")
         if not ok or wl is None:
@@ -292,7 +298,12 @@ class QGISEducation:
                 process = TerreImageProcessing( self.iface, working_dir, ProcessingManager().working_layer,  self.educationWidget.qgis_education_manager.mirror_map_tool, qgis_layer.name(), qgis_layer.source(), qgis_layer )
                 #ProcessingManager().add_processing(process)
             elif "couleur_naturelles" in  qgis_layer.name():
-                self.do_display_one_band('nat', qgis_layer, working_dir,  self.educationWidget.qgis_education_manager.mirror_map_tool)
+                try:
+                    self.do_display_one_band('nat', qgis_layer, working_dir,  self.educationWidget.qgis_education_manager.mirror_map_tool)
+                except AttributeError:
+                    QMessageBox.warning( None , "Erreur", u'Le projet ne peut être lu. Essayez de créer un projet vierge, puis de réouvrir le projet souhaité.', QMessageBox.Ok )
+                    #self.newProject(  )
+                    return None
                 #ProcessingManager().add_display( process )
                 
             else:
@@ -301,7 +312,12 @@ class QGISEducation:
                 #print result
                 if result:
                     #print "the couleur", result[0]
-                    self.do_display_one_band(result[0], qgis_layer, working_dir,  self.educationWidget.qgis_education_manager.mirror_map_tool)
+                    try:
+                        self.do_display_one_band(result[0], qgis_layer, working_dir,  self.educationWidget.qgis_education_manager.mirror_map_tool)
+                    except AttributeError:
+                        QMessageBox.warning( None , "Erreur", u'Le projet ne peut être lu. Essayez de créer un projet vierge, puis de réouvrir le projet souhaité.', QMessageBox.Ok )
+                        #self.newProject(  )
+                        return None
                 #ProcessingManager().add_display( process )
                     
                     
