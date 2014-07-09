@@ -154,19 +154,34 @@ def get_workinglayer_on_opening(iface):
                     red, green, blue, pir, mir = manage_bands(type_image, layer.get_band_number()).get_values()
                     
                     if red != -1 or green != -1 or blue != -1 or pir != -1 or mir != -1:
-                    
+                        all_set = True
                         bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
-                        layer.set_bands(bands)
+#                         for i in bands.values():
+#                             if bands.values().count(i) > 1:
+#                                 doublon = True
+#                                 break
+#                         if not doublon :
+                        for i in range(1,layer.get_band_number()+1):
+                            print i, bands.values()
+                            if not i in bands.values():
+                                all_set=False
+                        if all_set:
+                            
                         
-                        logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
-                        
-                        cst = TerreImageConstant()
-                        cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
-                        
-                        
-                        manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
-                        compute_overviews(fileOpened)
-                        return layer, bands
+                            layer.set_bands(bands)
+                            
+                            logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+                            
+                            cst = TerreImageConstant()
+                            cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
+                            
+                            
+                            manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
+                            compute_overviews(fileOpened)
+                            return layer, bands
+                        else:
+                            QMessageBox.warning( None , "Erreur", u'Il y a un problème dans la définition des bandes spectrales.', QMessageBox.Ok )
+                            return None, None
                     else:
                         return None, None
     else:

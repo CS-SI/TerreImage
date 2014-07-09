@@ -130,34 +130,49 @@ class manage_bands:
     
     
     def update_red(self, value):
-        if self.bandsUi.radioButton_autre.isChecked() == True:
+#         print self.bandsUi.radioButton_autre.isChecked()
+#         if self.bandsUi.radioButton_autre.isChecked() == False:
+#             self.bandsUi.radioButton_autre.setChecked(True)
+#         if self.bandsUi.radioButton_autre.isChecked() == True:
             #print "update red"
            # print "value", value
-            self.red = value
+        self.red = value
             #print self.red
             #self.debug("update red")
        
        
     def update_green(self, value):
-        if self.bandsUi.radioButton_autre.isChecked() == True:
-            self.green = value
+#         print self.bandsUi.radioButton_autre.isChecked()
+#         if self.bandsUi.radioButton_autre.isChecked() == False:
+#             self.bandsUi.radioButton_autre.setChecked(True)
+#         if self.bandsUi.radioButton_autre.isChecked() == True:
+        self.green = value
             #self.debug("update green")
       
           
     def update_blue(self, value):
-        if self.bandsUi.radioButton_autre.isChecked() == True:
-            self.blue = value
+#         print self.bandsUi.radioButton_autre.isChecked()
+#         if self.bandsUi.radioButton_autre.isChecked() == False:
+#             self.bandsUi.radioButton_autre.setChecked(True)
+#         if self.bandsUi.radioButton_autre.isChecked() == True:
+        self.blue = value
             #self.debug("update blue")
           
           
     def update_pir(self, value):
-        if self.bandsUi.radioButton_autre.isChecked() == True:
-            self.pir = value
+#         print self.bandsUi.radioButton_autre.isChecked()
+#         if self.bandsUi.radioButton_autre.isChecked() == False:
+#             self.bandsUi.radioButton_autre.setChecked(True)
+#         if self.bandsUi.radioButton_autre.isChecked() == True:
+        self.pir = value
             #self.debug("update pir")
           
     def update_mir(self, value):
-        if self.bandsUi.radioButton_autre.isChecked() == True:
-            self.mir = value    
+#         print self.bandsUi.radioButton_autre.isChecked()
+#         if self.bandsUi.radioButton_autre.isChecked() == False:
+#             self.bandsUi.radioButton_autre.setChecked(True)
+#         if self.bandsUi.radioButton_autre.isChecked() == True:
+        self.mir = value    
             #self.debug("update mir")   
     
     
@@ -168,32 +183,48 @@ class manage_bands:
         self.bandsUi.spinBox_blue.setMaximum( number_of_bands )
         self.bandsUi.spinBox_pir.setMaximum( number_of_bands )
         self.bandsUi.spinBox_mir.setMaximum( number_of_bands )
+        self.bandsUi.spinBox_red.setMinimum( 1 )
+        self.bandsUi.spinBox_green.setMinimum( 1 )
+        self.bandsUi.spinBox_blue.setMinimum( 1 )
+        self.bandsUi.spinBox_pir.setMinimum( 1 )
+        self.bandsUi.spinBox_mir.setMinimum( 1 )
         if number_of_bands == 1:
+            self.bandsUi.spinBox_red.setMinimum( 0 )
+            self.bandsUi.spinBox_green.setMinimum( 0 )
+            self.bandsUi.spinBox_blue.setMinimum( 0 )
+            self.bandsUi.spinBox_pir.setMinimum( 0 )
+            self.bandsUi.spinBox_mir.setMinimum( 0 )
             self.red = 0
             self.green = 0
             self.blue = 0
             self.pir = 0
             self.mir = 0
+            
+        
             self.bandsUi.radioButton_formosat.setEnabled(False)
             self.bandsUi.radioButton_spot.setEnabled(False)
             self.bandsUi.radioButton_pleiades.setEnabled(False)
             self.update_spin_box()
         elif number_of_bands == 3:
-            self.blue = -1
+            self.bandsUi.spinBox_blue.setMinimum( 0 )
+            self.bandsUi.spinBox_mir.setMinimum( 0 )
+            self.blue = 0
             self.green = 1
             self.red = 2
             self.pir = 3
-            self.mir = -1
+            self.mir = 0
             self.bandsUi.radioButton_formosat.setEnabled(False)
             self.bandsUi.radioButton_pleiades.setEnabled(False)
             self.update_spin_box()
             self.update_blue_mir("none")
         elif number_of_bands == 4:
+            self.bandsUi.spinBox_blue.setMinimum( 0 )
+            self.bandsUi.spinBox_mir.setMinimum( 0 )
             self.blue = 1
             self.green = 2
             self.red = 3
             self.pir = 4
-            self.mir = -1
+            self.mir = 0
             self.update_spin_box()
             self.update_blue_mir("blue")
         else:
@@ -310,7 +341,7 @@ class manage_bands:
         self.mir = -1
         self.update_spin_box()
         self.bandsUi.radioButton_formosat.setEnabled(True)
-         
+        
          
     def define_pleiade(self):
         self.blue = 3
@@ -320,7 +351,7 @@ class manage_bands:
         self.mir = -1
         self.update_spin_box()
         self.bandsUi.radioButton_pleiades.setEnabled(True)
-         
+        
     
     def define_spot(self):
         #print "define spot"
