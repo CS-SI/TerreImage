@@ -239,14 +239,24 @@ class MyMplCanvas(FigureCanvas):
         """
         Check if the clicked point is nearer from x_min than from x_max
         """
+        self.do_change = True
         logger.debug( 'press')
         x = event.xdata
-        # take x_min
-        if abs(x-self.x_min) < abs(x-self.x_max):
-            self.change_min = True
+        if x :
+            #knowing which line to move
+            # take x_min        
+#             if x < self.rasterMin:
+#                 self.x_min = self.rasterMin
+#             if x > self.rasterMax:
+#                 self.x_max = self.rasterMax
+                
+            if abs(x-self.x_min) < abs(x-self.x_max):
+                self.change_min = True
+            else:
+                self.change_min = False
+            #self.valueChanged.emit()
         else:
-            self.change_min = False
-        #self.valueChanged.emit()
+            self.do_change = False
         
         
         #self.x_min = 
@@ -255,24 +265,38 @@ class MyMplCanvas(FigureCanvas):
         """
         Check
         """
-        logger.debug( 'release')
-        if self.change_min :
-            self.x_min = event.xdata
-        else:
-            self.x_max = event.xdata
-        
-        self.axes.clear()
-        self.draw_histogram()
-        #self.axes.plot(self.t, self.s, self.color)
-        #self.axes.plot(self.x1, self.x1, 'g^')
-        self.draw_min_max_percent()
-        #self.axes.vlines(self.x1, [0], self.x1)
-#         self.axes.set_xlabel('time (s)')
-#         self.axes.set_title('Vertical lines demo')
-        
-        self.axes.figure.canvas.draw()
-        self.emit( QtCore.SIGNAL("valueChanged()") )
-        logger.debug( str(self.x_min) + " " + str(self.x_max))
+        if self.do_change:
+            logger.debug( 'release')
+            # classic case
+            last_min = self.x_min
+            last_max = self.x_max
+            if self.change_min :
+                self.x_min = event.xdata
+            else:
+                self.x_max = event.xdata
+            #if the user drag the max line under the min line, switch the values
+            if self.x_min > self.x_max:
+                temp = self.x_min
+                self.x_min = self.x_max
+                self.x_max = temp
+            if self.x_min < self.rasterMin:
+                self.x_min = self.rasterMin
+            if self.x_max > self.rasterMax:
+                self.x_max = self.rasterMax
+                
+                
+            self.axes.clear()
+            self.draw_histogram()
+            #self.axes.plot(self.t, self.s, self.color)
+            #self.axes.plot(self.x1, self.x1, 'g^')
+            self.draw_min_max_percent()
+            #self.axes.vlines(self.x1, [0], self.x1)
+    #         self.axes.set_xlabel('time (s)')
+    #         self.axes.set_title('Vertical lines demo')
+            
+            self.axes.figure.canvas.draw()
+            self.emit( QtCore.SIGNAL("valueChanged()") )
+            logger.debug( str(self.x_min) + " " + str(self.x_max))
 
 
 
