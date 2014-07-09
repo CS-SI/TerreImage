@@ -228,8 +228,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             self.main_histogram()
         elif text_changed != "Histogrammes" and text_changed != "":
             # find the layer corresponding to the name
-            process = self.qgis_education_manager.name_to_processing[text_changed]
+            #process = self.qgis_education_manager.name_to_processing[text_changed]
+            process = ProcessingManager().processing_from_name(text_changed)
             if process :
+                process = process[0]
                 specific_band = -1
                 
                 if text_changed == "Couleurs naturelles":
