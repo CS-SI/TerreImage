@@ -48,11 +48,6 @@ class TerreImageManager():
         self.layer = None
         self.working_directory = None #, _ = terre_image_utils.fill_default_directory()
         self.processings = []
-        #self.layers_for_value_tool = [ ]
-        self.layers_for_classif_tool = [ ]
-        self.name_to_processing = {}
-        self.has_spectral_angle = False
-        self.has_seuillage = False
         
         self.value_tool = ValueWidget( self.iface ) #, self )
         #creating a dock widget
@@ -73,27 +68,6 @@ class TerreImageManager():
         self.classif_tool = SupervisedClassificationDialog(self.iface)
         
         
-        
-        
-    def add_processing(self, processing):
-        self.processings.append(processing)
-        if isinstance(processing, TerreImageProcessing):
-            #self.layers_for_value_tool.append(processing.output_working_layer.qgis_layer)
-            self.layers_for_classif_tool.append(processing.output_working_layer.get_qgis_layer())
-        logger.info( " adding" + str(processing.processing_name) )
-        self.name_to_processing[processing.processing_name] = processing
-        
-        
-#     def get_process_to_display(self):
-#         for x in self.processings:
-#             logger.debug( x )
-#             logger.debug( x.output_working_layer.qgis_layer )
-#         
-#         
-#         temp = [x.output_working_layer.qgis_layer for x in self.processings if isinstance(x, TerreImageProcessing) and x.output_working_layer.qgis_layer is not None]
-#         logger.debug( temp )
-#         return temp
-        
     
     def set_current_layer(self):
         self.layer, bands  = terre_image_utils.get_workinglayer_on_opening( self.iface )
@@ -109,11 +83,6 @@ class TerreImageManager():
         #self.layers_for_value_tool.append(self.layer ) #.get_qgis_layer())
         logger.debug( "working directory" )
         
-        
-        
-        
-        
-        
         return self.layer, bands
         
         
@@ -124,7 +93,6 @@ class TerreImageManager():
         for pro in self.processings:
             sortie += str(pro) + "\n"
         sortie += "]"
-        sortie += "layers_for_classif_tool" + str( self.layers_for_classif_tool )
         
         return sortie
     
@@ -152,29 +120,14 @@ class TerreImageManager():
         if process :
             try:
                 QgsMapLayerRegistry.instance().removeMapLayer( process[0].output_working_layer.qgis_layer.id())
-                self.remove_process(process[0])
+                ProcessingManager().remove_process(process[0])
+                ProcessingManager().remove_display(process[0])
             except KeyError:
                 pass
-                
-        
-        
-    def remove_process(self, process):
-        if process in self.processings :
-            self.processings.remove(process)
-            #if isinstance(process, TerreImageProcessing):
-            #    self.layers_for_value_tool.remove(process.output_working_layer.qgis_layer)
-        self.name_to_processing[process.processing_name] = ""
         
         
     def removing_layer(self, layer_id):
         ProcessingManager().remove_process_from_layer_id(layer_id)
-#         process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
-#         logger.debug( "process" + str( process))
-#         if process :
-#             process[0].mirror.close()
-#             self.remove_process(process[0])
-            
-            
     
         
         

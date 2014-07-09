@@ -194,7 +194,7 @@ class QGISEducation:
             print "Aucune layer selectionnée"
         else :
             my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.educationWidget.mirror_map_tool, name )
-            self.qgis_education_manager.add_processing(my_processing)
+            ProcessingManager().add_processing(my_processing)
             self.qgisedudockwidget.set_combobox_histograms()
             
         
@@ -221,7 +221,7 @@ class QGISEducation:
             my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who, None, qgis_layer )
         else:
             my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who )
-        self.qgis_education_manager.add_processing(my_process)
+        ProcessingManager().add_processing(my_process)
         self.educationWidget.set_combobox_histograms()
         
         
@@ -410,7 +410,7 @@ class QGISEducation:
 #                 print "process", process
 #                 process.output_working_layer = i[1]
 #                 process.display(i[1])
-#                 self.qgis_education_manager.add_processing(my_processing)
+#                 ProcessingManager().add_processing(my_processing)
 #                 #self.educationWidget.do_manage_processing( i )
 #             else:
 #                 self.educationWidget.do_manage_sprectral_band_display(i)

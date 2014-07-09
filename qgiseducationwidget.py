@@ -139,6 +139,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
     def plugin_classification(self):
         self.qgis_education_manager.classif_tool.show()
+        print "ProcessingManager().get_qgis_working_layers()", ProcessingManager().get_qgis_working_layers()
         self.qgis_education_manager.classif_tool.update_layers( ProcessingManager().get_qgis_working_layers() )
         
         
@@ -208,7 +209,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                 
         self.set_working_message(True)
         my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, who.layer, self.qgis_education_manager.mirror_map_tool, "Seuillage", forms )
-        #self.qgis_education_manager.add_processing(my_processing) # TODO : keep it ?
+        #ProcessingManager().add_processing(my_processing) # TODO : keep it ?
         self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
         self.set_working_message(False)
         
@@ -321,10 +322,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                         self.set_working_message(True)
                         self.label_a_s.show()
                         self.label_a_s_img.show()
-                        self.qgis_education_manager.has_spectral_angle = True
                         QtCore.QObject.connect( my_processing, QtCore.SIGNAL( "display_ok()" ), lambda who=my_processing: self.processing_end_display(who) )
                     if not text_changed == "Angle Spectral":
-                        self.qgis_education_manager.add_processing(my_processing)
+                        #ProcessingManager().add_processing(my_processing)
                         self.set_combobox_histograms()
                         self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
                         self.set_working_message(False)
@@ -333,7 +333,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
     def processing_end_display(self, my_processing):
         logger.debug( "processing_end_display" )
-        self.qgis_education_manager.add_processing(my_processing)
+        #ProcessingManager().add_processing(my_processing)
         self.set_combobox_histograms()
         self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
         self.set_working_message(False)
@@ -388,7 +388,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     #manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
                     if do_it :
                         my_processing = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who )
-                        self.qgis_education_manager.add_processing(my_processing)
+                        #ProcessingManager().add_display(my_processing)
                         self.set_combobox_histograms()
                     break
             self.comboBox_sprectral_band_display.setCurrentIndex( 0 )
@@ -407,7 +407,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             nb_class = self.spinBox_kmeans.value()
             logger.debug( "nb_colass from spinbox: " + str(nb_class))
             my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, "KMEANS", nb_class )
-            self.qgis_education_manager.add_processing(my_processing)
+            #ProcessingManager().add_processing(my_processing)
             self.set_combobox_histograms()
             
             self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
