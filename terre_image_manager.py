@@ -47,7 +47,6 @@ class TerreImageManager():
         self.canvas = self.iface.mapCanvas()
         self.layer = None
         self.working_directory = None #, _ = terre_image_utils.fill_default_directory()
-        self.processings = []
         
         self.value_tool = ValueWidget( self.iface ) #, self )
         #creating a dock widget

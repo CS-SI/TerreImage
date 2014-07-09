@@ -84,7 +84,6 @@ class QGISEducation:
         self.iface.addToolBarIcon(self.action)
         self.iface.addPluginToMenu(u"&TerreImage", self.action)
         self.iface.addPluginToMenu("TerreImage", self.aboutAction)
-        #self.extra_menu()
         
         self.qgisedudockwidget = None
         self.dockOpened = False
@@ -95,124 +94,6 @@ class QGISEducation:
         QObject.connect(QgsProject.instance(), SIGNAL("writeProject(QDomDocument &)"), self.onWriteProject)
         QObject.connect(self.iface, SIGNAL("newProjectCreated()"), self.newProject)        
     
-        
-        
-        #self.classif_tool = SupervisedClassification()
-        #logger.debug( self.classif_tool )
-
-    def extra_menu(self):
-        # find the Raster menu
-        rasterMenu = None
-        menu_bar = self.iface.mainWindow().menuBar()
-        actions = menu_bar.actions()
-    
-        rasterText = QCoreApplication.translate( "QgisApp", "&TerreImage" )
-    
-        for a in actions:
-            if a.menu() != None and a.menu().title() == rasterText:
-                rasterMenu = a.menu()
-                break
-    
-        if rasterMenu == None:
-            # no Raster menu, create and insert it before the Help menu
-            self.menu = QMenu( rasterText, self.iface.mainWindow() )
-            lastAction = actions[ len( actions ) - 1 ]
-            menu_bar.insertMenu( lastAction, self.menu )
-        else:
-            self.menu = rasterMenu
-            self.menu.addSeparator()
-    
-        # projections menu (Warp (Reproject), Assign projection)
-        self.processing_menu = QMenu( QCoreApplication.translate( "TerreImage", "Traitements" ), self.iface.mainWindow() )
-        
-        processings = {"NDVI":"Calcule le NDVI de l'image de travail", "NDTI":"Calcule le NDTI de l'image de travail",\
-                       "Indice de brillance":"Calcule l'indice de brillance de l'image de travail", "KMEANS":"Calcule le kmeans sur l'image de travail",\
-                       "Angle spectral":"Calcule l'angle spectral pour la coordonnée pointée de l'image de travail", "Classif":"Ouvre le module de classification sur l'image de travail"}
-        icons = {"NDVI":":/icons/warp.png", "NDTI":":icons/projection-add.png", "Indice de brillance":":/icons/warp.png", \
-                 "KMEANS":":icons/projection-add.png", "Angle spectral":":/icons/warp.png", "Classif":":icons/projection-add.png"}
-        
-        for key in processings.keys():
-            action = QAction( QIcon(icons[key]),  QCoreApplication.translate( "TerreImage", key ), self.iface.mainWindow() )
-            action.setStatusTip( QCoreApplication.translate( "TerreImage", processings[key]) )
-            QObject.connect( action, SIGNAL( "triggered()" ), lambda who=key: self.do_process(who))
-            self.processing_menu.addAction( action )
-
-      
-        # conversion menu (Rasterize (Vector to raster), Polygonize (Raster to vector), Translate, RGB to PCT, PCT to RGB)
-        self.visualization_menu = QMenu( QCoreApplication.translate( "TerreImage", "Visualisation" ), self.iface.mainWindow() )
-    
-        self.histo = QAction( QIcon( ":icons/24-to-8-bits.png" ), QCoreApplication.translate( "TerreImage", "Afficher l'histogramme" ), self.iface.mainWindow() )
-        self.histo.setStatusTip( QCoreApplication.translate( "TerreImage", "Affiche l'histogramme de l'image de travail" ) )
-        QObject.connect( self.histo, SIGNAL( "triggered()" ), self.do_histogram )
-    
-        self.values = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Afficher les valeurs des pixels" ), self.iface.mainWindow() )
-        self.values.setStatusTip( QCoreApplication.translate( "TerreImage", "Affiche les valeurs des pixels sous la douris pour toutes les images" ) )
-        QObject.connect( self.values, SIGNAL( "triggered()" ), self.do_display_values )
-    
-        self.visualization_menu.addActions( [ self.histo, self.values ] )
-    
-    
-        self.kmz = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Export KMZ" ), self.iface.mainWindow() )
-        self.kmz.setStatusTip( QCoreApplication.translate( "TerreImage", "Export the current view in KMZ" ) )
-        #QObject.connect( self.kmz, SIGNAL( "triggered()" ), self.do_export_kmz )
-        QObject.connect( self.kmz, SIGNAL( "triggered()" ), lambda who="KMZ": self.do_process(who)) #self.do_display_one_band )
-                
-        
-        self.menu.addMenu( self.processing_menu )
-        self.menu.addMenu( self.visualization_menu )
-        self.menu.addActions([self.kmz])
-        
-#         if not self.analysisMenu.isEmpty():
-#           self.menu.addMenu( self.analysisMenu )
-
-    def extra_menu_visu( self, bands ):
-        logger.debug( "bands" + str(bands))
-        corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
-        
-        self.visualization_menu.clear()
-        self.visualization_menu.addActions( [ self.histo, self.values ] )
-        
-        if self.qgis_education_manager.layer.has_natural_colors():
-            visu_band = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ), self.iface.mainWindow() )
-            visu_band.setStatusTip( QCoreApplication.translate( "TerreImage", "Afficher en couleurs naturelles" ) )
-            QObject.connect( visu_band, SIGNAL( "triggered()" ), lambda who='nat': self.do_display_one_band(who)) #self.do_display_one_band )
-            self.visualization_menu.addAction(visu_band)
-            
-        for i in range(self.qgis_education_manager.layer.get_band_number()):
-            y=[x for x in bands if bands[x]==i+1]
-            if y :
-                text = corres[y[0]]
-                visu_band = QAction( QIcon( ":icons/8-to-24-bits.png" ), QCoreApplication.translate( "TerreImage", text ), self.iface.mainWindow() )
-                visu_band.setStatusTip( QCoreApplication.translate( "TerreImage", text ) )
-                QObject.connect( visu_band, SIGNAL( "triggered()" ), lambda who=str(y[0]): self.do_display_one_band(who)) #self.do_display_one_band )
-                self.visualization_menu.addAction(visu_band)
-
-
-    def do_process(self, name):
-        timeBegin = time.time()
-        if self.qgis_education_manager.layer == None :
-            print "Aucune layer selectionnée"
-        else :
-            my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.educationWidget.mirror_map_tool, name )
-            ProcessingManager().add_processing(my_processing)
-            self.qgisedudockwidget.set_combobox_histograms()
-            
-        
-        self.educationWidget.value_tool.set_layers(ProcessingManager().get_working_layers())
-        timeEnd = time.time()
-        timeExec = timeEnd - timeBegin
-        print "temps du " + str(name) + "  : " + str(timeExec)
-    
-    
-    def do_angles(self):
-        self.educationWidget.spectral_angles()
-    
-    
-    def do_classif(self):
-        pass
-
-    def do_export_kmz(self):
-        pass
     
     def do_display_one_band(self, who, qgis_layer=None):
         logger.debug( "who" + str(who))
@@ -223,14 +104,6 @@ class QGISEducation:
             my_process = TerreImageDisplay( self.iface, self.qgis_education_manager.working_directory, self.qgis_education_manager.layer, self.qgis_education_manager.mirror_map_tool, who )
         ProcessingManager().add_processing(my_process)
         self.educationWidget.set_combobox_histograms()
-        
-        
-    def do_histogram(self):
-        pass
-    
-    def do_display_values(self):
-        self.educationWidget.display_values()
-
 
 
     def unload(self):
@@ -312,7 +185,6 @@ class QGISEducation:
                     self.educationWidget.set_comboBox_sprectral_band_display()
     
                 text = "Plan R <- BS_PIR \nPlan V <- BS_R \nPlan B <- BS_V"
-                #self.extra_menu_visu(bands)
                 
                 self.qgisedudockwidget.show()
                 self.dockOpened = True        
