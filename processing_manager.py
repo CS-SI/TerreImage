@@ -152,9 +152,13 @@ class ProcessingManager(object):
             sortie += str(pro) + "\n"
         for pro in self.displays:
             sortie += str(pro) + "\n"
-        sortie += "]"
-        sortie += "layers" + str( self.get_layers() )
-        sortie += "working_layers" + str( self.get_working_layers() )
+        sortie += "]\n"
+        sortie += "layers"  + "\n"
+        for l in self.get_layers():
+            sortie += str( l ) + "\n"
+        sortie += "working_layers" + "\n"
+        for l in self.get_working_layers():
+            sortie += str( l ) + "\n"
         
         return sortie
     

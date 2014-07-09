@@ -113,7 +113,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.pushButton_profil_spectral.clicked.connect(self.display_values)
         self.pushButton_working_dir.clicked.connect(self.define_working_dir)
         self.pushButton_status.clicked.connect(self.status)
-        self.pushButton_status.hide()
+        #self.pushButton_status.hide()
         self.pushButton_histogramme.hide()
         self.pushButton_histogramme.clicked.connect(self.main_histogram)
         self.pushButton_plugin_classification.clicked.connect(self.plugin_classification)
@@ -133,6 +133,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         print ProcessingManager()
         print "\n"
         print ProcessingManager().get_processings_name()
+        print "layers value tool \n"
+        print self.qgis_education_manager.value_tool.layers_to_display
         
         
     def plugin_classification(self):
@@ -199,7 +201,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             processings_seuillage=ProcessingManager().processing_from_name("Seuillage")
             if processings_seuillage:
                 processings_seuillage[0].mirror.close()
-                QgsMapLayerRegistry.instance().removeMapLayer( processings_seuillage[0].output_working_layer.qgis_layer.id())
+                try :
+                    QgsMapLayerRegistry.instance().removeMapLayer( processings_seuillage[0].output_working_layer.qgis_layer.id())
+                except RuntimeError:
+                    pass
                 
         self.set_working_message(True)
         my_processing = TerreImageProcessing( self.iface, self.qgis_education_manager.working_directory, who.layer, self.qgis_education_manager.mirror_map_tool, "Seuillage", forms )
@@ -435,6 +440,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
         if self.qgis_education_manager:
+            if self.qgis_education_manager.value_tool:
+                self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
             logger.debug( "self.qgis_education_manager.layer.get_qgis_layer().id(): " +  str(self.qgis_education_manager.layer.get_qgis_layer().id()))
             if self.qgis_education_manager.layer.get_qgis_layer().id() == layer_id:
                 self.disconnect_interface()
