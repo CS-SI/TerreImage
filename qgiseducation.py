@@ -101,7 +101,7 @@ class QGISEducation:
             my_process = TerreImageDisplay( self.iface, working_directory, ProcessingManager().working_layer, mirror_tool, who, None, qgis_layer )
         else:
             my_process = TerreImageDisplay( self.iface, working_directory, ProcessingManager().working_layer, mirror_tool, who )
-        ProcessingManager().add_processing(my_process)
+        #ProcessingManager().add_processing(my_process)
         self.educationWidget.set_combobox_histograms()
 
 
