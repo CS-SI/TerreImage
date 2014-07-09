@@ -430,6 +430,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def layer_deleted(self, layer_id):
         #logger.debug( str(layer_id) + " deleted")
         #print str(layer_id) + " deleted"
+        layer_id = layer_id.encode('utf-8')
         
         if "Angle_Spectral" in str(layer_id):
             #delete rubberband
