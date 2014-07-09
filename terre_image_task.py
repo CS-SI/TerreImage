@@ -104,8 +104,8 @@ class TerreImageProcessing(TerreImageTask, QObject):
     def __str__(self):
         message = self.processing_name
         if self.output_working_layer.source_file :
-            message += " : \n\t status ok \n\t image resultante :" + self.output_working_layer.source_file
-            message += "\n\t mirror:" + str(self.mirror)
+            message += " : \t status ok \t image resultante :" + self.output_working_layer.source_file
+            message += "\t mirror:" + str(self.mirror)
         
         return message
 
@@ -270,7 +270,7 @@ class TerreImageDisplay(TerreImageTask):
     def __str__(self):
         message = self.processing_name
         if self.output_working_layer.source_file :
-            message += "\n\t mirror:" + str(self.mirror)
+            message += "\t mirror:" + str(self.mirror)
         
         return message
       

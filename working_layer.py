@@ -43,7 +43,7 @@ class WorkingLayer():
         
     
     def __str__(self):
-        message = "Working Layer : \n\t " + self.source_file + " " + str(self.bands)
+        message = self.source_file + " " + self.qgis_layer.name() + " " + str(self.bands)
         
         return message
     

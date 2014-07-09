@@ -45,7 +45,6 @@ class TerreImageManager():
     def __init__(self, iface ):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
-        self.layer = None
         self.working_directory = None #, _ = terre_image_utils.fill_default_directory()
         
         self.value_tool = ValueWidget( self.iface ) #, self )
@@ -86,12 +85,8 @@ class TerreImageManager():
         
         
     def __str__(self):
-        sortie = "working_dir : " + self.working_directory + "\n"
-        sortie += "image de travail : " + str(self.layer) + "\n"
-        sortie += "processings : ["
-        for pro in self.processings:
-            sortie += str(pro) + "\n"
-        sortie += "]"
+        sortie = "working_dir : " + self.working_directory
+
         
         return sortie
     

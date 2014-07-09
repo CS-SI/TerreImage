@@ -128,13 +128,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
     def status(self):
+        print "############# Status #############"
         print( self.qgis_education_manager )
         print( "self.qgis_education_manager.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors) ) + "\n"
         print ProcessingManager()
-        print "\n"
         print ProcessingManager().get_processings_name()
-        print "layers value tool \n"
+        print "layers value tool "
         print self.qgis_education_manager.value_tool.layers_to_display
+        print "##########################"
         
         
     def plugin_classification(self):
