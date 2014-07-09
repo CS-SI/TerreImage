@@ -440,8 +440,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
         if self.qgis_education_manager:
-            if self.qgis_education_manager.value_tool:
-                self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
             logger.debug( "self.qgis_education_manager.layer.get_qgis_layer().id(): " +  str(self.qgis_education_manager.layer.get_qgis_layer().id()))
             if self.qgis_education_manager.layer.get_qgis_layer().id() == layer_id:
                 self.disconnect_interface()
@@ -450,6 +448,13 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                 
         ProcessingManager().remove_process_from_layer_id(layer_id)
         ProcessingManager().remove_displays_from_layer_id(layer_id)
+        
+        
+        try:
+            self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
+        except  AttributeError:
+            pass
+        
         self.set_combobox_histograms()
 
     def disconnect_interface(self):
