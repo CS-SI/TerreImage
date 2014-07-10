@@ -165,7 +165,6 @@ class QGISEducation:
         if ProcessingManager().working_layer and bands:
 
             if not self.dockOpened :
-                print "not self.dock opened"
                 # create the widget to display information
                 self.educationWidget = QGISEducationWidget(self.iface)
                 QObject.connect( self.educationWidget, SIGNAL( "terminated()" ), self.unload_interface )
@@ -200,15 +199,12 @@ class QGISEducation:
         
             
     def newProject(self):
-        print "new project"
         for item in self.iface.mapCanvas().scene().items():
             if isinstance(item, QgsRubberBand):
                 item.reset(QGis.Point)
         if self.educationWidget is not None:
-            print "self.educationwidget not none"
             self.educationWidget.disconnect_interface()
             if self.qgisedudockwidget is not None:
-                print "self.qgisedudockwidget not none"
                 self.qgisedudockwidget.close()
                 self.educationWidget.disconnectP()
                 self.dockOpened = False

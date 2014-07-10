@@ -191,9 +191,10 @@ class SupervisedClassificationDialog(QtGui.QDialog):
     
         
     def update_layers(self, layers):
+        "self.update_layers(layers)"
         self.layers = layers
-        #for layer in self.layers:
-        #    print layer.name()
+        for layer in self.layers:
+            print layer.name()
         vectorlayers = QGisLayers.getVectorLayers(QGisLayerType.POLYGON)
         self.vectorlayerselector.set_layers(vectorlayers)
         rasterlayers = layers

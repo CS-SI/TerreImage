@@ -91,7 +91,6 @@ class MyMplCanvas(FigureCanvas):
         else :
             band = dataset.GetRasterBand(band_number)
             if no_data != -1:
-                print "setting no data for histogram :", no_data
                 band.SetNoDataValue(no_data)
             
             self.rasterMin, self.rasterMax = band.ComputeRasterMinMax()

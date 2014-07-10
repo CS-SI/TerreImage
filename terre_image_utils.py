@@ -179,7 +179,6 @@ def get_workinglayer_on_opening(iface):
 #                                 break
 #                         if not doublon :
                         for i in range(1,layer.get_band_number()+1):
-                            print i, bands.values()
                             if not i in bands.values():
                                 all_set=False
                         if all_set:
