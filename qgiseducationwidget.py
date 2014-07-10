@@ -240,7 +240,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     logger.debug( "text changed couleurs naturelles" )
                     self.set_working_message(True)
                     if not process.histogram:
-                        hist = TerreImageHistogram_multiband(ProcessingManager().working_layer, self.canvas, None, process)
+                        hist = TerreImageHistogram_multiband(ProcessingManager().working_layer, self.canvas, 3, process)
                         process.histogram = hist
                         self.histogram(process.output_working_layer, process, specific_band, hist)
                 else:
