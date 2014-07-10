@@ -120,10 +120,11 @@ def set_current_layer(iface):
         #self.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), self.layer.get_qgis_layer(), self.layer.band_invert)
         #self.classif_tool.set_directory(self.working_directory)
         #self.classif_tool.setupUi()
-    #layers_for_value_tool.append(layer ) #.get_qgis_layer())
-    logger.debug( "working directory" + working_directory )
+        #layers_for_value_tool.append(layer ) #.get_qgis_layer())
+        logger.debug( "working directory" + working_directory )
     
-    return layer, bands, working_directory
+        return layer, bands, working_directory
+    return None, None, None
         
 def get_workinglayer_on_opening(iface):
     settings = QSettings()
