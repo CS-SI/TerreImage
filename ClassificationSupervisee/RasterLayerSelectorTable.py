@@ -36,7 +36,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'RasterLayerSelectorTable' )
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 class TreeWidgetItem(QtGui.QTreeWidgetItem):
     def setData(self, column, role, value):

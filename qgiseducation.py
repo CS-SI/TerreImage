@@ -173,6 +173,10 @@ class QGISEducation:
                 self.educationWidget.qgis_education_manager.working_directory = working_dir
                 self.educationWidget.lineEdit_working_dir.setText(working_dir)
                 
+                self.educationWidget.qgis_education_manager.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), ProcessingManager().working_layer.get_qgis_layer(), ProcessingManager().working_layer.band_invert)
+                self.educationWidget.qgis_education_manager.classif_tool.set_directory(working_dir)
+                self.educationWidget.qgis_education_manager.classif_tool.setupUi()
+                
                 # create the dockwidget with the correct parent and add the valuewidget
                 self.qgisedudockwidget = Terre_Image_Dock_widget("Terre Image", self.iface.mainWindow() )
                 self.qgisedudockwidget.setObjectName("Terre Image")
