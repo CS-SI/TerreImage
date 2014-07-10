@@ -107,6 +107,11 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.app_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)), "win32", "bin")
         logger.debug( "self.app_dir" + str(self.app_dir) )
         
+        self.layers = []
+        self.main_layer = None
+        self.main_layer_bands = {}
+        
+        
         #self.setupUi()
         QGisLayers.setInterface(iface)
         self.output_dir = None

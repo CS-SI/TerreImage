@@ -64,6 +64,7 @@ class TerreImageManager():
         #self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
         
         self.classif_tool = SupervisedClassificationDialog(self.iface)
+        self.classif_tool.setupUi()
         
         
     
