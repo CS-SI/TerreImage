@@ -5,7 +5,7 @@ project( TerreImage )
 # Current official TerreImage software version
 set( TerreImage_VERSION_MAJOR 2 )
 set( TerreImage_VERSION_MINOR 3 )
-set( TerreImage_VERSION_PATCH 9 )
+set( TerreImage_VERSION_PATCH 10 )
 set( TerreImage_VERSION_FULL
      "${TerreImage_VERSION_MAJOR}.${TerreImage_VERSION_MINOR}.${TerreImage_VERSION_PATCH}" )
 

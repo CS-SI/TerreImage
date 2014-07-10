@@ -1,3 +1,13 @@
+Version 2.3.10
+- Amélioration de la stabilité générale du plugin
+- Harmonisation des classes
+
+Version 2.3.9
+- Meilleure gestion de l'intéraction des barres de min et max dans les histogrammes
+- Correction du comportement du seuillage qui écrase le précédent
+- Ajout d'une valeur de no data sur le calcul de l'histogramme de l'image de travail, la vue en couleurs naturelle et pour chacune des bandes spectrales 
+- Correction de la formule du NDTI
+
 Version 2.3.8
 - Correction de la sélection du canal pir de l'image
 - Remise à 0 de la valeur du NDVI pour un dénominateur nul
