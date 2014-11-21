@@ -215,6 +215,7 @@ class MyMplCanvas(FigureCanvas):
             ytext = self.axes.set_ylabel('Nombre')
             self.axes.set_title(self.name)
             
+            
     def draw_reset_percent(self):
         logger.debug(  "draw reset" )
         self.axes.clear()
@@ -246,12 +247,6 @@ class MyMplCanvas(FigureCanvas):
         x = event.xdata
         if x :
             #knowing which line to move
-            # take x_min        
-#             if x < self.rasterMin:
-#                 self.x_min = self.rasterMin
-#             if x > self.rasterMax:
-#                 self.x_max = self.rasterMax
-                
             if abs(x-self.x_min) < abs(x-self.x_max):
                 self.change_min = True
             else:
@@ -260,12 +255,10 @@ class MyMplCanvas(FigureCanvas):
         else:
             self.do_change = False
         
-        
-        #self.x_min = 
 
     def on_release(self, event):
         """
-        Check
+        Get asbscissas of new x_min or x_max
         """
         if self.do_change and event.xdata:
             logger.debug( 'release')
@@ -304,7 +297,6 @@ class MyMplCanvas(FigureCanvas):
 
 class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
     
-    #__pyqtSignals__ = ("curveTitleChanged(str)", "hideCurve(int)", "colorChanged(QtGui.QColor)", "deleteCurve()")
     __pyqtSignals__ = ("valueChanged(PyQt_PyObject)", "threshold(PyQt_PyObject)")
     
     
@@ -332,10 +324,6 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
         b = QtGui.QPushButton("Remise à zéro")
         b.clicked.connect(self.reset)
         self.l.addWidget(b)
-#         seuil = QtGui.QPushButton("Seuillage")
-#         seuil.clicked.connect(self.seuillage)
-#         self.l.addWidget(seuil)
-        
         
         
     def reset(self):
