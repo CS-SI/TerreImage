@@ -110,8 +110,8 @@ class MyMplCanvas(FigureCanvas):
         print "self.x_min, self.x_max", self.x_min, self.x_max
         
         logger.debug(  "self.x_min, self.x_max" + str(self.x_min) + " " + str(self.x_max))
-        self.x_min = (self.x_min-self.rasterMin)*self.facteur+self.rasterMin
-        self.x_max = (self.x_max-self.rasterMin)*self.facteur+self.rasterMin
+        self.x_min = (self.x_min-self.rasterMin)*self.bin_witdh+self.rasterMin
+        self.x_max = (self.x_max-self.rasterMin)*self.bin_witdh+self.rasterMin
         self.two_min = self.x_min
         self.ninety_eight_max = self.x_max
             
@@ -126,23 +126,21 @@ class MyMplCanvas(FigureCanvas):
         From the given binary image, compute histogram and return the number of 1
         """
         histogram = []
-        
-        decimal_values = False
-        
+
         logger.debug( "image: " + str(image) + " band: " + str(band_number) )
         dataset = gdal.Open(str(image), gdal.GA_ReadOnly)
         if dataset is None:
             print "Error : Opening file ", image
         else :
+            #get raster band
             band = dataset.GetRasterBand(band_number)
             if no_data != -1:
                 band.SetNoDataValue(no_data)
             
+            #get raster and overview if available
             overview = 2
-            if overview < band.GetOverviewCount() :#or nbVal > 1 :
+            if overview < band.GetOverviewCount() :
                 band_overview = band.GetOverview(overview)
-            #elif overview < band.GetOverviewCount() or nbVal > 1 :
-            #    band_overview = band.GetOverview(1)
             else :
                 band_overview = band
                 
@@ -150,8 +148,7 @@ class MyMplCanvas(FigureCanvas):
             self.rasterMin, self.rasterMax, mean, stddev = band_overview.ComputeStatistics(True)
             print self.rasterMin, self.rasterMax, mean, stddev
             logger.debug( "self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin) )
-            #nbVal = max( self.rasterMax - self.rasterMin, self.rasterMax)
-            nbVal = self.rasterMax - self.rasterMin                        
+            nbVal = self.rasterMax - self.rasterMin
             print "nbVal", nbVal
 
             #taking the size of the raster
@@ -160,6 +157,7 @@ class MyMplCanvas(FigureCanvas):
             print "totalXSize", sizeX
             print "totalYSize", sizeY
             
+            #computing nb bins
             stddev_part = 3.5 * stddev 
             sizexy_part = math.pow( sizeX*sizeY, 1./3. )
             print "stddev", stddev_part
@@ -171,46 +169,39 @@ class MyMplCanvas(FigureCanvas):
             self.nb_bin = int(math.ceil(nbVal / nb_bin_part))
             print "nb_bin", self.nb_bin
             
-            self.facteur = float(self.rasterMax - self.rasterMin)/self.nb_bin
-            print "facteur", self.facteur
-            
             histogram = band_overview.GetHistogram(self.rasterMin, self.rasterMax+1, self.nb_bin, approx_ok = 0)
             
             # removing 0 at the end of the histogram
             while len(histogram) > 1 and histogram[-1] == 0 :
                 del histogram[-1]
-            #print "histogram", histogram
+            print "histogram", histogram
+            
+            self.bin_witdh = float(self.rasterMax - self.rasterMin)/len(histogram)
+            print "bin_witdh", self.bin_witdh
             
             self.get_2_98_percent(sizeX, sizeY, histogram)
             
             
             
-            return histogram, decimal_values
+            return histogram
         
         
     def display_histogram(self, filename, band, color, name, qgis_layer, no_data=-1):
         self.color = color
         self.name = name
         
+        #getting histogram
         if name == "NDVI":
-            histogram, decimal_values = self.get_GDAL_histogram(filename, band, qgis_layer)
+            histogram = self.get_GDAL_histogram(filename, band, qgis_layer)
         else :
-            histogram, decimal_values = self.get_GDAL_histogram(filename, band, qgis_layer, no_data)
-#         print "type(histogram)", type(histogram)
-#         print "histogram", histogram
-#         print "len(histogram)", len(histogram)
-        if not decimal_values:
-            #print arange(0, len(histogram)) + self.rasterMin
-            self.t = arange(0, len(histogram))*self.facteur + self.rasterMin#*(self.rasterMax - self.rasterMin)/self.nb_bin + self.rasterMin #range(0, len(histogram))
-        else:
-            #print arange(0, len(histogram)/1000., 0.001) + self.rasterMin
-            self.t = arange(0, len(histogram)/1000., 0.001) + self.rasterMin
-            #locs,labels = plt.yticks()
-            #plt.yticks(locs, map(lambda x: "%.1f" % x, locs*1e9))
-            #ylabel('microseconds (1E-9)'
+            histogram = self.get_GDAL_histogram(filename, band, qgis_layer, no_data)
+
+        #setting plot axis
+        self.t = arange(0, len(histogram))*self.bin_witdh + self.rasterMin#*(self.rasterMax - self.rasterMin)/self.nb_bin + self.rasterMin #range(0, len(histogram))
         self.s = histogram
         logger.debug(  "len s and len t"+ str(len(self.s)) + " " + str(len(self.t)))
-        #print "self.t", self.t
+        
+        #draw histogram, 2, 98 % and connect canvas
         self.draw_histogram()
         self.axes.figure.canvas.mpl_connect('button_press_event', self.on_press)
         self.axes.figure.canvas.mpl_connect('button_release_event', self.on_release)
@@ -229,9 +220,9 @@ class MyMplCanvas(FigureCanvas):
         self.axes.clear()
         self.draw_histogram()
         if self.two_min and self.ninety_eight_max:
-             logger.debug(  "self.two_min, self.ninety_eight_max" + str(self.two_min) + str(self.ninety_eight_max))
-             self.axes.axvline(x=self.two_min,c="red",linewidth=2,zorder=0, clip_on=False)
-             self.axes.axvline(x=self.ninety_eight_max,c="red",linewidth=2,zorder=0, clip_on=False)
+            logger.debug(  "self.two_min, self.ninety_eight_max" + str(self.two_min) + str(self.ninety_eight_max))
+            self.axes.axvline(x=self.two_min,c="red",linewidth=2,zorder=0, clip_on=False)
+            self.axes.axvline(x=self.ninety_eight_max,c="red",linewidth=2,zorder=0, clip_on=False)
         self.axes.figure.canvas.draw()
         self.x_min = self.two_min
         self.x_max = self.ninety_eight_max 
