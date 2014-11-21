@@ -30,8 +30,9 @@ from PyQt4 import QtGui, QtCore
 
 from osgeo import gdal, gdalconst, ogr
 
-from numpy import arange, sin, pi
+from numpy import arange, sin, pi, cumsum, percentile
 import numpy.ma as ma
+
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -40,12 +41,14 @@ from matplotlib.patches import Rectangle
 
 import manage_QGIS
 
+import math
+
 #import loggin for debug messages
 import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_Histograms' )
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 
@@ -73,7 +76,49 @@ class MyMplCanvas(FigureCanvas):
         self.ninety_eight_max = 0
         self.x_min = 0
         self.x_max = 0
+        self.real_x_min = 0
+        self.real_x_max = 0
         self.change_min = True
+
+
+    def get_2_98_percent(self, sizeX, sizeY, histogram):
+        # get 2 - 98 %
+        logger.debug(  "sizeX, sizeY" + str(sizeX) + " " + str(sizeY))
+        nb_pixels = sizeX * sizeY
+        logger.debug("nb_pixels: " + str(nb_pixels))
+        
+        nb_pixels_2 = int(float(nb_pixels * 0.02))
+        nb_pixels_98 = int(float(nb_pixels * 0.98))
+        
+        logger.debug(  "nb_pixels_2, nb_pixels_98: "  + str(nb_pixels_2) + " " + str(nb_pixels_98))
+        
+        hist_cum = cumsum(histogram)
+        #print "histogram", histogram
+        #print "hist cum", hist_cum
+        print "len(hist_cum)", len(hist_cum)
+        
+        self.x_min = 0
+        self.x_max = len(hist_cum)
+        hist_cum[-1] + self.rasterMin
+        for index in range(0,len(hist_cum)-1):
+            if hist_cum[index+1] > nb_pixels_2 and self.x_min == 0 :
+                self.x_min = index + self.rasterMin
+            if hist_cum[index+1] > nb_pixels_98 :
+                self.x_max = index + self.rasterMin
+                break;
+            
+        print "self.x_min, self.x_max", self.x_min, self.x_max
+        
+        logger.debug(  "self.x_min, self.x_max" + str(self.x_min) + " " + str(self.x_max))
+        self.x_min = (self.x_min-self.rasterMin)*self.facteur+self.rasterMin
+        self.x_max = (self.x_max-self.rasterMin)*self.facteur+self.rasterMin
+        self.two_min = self.x_min
+        self.ninety_eight_max = self.x_max
+            
+        print "self.x_min, self.x_max", self.x_min, self.x_max
+            
+        self.real_x_min = 0
+        self.real_x_max = 0
 
 
     def get_GDAL_histogram( self, image, band_number, qgis_layer, no_data=-1 ):
@@ -93,11 +138,6 @@ class MyMplCanvas(FigureCanvas):
             if no_data != -1:
                 band.SetNoDataValue(no_data)
             
-            self.rasterMin, self.rasterMax = band.ComputeRasterMinMax()
-            logger.debug( "self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin) )
-            #nbVal = max( self.rasterMax - self.rasterMin, self.rasterMax)
-            nbVal = self.rasterMax - self.rasterMin
-            
             overview = 2
             if overview < band.GetOverviewCount() :#or nbVal > 1 :
                 band_overview = band.GetOverview(overview)
@@ -105,75 +145,46 @@ class MyMplCanvas(FigureCanvas):
             #    band_overview = band.GetOverview(1)
             else :
                 band_overview = band
+                
+            # get overview statistics
+            self.rasterMin, self.rasterMax, mean, stddev = band_overview.ComputeStatistics(True)
+            print self.rasterMin, self.rasterMax, mean, stddev
+            logger.debug( "self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin) )
+            #nbVal = max( self.rasterMax - self.rasterMin, self.rasterMax)
+            nbVal = self.rasterMax - self.rasterMin                        
+            print "nbVal", nbVal
+
+            #taking the size of the raster
+            sizeX = float(band_overview.XSize)
+            sizeY = float(band_overview.YSize)
+            print "totalXSize", sizeX
+            print "totalYSize", sizeY
             
-            logger.debug("band_overview, xsize" + str(band_overview.XSize))
+            stddev_part = 3.5 * stddev 
+            sizexy_part = math.pow( sizeX*sizeY, 1./3. )
+            print "stddev", stddev_part
+            print "sizexy", sizexy_part
             
+            # warning stddev
+            nb_bin_part = (3.5 * stddev ) / (math.pow( sizeX*sizeY, 1./3. ) )
+            print nb_bin_part
+            self.nb_bin = int(math.ceil(nbVal / nb_bin_part))
+            print "nb_bin", self.nb_bin
             
-            if nbVal < 10 :
-                logger.debug( "nb val < 1" + str( nbVal) )
-                if nbVal != 0:
-                    #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1)*100, approx_ok = 0)
-                    histogram = band_overview.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1)*1000, approx_ok = 0)
-                    decimal_values = True
-                else:
-                    return []
-            else :
-                #get the histogram of the given raster
-                #histogram = band.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
-                #histogram = band.GetHistogram(min(0,self.rasterMin), self.rasterMax+1, int(nbVal+1), approx_ok = 0)
-                histogram = band_overview.GetHistogram(self.rasterMin, self.rasterMax+1, int(nbVal+1), approx_ok = 0)
+            self.facteur = float(self.rasterMax - self.rasterMin)/self.nb_bin
+            print "facteur", self.facteur
             
+            histogram = band_overview.GetHistogram(self.rasterMin, self.rasterMax+1, self.nb_bin, approx_ok = 0)
             
             # removing 0 at the end of the histogram
             while len(histogram) > 1 and histogram[-1] == 0 :
                 del histogram[-1]
             #print "histogram", histogram
             
-            # get 2 - 98 %
-            #taking the size of the raster
-            #sizeX = dataset.RasterXSize
-            sizeX = float(band_overview.XSize)
-            #sizeY = dataset.RasterYSize
-            sizeY = float(band_overview.YSize)
-            logger.debug(  "sizeX, sizeY" + str(sizeX) + " " + str(sizeY))
-            nb_pixels = sizeX * sizeY
-            logger.debug("nb_pixels: " + str(nb_pixels))
+            self.get_2_98_percent(sizeX, sizeY, histogram)
             
-            nb_pixels_2 = int(float(nb_pixels * 0.02))
-            nb_pixels_98 = int(float(nb_pixels * 0.98))
             
-            logger.debug(  "nb_pixels_2, nb_pixels_98: "  + str(nb_pixels_2) + " " + str(nb_pixels_98))
             
-            # catch the i where cum_hist(i) > nb_pixels_2 and nb_pixels_98
-            hist_cum = 0
-            
-            if decimal_values:
-                parcours = arange(0, len(histogram)/1000., 0.001)
-            else:
-                parcours = arange(0, len(histogram))
-            #print "parcours", parcours
-            cpt = 0
-            for i in parcours: #range(len(histogram)):
-                #print "i , hist cum", i, hist_cum
-                if hist_cum > nb_pixels_2 and self.x_min == 0 :
-                    self.x_min = i + self.rasterMin
-                if hist_cum > nb_pixels_98 :
-                    self.x_max = i + self.rasterMin
-                    break;
-                hist_cum += histogram[cpt]
-                cpt += 1
-            logger.debug(  "self.x_min, self.x_max" + str(self.x_min) + " " + str(self.x_max))
-            self.two_min = self.x_min
-            self.ninety_eight_max = self.x_max
-            if qgis_layer :
-                my_min, my_max = qgis_layer.dataProvider().cumulativeCut( band_number, 0, 0.98 );
-                #self.two_min = my_min
-                self.ninety_eight_max = my_max
-                #self.x_min = my_min
-                self.x_max = my_max
-                
-            logger.debug(  "self.two_min, self.ninety_eight_max" + str(self.two_min) + " " + str(self.ninety_eight_max))
-
             return histogram, decimal_values
         
         
@@ -190,7 +201,7 @@ class MyMplCanvas(FigureCanvas):
 #         print "len(histogram)", len(histogram)
         if not decimal_values:
             #print arange(0, len(histogram)) + self.rasterMin
-            self.t = arange(0, len(histogram)) + self.rasterMin #range(0, len(histogram))
+            self.t = arange(0, len(histogram))*self.facteur + self.rasterMin#*(self.rasterMax - self.rasterMin)/self.nb_bin + self.rasterMin #range(0, len(histogram))
         else:
             #print arange(0, len(histogram)/1000., 0.001) + self.rasterMin
             self.t = arange(0, len(histogram)/1000., 0.001) + self.rasterMin
@@ -198,7 +209,7 @@ class MyMplCanvas(FigureCanvas):
             #plt.yticks(locs, map(lambda x: "%.1f" % x, locs*1e9))
             #ylabel('microseconds (1E-9)'
         self.s = histogram
-        logger.debug(  "len s and len t"+ str(len(self.s)) + str(len(self.t)))
+        logger.debug(  "len s and len t"+ str(len(self.s)) + " " + str(len(self.t)))
         #print "self.t", self.t
         self.draw_histogram()
         self.axes.figure.canvas.mpl_connect('button_press_event', self.on_press)
@@ -229,6 +240,7 @@ class MyMplCanvas(FigureCanvas):
 
     def draw_min_max_percent(self):
         if self.x_min and self.x_max:
+            print "self.x_min, self.x_max", self.x_min, self.x_max
             logger.debug( "self.x_min, self.x_max" + str(self.x_min) + str(self.x_max))
             self.axes.axvline(x=self.x_min,c="red",linewidth=2,zorder=0, clip_on=False)
             self.axes.axvline(x=self.x_max,c="red",linewidth=2,zorder=0, clip_on=False)
