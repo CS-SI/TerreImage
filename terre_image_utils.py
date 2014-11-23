@@ -136,7 +136,7 @@ def get_workinglayer_on_opening(iface):
         path = QDir.currentPath()
         
         
-    fileOpened = QFileDialog.getOpenFileName( None, "Selectionner un fichier raster", path )
+    fileOpened = unicode(QFileDialog.getOpenFileName( None, "Selectionner un fichier raster", path ))
     
     settings.setValue("terre_image_lastFolder", os.path.dirname(fileOpened))
     settings.sync()

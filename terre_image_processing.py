@@ -20,7 +20,7 @@
  ***************************************************************************/
 """
 
-import os
+import os, sys
 import OTBApplications
 import manage_QGIS
 import re
@@ -144,9 +144,7 @@ def angles(layer, working_directory, iface, x, y):
             image_in = layer.get_qgis_layer().source()
             output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x).replace(".", "dot") + "_" + str(y).replace(".", "dot") + os.path.splitext(image_in)[1])
             
-            if not os.path.isfile(output_filename) :
-            
-                
+            if not os.path.isfile(output_filename) :                
                 num = []
                 denom = []
                 fact = []
@@ -247,23 +245,29 @@ def get_sensor_id( image ):
     currentOs = os.name
     
     if currentOs == "posix" :
-        command = "otbcli_ReadImageInfo -in " + image + " | grep \"sensor:\""
+        command = unicode("otbcli_ReadImageInfo -in " + image)# + " | grep \"sensor:\"")
     else :
-        command = "otbcli_ReadImageInfo -in " + image + " | findstr \"sensor:\""
+        command = unicode("otbcli_ReadImageInfo -in " + image)# + " | findstr \"sensor:\"")
         
-    command = command.decode('utf-8')
+    #command = command.encode(sys.getdefaultencoding(), 'replace')
+    print sys.stdout.encoding 
+    #reload(sys)
+    #sys.setdefaultencoding("utf-8")
+    #print sys.getdefaultencoding()
+    print command
     fused_command = command.split(" ")
     print fused_command
+    #fused_command = [ str(x) for x in fused_command ]
+    #print fused_command
 #         print "fused commadn", fused_command
 #         print "str fused, command", str(fused_command) #ascii pb
-    result_sensor = subprocess.Popen(fused_command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE,stderr=subprocess.STDOUT, universal_newlines=True).stdout
+    result_sensor = subprocess.check_output(fused_command)#, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE,stderr=subprocess.STDOUT, universal_newlines=True).stdout
     if result_sensor:
-        for line in iter(result_sensor.readline, ""):
-            print "line", line
+        for line in result_sensor.split("\n"):
             if "sensor" in line:
                 print "sensor line", line
                 sensor = re.search("sensor: ([a-zA-Z \d]+)$", line)
-             
+              
                 if sensor:
                     #group 1 parce qu'on a demande qqchose de particulier a la regexpr a cause des ()
                     sensor = sensor.group(1)
