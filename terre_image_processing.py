@@ -38,7 +38,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_processing' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
         
 def ndvi(layer, working_directory, iface):
     #NDVI= (PIR-R)/(PIR+R)
@@ -237,7 +237,9 @@ def gdal_translate_get_one_band(image_in, band_number, working_dir):
     if not os.path.isfile(output_image_one_band):
         command_gdal = "gdal_translate -b " + str(band_number) + " " + "\"" +  image_in + "\""  + " " +  "\"" + output_image_one_band + "\"" 
         logger.debug( "command_gdal" + str(command_gdal))
-        os.system(command_gdal)
+        fused_command = command_gdal.split(" ")
+        #os.system(command_gdal)
+        subprocess.call(fused_command)
     return output_image_one_band
     
     

@@ -37,13 +37,14 @@ from PyQt4.QtGui import QFileDialog, QMessageBox
 from PyQt4.QtCore import QDir, QSettings
 
 from osgeo import gdal
+import subprocess
 
 #import loggin for debug messages
 import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'Terre_Image_Utils' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 def fill_default_directory( ):
     """
@@ -259,7 +260,9 @@ def compute_overviews(filename):
         command += "\"" + filename + "\""
         command += " 2 4 8 16"
         logger.debug( "command to run" + command)
-        os.system(command)
+        fused_command = command.split(" ")
+        #os.system(command)
+        subprocess.call(fused_command)
     
     
         

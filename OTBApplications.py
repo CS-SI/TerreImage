@@ -22,7 +22,7 @@
 #import system libraries
 import os
 import datetime
-
+import subprocess
 
 #import loggin for debug messages
 import logging
@@ -62,7 +62,11 @@ def bandmath_cli( images, expression, output_filename ):
     command += " -out " +  "\"" + str( output_filename )  + "\"" 
     
     logger.info( "command: "+ str(command) ) 
-    os.system( command )
+
+    fused_command = command.split(" ")
+    #os.system(command)
+    subprocess.call(fused_command)
+    
 
 
 
@@ -85,7 +89,9 @@ def concatenateImages_cli( listImagesIn, outputname, options=None ):
         
         logger.info( "command: " + str(command))
         
-        os.system(command)
+        fused_command = command.split(" ")
+        #os.system(command)
+        subprocess.call(fused_command)
 
 
 
@@ -106,7 +112,9 @@ def kmeans_cli( image, nbClass, outputDirectory ):
             
             logger.info( "command: " + str(command))
             
-            os.system(command)
+            fused_command = command.split(" ")
+            #os.system(command)
+            subprocess.call(fused_command)
         
     return output
 
@@ -123,7 +131,10 @@ def color_mapping_cli_ref_image( image_to_color, reference_image, working_dir):
         command += " -method \"image\""
         command += " -method.image.in " + "\"" + reference_image + "\""
         logger.info( "command: " + str(command))
-        os.system(command)
+        
+        fused_command = command.split(" ")
+        #os.system(command)
+        subprocess.call(fused_command)
     return output_filename
 
 
@@ -136,7 +147,10 @@ def otbcli_export_kmz( filename, working_directory):
         command += " -in " + "\"" + filename + "\""
         command += " -out " + "\"" + output_kmz + "\""
         logger.info( "command: " + str(command))
-        os.system( command )
+        
+        fused_command = command.split(" ")
+        #os.system(command)
+        subprocess.call(fused_command)
     output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + "xt.kmz" )
     return output_kmz
     
