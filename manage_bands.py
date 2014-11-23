@@ -33,7 +33,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_manage_bands' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 

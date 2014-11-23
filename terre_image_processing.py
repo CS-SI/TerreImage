@@ -47,7 +47,7 @@ def ndvi(layer, working_directory, iface):
     else :
         if layer.pir and layer.red :
             image_in = layer.source_file
-            logger.debug( "image_in: " + str(image_in))
+            logger.debug( "image_in: " + image_in)
             logger.debug( working_directory )
             output_filename = os.path.join( working_directory, 
                                             os.path.basename(os.path.splitext(image_in)[0]) + "_ndvi" + os.path.splitext(image_in)[1]
@@ -58,7 +58,7 @@ def ndvi(layer, working_directory, iface):
                 layer_red = "im1b" + str(layer.red)
                 expression = "\"if((" + layer_pir + "+" + layer_red + ")!=0,(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "),0)\""
                 logger.debug( expression )
-                logger.debug( "image_in" + str(image_in))
+                logger.debug( "image_in" + image_in)
                 OTBApplications.bandmath_cli( [image_in], expression, output_filename )
             return output_filename
     return ""
@@ -72,7 +72,7 @@ def ndti(layer, working_directory, iface):
     else :
         if layer.red :
             image_in = layer.source_file
-            logger.debug( "image_in" + str(image_in))
+            logger.debug( "image_in" + image_in)
             output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_ndti" + os.path.splitext(image_in)[1])
             logger.debug( output_filename )
             if not os.path.isfile(output_filename) : 
@@ -81,7 +81,7 @@ def ndti(layer, working_directory, iface):
                 #expression = "\"sqrt(" + layer_red + "+0.5)\""
                 expression = "\"if((" + layer_red + "+" + layer_green + ")!=0,(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "),0)\""
                 logger.debug( expression )
-                logger.debug( "image_in" + str(image_in))
+                logger.debug( "image_in" + image_in)
                 OTBApplications.bandmath_cli( [image_in], expression, output_filename )
             return output_filename
                 
@@ -93,7 +93,7 @@ def brightness( layer, working_directory, iface ):
     else :
         if layer.pir and layer.red :
             image_in = layer.source_file
-            logger.debug( "image_in" + str(image_in))
+            logger.debug( "image_in" + image_in)
             logger.debug( working_directory )
             output_filename = os.path.join( working_directory, 
                                             os.path.basename(os.path.splitext(image_in)[0]) + "_brillance" + os.path.splitext(image_in)[1]
@@ -104,7 +104,7 @@ def brightness( layer, working_directory, iface ):
                 layer_red = "im1b" + str(layer.red)
                 expression = "\"sqrt(" + layer_red + "*" + layer_red + "*" + layer_pir + "*" + layer_pir + ")\""
                 logger.debug( expression )
-                logger.debug( "image_in" + str(image_in))
+                logger.debug( "image_in" + image_in)
                 OTBApplications.bandmath_cli( [image_in], expression, output_filename )
             return output_filename   
     

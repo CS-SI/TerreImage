@@ -33,7 +33,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger('DockableMirrorMap_mirrorMap')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 class MirrorMap(QWidget):

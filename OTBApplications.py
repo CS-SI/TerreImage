@@ -59,9 +59,9 @@ def bandmath_cli( images, expression, output_filename ):
         command += "\"" + image + "\"" + " "
     
     command += " -exp " + str( expression )
-    command += " -out " +  "\"" + str( output_filename )  + "\"" 
+    command += " -out " +  "\"" + unicode(output_filename)  + "\"" 
     
-    logger.info( "command: "+ str(command) ) 
+    logger.info( "command: "+ command ) 
 
     fused_command = command.split(" ")
     #os.system(command)
@@ -87,7 +87,7 @@ def concatenateImages_cli( listImagesIn, outputname, options=None ):
         if options:
             command += " uint16 " 
         
-        logger.info( "command: " + str(command))
+        logger.info( "command: " + command)
         
         fused_command = command.split(" ")
         #os.system(command)
@@ -110,7 +110,7 @@ def kmeans_cli( image, nbClass, outputDirectory ):
             command += " -nc " + str(nbClass)
             command += " -rand " + str(42)
             
-            logger.info( "command: " + str(command))
+            logger.info( "command: " + command)
             
             fused_command = command.split(" ")
             #os.system(command)
@@ -130,7 +130,7 @@ def color_mapping_cli_ref_image( image_to_color, reference_image, working_dir):
         command += " -out " + "\"" + output_filename + "\" uint8"
         command += " -method \"image\""
         command += " -method.image.in " + "\"" + reference_image + "\""
-        logger.info( "command: " + str(command))
+        logger.info( "command: " + command)
         
         fused_command = command.split(" ")
         #os.system(command)
@@ -146,7 +146,7 @@ def otbcli_export_kmz( filename, working_directory):
         command += "KmzExport "
         command += " -in " + "\"" + filename + "\""
         command += " -out " + "\"" + output_kmz + "\""
-        logger.info( "command: " + str(command))
+        logger.info( "command: " + command)
         
         fused_command = command.split(" ")
         #os.system(command)

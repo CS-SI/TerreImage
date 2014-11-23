@@ -112,6 +112,7 @@ def add_qgis_raser_layer( rasterLayer, canvas, bands=None):
     
     QgsMapLayerRegistry.instance().addMapLayer( rasterLayer )
     TerreImageConstant().legendInterface.moveLayer( rasterLayer, index_group )
+    rasterLayer.triggerRepaint()
       
       
 def addRasterLayerToQGIS( raster, layername, iface = None ):

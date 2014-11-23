@@ -48,8 +48,9 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_Histograms' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
+from terre_image_environement import TerreImageParamaters
 
 
 class MyMplCanvas(FigureCanvas):
@@ -127,8 +128,8 @@ class MyMplCanvas(FigureCanvas):
         """
         histogram = []
 
-        logger.debug( "image: " + str(image) + " band: " + str(band_number) )
-        dataset = gdal.Open(str(image), gdal.GA_ReadOnly)
+        logger.debug( "image: " + image + " band: " + str(band_number) )
+        dataset = gdal.Open(image, gdal.GA_ReadOnly)
         if dataset is None:
             print "Error : Opening file ", image
         else :
@@ -288,6 +289,10 @@ class MyMplCanvas(FigureCanvas):
             #self.axes.vlines(self.x1, [0], self.x1)
     #         self.axes.set_xlabel('time (s)')
     #         self.axes.set_title('Vertical lines demo')
+            
+            print self.color
+            p = TerreImageParamaters()
+            
             
             self.axes.figure.canvas.draw()
             self.emit( QtCore.SIGNAL("valueChanged()") )

@@ -34,7 +34,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'DockableMirrorMap_plugin' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 class DockableMirrorMapPlugin(QObject):
 	__pyqtSignals__ = ("mirrorClosed(PyQt_PyObject)")
