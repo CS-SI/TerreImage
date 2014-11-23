@@ -182,7 +182,7 @@ class MirrorMap(QWidget):
     
     	self.onExtentsChanged()
     	self.canvas.setRenderFlag(prevFlag)
-    
+        
     def delLayer(self, layerId=None):
     	if layerId == None:
     		layer = self.iface.activeLayer()

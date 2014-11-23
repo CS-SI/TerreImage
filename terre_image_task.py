@@ -211,6 +211,8 @@ class TerreImageProcessing(TerreImageTask, QObject):
         # thaw the canvas
         self.freezeCanvas( False )
         
+        result_layer.triggerRepaint()
+        
         
 class TerreImageDisplay(TerreImageTask):
     
