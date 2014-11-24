@@ -116,9 +116,13 @@ class MyMplCanvas(FigureCanvas):
         self.ninety_eight_max = self.x_max
             
         print "self.x_min, self.x_max", self.x_min, self.x_max
-            
-        self.real_x_min = 0
-        self.real_x_max = 0
+        
+        dic = {"r":"red", "g":"green", "b":"blue"} 
+        p = TerreImageParamaters()
+        exec( "p." + dic[self.color] + "_min=" + str(self.x_min) )
+        #print "p." + dic[self.color] + "_min=" + str(self.x_min)
+        exec( "p." + dic[self.color] + "_max=" + str(self.x_max) )
+        #print "p." + dic[self.color] + "_max=" + str(self.x_max)
 
 
     def get_GDAL_histogram( self, image, band_number, qgis_layer, no_data=-1 ):
@@ -181,7 +185,11 @@ class MyMplCanvas(FigureCanvas):
             
             self.get_2_98_percent(sizeX, sizeY, histogram)
             
-            
+            p = TerreImageParamaters()
+            if p.is_complete():
+                dic = {"r":"red", "g":"green", "b":"blue"} 
+                exec( "self.x_min=int(p." + dic[self.color] + "_min)" )
+                exec( "self.x_max=int(p." + dic[self.color] + "_max)" )
             
             return histogram
         

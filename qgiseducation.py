@@ -42,6 +42,7 @@ import time
 from terre_image_constant import TerreImageConstant
 from processing_manager import ProcessingManager
 #from supervisedclassification import SupervisedClassification
+from terre_image_environement import TerreImageParamaters
 
 
 #import loggin for debug messages
@@ -248,6 +249,14 @@ class QGISEducation:
                         #print point
                         QgsProject.instance().writeEntryDouble( "QGISEducation", "/angle_spectral_point_x", point.x() )
                         QgsProject.instance().writeEntryDouble( "QGISEducation", "/angle_spectral_point_y", point.y() )
+                        
+        p=TerreImageParamaters()
+        QgsProject.instance().writeEntryDouble( "QGISEducation", "/red_x_min", p.red_min )
+        QgsProject.instance().writeEntryDouble( "QGISEducation", "/red_x_max", p.red_max )
+        QgsProject.instance().writeEntryDouble( "QGISEducation", "/green_x_min", p.green_min )
+        QgsProject.instance().writeEntryDouble( "QGISEducation", "/green_x_max", p.green_max )
+        QgsProject.instance().writeEntryDouble( "QGISEducation", "/blue_x_min", p.blue_min )
+        QgsProject.instance().writeEntryDouble( "QGISEducation", "/blue_x_max", p.blue_max )
                 
 
     def onProjectLoaded(self):
@@ -333,6 +342,17 @@ class QGISEducation:
                 rubberband.setWidth(10)
                 rubberband.setColor(QColor(Qt.yellow))
                 rubberband.addPoint(QgsPoint(float(angle_spectral_point_x),float(angle_spectral_point_y)))
+              
+              
+        
+        p=TerreImageParamaters()
+        p.red_min = QgsProject.instance().readDoubleEntry("QGISEducation", "/red_x_min")[0]
+        p.red_max = QgsProject.instance().readDoubleEntry("QGISEducation", "/red_x_max")[0]
+        p.green_min = QgsProject.instance().readDoubleEntry("QGISEducation", "/green_x_min")[0]
+        p.green_max = QgsProject.instance().readDoubleEntry("QGISEducation", "/green_x_max")[0]
+        p.blue_min = QgsProject.instance().readDoubleEntry("QGISEducation", "/blue_x_min")[0]
+        p.blue_max = QgsProject.instance().readDoubleEntry("QGISEducation", "/blue_x_max")[0]
+
               
         self.educationWidget.set_combobox_histograms()          
 
