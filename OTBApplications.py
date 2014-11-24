@@ -22,6 +22,7 @@
 #import system libraries
 import os
 import datetime
+import terre_image_utils
 
 
 #import loggin for debug messages
@@ -59,10 +60,11 @@ def bandmath_cli( images, expression, output_filename ):
         command += "\"" + image + "\"" + " "
     
     command += " -exp " + str( expression )
-    command += " -out " +  "\"" + str( output_filename )  + "\"" 
+    command += " -out " +  "\"" + output_filename  + "\"" 
     
-    logger.info( "command: "+ str(command) ) 
-    os.system( command )
+    logger.info( "command: "+ command ) 
+    #os.system( command )
+    terre_image_utils.run_process(command)
 
 
 
@@ -82,11 +84,10 @@ def concatenateImages_cli( listImagesIn, outputname, options=None ):
         command += " -out " + "\"" + outputname + "\""
         if options:
             command += " uint16 " 
-        
-        logger.info( "command: " + str(command))
-        
-        os.system(command)
-
+            
+        logger.info( "command: "+ command ) 
+        #os.system( command )
+        terre_image_utils.run_process(command)
 
 
 def kmeans_cli( image, nbClass, outputDirectory ):
@@ -104,9 +105,9 @@ def kmeans_cli( image, nbClass, outputDirectory ):
             command += " -nc " + str(nbClass)
             command += " -rand " + str(42)
             
-            logger.info( "command: " + str(command))
-            
-            os.system(command)
+            logger.info( "command: "+ command ) 
+            #os.system( command )
+            terre_image_utils.run_process(command)
         
     return output
 
@@ -122,8 +123,10 @@ def color_mapping_cli_ref_image( image_to_color, reference_image, working_dir):
         command += " -out " + "\"" + output_filename + "\" uint8"
         command += " -method \"image\""
         command += " -method.image.in " + "\"" + reference_image + "\""
-        logger.info( "command: " + str(command))
-        os.system(command)
+        
+        logger.info( "command: "+ command ) 
+        #os.system( command )
+        terre_image_utils.run_process(command)
     return output_filename
 
 
@@ -135,8 +138,10 @@ def otbcli_export_kmz( filename, working_directory):
         command += "KmzExport "
         command += " -in " + "\"" + filename + "\""
         command += " -out " + "\"" + output_kmz + "\""
-        logger.info( "command: " + str(command))
-        os.system( command )
+        
+        logger.info( "command: "+ command ) 
+        #os.system( command )
+        terre_image_utils.run_process(command)
     output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + "xt.kmz" )
     return output_kmz
     

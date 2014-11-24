@@ -22,6 +22,7 @@
 
 import os
 import OTBApplications
+import terre_image_utils
 import manage_QGIS
 import re
 import shutil
@@ -46,7 +47,7 @@ def ndvi(layer, working_directory, iface):
     else :
         if layer.pir and layer.red :
             image_in = layer.source_file
-            logger.debug( "image_in: " + str(image_in))
+            logger.debug( "image_in: " + image_in)
             logger.debug( working_directory )
             output_filename = os.path.join( working_directory, 
                                             os.path.basename(os.path.splitext(image_in)[0]) + "_ndvi" + os.path.splitext(image_in)[1]
@@ -57,7 +58,7 @@ def ndvi(layer, working_directory, iface):
                 layer_red = "im1b" + str(layer.red)
                 expression = "\"if((" + layer_pir + "+" + layer_red + ")!=0,(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "),0)\""
                 logger.debug( expression )
-                logger.debug( "image_in" + str(image_in))
+                logger.debug( "image_in" + image_in)
                 OTBApplications.bandmath_cli( [image_in], expression, output_filename )
             return output_filename
     return ""
@@ -71,7 +72,7 @@ def ndti(layer, working_directory, iface):
     else :
         if layer.red :
             image_in = layer.source_file
-            logger.debug( "image_in" + str(image_in))
+            logger.debug( "image_in" + image_in)
             output_filename = os.path.join( working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_ndti" + os.path.splitext(image_in)[1])
             logger.debug( output_filename )
             if not os.path.isfile(output_filename) : 
@@ -80,7 +81,7 @@ def ndti(layer, working_directory, iface):
                 #expression = "\"sqrt(" + layer_red + "+0.5)\""
                 expression = "\"if((" + layer_red + "+" + layer_green + ")!=0,(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "),0)\""
                 logger.debug( expression )
-                logger.debug( "image_in" + str(image_in))
+                logger.debug( "image_in" + image_in)
                 OTBApplications.bandmath_cli( [image_in], expression, output_filename )
             return output_filename
                 
@@ -92,7 +93,7 @@ def brightness( layer, working_directory, iface ):
     else :
         if layer.pir and layer.red :
             image_in = layer.source_file
-            logger.debug( "image_in" + str(image_in))
+            logger.debug( "image_in" + image_in)
             logger.debug( working_directory )
             output_filename = os.path.join( working_directory, 
                                             os.path.basename(os.path.splitext(image_in)[0]) + "_brillance" + os.path.splitext(image_in)[1]
@@ -103,7 +104,7 @@ def brightness( layer, working_directory, iface ):
                 layer_red = "im1b" + str(layer.red)
                 expression = "\"sqrt(" + layer_red + "*" + layer_red + "*" + layer_pir + "*" + layer_pir + ")\""
                 logger.debug( expression )
-                logger.debug( "image_in" + str(image_in))
+                logger.debug( "image_in" + image_in)
                 OTBApplications.bandmath_cli( [image_in], expression, output_filename )
             return output_filename   
     
@@ -217,12 +218,12 @@ def recompose_image( layer, working_directory ):
     band_red = gdal_translate_get_one_band(image_in, num_band_red, working_directory)
     band_green = gdal_translate_get_one_band(image_in, num_band_green, working_directory)
     
-    logger.debug( "pir" + str(band_pir))
-    logger.debug("red" + str(band_red))
-    logger.debug( "green" + str(band_green))
+    logger.debug( "pir" + band_pir)
+    logger.debug("red" + band_red)
+    logger.debug( "green" + band_green)
     
     output_filename = os.path.join( working_directory, os.path.splitext(os.path.basename(image_in))[0] + "pir_red_green" + os.path.splitext(os.path.basename(image_in))[1] )
-    logger.debug( "recomposed image" + str(output_filename))
+    logger.debug( "recomposed image" + output_filename)
     if not os.path.isfile(output_filename):
         OTBApplications.concatenateImages_cli( [band_pir, band_red, band_green], output_filename, "uint16" )
     return output_filename
@@ -237,8 +238,9 @@ def gdal_translate_get_one_band(image_in, band_number, working_dir):
     output_image_one_band = os.path.join(working_dir, os.path.splitext(os.path.basename(image_in))[0] + "-b" + str(band_number) + os.path.splitext(image_in)[1])
     if not os.path.isfile(output_image_one_band):
         command_gdal = "gdal_translate -b " + str(band_number) + " " + "\"" +  image_in + "\""  + " " +  "\"" + output_image_one_band + "\"" 
-        logger.debug( "command_gdal" + str(command_gdal))
-        os.system(command_gdal)
+        logger.info( "command_gdal" + command_gdal)
+        #os.system( command_gdal )
+        terre_image_utils.run_process(command_gdal)
     return output_image_one_band
     
     
@@ -246,18 +248,21 @@ def get_sensor_id( image ):
     currentOs = os.name
     
     if currentOs == "posix" :
-        command = "otbcli_ReadImageInfo -in " + image + " | grep \"sensor:\""
+        command = "otbcli_ReadImageInfo -in " + image #+ " | grep \"sensor:\""
     else :
-        command = "otbcli_ReadImageInfo -in " + image + " | findstr \"sensor:\""
-    result_sensor = os.popen( command ).readlines()
+        command = "otbcli_ReadImageInfo -in " + image #+ " | findstr \"sensor:\""
+    #result_sensor = os.popen( command ).readlines()
+    result_sensor = terre_image_utils.run_process(command, True)
     if result_sensor :
-        sensor_line = result_sensor[0]
-        sensor = re.search("sensor: ([a-zA-Z \d]+)$", sensor_line)
-        
-        if sensor:
-            #group 1 parce qu'on a demande qqchose de particulier a la regexpr a cause des ()
-            sensor = sensor.group(1)
-        return sensor
+        for line in result_sensor.splitlines():
+            if "sensor" in line:
+                #sensor_line = result_sensor[0]
+                sensor = re.search("sensor: ([a-zA-Z \d]+)$", line)
+                
+                if sensor:
+                    #group 1 parce qu'on a demande qqchose de particulier a la regexpr a cause des ()
+                    sensor = sensor.group(1)
+                return sensor
     
     
 def export_kmz( filenames, working_directory ):
