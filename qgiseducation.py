@@ -251,12 +251,13 @@ class QGISEducation:
                         QgsProject.instance().writeEntryDouble( "QGISEducation", "/angle_spectral_point_y", point.y() )
                         
         p=TerreImageParamaters()
-        QgsProject.instance().writeEntryDouble( "QGISEducation", "/red_x_min", p.red_min )
-        QgsProject.instance().writeEntryDouble( "QGISEducation", "/red_x_max", p.red_max )
-        QgsProject.instance().writeEntryDouble( "QGISEducation", "/green_x_min", p.green_min )
-        QgsProject.instance().writeEntryDouble( "QGISEducation", "/green_x_max", p.green_max )
-        QgsProject.instance().writeEntryDouble( "QGISEducation", "/blue_x_min", p.blue_min )
-        QgsProject.instance().writeEntryDouble( "QGISEducation", "/blue_x_max", p.blue_max )
+        if p.is_complete():
+            QgsProject.instance().writeEntryDouble( "QGISEducation", "/red_x_min", p.red_min )
+            QgsProject.instance().writeEntryDouble( "QGISEducation", "/red_x_max", p.red_max )
+            QgsProject.instance().writeEntryDouble( "QGISEducation", "/green_x_min", p.green_min )
+            QgsProject.instance().writeEntryDouble( "QGISEducation", "/green_x_max", p.green_max )
+            QgsProject.instance().writeEntryDouble( "QGISEducation", "/blue_x_min", p.blue_min )
+            QgsProject.instance().writeEntryDouble( "QGISEducation", "/blue_x_max", p.blue_max )
                 
 
     def onProjectLoaded(self):
