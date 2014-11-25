@@ -348,14 +348,18 @@ def custom_stretch( theRasterLayer, values, canvas, mono=False ):
     Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
     """
 
-    #print canvas
+    print "custom stretch"
+    print canvas
+    print "layer :", theRasterLayer
+    
     # type of layer : raster, vector, other
     typeOfLayer = theRasterLayer.type()
      
     #take the layer renderer to get the min and max 
     layerRenderer = theRasterLayer.renderer() # for qgis > 1.9
     dataProvider = theRasterLayer.dataProvider()
-     
+    
+    print "values", values
     # the layer has to be a raster layer
     if typeOfLayer == 1 :
         if (theRasterLayer.rasterType() == 0 or mono) and layerRenderer:
@@ -371,7 +375,7 @@ def custom_stretch( theRasterLayer, values, canvas, mono=False ):
                 layerRenderer.setContrastEnhancement( grayEnhancement )
                 
         elif theRasterLayer.rasterType() == 2  and layerRenderer:
-                          
+            print "layer 3 bandes"
             min_red, max_red = values[0]
             min_green, max_green = values[1]
             min_blue, max_blue = values[2]
@@ -389,15 +393,25 @@ def custom_stretch( theRasterLayer, values, canvas, mono=False ):
             redEnhancement.setContrastEnhancementAlgorithm(1)
             greenEnhancement.setContrastEnhancementAlgorithm(1)
             blueEnhancement.setContrastEnhancementAlgorithm(1)
+            
+            print "blue enhancement", blueEnhancement
+            print "blue max", blueEnhancement.maximumValue()
+            print "blue min", blueEnhancement.minimumValue()
+            
             layerRenderer.setRedContrastEnhancement( redEnhancement) #, QgsRaster.ContrastEnhancementCumulativeCut  )
             layerRenderer.setGreenContrastEnhancement( greenEnhancement ) #, QgsRaster.ContrastEnhancementCumulativeCut  )
             layerRenderer.setBlueContrastEnhancement( blueEnhancement)#, QgsRaster.ContrastEnhancementCumulativeCut  )
+            
+            print "layer renderer"
+            
+            
+            print "end"
         theRasterLayer.setCacheImage( None )    
-
         theRasterLayer.triggerRepaint()
+        print "2"
     canvas.refresh()
     canvas.repaint()
-    
+    print "3"
     
     
     
