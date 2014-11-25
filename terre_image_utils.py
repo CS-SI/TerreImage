@@ -61,6 +61,7 @@ def getOutputDirectory( ui ):
     """
     Opens a dialog to get the output directory
     """
+    current_directory = ui.lineEdit_working_dir.text( )
     if ui.lineEdit_working_dir.text():
         path = ui.lineEdit_working_dir.text()
     else:
@@ -68,9 +69,17 @@ def getOutputDirectory( ui ):
     outputDirectory = ""
     dirDest = QFileDialog.getExistingDirectory( None, str( "Répertoire de destination des fichiers de TerreImage" ), path )
     if dirDest :
-        ui.lineEdit_working_dir.setText( dirDest )
-        outputDirectory = dirDest
-        update_subdirectories( outputDirectory )
+        try : 
+            str(dirDest)
+            ui.lineEdit_working_dir.setText( dirDest )
+            outputDirectory = dirDest
+            update_subdirectories( outputDirectory )
+        
+        except UnicodeEncodeError:
+            QMessageBox.warning( None , "Erreur", u'Le répertoire que vous avec sélectionné contient un ou des caractères spéciaux. \
+La version actuelle du plugin ne gère pas ce type de répertoires. \
+Veuillez renommer le répertoire ou choisir un autre emplacement.', QMessageBox.Ok )
+            
         
     return str( outputDirectory )
 
@@ -146,7 +155,9 @@ def get_workinglayer_on_opening(iface):
         try:
             str(fileOpened)
         except UnicodeEncodeError:
-            QMessageBox.warning( None , "Erreur", u'L\'image que vous essayez d\'ouvrir contient un ou des caractères spéciaux. La version actuelle du plugin ne gère pas ce type de fichiers.', QMessageBox.Ok )
+            QMessageBox.warning( None , "Erreur", u'L\'image que vous essayez d\'ouvrir contient un ou des caractères spéciaux. \
+La version actuelle du plugin ne gère pas ce type de fichiers. \
+Veuillez renommer le fichier et ou les répertoires le contenant.', QMessageBox.Ok )
             return None, None
         else:
 #             if fileOpened.find(" ") != -1:
