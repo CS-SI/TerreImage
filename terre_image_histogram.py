@@ -40,6 +40,7 @@ from matplotlib.patches import Rectangle
 #import matplotlib.pyplot as plt
 
 import manage_QGIS
+from terre_image_environement import TerreImageParamaters
 
 import math
 
@@ -119,10 +120,11 @@ class MyMplCanvas(FigureCanvas):
         
         dic = {"r":"red", "g":"green", "b":"blue"} 
         p = TerreImageParamaters()
-        exec( "p." + dic[self.color] + "_min=" + str(self.x_min) )
-        #print "p." + dic[self.color] + "_min=" + str(self.x_min)
-        exec( "p." + dic[self.color] + "_max=" + str(self.x_max) )
-        #print "p." + dic[self.color] + "_max=" + str(self.x_max)
+        if not p.is_complete():
+            exec( "p." + dic[self.color] + "_min=" + str(self.x_min) )
+            #print "p." + dic[self.color] + "_min=" + str(self.x_min)
+            exec( "p." + dic[self.color] + "_max=" + str(self.x_max) )
+            #print "p." + dic[self.color] + "_max=" + str(self.x_max)
 
 
     def get_GDAL_histogram( self, image, band_number, qgis_layer, no_data=-1 ):
@@ -187,9 +189,11 @@ class MyMplCanvas(FigureCanvas):
             
             p = TerreImageParamaters()
             if p.is_complete():
+                print "here"
                 dic = {"r":"red", "g":"green", "b":"blue"} 
                 exec( "self.x_min=int(p." + dic[self.color] + "_min)" )
                 exec( "self.x_max=int(p." + dic[self.color] + "_max)" )
+                print self.x_min, self.x_max
             
             return histogram
         
@@ -240,7 +244,7 @@ class MyMplCanvas(FigureCanvas):
 
     def draw_min_max_percent(self):
         if self.x_min and self.x_max:
-            print "self.x_min, self.x_max", self.x_min, self.x_max
+            print "self.x_min, self.x_max for", self.color, self.x_min, self.x_max
             logger.debug( "self.x_min, self.x_max" + str(self.x_min) + str(self.x_max))
             self.axes.axvline(x=self.x_min,c="red",linewidth=2,zorder=0, clip_on=False)
             self.axes.axvline(x=self.x_max,c="red",linewidth=2,zorder=0, clip_on=False)
@@ -300,6 +304,13 @@ class MyMplCanvas(FigureCanvas):
             self.axes.figure.canvas.draw()
             self.emit( QtCore.SIGNAL("valueChanged()") )
             logger.debug( str(self.x_min) + " " + str(self.x_max))
+            
+            dic = {"r":"red", "g":"green", "b":"blue"} 
+            p = TerreImageParamaters()
+            exec( "p." + dic[self.color] + "_min=" + str(self.x_min) )
+            #print "p." + dic[self.color] + "_min=" + str(self.x_min)
+            exec( "p." + dic[self.color] + "_max=" + str(self.x_max) )
+            #print "p." + dic[self.color] + "_max=" + str(self.x_max)
 
 
 
