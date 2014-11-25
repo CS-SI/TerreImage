@@ -86,6 +86,8 @@ class MirrorMap(QWidget):
 
     def toggleRender(self, enabled):
         self.canvas.setRenderFlag(enabled)
+        self.canvas.refresh()
+        self.canvas.repaint()
 
     def onExtentsChanged(self):
         try :
@@ -96,6 +98,8 @@ class MirrorMap(QWidget):
             # self.canvas.zoomByFactor( self.scaleFactor.value() )
         
             self.canvas.setRenderFlag(prevFlag)
+            self.canvas.repaint()
+            self.canvas.refresh()
         except Exception:
         	pass
 		
@@ -115,17 +119,23 @@ class MirrorMap(QWidget):
             self.canvas.mapRenderer().setMapUnits(renderer.mapUnits())
             
             self.canvas.setRenderFlag(prevFlag)
+            self.canvas.repaint()
+            self.canvas.refresh()
+            
+            
         except Exception:
             pass
 
     def onCrsTransformEnabled(self, enabled):
         try:
-        	prevFlag = self.canvas.renderFlag()
-        	self.canvas.setRenderFlag(False)
-        
-        	self.canvas.mapRenderer().setProjectionsEnabled(enabled)
-        
-        	self.canvas.setRenderFlag(prevFlag)
+            prevFlag = self.canvas.renderFlag()
+            self.canvas.setRenderFlag(False)
+            
+            self.canvas.mapRenderer().setProjectionsEnabled(enabled)
+            
+            self.canvas.setRenderFlag(prevFlag)
+            self.canvas.repaint()
+            self.canvas.refresh()
         except Exception:
             pass
 
@@ -147,7 +157,11 @@ class MirrorMap(QWidget):
     			self.addLayer(lid)
     
     	self.onExtentsChanged()
-    	self.canvas.setRenderFlag(prevFlag)
+        
+        self.canvas.setRenderFlag(prevFlag)
+        self.canvas.repaint()
+        self.canvas.refresh()
+        
 
 
     def addLayer(self, layerId=None):
@@ -182,6 +196,8 @@ class MirrorMap(QWidget):
     
     	self.onExtentsChanged()
     	self.canvas.setRenderFlag(prevFlag)
+        self.canvas.repaint()
+        self.canvas.refresh()
     
     def delLayer(self, layerId=None):
     	if layerId == None:
@@ -205,6 +221,8 @@ class MirrorMap(QWidget):
     
     	self.onExtentsChanged()
     	self.canvas.setRenderFlag(prevFlag)
+        self.canvas.repaint()
+        self.canvas.refresh()
     
     
     def _layerId(self, layer):

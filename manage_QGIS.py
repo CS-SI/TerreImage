@@ -156,6 +156,7 @@ def histogram_stretching(raster_layer, canvas):
     raster_layer.setContrastEnhancement( QgsContrastEnhancement.StretchToMinimumMaximum, theLimits )
     raster_layer.setCacheImage( None )
     canvas.refresh()
+    canvas.repaint()
         
 
 def histogram_stretching_for_threshold(raster_layer, canvas):
@@ -174,6 +175,7 @@ def histogram_stretching_for_threshold(raster_layer, canvas):
     raster_layer.setContrastEnhancement( QgsContrastEnhancement.StretchToMinimumMaximum, theLimits )
     raster_layer.setCacheImage( None )
     canvas.refresh()
+    canvas.repaint()
 
 def get_min_max_via_qgis( theRasterLayer, num_band ):
 #     my_raster_stats = theRasterLayer.dataProvider().bandStatistics( num_band )#, 2, 98  )
@@ -394,6 +396,7 @@ def custom_stretch( theRasterLayer, values, canvas, mono=False ):
 
         theRasterLayer.triggerRepaint()
     canvas.refresh()
+    canvas.repaint()
     
     
     
