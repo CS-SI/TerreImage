@@ -180,7 +180,7 @@ class MyMplCanvas(FigureCanvas):
             # removing 0 at the end of the histogram
             while len(histogram) > 1 and histogram[-1] == 0 :
                 del histogram[-1]
-            print "histogram", histogram
+            #print "histogram", histogram
             
             self.bin_witdh = float(self.rasterMax - self.rasterMin)/len(histogram)
             print "bin_witdh", self.bin_witdh
