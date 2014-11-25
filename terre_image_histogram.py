@@ -57,7 +57,7 @@ class MyMplCanvas(FigureCanvas):
     __pyqtSignals__ = ("valueChanged()")
     
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, parent=None, width=5, height=4, dpi=100, nb_bands = 1):
        
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
@@ -80,6 +80,13 @@ class MyMplCanvas(FigureCanvas):
         self.real_x_min = 0
         self.real_x_max = 0
         self.change_min = True
+        
+        if nb_bands == 3:
+            self.multiband = True
+        else:
+            self.multiband = False
+        print "self.multiband0", self.multiband
+        
 
 
     def get_2_98_percent(self, sizeX, sizeY, histogram):
@@ -118,13 +125,14 @@ class MyMplCanvas(FigureCanvas):
             
         print "self.x_min, self.x_max", self.x_min, self.x_max
         
-        dic = {"r":"red", "g":"green", "b":"blue"} 
-        p = TerreImageParamaters()
-        if not p.is_complete():
-            exec( "p." + dic[self.color] + "_min=" + str(self.x_min) )
-            #print "p." + dic[self.color] + "_min=" + str(self.x_min)
-            exec( "p." + dic[self.color] + "_max=" + str(self.x_max) )
-            #print "p." + dic[self.color] + "_max=" + str(self.x_max)
+        if self.multiband:
+            dic = {"r":"red", "g":"green", "b":"blue"} 
+            p = TerreImageParamaters()
+            if not p.is_complete():
+                exec( "p." + dic[self.color] + "_min=" + str(self.x_min) )
+                #print "p." + dic[self.color] + "_min=" + str(self.x_min)
+                exec( "p." + dic[self.color] + "_max=" + str(self.x_max) )
+                #print "p." + dic[self.color] + "_max=" + str(self.x_max)
 
 
     def get_GDAL_histogram( self, image, band_number, qgis_layer, no_data=-1 ):
@@ -187,13 +195,14 @@ class MyMplCanvas(FigureCanvas):
             
             self.get_2_98_percent(sizeX, sizeY, histogram)
             
-            p = TerreImageParamaters()
-            if p.is_complete():
-                print "here"
-                dic = {"r":"red", "g":"green", "b":"blue"} 
-                exec( "self.x_min=int(p." + dic[self.color] + "_min)" )
-                exec( "self.x_max=int(p." + dic[self.color] + "_max)" )
-                print self.x_min, self.x_max
+            if self.multiband:
+                p = TerreImageParamaters()
+                if p.is_complete():
+                    print "here"
+                    dic = {"r":"red", "g":"green", "b":"blue"} 
+                    exec( "self.x_min=int(p." + dic[self.color] + "_min)" )
+                    exec( "self.x_max=int(p." + dic[self.color] + "_max)" )
+                    print self.x_min, self.x_max
             
             return histogram
         
@@ -305,12 +314,13 @@ class MyMplCanvas(FigureCanvas):
             self.emit( QtCore.SIGNAL("valueChanged()") )
             logger.debug( str(self.x_min) + " " + str(self.x_max))
             
-            dic = {"r":"red", "g":"green", "b":"blue"} 
-            p = TerreImageParamaters()
-            exec( "p." + dic[self.color] + "_min=" + str(self.x_min) )
-            #print "p." + dic[self.color] + "_min=" + str(self.x_min)
-            exec( "p." + dic[self.color] + "_max=" + str(self.x_max) )
-            #print "p." + dic[self.color] + "_max=" + str(self.x_max)
+            if self.multiband:
+                dic = {"r":"red", "g":"green", "b":"blue"} 
+                p = TerreImageParamaters()
+                exec( "p." + dic[self.color] + "_min=" + str(self.x_min) )
+                #print "p." + dic[self.color] + "_min=" + str(self.x_min)
+                exec( "p." + dic[self.color] + "_max=" + str(self.x_max) )
+                #print "p." + dic[self.color] + "_max=" + str(self.x_max)
 
 
 
@@ -319,7 +329,7 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
     __pyqtSignals__ = ("valueChanged(PyQt_PyObject)", "threshold(PyQt_PyObject)")
     
     
-    def __init__(self, layer, nb_bands = 3):
+    def __init__(self, layer, nb_bands = 3, main=False):
         QtGui.QWidget.__init__(self)
         QtCore.QObject.__init__(self)
         #self.setupUi(self)
@@ -332,7 +342,11 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
             self.nb_hist = 1
         
         self.l = QtGui.QVBoxLayout(self)
-        self.sc_1 = MyMplCanvas(self, width=5, height=4, dpi=100)
+        if main:
+            self.sc_1 = MyMplCanvas(self, width=5, height=4, dpi=100, nb_bands = nb_bands)
+        else:
+            self.sc_1 = MyMplCanvas(self, width=5, height=4, dpi=100, nb_bands = -1)
+            
         QtCore.QObject.connect( self.sc_1, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
         self.l.addWidget(self.sc_1)
         
@@ -407,10 +421,14 @@ class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):
 class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):    
       
     def __init__(self, layer, canvas, nb_bands = 3, processing=None):
-        #super(TerreImageHistogram_monoband, self).__init__(layer, nb_bands) 
-        TerreImageHistogram.__init__( self, layer, nb_bands )  
+        #super(TerreImageHistogram_monoband, self).__init__(layer, nb_bands)
+        if processing :
+            TerreImageHistogram.__init__( self, layer, nb_bands )
+        else:
+            TerreImageHistogram.__init__( self, layer, nb_bands, True )
+              
         
-        
+        print "processing", processing
         logger.debug( "processing" + str(processing))
         if processing is None:
             logger.debug( "processing none")
