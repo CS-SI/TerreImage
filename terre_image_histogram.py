@@ -159,7 +159,7 @@ class MyMplCanvas(FigureCanvas):
                 band_overview = band
                 
             # get overview statistics
-            self.rasterMin, self.rasterMax, mean, stddev = band_overview.ComputeStatistics(True)
+            self.rasterMin, self.rasterMax, mean, stddev = band_overview.ComputeStatistics(False)
             print self.rasterMin, self.rasterMax, mean, stddev
             logger.debug( "self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin) )
             nbVal = self.rasterMax - self.rasterMin
@@ -183,15 +183,12 @@ class MyMplCanvas(FigureCanvas):
             self.nb_bin = int(math.ceil(nbVal / nb_bin_part))
             print "nb_bin", self.nb_bin
             
-            histogram = band_overview.GetHistogram(self.rasterMin, self.rasterMax+1, self.nb_bin, approx_ok = 0)
-            
-            # removing 0 at the end of the histogram
-            while len(histogram) > 1 and histogram[-1] == 0 :
-                del histogram[-1]
-            #print "histogram", histogram
-            
-            self.bin_witdh = float(self.rasterMax - self.rasterMin)/len(histogram)
+            self.bin_witdh = float(self.rasterMax - self.rasterMin)/self.nb_bin
             print "bin_witdh", self.bin_witdh
+            
+            histogram = band_overview.GetHistogram(self.rasterMin-self.bin_witdh/2, self.rasterMax+self.bin_witdh/2, self.nb_bin, approx_ok = 0)
+            
+            #print "histogram", histogram
             
             self.get_2_98_percent(sizeX, sizeY, histogram)
             
