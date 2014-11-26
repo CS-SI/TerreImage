@@ -1,3 +1,9 @@
+Version 2.3.11
+- Amélioration de l'histogramme
+- Correction du bug de l'histogramme de l'indice de brillance
+- Correction du bug de refresh
+- Correction de bugs mineurs
+
 Version 2.3.10
 - Amélioration de la stabilité générale du plugin
 - Harmonisation des classes
