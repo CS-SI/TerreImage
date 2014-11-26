@@ -49,7 +49,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_Histograms' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 
@@ -85,7 +85,7 @@ class MyMplCanvas(FigureCanvas):
             self.multiband = True
         else:
             self.multiband = False
-        print "self.multiband0", self.multiband
+        #print "self.multiband0", self.multiband
         
 
 
@@ -103,7 +103,7 @@ class MyMplCanvas(FigureCanvas):
         hist_cum = cumsum(histogram)
         #print "histogram", histogram
         #print "hist cum", hist_cum
-        print "len(hist_cum)", len(hist_cum)
+        #print "len(hist_cum)", len(hist_cum)
         
         self.x_min = 0
         self.x_max = len(hist_cum)
@@ -115,7 +115,7 @@ class MyMplCanvas(FigureCanvas):
                 self.x_max = index + self.rasterMin
                 break;
             
-        print "self.x_min, self.x_max", self.x_min, self.x_max
+        #print "self.x_min, self.x_max", self.x_min, self.x_max
         
         logger.debug(  "self.x_min, self.x_max" + str(self.x_min) + " " + str(self.x_max))
         self.x_min = (self.x_min-self.rasterMin)*self.bin_witdh+self.rasterMin
@@ -123,7 +123,7 @@ class MyMplCanvas(FigureCanvas):
         self.two_min = self.x_min
         self.ninety_eight_max = self.x_max
             
-        print "self.x_min, self.x_max", self.x_min, self.x_max
+        #print "self.x_min, self.x_max", self.x_min, self.x_max
         
         if self.multiband:
             dic = {"r":"red", "g":"green", "b":"blue"} 
@@ -160,31 +160,31 @@ class MyMplCanvas(FigureCanvas):
                 
             # get overview statistics
             self.rasterMin, self.rasterMax, mean, stddev = band_overview.ComputeStatistics(False)
-            print self.rasterMin, self.rasterMax, mean, stddev
+            #print self.rasterMin, self.rasterMax, mean, stddev
             logger.debug( "self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin) )
             nbVal = self.rasterMax - self.rasterMin
-            print "nbVal", nbVal
+            #print "nbVal", nbVal
 
             #taking the size of the raster
             sizeX = float(band_overview.XSize)
             sizeY = float(band_overview.YSize)
-            print "totalXSize", sizeX
-            print "totalYSize", sizeY
+            #print "totalXSize", sizeX
+            #print "totalYSize", sizeY
             
             #computing nb bins
             stddev_part = 3.5 * stddev 
             sizexy_part = math.pow( sizeX*sizeY, 1./3. )
-            print "stddev", stddev_part
-            print "sizexy", sizexy_part
+            #print "stddev", stddev_part
+            #print "sizexy", sizexy_part
             
             # warning stddev
             nb_bin_part = (3.5 * stddev ) / (math.pow( sizeX*sizeY, 1./3. ) )
-            print nb_bin_part
+            #print nb_bin_part
             self.nb_bin = int(math.ceil(nbVal / nb_bin_part))
-            print "nb_bin", self.nb_bin
+            #print "nb_bin", self.nb_bin
             
             self.bin_witdh = float(self.rasterMax - self.rasterMin)/self.nb_bin
-            print "bin_witdh", self.bin_witdh
+            #print "bin_witdh", self.bin_witdh
             
             histogram = band_overview.GetHistogram(self.rasterMin-self.bin_witdh/2, self.rasterMax+self.bin_witdh/2, self.nb_bin, approx_ok = 0)
             
@@ -195,11 +195,11 @@ class MyMplCanvas(FigureCanvas):
             if self.multiband:
                 p = TerreImageParamaters()
                 if p.is_complete():
-                    print "here"
+                    #print "here"
                     dic = {"r":"red", "g":"green", "b":"blue"} 
                     exec( "self.x_min=int(p." + dic[self.color] + "_min)" )
                     exec( "self.x_max=int(p." + dic[self.color] + "_max)" )
-                    print self.x_min, self.x_max
+                    #print self.x_min, self.x_max
             
             return histogram
         
@@ -250,7 +250,7 @@ class MyMplCanvas(FigureCanvas):
 
     def draw_min_max_percent(self):
         if self.x_min and self.x_max:
-            print "self.x_min, self.x_max for", self.color, self.x_min, self.x_max
+            #print "self.x_min, self.x_max for", self.color, self.x_min, self.x_max
             logger.debug( "self.x_min, self.x_max" + str(self.x_min) + str(self.x_max))
             self.axes.axvline(x=self.x_min,c="red",linewidth=2,zorder=0, clip_on=False)
             self.axes.axvline(x=self.x_max,c="red",linewidth=2,zorder=0, clip_on=False)
@@ -425,7 +425,7 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
             TerreImageHistogram.__init__( self, layer, nb_bands, True )
               
         
-        print "processing", processing
+        #print "processing", processing
         logger.debug( "processing" + str(processing))
         if processing is None:
             logger.debug( "processing none")

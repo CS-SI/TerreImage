@@ -140,7 +140,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
     def plugin_classification(self):
         self.qgis_education_manager.classif_tool.show()
-        print "ProcessingManager().get_qgis_working_layers()", ProcessingManager().get_qgis_working_layers()
+        #print "ProcessingManager().get_qgis_working_layers()", ProcessingManager().get_qgis_working_layers()
         self.qgis_education_manager.classif_tool.update_layers( ProcessingManager().get_qgis_working_layers() )
         
         

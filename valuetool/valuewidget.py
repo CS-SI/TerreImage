@@ -65,7 +65,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'ValueTool_valueWidget' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 

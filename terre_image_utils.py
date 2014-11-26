@@ -43,7 +43,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'Terre_Image_Utils' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 def fill_default_directory( ):
     """

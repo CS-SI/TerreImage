@@ -40,7 +40,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_SpectralAngle' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 

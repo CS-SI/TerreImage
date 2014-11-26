@@ -35,7 +35,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_Curve' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 class TerreImageCurve(QtGui.QWidget, Ui_Form):
     
