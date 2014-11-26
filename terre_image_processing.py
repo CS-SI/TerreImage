@@ -37,7 +37,7 @@ import logging
 logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'TerreImage_processing' )
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
         
 def ndvi(layer, working_directory, iface):
     #NDVI= (PIR-R)/(PIR+R)
