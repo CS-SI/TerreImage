@@ -357,7 +357,6 @@ def custom_stretch( theRasterLayer, values, canvas, mono=False ):
      
     #take the layer renderer to get the min and max 
     layerRenderer = theRasterLayer.renderer() # for qgis > 1.9
-    print "layer renderer", layerRenderer
     dataProvider = theRasterLayer.dataProvider()
     
     #print "values", values
