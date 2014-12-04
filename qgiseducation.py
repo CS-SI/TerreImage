@@ -355,5 +355,7 @@ class QGISEducation:
         p.blue_max = QgsProject.instance().readDoubleEntry("QGISEducation", "/blue_x_max")[0]
 
               
-        self.educationWidget.set_combobox_histograms()          
+        self.educationWidget.set_combobox_histograms()     
+        self.iface.mapCanvas().refresh()
+        self.iface.mapCanvas().repaint()
 
