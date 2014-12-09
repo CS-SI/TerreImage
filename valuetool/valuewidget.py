@@ -167,6 +167,7 @@ class ValueWidget(QWidget, Ui_Widget):
         QObject.connect(self.plotSelector, SIGNAL( "currentIndexChanged ( int )" ), self.changePlot )
         QObject.connect(self.pushButton_get_point, SIGNAL( "clicked()" ), self.on_get_point_button )
         QObject.connect(self.pushButton_csv, SIGNAL( "clicked()" ), self.export_csv )
+        QObject.connect(self.checkBox_hide_current, SIGNAL( "stateChanged(int)" ), self.update_plot )
         numvalues = None
 
 
@@ -833,6 +834,7 @@ class ValueWidget(QWidget, Ui_Widget):
     def del_extra_curve(self, curve):
         self.saved_curves.remove(curve)
         curve.close()
+        self.plot()
 
 
     def extra_plot(self):
@@ -930,6 +932,7 @@ class ValueWidget(QWidget, Ui_Widget):
             #QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), x, y, points_for_curve)
             QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
+            QObject.connect( curve_temp, SIGNAL( "colorChanged()"),  self.update_plot)
             self.saved_curves.append(curve_temp)
             self.verticalLayout_curves.addWidget( curve_temp )
             self.groupBox_saved_layers.show()
@@ -952,7 +955,9 @@ class ValueWidget(QWidget, Ui_Widget):
                     
                 csv_file.write( "\n\n\n")
                 
-        
+    def update_plot(self):
+        print "update plot"
+        self.plot()
 
     def statsNeedChecked(self, indx):
         #self.statsChecked = False

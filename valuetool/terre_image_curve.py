@@ -39,7 +39,7 @@ logger.setLevel(logging.INFO)
 
 class TerreImageCurve(QtGui.QWidget, Ui_Form):
     
-    __pyqtSignals__ = ("curveTitleChanged(str)", "hideCurve(int)", "colorChanged(QtGui.QColor)", "deleteCurve()")
+    __pyqtSignals__ = ("curveTitleChanged(str)", "hideCurve(int)", "colorChanged()", "deleteCurve()")
     
     
     
@@ -135,7 +135,7 @@ class TerreImageCurve(QtGui.QWidget, Ui_Form):
 #         #palette.setColor(QtGui.QPalette.ButtonText, self.lettersToQColor[testqt])
 #         palette.setColor(10, couleur)
 #         self.pushButton_color.setPalette(palette)
-        #self.emit( QtCore.SIGNAL("colorChanged"), self.color )
+        self.emit( QtCore.SIGNAL("colorChanged") )
         
         
         
