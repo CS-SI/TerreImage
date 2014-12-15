@@ -34,7 +34,7 @@ from processing_manager import ProcessingManager
 
 
 from PyQt4.QtGui import QFileDialog, QMessageBox
-from PyQt4.QtCore import QDir, QSettings
+from PyQt4.QtCore import QDir, QSettings, QProcess
 
 from osgeo import gdal
 
@@ -152,65 +152,66 @@ def get_workinglayer_on_opening(iface):
     
 
     if fileOpened:
-        try:
-            str(fileOpened)
-        except UnicodeEncodeError:
-            QMessageBox.warning( None , "Erreur", u'L\'image que vous essayez d\'ouvrir contient un ou des caractères spéciaux. \
-La version actuelle du plugin ne gère pas ce type de fichiers. \
-Veuillez renommer le fichier et ou les répertoires le contenant.', QMessageBox.Ok )
-            return None, None
-        else:
+#         try:
+#             str(fileOpened)
+#         except UnicodeEncodeError:
+#             QMessageBox.warning( None , "Erreur", u'L\'image que vous essayez d\'ouvrir contient un ou des caractères spéciaux. \
+# La version actuelle du plugin ne gère pas ce type de fichiers. \
+# Veuillez renommer le fichier et ou les répertoires le contenant.', QMessageBox.Ok )
+#             return None, None
+#         else:
 #             if fileOpened.find(" ") != -1:
 #                 QMessageBox.warning( None , "Attention", u'L\'image que vous essayez d\'ouvrir contient un ou plusieurs espaces. Les traitements sur cette image provoqueront une erreur.'.encode('utf8'), QMessageBox.Ok )
             
             
-            if fileOpened.endswith( ".qgs" ):
-                #open new qgis project
-                pass
-            else :
-                raster_layer = manage_QGIS.get_raster_layer(fileOpened, os.path.splitext(os.path.basename(fileOpened))[0])
-                 
-                type_image = terre_image_processing.get_sensor_id(fileOpened)
-                logger.debug( "type_image " + str(type_image) )
-                layer = WorkingLayer( fileOpened, raster_layer )
-                layer.set_type(type_image)
-                #self.layer = self.canvas.currentLayer()
-                if layer :
-                    #self.define_bands(self.layer)
-                    #manage_bands()
-                    #self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
-                    red, green, blue, pir, mir = manage_bands(type_image, layer.get_band_number()).get_values()
-                    
-                    if red != -1 or green != -1 or blue != -1 or pir != -1 or mir != -1:
-                        all_set = True
-                        bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
+        if fileOpened.endswith( ".qgs" ):
+            #open new qgis project
+            pass
+        else :
+            raster_layer = manage_QGIS.get_raster_layer(fileOpened, os.path.splitext(os.path.basename(fileOpened))[0])
+             
+            type_image = terre_image_processing.get_sensor_id(fileOpened)
+            logger.debug( "type_image " + str(type_image) )
+            layer = WorkingLayer( fileOpened, raster_layer )
+            layer.set_type(type_image)
+            #self.layer = self.canvas.currentLayer()
+            if layer :
+                #self.define_bands(self.layer)
+                #manage_bands()
+                #self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
+                red, green, blue, pir, mir = manage_bands(type_image, layer.get_band_number()).get_values()
+                
+                if red != -1 or green != -1 or blue != -1 or pir != -1 or mir != -1:
+                    all_set = True
+                    bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
 #                         for i in bands.values():
 #                             if bands.values().count(i) > 1:
 #                                 doublon = True
 #                                 break
 #                         if not doublon :
-                        for i in range(1,layer.get_band_number()+1):
-                            if not i in bands.values():
-                                all_set=False
-                        if all_set:
-                            
+                    for i in range(1,layer.get_band_number()+1):
+                        if not i in bands.values():
+                            all_set=False
+                    if all_set:
                         
-                            layer.set_bands(bands)
-                            
-                            logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
-                            
-                            cst = TerreImageConstant()
-                            cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
-                            
-                            
-                            manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
-                            compute_overviews(fileOpened)
-                            return layer, bands
-                        else:
-                            QMessageBox.warning( None , "Erreur", u'Il y a un problème dans la définition des bandes spectrales.', QMessageBox.Ok )
-                            return None, None
+                    
+                        layer.set_bands(bands)
+                        
+                        logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+                        
+                        cst = TerreImageConstant()
+                        cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
+                        
+                        
+                        manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
+                        compute_overviews(fileOpened)
+                        set_OTB_PATH()
+                        return layer, bands
                     else:
+                        QMessageBox.warning( None , "Erreur", u'Il y a un problème dans la définition des bandes spectrales.', QMessageBox.Ok )
                         return None, None
+                else:
+                    return None, None
     else:
         return None, None
     
@@ -268,8 +269,40 @@ def compute_overviews(filename):
         command += "\"" + filename + "\""
         command += " 2 4 8 16"
         logger.debug( "command to run" + command)
-        os.system(command)
+        #os.system(command)
+        run_process(command)
     
     
-        
-        
+
+def run_process(fused_command, read_output=False):
+    qprocess = QProcess()
+    qprocess.execute( fused_command )
+
+    if not qprocess.waitForStarted():
+        # handle a failed command here
+        return
+
+    if not qprocess.waitForReadyRead():
+        # handle a timeout or error here
+        return
+    #if not qprocess.waitForFinished(1):
+    #    qprocess.kill()
+    #    qprocess.waitForFinished(1)
+
+#     if read_output:
+    output = str(qprocess.readAllStandardOutput())
+    print output
+    return output 
+
+
+
+def set_OTB_PATH( ):
+    if not os.name == "posix" : 
+        os.environ["PATH"] = os.path.join(os.path.abspath(__FILE__),"win32\bin") + ":" +  os.environ["PATH"]
+        os.environ["ITK_AUTOLOAD_PATH"] = os.path.join(os.path.abspath(__FILE__),"win32\plugin") + ":" + os.environ["ITK_AUTOLOAD_PATH"]
+    
+    
+    
+    
+    
+    
