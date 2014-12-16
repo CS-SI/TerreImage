@@ -34,7 +34,7 @@ from processing_manager import ProcessingManager
 
 
 from PyQt4.QtGui import QFileDialog, QMessageBox
-from PyQt4.QtCore import QDir, QSettings, QProcess
+from PyQt4.QtCore import QDir, QSettings, QProcess, QProcessEnvironment
 
 from osgeo import gdal
 
@@ -275,34 +275,49 @@ def compute_overviews(filename):
     
 
 def run_process(fused_command, read_output=False):
+    print "run process"
     qprocess = QProcess()
+    set_process_env(qprocess)
     qprocess.execute( fused_command )
 
-    if not qprocess.waitForStarted():
-        # handle a failed command here
-        return
-
-    if not qprocess.waitForReadyRead():
-        # handle a timeout or error here
-        return
-    #if not qprocess.waitForFinished(1):
-    #    qprocess.kill()
-    #    qprocess.waitForFinished(1)
+#     if not qprocess.waitForStarted():
+#         # handle a failed command here
+#         print "qprocess.waitForStarted()"
+#         return
+# 
+#     if not qprocess.waitForReadyRead():
+#         # handle a timeout or error here
+#         print "qprocess.waitForReadyRead()"
+#         return
+#     #if not qprocess.waitForFinished(1):
+#     #    qprocess.kill()
+#     #    qprocess.waitForFinished(1)
 
 #     if read_output:
+    print "get output"
     output = str(qprocess.readAllStandardOutput())
-    print output
+    #print "output", output
+    print 'end output'
     return output 
 
 
 
 def set_OTB_PATH( ):
     if not os.name == "posix" : 
-        os.environ["PATH"] = os.path.join(os.path.abspath(__FILE__),"win32\bin") + ":" +  os.environ["PATH"]
-        os.environ["ITK_AUTOLOAD_PATH"] = os.path.join(os.path.abspath(__FILE__),"win32\plugin") + ":" + os.environ["ITK_AUTOLOAD_PATH"]
+        if "PATH" in os.environ.keys():
+            os.environ["PATH"] = os.path.join(os.path.abspath(__file__),"win32\bin") + ":" +  os.environ["PATH"]
+        else:
+            os.environ["PATH"] = os.path.join(os.path.abspath(__file__),"win32\bin")
+        if "ITK_AUTOLOAD_PATH" in os.environ.keys():
+            os.environ["ITK_AUTOLOAD_PATH"] = os.path.join(os.path.abspath(__file__),"win32\plugin") + ":" + os.environ["ITK_AUTOLOAD_PATH"]
+        else:
+            os.environ["ITK_AUTOLOAD_PATH"] = os.path.join(os.path.abspath(__file__),"win32\plugin")
     
     
-    
-    
+def set_process_env( process ):
+    env = QProcessEnvironment.systemEnvironment()
+    env.insert("TMPDIR", os.path.join(os.path.abspath(__file__),"win32\plugin") + ":" ) # Add an environment variable
+    env.insert("PATH", os.path.join(os.path.abspath(__file__),"win32\bin") + ":" + env.value("Path") )
+    process.setProcessEnvironment(env)
     
     
