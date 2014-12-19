@@ -247,12 +247,16 @@ def gdal_translate_get_one_band(image_in, band_number, working_dir):
 def get_sensor_id( image ):
     currentOs = os.name
     
+#     if currentOs == "posix" :
+    command = "otbcli_ReadImageInfo -in " + image #+ " | grep \"sensor:\""
+#     else :
+#         command = "otbcli ReadImageInfo -in " + image #+ " | findstr \"sensor:\""
+    args = " -in " + image
+        
     if currentOs == "posix" :
-        command = "otbcli_ReadImageInfo -in " + image #+ " | grep \"sensor:\""
-    else :
-        command = "otbcli_ReadImageInfo -in " + image #+ " | findstr \"sensor:\""
-    #result_sensor = os.popen( command ).readlines()
-    result_sensor = terre_image_utils.run_process(command, True)
+        result_sensor = os.popen( command ).readlines()
+    else:
+        result_sensor = terre_image_utils.run_otb_app("ReadImageInfo", args)
     if result_sensor :
         for line in result_sensor.splitlines():
             if "sensor" in line:

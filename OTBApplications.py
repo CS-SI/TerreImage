@@ -54,17 +54,24 @@ def bandmath_cli( images, expression, output_filename ):
     
     
     command = os.path.join(prefix, "otbcli ")
-    command += " BandMath -il "
+    command += " BandMath "
     
+    args = " -il "
     for image in images :
-        command += "\"" + image + "\"" + " "
+        args += "\"" + image + "\"" + " "
     
-    command += " -exp " + str( expression )
-    command += " -out " +  "\"" + output_filename  + "\"" 
+    args += " -exp " + str( expression )
+    args += " -out " +  "\"" + output_filename  + "\"" 
     
     logger.info( "command: "+ command ) 
     #os.system( command )
-    terre_image_utils.run_process(command)
+    #terre_image_utils.run_process(command)
+    if os.name == "posix" :
+    #os.system( command )
+        command += args
+        terre_image_utils.run_process(command)
+    else:
+        terre_image_utils.run_otb_app("BandMath", args)
 
 
 
@@ -80,14 +87,20 @@ def concatenateImages_cli( listImagesIn, outputname, options=None ):
     if listImagesIn and outputname :
         command = os.path.join(prefix, "otbcli ")
         command += " ConcatenateImages "
-        command += " -il " + " ".join(["\"" + f + "\"" for f in listImagesIn])
-        command += " -out " + "\"" + outputname + "\""
+        args = " -il " + " ".join(["\"" + f + "\"" for f in listImagesIn])
+        args += " -out " + "\"" + outputname + "\""
         if options:
-            command += " uint16 " 
+            args += " uint16 " 
             
         logger.info( "command: "+ command ) 
         #os.system( command )
-        terre_image_utils.run_process(command)
+        #terre_image_utils.run_process(command)
+        if os.name == "posix" :
+            #os.system( command )
+            command += args
+            terre_image_utils.run_process(command)
+        else:
+            terre_image_utils.run_otb_app("ConcatenateImages", args)
 
 
 def kmeans_cli( image, nbClass, outputDirectory ):
@@ -100,14 +113,21 @@ def kmeans_cli( image, nbClass, outputDirectory ):
         if image and nbClass and outputDirectory :
             command = os.path.join(prefix, "otbcli")
             command += " KMeansClassification "
-            command += " -in " + "\"" + image + "\""
-            command += " -out " + "\"" + output + "\""
-            command += " -nc " + str(nbClass)
-            command += " -rand " + str(42)
+            args =  " -in " + "\"" + image + "\""
+            args += " -out " + "\"" + output + "\""
+            args += " -nc " + str(nbClass)
+            args += " -rand " + str(42)
             
             logger.info( "command: "+ command ) 
             #os.system( command )
-            terre_image_utils.run_process(command)
+            #terre_image_utils.run_process(command)
+            
+            if os.name == "posix" :
+            #os.system( command )
+                command += args
+                terre_image_utils.run_process(command)
+            else:
+                terre_image_utils.run_otb_app("KMeansClassification", args)
         
     return output
 
@@ -119,14 +139,20 @@ def color_mapping_cli_ref_image( image_to_color, reference_image, working_dir):
         logger.info( output_filename )
         command = os.path.join(prefix, "otbcli")
         command += " ColorMapping "
-        command += " -in " + "\"" + image_to_color + "\""
-        command += " -out " + "\"" + output_filename + "\" uint8"
-        command += " -method \"image\""
-        command += " -method.image.in " + "\"" + reference_image + "\""
+        args = " -in " + "\"" + image_to_color + "\""
+        args += " -out " + "\"" + output_filename + "\" uint8"
+        args += " -method \"image\""
+        args += " -method.image.in " + "\"" + reference_image + "\""
         
-        logger.info( "command: "+ command ) 
+        logger.info( "command: "+ command )
+        
+        if os.name == "posix" :
         #os.system( command )
-        terre_image_utils.run_process(command)
+            command += args
+            terre_image_utils.run_process(command)
+        else:
+            terre_image_utils.run_otb_app("ColorMapping", args)
+            
     return output_filename
 
 
@@ -136,12 +162,20 @@ def otbcli_export_kmz( filename, working_directory):
     if not os.path.isfile(output_kmz):
         command = os.path.join(prefix, "otbcli ")
         command += "KmzExport "
-        command += " -in " + "\"" + filename + "\""
-        command += " -out " + "\"" + output_kmz + "\""
+        args =  " -in " + "\"" + filename + "\""
+        args += " -out " + "\"" + output_kmz + "\""
         
         logger.info( "command: "+ command ) 
         #os.system( command )
         terre_image_utils.run_process(command)
+        if os.name == "posix" :
+        #os.system( command )
+            command += args
+            terre_image_utils.run_process(command)
+        else:
+            terre_image_utils.run_otb_app("KmzExport", args)
+        
+        
     output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + "xt.kmz" )
     return output_kmz
     
