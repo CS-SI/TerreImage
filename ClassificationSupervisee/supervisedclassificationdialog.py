@@ -42,6 +42,8 @@ import shutil
 import time
 import datetime
 
+from TerreImage import terre_image_processing
+
 import logging
 # create logger
 logger = logging.getLogger( 'SupervisedClassificationDialog' )
@@ -292,49 +294,49 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                                  os.path.join(vectordir,"imageenveloppe.shp"),
                                  os.path.join(vectordir,"tmp_reprojected.shp"),
                                  preprocessedshpfile) )
-
-                try:
-                  if (simulation):
-                      time.sleep(3)
-                  else:
-                      proc = subprocess.Popen(cropcommand.encode('mbcs'),
-                                              shell=True,
-                                              stdout=subprocess.PIPE,
-                                              stdin=subprocess.PIPE,
-                                              stderr=subprocess.STDOUT,
-                                              universal_newlines=False)
-                      
-                      loglines = []
-                      for line in iter(proc.stdout.readline, ""):
-                          loglines.append(line)
-                          
-                      proc.wait()
-                      if proc.returncode != 0:
-                          raise OSError
-
-                except OSError:
-                  errorDuringClassif = True
-                  
-                  mbox = QtGui.QMessageBox()
-                  mbox.setWindowTitle(u"Erreur")
-                  mbox.setText(u"Une erreur a été rencontrée lors de la préparation des données vecteurs")
-                  
-                  # has no effect...
-                  #mbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                  #mbox.setSizeGripEnabled(True)
-                  
-                  detailedtext = (u"Code de retour : %s%s"
-                                  "Commande : %s%s"
-                                  "Sortie standard :%s%s"
-                                  % ( proc.returncode, 2*os.linesep,
-                                      cropcommand, 2*os.linesep,
-                                      os.linesep, u''.join([u'%s%s' % (unicode(c, 'mbcs'), os.linesep) for c in loglines]) ) )
-
-                  mbox.setDetailedText(detailedtext)
-                  mbox.setIcon(QtGui.QMessageBox.Critical)
-                  mbox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
-                  ret = mbox.exec_()
-                  raise OSError
+                terre_image_processing.run_process(cropcommand, True)
+#                 try:
+#                   if (simulation):
+#                       time.sleep(3)
+#                   else:
+#                       proc = subprocess.Popen(cropcommand.encode('mbcs'),
+#                                               shell=True,
+#                                               stdout=subprocess.PIPE,
+#                                               stdin=subprocess.PIPE,
+#                                               stderr=subprocess.STDOUT,
+#                                               universal_newlines=False)
+#                       
+#                       loglines = []
+#                       for line in iter(proc.stdout.readline, ""):
+#                           loglines.append(line)
+#                           
+#                       proc.wait()
+#                       if proc.returncode != 0:
+#                           raise OSError
+# 
+#                 except OSError:
+#                   errorDuringClassif = True
+#                   
+#                   mbox = QtGui.QMessageBox()
+#                   mbox.setWindowTitle(u"Erreur")
+#                   mbox.setText(u"Une erreur a été rencontrée lors de la préparation des données vecteurs")
+#                   
+#                   # has no effect...
+#                   #mbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+#                   #mbox.setSizeGripEnabled(True)
+#                   
+#                   detailedtext = (u"Code de retour : %s%s"
+#                                   "Commande : %s%s"
+#                                   "Sortie standard :%s%s"
+#                                   % ( proc.returncode, 2*os.linesep,
+#                                       cropcommand, 2*os.linesep,
+#                                       os.linesep, u''.join([u'%s%s' % (unicode(c, 'mbcs'), os.linesep) for c in loglines]) ) )
+# 
+#                   mbox.setDetailedText(detailedtext)
+#                   mbox.setIcon(QtGui.QMessageBox.Critical)
+#                   mbox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
+#                   ret = mbox.exec_()
+#                   raise OSError
                   
                 vectorlist += '"%s" ' % (preprocessedshpfile)
 
@@ -355,56 +357,57 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                                     outputclassification,
                                     outputresults) )
 
+            terre_image_processing.run_process(classifcommand, True)
             # Execute commandline
-            try:
-                if (simulation):
-                    time.sleep(3)
-                else:
-                    proc = subprocess.Popen(classifcommand.encode('mbcs'),
-                                            shell=True,
-                                            stdout=subprocess.PIPE,
-                                            stdin=subprocess.PIPE,
-                                            stderr=subprocess.STDOUT,
-                                            universal_newlines=False)
-                    
-                    loglines = []
-                    with open(outputlog, "w") as logfile:
-                      for line in iter(proc.stdout.readline, ""):
-                          loglines.append(line)
-                          logfile.writelines(line)
-                          logfile.flush()
-                          os.fsync(logfile.fileno())
-
-                    proc.wait()
-                    if proc.returncode != 0:
-                        raise OSError
-
-            except OSError:
-                errorDuringClassif = True
-                
-                mbox = QtGui.QMessageBox()
-                mbox.setWindowTitle(u"Erreur")
-                mbox.setText(u"Une erreur a été rencontrée lors de la classification")
-                
-                # has no effect...
-                #mbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                #mbox.setSizeGripEnabled(True)
-                
-                detailedtext = (u"Code de retour : %s%s"
-                                "Commande : %s%s"
-                                "Sortie standard :%s%s"
-                                % ( proc.returncode, 2*os.linesep,
-                                    classifcommand, 2*os.linesep,
-                                    os.linesep, u''.join([u'%s%s' % (unicode(c, 'mbcs'), os.linesep) for c in loglines]) ) )
-
-                mbox.setDetailedText(detailedtext)
-                mbox.setIcon(QtGui.QMessageBox.Critical)
-                mbox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
-                ret = mbox.exec_()
-                
-                saferemovefile(outputlog)
-                saferemovefile(outputclassification)
-                saferemovefile(outputresults)
+#             try:
+#                 if (simulation):
+#                     time.sleep(3)
+#                 else:
+#                     proc = subprocess.Popen(classifcommand.encode('mbcs'),
+#                                             shell=True,
+#                                             stdout=subprocess.PIPE,
+#                                             stdin=subprocess.PIPE,
+#                                             stderr=subprocess.STDOUT,
+#                                             universal_newlines=False)
+#                     
+#                     loglines = []
+#                     with open(outputlog, "w") as logfile:
+#                       for line in iter(proc.stdout.readline, ""):
+#                           loglines.append(line)
+#                           logfile.writelines(line)
+#                           logfile.flush()
+#                           os.fsync(logfile.fileno())
+# 
+#                     proc.wait()
+#                     if proc.returncode != 0:
+#                         raise OSError
+# 
+#             except OSError:
+#                 errorDuringClassif = True
+#                 
+#                 mbox = QtGui.QMessageBox()
+#                 mbox.setWindowTitle(u"Erreur")
+#                 mbox.setText(u"Une erreur a été rencontrée lors de la classification")
+#                 
+#                 # has no effect...
+#                 #mbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+#                 #mbox.setSizeGripEnabled(True)
+#                 
+#                 detailedtext = (u"Code de retour : %s%s"
+#                                 "Commande : %s%s"
+#                                 "Sortie standard :%s%s"
+#                                 % ( proc.returncode, 2*os.linesep,
+#                                     classifcommand, 2*os.linesep,
+#                                     os.linesep, u''.join([u'%s%s' % (unicode(c, 'mbcs'), os.linesep) for c in loglines]) ) )
+# 
+#                 mbox.setDetailedText(detailedtext)
+#                 mbox.setIcon(QtGui.QMessageBox.Critical)
+#                 mbox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
+#                 ret = mbox.exec_()
+#                 
+#                 saferemovefile(outputlog)
+#                 saferemovefile(outputclassification)
+#                 saferemovefile(outputresults)
 
             if (not simulation and not errorDuringClassif):
                 QGisLayers.loadLabelImage(outputclassification, labeldescriptor)

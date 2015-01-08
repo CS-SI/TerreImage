@@ -169,8 +169,8 @@ def get_workinglayer_on_opening(iface):
             pass
         else :
             raster_layer = manage_QGIS.get_raster_layer(fileOpened, os.path.splitext(os.path.basename(fileOpened))[0])
-             
-            set_OTB_PATH()
+            if not os.name == "posix" : 
+                terre_image_processing.set_OTB_PATH()
             type_image = terre_image_processing.get_sensor_id(fileOpened)
             logger.debug( "type_image " + str(type_image) )
             layer = WorkingLayer( fileOpened, raster_layer )
@@ -270,69 +270,9 @@ def compute_overviews(filename):
         command += " 2 4 8 16"
         logger.debug( "command to run" + command)
         #os.system(command)
-        run_process(command)
+        terre_image_processing.run_process(command)
     
     
 
-def run_process(fused_command, read_output=False):
-    print "run process", fused_command
-    qprocess = QProcess()
-    set_process_env(qprocess)
-    code_de_retour = qprocess.execute( fused_command )
-    print "code de retour", code_de_retour
-    
-#     if not qprocess.waitForStarted():
-#         # handle a failed command here
-#         print "qprocess.waitForStarted()"
-#         return
-# 
-#     if not qprocess.waitForReadyRead():
-#         # handle a timeout or error here
-#         print "qprocess.waitForReadyRead()"
-#         return
-#     #if not qprocess.waitForFinished(1):
-#     #    qprocess.kill()
-#     #    qprocess.waitForFinished(1)
 
-#     if read_output:
-
-    print "get output"
-    output = str(qprocess.readAllStandardOutput())
-    #print "output", output
-    print 'end output'
-    return output 
-
-def run_otb_app( app_name, arguments ):
-    dirname = os.path.dirname(os.path.abspath(__file__))
-    launcher = os.path.join(dirname,"win32", "bin","otbApplicationLauncherCommandLine.exe") + " " + app_name + " " + os.path.join(dirname,"win32", "plugin")
-    command = launcher + " "+ arguments
-    run_process(command)
-    
-    
-
-def set_OTB_PATH( ):
-    dirname = os.path.dirname(os.path.abspath(__file__))
-    if not os.name == "posix" : 
-        if "PATH" in os.environ.keys():
-            os.environ["PATH"] = os.path.join(dirname,"win32", "bin") + ";" +  os.environ["PATH"]
-        else:
-            os.environ["PATH"] = os.path.join(dirname,"win32", "bin")
-        if "ITK_AUTOLOAD_PATH" in os.environ.keys():
-            os.environ["ITK_AUTOLOAD_PATH"] = os.path.join(dirname,"win32", "plugin") + ";" + os.environ["ITK_AUTOLOAD_PATH"]
-        else:
-            os.environ["ITK_AUTOLOAD_PATH"] = os.path.join(dirname,"win32", "plugin")
-    print os.environ["PATH"]
-    print os.environ["ITK_AUTOLOAD_PATH"]
-    
-    
-def set_process_env( process ):
-    dirname = os.path.dirname(os.path.abspath(__file__))
-    env = QProcessEnvironment.systemEnvironment()
-
-    env.insert("ITK_AUTOLOAD_PATH", os.path.join(dirname,"win32", "plugin") ) # Add an environment variable
-    env.insert("PATH", os.path.join(dirname,"win32", "bin") + ";" + env.value("Path") )
-    process.setProcessEnvironment(env)
-    print "env ITK_AUTOLOAD_PATH", env.value("ITK_AUTOLOAD_PATH")
-    print "env PATH", env.value("PATH")
-    
     
