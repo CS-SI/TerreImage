@@ -256,7 +256,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
             rasterlist = ""
             for r in selectedrasterlayers:
                 rasterlist += '"%s" ' % (r.source())
-            logger.debug( "rasterlist" + str( rasterlist ) )
+            #logger.debug( "rasterlist" + str( rasterlist ) )
 
             #firstraster = '"%s" ' % (unicode(selectedrasterlayers[0].source()))
             logger.debug( "selectedrasterlayers[0]" + str(selectedrasterlayers[0]) )
