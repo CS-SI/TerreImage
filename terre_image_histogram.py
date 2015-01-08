@@ -141,8 +141,8 @@ class MyMplCanvas(FigureCanvas):
         """
         histogram = []
 
-        logger.debug( "image: " + str(image) + " band: " + str(band_number) )
-        dataset = gdal.Open(str(image), gdal.GA_ReadOnly)
+        #logger.debug( "image: " + str(image) + " band: " + str(band_number) )
+        dataset = gdal.Open(image, gdal.GA_ReadOnly)
         if dataset is None:
             print "Error : Opening file ", image
         else :

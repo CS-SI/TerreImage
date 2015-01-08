@@ -254,8 +254,8 @@ class TerreImageDisplay(TerreImageTask):
             ifaceLayers = QgsMapLayerRegistry.instance().mapLayers()
             logger.debug( "ifacelayers" + str( ifaceLayers ))
             id_layer = result_layer.id()
-            logger.debug( "id_layer" + str( id_layer ))
-            logger.debug( "result layer" + str( result_layer ))
+            #logger.debug( "id_layer" + str( id_layer ))
+            #logger.debug( "result layer" + str( result_layer ))
             #QgsMapLayerRegistry.instance().mapLayers()
             #{u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>, u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
             ifaceLegend.setLayerVisible( result_layer, False )

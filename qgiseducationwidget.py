@@ -260,9 +260,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                             
                             
                     if not process.histogram:
-                        logger.debug( "process: " + str(process) + " " + str(type(process)))
-                        logger.debug( "type(process.output_working_layer): " + str(type(process.output_working_layer)))
-                        logger.debug( "histogram to display: " + str(process.output_working_layer.get_source()))
+                        #logger.debug( "process: " + str(process) + " " + str(type(process)))
+                        #logger.debug( "type(process.output_working_layer): " + str(type(process.output_working_layer)))
+                        #logger.debug( "histogram to display: " + str(process.output_working_layer.get_source()))
                         # display the histogram of the layer
                         
                         hist = self.histogram( process.output_working_layer, process, specific_band )
@@ -444,7 +444,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         
         
         if self.qgis_education_manager:
-            logger.debug( "ProcessingManager().working_layer.get_qgis_layer().id(): " +  str(ProcessingManager().working_layer.get_qgis_layer().id()))
+            #logger.debug( "ProcessingManager().working_layer.get_qgis_layer().id(): " +  str(ProcessingManager().working_layer.get_qgis_layer().id()))
             if ProcessingManager().working_layer.get_qgis_layer().id() == layer_id:
                 self.disconnect_interface()
             #else:

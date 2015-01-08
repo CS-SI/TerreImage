@@ -549,7 +549,7 @@ class ValueWidget(QWidget, Ui_Widget):
         
         #using GDAL
         try :
-            dataset = gdal.Open( str(layer.source()), gdalconst.GA_ReadOnly )
+            dataset = gdal.Open( layer.source(), gdalconst.GA_ReadOnly )
         except RuntimeError:
             message = "Failed to open " + layer.source() + ". You may have to many data opened in QGIS."
             logger.error(message)

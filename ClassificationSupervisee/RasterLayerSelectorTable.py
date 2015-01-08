@@ -139,7 +139,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                         child_name = layer.name() + "_band " + corres[self.the_layer_bands[i+1]]
                     else:
                         child_name = layer.name() + "_band " + str(i+1)
-                    logger.debug(  "child_name" + str(child_name) )
+                    #logger.debug(  "child_name" + str(child_name) )
                     item_child = QtGui.QTreeWidgetItem()
                     item_child.setFlags(item_child.flags()|QtCore.Qt.ItemIsUserCheckable)
                     item_child.setCheckState(0, QtCore.Qt.Unchecked)
