@@ -287,7 +287,7 @@ def export_kmz( filenames, working_directory ):
         
         
 def run_process(fused_command, read_output=False):
-    print "run process", fused_command
+    #print "run process", fused_command
     qprocess = QProcess()
     set_process_env(qprocess)
     code_de_retour = qprocess.execute( fused_command )
