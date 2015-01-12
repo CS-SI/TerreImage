@@ -69,19 +69,19 @@ def getOutputDirectory( ui ):
     outputDirectory = ""
     dirDest = QFileDialog.getExistingDirectory( None, str( "Répertoire de destination des fichiers de TerreImage" ), path )
     if dirDest :
-        try : 
-            str(dirDest)
-            ui.lineEdit_working_dir.setText( dirDest )
-            outputDirectory = dirDest
-            update_subdirectories( outputDirectory )
+#         try : 
+#             str(dirDest)
+        ui.lineEdit_working_dir.setText( dirDest )
+        outputDirectory = dirDest
+        update_subdirectories( outputDirectory )
         
-        except UnicodeEncodeError:
-            QMessageBox.warning( None , "Erreur", u'Le répertoire que vous avec sélectionné contient un ou des caractères spéciaux. \
-La version actuelle du plugin ne gère pas ce type de répertoires. \
-Veuillez renommer le répertoire ou choisir un autre emplacement.', QMessageBox.Ok )
+#         except UnicodeEncodeError:
+#             QMessageBox.warning( None , "Erreur", u'Le répertoire que vous avec sélectionné contient un ou des caractères spéciaux. \
+# La version actuelle du plugin ne gère pas ce type de répertoires. \
+# Veuillez renommer le répertoire ou choisir un autre emplacement.', QMessageBox.Ok )
             
         
-    return str( outputDirectory )
+    return outputDirectory
 
 
 def update_subdirectories( outputDirectory ):
