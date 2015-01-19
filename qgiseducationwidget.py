@@ -113,7 +113,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.pushButton_profil_spectral.clicked.connect(self.display_values)
         self.pushButton_working_dir.clicked.connect(self.define_working_dir)
         self.pushButton_status.clicked.connect(self.status)
-        #self.pushButton_status.hide()
+        self.pushButton_status.hide()
         self.pushButton_histogramme.hide()
         self.pushButton_histogramme.clicked.connect(self.main_histogram)
         self.pushButton_plugin_classification.clicked.connect(self.plugin_classification)
