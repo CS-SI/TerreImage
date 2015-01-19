@@ -1,7 +1,13 @@
+Version 2.3.13
+-Suppression bouton d'affichage de status
+
+Version 2.3.12
+-Correction du problème des accents
+
 Version 2.3.11
 - Amélioration de l'histogramme
 - Correction du bug de l'histogramme de l'indice de brillance
-- Correction du bug de refresh
+- Correction du bug de refresh (FA 001)
 - Correction de bugs mineurs
 
 Version 2.3.10
