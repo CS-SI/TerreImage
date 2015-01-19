@@ -28,7 +28,7 @@ def description():
     return ""
 
 def version():
-    return "2.3.12.1"
+    return "2.3.13"
 
 def qgisMinimumVersion():
     return "2.0"
