@@ -1,3 +1,6 @@
+Version 2.3.14
+-Mise à jour des licences
+
 Version 2.3.13
 -Suppression bouton d'affichage de status
 
