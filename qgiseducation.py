@@ -29,7 +29,7 @@ from qgis.gui import QgsMessageBar, QgsRubberBand
 import resources_rc
 # Import the code for the dialog
 from qgiseducationwidget import QGISEducationWidget
-from qgiseducationwidget import Terre_Image_Dock_widget
+from qgiseducationwidget import Terre_Image_Dock_widget, Terre_Image_Main_Dock_widget
 import os.path
 
 from manage_bands import manage_bands
@@ -116,7 +116,7 @@ class QGISEducation:
         self.iface.removeToolBarIcon(self.action)
 
     def unload_interface(self):
-        if self.qgisedudockwidget is not None:
+        if self.qgisedudockwidget is not None and self.educationWidget is not None:
             self.qgisedudockwidget.close()
             self.educationWidget.disconnectP()
 
@@ -179,7 +179,7 @@ class QGISEducation:
                 self.educationWidget.qgis_education_manager.classif_tool.setupUi()
                 
                 # create the dockwidget with the correct parent and add the valuewidget
-                self.qgisedudockwidget = Terre_Image_Dock_widget("Terre Image", self.iface.mainWindow() )
+                self.qgisedudockwidget = Terre_Image_Main_Dock_widget("Terre Image", self.iface.mainWindow(), self.iface )
                 self.qgisedudockwidget.setObjectName("Terre Image")
                 self.qgisedudockwidget.setWidget(self.educationWidget)
                 QObject.connect( self.qgisedudockwidget, SIGNAL( "closed(PyQt_PyObject)" ), self.close_dock )
@@ -199,9 +199,11 @@ class QGISEducation:
     
     
     def close_dock(self, object):
-        if self.iface.legendInterface().layers():
-            self.iface.newProject( True )
-        
+        self.qgisedudockwidget=None
+        self.dockOpened = False
+        self.educationWidget = None
+        if self.iface.legendInterface().layers() != []:
+            self.iface.newProject( )
             
     def newProject(self):
         for item in self.iface.mapCanvas().scene().items():
@@ -213,6 +215,10 @@ class QGISEducation:
                 self.qgisedudockwidget.close()
                 self.educationWidget.disconnectP()
                 self.dockOpened = False
+            
+        self.qgisedudockwidget=None
+        self.dockOpened = False
+        self.educationWidget = None
 
     def onWriteProject(self, domproject):
         if ProcessingManager().working_layer is None:

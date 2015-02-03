@@ -69,6 +69,24 @@ class Terre_Image_Dock_widget(QtGui.QDockWidget):
 
 
 
+class Terre_Image_Main_Dock_widget(QtGui.QDockWidget):
+    __pyqtSignals__ = ("closed(PyQt_PyObject)")
+    def __init__(self, title, parent,iface):
+        QtGui.QDockWidget.__init__(self, title, parent)
+        self.iface=iface
+        
+    def closeEvent(self, event):
+        if self.iface.legendInterface().layers() != []:
+            res = QtGui.QMessageBox.question(self, "Terr'Image", "Voulez vous vraiment quitter Terr'Image ?", QtGui.QMessageBox.Yes |  QtGui.QMessageBox.No |  QtGui.QMessageBox.Cancel, QtGui.QMessageBox.Yes)
+        
+            if res != QtGui.QMessageBox.Yes:
+                event.ignore()
+            else:
+                event.accept()
+                self.emit( QtCore.SIGNAL( "closed(PyQt_PyObject)" ), self )
+
+
+
 class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     __pyqtSignals__ = ("valueChanged()")
     def __init__(self, iface):
