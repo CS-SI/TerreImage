@@ -58,8 +58,8 @@ class SpectralAngle(QtCore.QObject):
         if layer :
             self.layer = layer
         
-        self.tool = ProfiletoolMapTool(self.iface.mapCanvas())        #the mouselistener
-        logger.debug(  "self.tool" + str(self.tool))
+        #self.tool = ProfiletoolMapTool(self.iface.mapCanvas())        #the mouselistener
+        #logger.debug(  "self.tool" + str(self.tool))
         self.pointstoDraw = None    #Polyline in mapcanvas CRS analysed
         self.maptool = self.canvas.mapTool()
         #self.get_point_for_angles()
@@ -124,6 +124,8 @@ class SpectralAngle(QtCore.QObject):
                     
     
     def get_point_for_angles(self, layer):
+        self.tool = ProfiletoolMapTool(self.iface.mapCanvas())        #the mouselistener
+        logger.debug(  "self.tool" + str(self.tool)) 
         self.layer = layer
         logger.debug(  "get point for angles" )
         QtCore.QObject.connect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
@@ -160,4 +162,5 @@ class SpectralAngle(QtCore.QObject):
         self.canvas.setMapTool( self.toolPan )
         #create new vlayer ???
         self.angles(mapPos.x(),mapPos.y())
+        self.tool = None
  

@@ -33,7 +33,7 @@ from numpy import arange
 from ui_valuewidgetbase import Ui_ValueWidgetBase as Ui_Widget
 from terre_image_curve import TerreImageCurve
 import random
-from ptmaptool import ProfiletoolMapTool
+from ptmaptool import ProfiletoolMapTool_ValueTool
 
 from osgeo import osr, gdal
 import gdalconst
@@ -157,7 +157,7 @@ class ValueWidget(QWidget, Ui_Widget):
         self.setupUi(self)
         self.setupUi_extra()
         
-        self.tool = ProfiletoolMapTool(self.iface.mapCanvas())
+        #self.tool = ProfiletoolMapTool_ValueTool(self.iface.mapCanvas())
         self.maptool = self.canvas.mapTool()
         
         
@@ -883,15 +883,17 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def on_get_point_button(self):
         if self.pushButton_get_point.isFlat() == False:
-            QtCore.QObject.connect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
+            self.tool = ProfiletoolMapTool_ValueTool(self.iface.mapCanvas())
+            QtCore.QObject.connect(self.tool, QtCore.SIGNAL("canvas_clicked_v"), self.rightClicked)
             #init the mouse listener comportement and save the classic to restore it on quit
             self.canvas.setMapTool(self.tool)
             self.pushButton_get_point.setFlat( True )
         else :
-            QtCore.QObject.disconnect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.rightClicked)
+            QtCore.QObject.disconnect(self.tool, QtCore.SIGNAL("canvas_clicked_v"), self.rightClicked)
             self.toolPan = qgis.gui.QgsMapToolPan( self.canvas )
             self.canvas.setMapTool( self.toolPan )
             self.pushButton_get_point.setFlat( False )
+            self.tool = None
             
         
     def rightClicked(self, position):
@@ -903,6 +905,7 @@ class ValueWidget(QWidget, Ui_Widget):
             y = int(float(y))
         except ValueError:
             pass
+        
         
         
         newPoints = [[mapPos.x(), mapPos.y()]]

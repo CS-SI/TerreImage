@@ -29,7 +29,7 @@ from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
 
-class ProfiletoolMapTool(QgsMapTool):
+class ProfiletoolMapTool_ValueTool(QgsMapTool):
 
 	def __init__(self, canvas):
 		QgsMapTool.__init__(self,canvas)
@@ -38,7 +38,7 @@ class ProfiletoolMapTool(QgsMapTool):
 
 	def canvasReleaseEvent(self,event):
 		#print "canvasReleaseEvent"
-		self.emit( SIGNAL("canvas_clicked"), {'x': event.pos().x(), 'y': event.pos().y()} )
+		self.emit( SIGNAL("canvas_clicked_v"), {'x': event.pos().x(), 'y': event.pos().y()} )
 
 	def activate(self):
 		QgsMapTool.activate(self)
