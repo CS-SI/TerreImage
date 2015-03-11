@@ -38,42 +38,42 @@ from PyQt4.QtCore import QDir, QSettings, QProcess, QProcessEnvironment
 
 from osgeo import gdal
 
-#import loggin for debug messages
+# import loggin for debug messages
 import logging
 logging.basicConfig()
 # create logger
-logger = logging.getLogger( 'Terre_Image_Utils' )
-logger.setLevel(logging.INFO)
+logger = logging.getLogger('Terre_Image_Utils')
+logger.setLevel(logging.DEBUG)
 
-def fill_default_directory( ):
+def fill_default_directory():
     """
     Creates working directory 
     Fills the output directory line edit if ui given
     """
     datetimeNow = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    currentDirectory = os.path.join( os.getenv("HOME"), "TerreImage", datetimeNow )
-    if not os.path.exists( currentDirectory ):
-        os.makedirs( currentDirectory )
+    currentDirectory = os.path.join(os.getenv("HOME"), "TerreImage", datetimeNow)
+    if not os.path.exists(currentDirectory):
+        os.makedirs(currentDirectory)
     return currentDirectory, datetimeNow
 
 
-def getOutputDirectory( ui ):
+def getOutputDirectory(ui):
     """
     Opens a dialog to get the output directory
     """
-    current_directory = ui.lineEdit_working_dir.text( )
+    current_directory = ui.lineEdit_working_dir.text()
     if ui.lineEdit_working_dir.text():
         path = ui.lineEdit_working_dir.text()
     else:
         path = QDir.currentPath()
     outputDirectory = ""
-    dirDest = QFileDialog.getExistingDirectory( None, str( "Répertoire de destination des fichiers de TerreImage" ), path )
+    dirDest = QFileDialog.getExistingDirectory(None, str("Répertoire de destination des fichiers de TerreImage"), path)
     if dirDest :
 #         try : 
 #             str(dirDest)
-        ui.lineEdit_working_dir.setText( dirDest )
+        ui.lineEdit_working_dir.setText(dirDest)
         outputDirectory = dirDest
-        update_subdirectories( outputDirectory )
+        update_subdirectories(outputDirectory)
         
 #         except UnicodeEncodeError:
 #             QMessageBox.warning( None , "Erreur", u'Le répertoire que vous avec sélectionné contient un ou des caractères spéciaux. \
@@ -84,7 +84,7 @@ def getOutputDirectory( ui ):
     return outputDirectory
 
 
-def update_subdirectories( outputDirectory ):
+def update_subdirectories(outputDirectory):
     """
     Create sub directories for the processings:
     
@@ -94,8 +94,8 @@ def update_subdirectories( outputDirectory ):
     """
     sub = ['Classification', 'Internal']
     for item in sub: 
-        if not os.path.exists( os.path.join(outputDirectory, item) ):
-            os.makedirs( os.path.join(outputDirectory, item) )
+        if not os.path.exists(os.path.join(outputDirectory, item)):
+            os.makedirs(os.path.join(outputDirectory, item))
     
     
 
@@ -104,33 +104,33 @@ def working_layer(canvas):
     layer = WorkingLayer(source, canvas.currentLayer())
     
     
-    #self.layer = self.canvas.currentLayer()
+    # self.layer = self.canvas.currentLayer()
     if layer :
-        #self.define_bands(self.layer)
-        #manage_bands()
-        #self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
+        # self.define_bands(self.layer)
+        # manage_bands()
+        # self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
         red, green, blue, pir, mir = manage_bands().get_values()
         
         bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
         layer.set_bands(bands)
         
         
-        logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+        logger.debug(str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
         return layer
         
 def set_current_layer(iface):
-    layer, bands  = get_workinglayer_on_opening( iface )
+    layer, bands = get_workinglayer_on_opening(iface)
     if layer:
         working_directory = os.path.join(os.path.dirname(layer.source_file), "working_directory")
         update_subdirectories(working_directory)
-        if not os.path.exists( working_directory ):
-            os.makedirs( working_directory )
+        if not os.path.exists(working_directory):
+            os.makedirs(working_directory)
         ProcessingManager().working_layer = layer
-        #self.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), self.layer.get_qgis_layer(), self.layer.band_invert)
-        #self.classif_tool.set_directory(self.working_directory)
-        #self.classif_tool.setupUi()
-        #layers_for_value_tool.append(layer ) #.get_qgis_layer())
-        logger.debug( "working directory" + working_directory )
+        # self.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), self.layer.get_qgis_layer(), self.layer.band_invert)
+        # self.classif_tool.set_directory(self.working_directory)
+        # self.classif_tool.setupUi()
+        # layers_for_value_tool.append(layer ) #.get_qgis_layer())
+        logger.debug("working directory" + working_directory)
     
         return layer, bands, working_directory
     return None, None, None
@@ -145,7 +145,7 @@ def get_workinglayer_on_opening(iface):
         path = QDir.currentPath()
         
         
-    fileOpened = QFileDialog.getOpenFileName( None, "Selectionner un fichier raster", path )
+    fileOpened = QFileDialog.getOpenFileName(None, "Selectionner un fichier raster", path)
     
     settings.setValue("terre_image_lastFolder", os.path.dirname(fileOpened))
     settings.sync()
@@ -164,22 +164,22 @@ def get_workinglayer_on_opening(iface):
 #                 QMessageBox.warning( None , "Attention", u'L\'image que vous essayez d\'ouvrir contient un ou plusieurs espaces. Les traitements sur cette image provoqueront une erreur.'.encode('utf8'), QMessageBox.Ok )
             
             
-        if fileOpened.endswith( ".qgs" ):
-            #open new qgis project
+        if fileOpened.endswith(".qgs"):
+            # open new qgis project
             pass
         else :
             raster_layer = manage_QGIS.get_raster_layer(fileOpened, os.path.splitext(os.path.basename(fileOpened))[0])
             if not os.name == "posix" : 
                 terre_image_processing.set_OTB_PATH()
             type_image = terre_image_processing.get_sensor_id(fileOpened)
-            logger.debug( "type_image " + str(type_image) )
-            layer = WorkingLayer( fileOpened, raster_layer )
+            logger.debug("type_image " + str(type_image))
+            layer = WorkingLayer(fileOpened, raster_layer)
             layer.set_type(type_image)
-            #self.layer = self.canvas.currentLayer()
+            # self.layer = self.canvas.currentLayer()
             if layer :
-                #self.define_bands(self.layer)
-                #manage_bands()
-                #self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
+                # self.define_bands(self.layer)
+                # manage_bands()
+                # self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
                 red, green, blue, pir, mir = manage_bands(type_image, layer.get_band_number()).get_values()
                 
                 if red != -1 or green != -1 or blue != -1 or pir != -1 or mir != -1:
@@ -190,41 +190,41 @@ def get_workinglayer_on_opening(iface):
 #                                 doublon = True
 #                                 break
 #                         if not doublon :
-                    for i in range(1,layer.get_band_number()+1):
+                    for i in range(1, layer.get_band_number() + 1):
                         if not i in bands.values():
-                            all_set=False
+                            all_set = False
                     if all_set:
                         
                     
                         layer.set_bands(bands)
                         
-                        logger.debug( str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+                        logger.debug(str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
                         
                         cst = TerreImageConstant()
-                        cst.index_group = cst.iface.legendInterface().addGroup( "Terre Image", True, None )
+                        cst.index_group = cst.iface.legendInterface().addGroup("Terre Image", True, None)
                         
                         
                         manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
                         compute_overviews(fileOpened)
                         return layer, bands
                     else:
-                        QMessageBox.warning( None , "Erreur", u'Il y a un problème dans la définition des bandes spectrales.', QMessageBox.Ok )
+                        QMessageBox.warning(None , "Erreur", u'Il y a un problème dans la définition des bandes spectrales.', QMessageBox.Ok)
                         return None, None
                 else:
                     return None, None
     else:
         return None, None
     
-def restore_working_layer( filename, bands, type ):
+def restore_working_layer(filename, bands, type):
     raster_layer = manage_QGIS.get_raster_layer(filename, os.path.splitext(os.path.basename(filename))[0])
-    layer = WorkingLayer( filename, raster_layer )
+    layer = WorkingLayer(filename, raster_layer)
     layer.set_type(type)
     layer.set_bands(bands)
     return layer, bands
     
     
     
-def computeStatistics( OneFeature, i, j=None, nodata=True ):
+def computeStatistics(OneFeature, i, j=None, nodata=True):
     """
     From the given feature, computes its statistics
     
@@ -233,13 +233,13 @@ def computeStatistics( OneFeature, i, j=None, nodata=True ):
         i             --    only for debugging
     """
     
-    logger.debug("one feature : " + OneFeature )
+    logger.debug("one feature : " + OneFeature)
     
-    #saving the feature only for testing
-    outOne = OneFeature + str( i ) + ".tif" 
-    shutil.copy( OneFeature, outOne )
-    logger.debug( outOne )
-    #/testing
+    # saving the feature only for testing
+    outOne = OneFeature + str(i) + ".tif" 
+    shutil.copy(OneFeature, outOne)
+    logger.debug(outOne)
+    # /testing
     
     dataset = gdal.Open(str(OneFeature), gdal.GA_ReadOnly)
     # dataset  : GDALDataset
@@ -254,8 +254,8 @@ def computeStatistics( OneFeature, i, j=None, nodata=True ):
             band.SetNoDataValue(0)
         stats = band.ComputeStatistics(False)
         
-        logger.debug( "Feature " + str(i) + " : " )
-        logger.debug( stats )
+        logger.debug("Feature " + str(i) + " : ")
+        logger.debug(stats)
         return stats
         
     dataset = None
@@ -268,8 +268,8 @@ def compute_overviews(filename):
         command += " -ro "
         command += "\"" + filename + "\""
         command += " 2 4 8 16"
-        logger.debug( "command to run" + command)
-        #os.system(command)
+        logger.debug("command to run" + command)
+        # os.system(command)
         terre_image_processing.run_process(command)
     
     
