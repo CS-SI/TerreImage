@@ -32,22 +32,24 @@ from qgis.gui import *
 class ProfiletoolMapTool_ValueTool(QgsMapTool):
 
 	def __init__(self, canvas):
-		QgsMapTool.__init__(self,canvas)
+		QgsMapTool.__init__(self, canvas)
 		self.canvas = canvas
 		self.cursor = QCursor(Qt.CrossCursor)
 
-	def canvasReleaseEvent(self,event):
-		#print "canvasReleaseEvent"
-		self.emit( SIGNAL("canvas_clicked_v"), {'x': event.pos().x(), 'y': event.pos().y()} )
+	def canvasReleaseEvent(self, event):
+		print "canvasReleaseEvent_v"
+		print "event", event
+		self.emit(SIGNAL("canvas_clicked_v"), {'x': event.pos().x(), 'y': event.pos().y()})
+		print "canvasReleaseEvent_v"
 
 	def activate(self):
 		QgsMapTool.activate(self)
 		self.canvas.setCursor(self.cursor)
 
 	def deactivate(self):
-		#self.emit( SIGNAL("deactivate") )
-		#self.canvas.setCursor( QCursor(Qt.ArrowCursor)) 
+		# self.emit( SIGNAL("deactivate") )
+		# self.canvas.setCursor( QCursor(Qt.ArrowCursor)) 
 		QgsMapTool.deactivate(self)
 
-	def setCursor(self,cursor):
+	def setCursor(self, cursor):
 		self.cursor = QCursor(cursor)
