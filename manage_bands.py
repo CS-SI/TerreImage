@@ -291,13 +291,13 @@ class manage_bands:
             self.bandsUi.label_mir.setEnabled(True)
             self.bandsUi.spinBox_mir.setEnabled(True)
             self.bandsUi.spinBox_blue.setValue(0)
-#         if keyword == "all" : 
-#             self.bandsUi.label_blue.setEnabled(True)
-#             self.bandsUi.spinBox_blue.setEnabled(True)
-#             self.bandsUi.checkBox_blue.setCheckState(Qt.Unchecked)
-#             self.bandsUi.checkBox_mir.setCheckState(Qt.Unchecked)
-#             self.bandsUi.label_mir.setEnabled(True)
-#             self.bandsUi.spinBox_mir.setEnabled(True)
+        if keyword == "all" : 
+            self.bandsUi.label_blue.setEnabled(True)
+            self.bandsUi.spinBox_blue.setEnabled(True)
+            self.bandsUi.checkBox_blue.setCheckState(Qt.Unchecked)
+            self.bandsUi.checkBox_mir.setCheckState(Qt.Unchecked)
+            self.bandsUi.label_mir.setEnabled(True)
+            self.bandsUi.spinBox_mir.setEnabled(True)
         if keyword == "none":
             self.bandsUi.label_blue.setEnabled(False)
             self.bandsUi.spinBox_blue.setEnabled(False)
@@ -316,7 +316,7 @@ class manage_bands:
         if self.green == -1:
             self.bandsUi.spinBox_green.setEnabled(False)
         self.bandsUi.spinBox_blue.setValue(self.blue)
-        if self.blue == -1:
+        if self.blue == -1 or self.blue == 0:
             self.bandsUi.spinBox_blue.setEnabled(False)
             if self.nb_bands:
                 if self.nb_bands > 3:
@@ -325,7 +325,7 @@ class manage_bands:
         if self.pir == -1:
             self.bandsUi.spinBox_pir.setEnabled(False)
         self.bandsUi.spinBox_mir.setValue(self.mir)
-        if self.mir == -1:
+        if self.mir == -1 or self.mir == 0:
             self.bandsUi.spinBox_mir.setEnabled(False)
             if self.nb_bands:
                 if self.nb_bands > 3:
@@ -345,9 +345,9 @@ class manage_bands:
         self.red = 1
         self.pir = 4
         self.mir = -1
+        self.update_blue_mir("blue")
         self.update_spin_box()
         self.bandsUi.radioButton_formosat.setEnabled(True)
-        self.update_blue_mir("mir")
          
     def define_pleiade(self):
         """
@@ -357,15 +357,12 @@ class manage_bands:
         3     600 – 720 nm (rouge)
         4     750 – 950 nm (proche infrarouge)
         """
-#         self.blue = 3
-#         self.green = 2
-#         self.red = 1
-#         self.pir = 4
-        self.blue = 1
+        self.blue = 3
         self.green = 2
-        self.red = 3
+        self.red = 1
         self.pir = 4
         self.mir = -1
+        self.update_blue_mir("blue")
         self.update_spin_box()
         self.bandsUi.radioButton_pleiades.setEnabled(True)
         
@@ -380,16 +377,15 @@ class manage_bands:
         # print "define spot"
         # spot 4-5
         self.blue = -1
-        self.green = 1
+        self.green = 3
         self.red = 2
-        self.pir = 3
-#         self.blue = -1
-#         self.green = 3
-#         self.red = 2
-#         self.pir = 1
+        self.pir = 1
         if self.nb_bands:
             if self.nb_bands > 3 :
                 self.mir = 4
+                self.update_blue_mir("mir")
+            else:
+                self.update_blue_mir("none")
         self.update_spin_box()
         self.bandsUi.radioButton_spot.setEnabled(True)
      
