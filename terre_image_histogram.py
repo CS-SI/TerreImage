@@ -37,27 +37,39 @@ import numpy.ma as ma
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
-#import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 import manage_QGIS
 from terre_image_environement import TerreImageParamaters
 
 import math
 
-#import loggin for debug messages
+# import loggin for debug messages
 import logging
 logging.basicConfig()
 # create logger
-logger = logging.getLogger( 'TerreImage_Histograms' )
+logger = logging.getLogger('TerreImage_Histograms')
 logger.setLevel(logging.INFO)
 
+# import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger('TerreImage_histogram')
+logger.setLevel(logging.DEBUG)
+log_file = os.path.join(os.path.expanduser("~"), "log_terr_image_histogram")
+fh = logging.FileHandler(log_file)
+formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
 
 
 class MyMplCanvas(FigureCanvas):
     __pyqtSignals__ = ("valueChanged()")
     
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
-    def __init__(self, parent=None, width=5, height=4, dpi=100, nb_bands = 1):
+    def __init__(self, parent=None, width=5, height=4, dpi=100, nb_bands=1):
        
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
@@ -85,73 +97,73 @@ class MyMplCanvas(FigureCanvas):
             self.multiband = True
         else:
             self.multiband = False
-        #print "self.multiband0", self.multiband
+        # print "self.multiband0", self.multiband
         
 
 
     def get_2_98_percent(self, sizeX, sizeY, histogram):
         # get 2 - 98 %
-        logger.debug(  "sizeX, sizeY" + str(sizeX) + " " + str(sizeY))
+        logger.debug("sizeX, sizeY" + str(sizeX) + " " + str(sizeY))
         nb_pixels = sizeX * sizeY
         logger.debug("nb_pixels: " + str(nb_pixels))
         
         nb_pixels_2 = int(float(nb_pixels * 0.02))
         nb_pixels_98 = int(float(nb_pixels * 0.98))
         
-        logger.debug(  "nb_pixels_2, nb_pixels_98: "  + str(nb_pixels_2) + " " + str(nb_pixels_98))
+        logger.debug("nb_pixels_2, nb_pixels_98: " + str(nb_pixels_2) + " " + str(nb_pixels_98))
         
         hist_cum = cumsum(histogram)
-        #print "histogram", histogram
-        #print "hist cum", hist_cum
-        #print "len(hist_cum)", len(hist_cum)
+        # print "histogram", histogram
+        # print "hist cum", hist_cum
+        # print "len(hist_cum)", len(hist_cum)
         
         self.x_min = 0
         self.x_max = len(hist_cum)
         hist_cum[-1] + self.rasterMin
-        for index in range(0,len(hist_cum)-1):
-            if hist_cum[index+1] > nb_pixels_2 and self.x_min == 0 :
+        for index in range(0, len(hist_cum) - 1):
+            if hist_cum[index + 1] > nb_pixels_2 and self.x_min == 0 :
                 self.x_min = index + self.rasterMin
-            if hist_cum[index+1] > nb_pixels_98 :
+            if hist_cum[index + 1] > nb_pixels_98 :
                 self.x_max = index + self.rasterMin
                 break;
             
-        #print "self.x_min, self.x_max", self.x_min, self.x_max
+        # print "self.x_min, self.x_max", self.x_min, self.x_max
         
-        logger.debug(  "self.x_min, self.x_max" + str(self.x_min) + " " + str(self.x_max))
-        self.x_min = (self.x_min-self.rasterMin)*self.bin_witdh+self.rasterMin
-        self.x_max = (self.x_max-self.rasterMin)*self.bin_witdh+self.rasterMin
+        logger.debug("self.x_min, self.x_max" + str(self.x_min) + " " + str(self.x_max))
+        self.x_min = (self.x_min - self.rasterMin) * self.bin_witdh + self.rasterMin
+        self.x_max = (self.x_max - self.rasterMin) * self.bin_witdh + self.rasterMin
         self.two_min = self.x_min
         self.ninety_eight_max = self.x_max
             
-        #print "self.x_min, self.x_max", self.x_min, self.x_max
+        # print "self.x_min, self.x_max", self.x_min, self.x_max
         
         if self.multiband:
             dic = {"r":"red", "g":"green", "b":"blue"} 
             p = TerreImageParamaters()
             if not p.is_complete():
-                exec( "p." + dic[self.color] + "_min=" + str(self.x_min) )
-                #print "p." + dic[self.color] + "_min=" + str(self.x_min)
-                exec( "p." + dic[self.color] + "_max=" + str(self.x_max) )
-                #print "p." + dic[self.color] + "_max=" + str(self.x_max)
+                exec("p." + dic[self.color] + "_min=" + str(self.x_min))
+                # print "p." + dic[self.color] + "_min=" + str(self.x_min)
+                exec("p." + dic[self.color] + "_max=" + str(self.x_max))
+                # print "p." + dic[self.color] + "_max=" + str(self.x_max)
 
 
-    def get_GDAL_histogram( self, image, band_number, qgis_layer, no_data=-1 ):
+    def get_GDAL_histogram(self, image, band_number, qgis_layer, no_data=-1):
         """
         From the given binary image, compute histogram and return the number of 1
         """
         histogram = []
 
-        #logger.debug( "image: " + str(image) + " band: " + str(band_number) )
+        # logger.debug( "image: " + str(image) + " band: " + str(band_number) )
         dataset = gdal.Open(image, gdal.GA_ReadOnly)
         if dataset is None:
             print "Error : Opening file ", image
         else :
-            #get raster band
+            # get raster band
             band = dataset.GetRasterBand(band_number)
             if no_data != -1:
                 band.SetNoDataValue(no_data)
             
-            #get raster and overview if available
+            # get raster and overview if available
             overview = 2
             if overview < band.GetOverviewCount() :
                 band_overview = band.GetOverview(overview)
@@ -160,46 +172,46 @@ class MyMplCanvas(FigureCanvas):
                 
             # get overview statistics
             self.rasterMin, self.rasterMax, mean, stddev = band_overview.ComputeStatistics(False)
-            #print self.rasterMin, self.rasterMax, mean, stddev
-            logger.debug( "self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin) )
+            # print self.rasterMin, self.rasterMax, mean, stddev
+            logger.debug("self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin))
             nbVal = self.rasterMax - self.rasterMin
-            #print "nbVal", nbVal
+            # print "nbVal", nbVal
 
-            #taking the size of the raster
+            # taking the size of the raster
             sizeX = float(band_overview.XSize)
             sizeY = float(band_overview.YSize)
-            #print "totalXSize", sizeX
-            #print "totalYSize", sizeY
+            # print "totalXSize", sizeX
+            # print "totalYSize", sizeY
             
-            #computing nb bins
+            # computing nb bins
             stddev_part = 3.5 * stddev 
-            sizexy_part = math.pow( sizeX*sizeY, 1./3. )
-            #print "stddev", stddev_part
-            #print "sizexy", sizexy_part
+            sizexy_part = math.pow(sizeX * sizeY, 1. / 3.)
+            # print "stddev", stddev_part
+            # print "sizexy", sizexy_part
             
             # warning stddev
-            nb_bin_part = (3.5 * stddev ) / (math.pow( sizeX*sizeY, 1./3. ) )
-            #print nb_bin_part
+            nb_bin_part = (3.5 * stddev) / (math.pow(sizeX * sizeY, 1. / 3.))
+            # print nb_bin_part
             self.nb_bin = int(math.ceil(nbVal / nb_bin_part))
-            #print "nb_bin", self.nb_bin
+            # print "nb_bin", self.nb_bin
             
-            self.bin_witdh = float(self.rasterMax - self.rasterMin)/self.nb_bin
-            #print "bin_witdh", self.bin_witdh
+            self.bin_witdh = float(self.rasterMax - self.rasterMin) / self.nb_bin
+            # print "bin_witdh", self.bin_witdh
             
-            histogram = band_overview.GetHistogram(self.rasterMin-self.bin_witdh/2, self.rasterMax+self.bin_witdh/2, self.nb_bin, approx_ok = 0)
+            histogram = band_overview.GetHistogram(self.rasterMin - self.bin_witdh / 2, self.rasterMax + self.bin_witdh / 2, self.nb_bin, approx_ok=0)
             
-            #print "histogram", histogram
+            # print "histogram", histogram
             
             self.get_2_98_percent(sizeX, sizeY, histogram)
             
             if self.multiband:
                 p = TerreImageParamaters()
                 if p.is_complete():
-                    #print "here"
+                    # print "here"
                     dic = {"r":"red", "g":"green", "b":"blue"} 
-                    exec( "self.x_min=int(p." + dic[self.color] + "_min)" )
-                    exec( "self.x_max=int(p." + dic[self.color] + "_max)" )
-                    #print self.x_min, self.x_max
+                    exec("self.x_min=int(p." + dic[self.color] + "_min)")
+                    exec("self.x_max=int(p." + dic[self.color] + "_max)")
+                    # print self.x_min, self.x_max
             
             return histogram
         
@@ -208,18 +220,18 @@ class MyMplCanvas(FigureCanvas):
         self.color = color
         self.name = name
         
-        #getting histogram
+        # getting histogram
         if name == "NDVI":
             histogram = self.get_GDAL_histogram(filename, band, qgis_layer)
         else :
             histogram = self.get_GDAL_histogram(filename, band, qgis_layer, no_data)
 
-        #setting plot axis
-        self.t = arange(0, len(histogram))*self.bin_witdh + self.rasterMin#*(self.rasterMax - self.rasterMin)/self.nb_bin + self.rasterMin #range(0, len(histogram))
+        # setting plot axis
+        self.t = arange(0, len(histogram)) * self.bin_witdh + self.rasterMin  # *(self.rasterMax - self.rasterMin)/self.nb_bin + self.rasterMin #range(0, len(histogram))
         self.s = histogram
-        logger.debug(  "len s and len t"+ str(len(self.s)) + " " + str(len(self.t)))
+        logger.debug("len s and len t" + str(len(self.s)) + " " + str(len(self.t)))
         
-        #draw histogram, 2, 98 % and connect canvas
+        # draw histogram, 2, 98 % and connect canvas
         self.draw_histogram()
         self.axes.figure.canvas.mpl_connect('button_press_event', self.on_press)
         self.axes.figure.canvas.mpl_connect('button_release_event', self.on_release)
@@ -229,31 +241,31 @@ class MyMplCanvas(FigureCanvas):
     def draw_histogram(self):
         if self.t.any() and self.s and self.color and self.name:
             self.axes.plot(self.t, self.s, self.color)
-            xtext = self.axes.set_xlabel('Valeur') # returns a Text instance
+            xtext = self.axes.set_xlabel('Valeur')  # returns a Text instance
             ytext = self.axes.set_ylabel('Nombre')
             self.axes.set_title(self.name)
             
             
     def draw_reset_percent(self):
-        logger.debug(  "draw reset" )
+        logger.debug("draw reset")
         self.axes.clear()
         self.draw_histogram()
         if self.two_min and self.ninety_eight_max:
-            logger.debug(  "self.two_min, self.ninety_eight_max" + str(self.two_min) + str(self.ninety_eight_max))
-            self.axes.axvline(x=self.two_min,c="red",linewidth=2,zorder=0, clip_on=False)
-            self.axes.axvline(x=self.ninety_eight_max,c="red",linewidth=2,zorder=0, clip_on=False)
+            logger.debug("self.two_min, self.ninety_eight_max" + str(self.two_min) + str(self.ninety_eight_max))
+            self.axes.axvline(x=self.two_min, c="red", linewidth=2, zorder=0, clip_on=False)
+            self.axes.axvline(x=self.ninety_eight_max, c="red", linewidth=2, zorder=0, clip_on=False)
         self.axes.figure.canvas.draw()
         self.x_min = self.two_min
         self.x_max = self.ninety_eight_max 
-        self.emit( QtCore.SIGNAL("valueChanged()") )
+        self.emit(QtCore.SIGNAL("valueChanged()"))
 
 
     def draw_min_max_percent(self):
         if self.x_min and self.x_max:
-            #print "self.x_min, self.x_max for", self.color, self.x_min, self.x_max
-            logger.debug( "self.x_min, self.x_max" + str(self.x_min) + str(self.x_max))
-            self.axes.axvline(x=self.x_min,c="red",linewidth=2,zorder=0, clip_on=False)
-            self.axes.axvline(x=self.x_max,c="red",linewidth=2,zorder=0, clip_on=False)
+            # print "self.x_min, self.x_max for", self.color, self.x_min, self.x_max
+            logger.debug("self.x_min, self.x_max" + str(self.x_min) + str(self.x_max))
+            self.axes.axvline(x=self.x_min, c="red", linewidth=2, zorder=0, clip_on=False)
+            self.axes.axvline(x=self.x_max, c="red", linewidth=2, zorder=0, clip_on=False)
             
         
     def on_press(self, event):
@@ -261,15 +273,15 @@ class MyMplCanvas(FigureCanvas):
         Check if the clicked point is nearer from x_min than from x_max
         """
         self.do_change = True
-        logger.debug( 'press')
+        logger.debug('press')
         x = event.xdata
         if x :
-            #knowing which line to move
-            if abs(x-self.x_min) < abs(x-self.x_max):
+            # knowing which line to move
+            if abs(x - self.x_min) < abs(x - self.x_max):
                 self.change_min = True
             else:
                 self.change_min = False
-            #self.valueChanged.emit()
+            # self.valueChanged.emit()
         else:
             self.do_change = False
         
@@ -279,7 +291,7 @@ class MyMplCanvas(FigureCanvas):
         Get asbscissas of new x_min or x_max
         """
         if self.do_change and event.xdata:
-            logger.debug( 'release')
+            logger.debug('release')
             # classic case
             last_min = self.x_min
             last_max = self.x_max
@@ -287,7 +299,7 @@ class MyMplCanvas(FigureCanvas):
                 self.x_min = event.xdata
             else:
                 self.x_max = event.xdata
-            #if the user drag the max line under the min line, switch the values
+            # if the user drag the max line under the min line, switch the values
             if self.x_min > self.x_max:
                 temp = self.x_min
                 self.x_min = self.x_max
@@ -297,39 +309,41 @@ class MyMplCanvas(FigureCanvas):
             if self.x_max > self.rasterMax:
                 self.x_max = self.rasterMax
                 
+            logger.info("on release : x_min" + str(self.x_min))
+            logger.info("on release : x_max" + str(self.x_max))
                 
             self.axes.clear()
             self.draw_histogram()
-            #self.axes.plot(self.t, self.s, self.color)
-            #self.axes.plot(self.x1, self.x1, 'g^')
+            # self.axes.plot(self.t, self.s, self.color)
+            # self.axes.plot(self.x1, self.x1, 'g^')
             self.draw_min_max_percent()
-            #self.axes.vlines(self.x1, [0], self.x1)
+            # self.axes.vlines(self.x1, [0], self.x1)
     #         self.axes.set_xlabel('time (s)')
     #         self.axes.set_title('Vertical lines demo')
             
             self.axes.figure.canvas.draw()
-            self.emit( QtCore.SIGNAL("valueChanged()") )
-            logger.debug( str(self.x_min) + " " + str(self.x_max))
+            self.emit(QtCore.SIGNAL("valueChanged()"))
+            logger.debug(str(self.x_min) + " " + str(self.x_max))
             
             if self.multiband:
                 dic = {"r":"red", "g":"green", "b":"blue"} 
                 p = TerreImageParamaters()
-                exec( "p." + dic[self.color] + "_min=" + str(self.x_min) )
-                #print "p." + dic[self.color] + "_min=" + str(self.x_min)
-                exec( "p." + dic[self.color] + "_max=" + str(self.x_max) )
-                #print "p." + dic[self.color] + "_max=" + str(self.x_max)
+                exec("p." + dic[self.color] + "_min=" + str(self.x_min))
+                # print "p." + dic[self.color] + "_min=" + str(self.x_min)
+                exec("p." + dic[self.color] + "_max=" + str(self.x_max))
+                # print "p." + dic[self.color] + "_max=" + str(self.x_max)
 
 
 
-class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
+class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :  # , Ui_Form):
     
     __pyqtSignals__ = ("valueChanged(PyQt_PyObject)", "threshold(PyQt_PyObject)")
     
     
-    def __init__(self, layer, nb_bands = 3, main=False):
+    def __init__(self, layer, nb_bands=3, main=False):
         QtGui.QWidget.__init__(self)
         QtCore.QObject.__init__(self)
-        #self.setupUi(self)
+        # self.setupUi(self)
         
         self.layer = layer
         
@@ -340,11 +354,11 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
         
         self.l = QtGui.QVBoxLayout(self)
         if main:
-            self.sc_1 = MyMplCanvas(self, width=5, height=4, dpi=100, nb_bands = nb_bands)
+            self.sc_1 = MyMplCanvas(self, width=5, height=4, dpi=100, nb_bands=nb_bands)
         else:
-            self.sc_1 = MyMplCanvas(self, width=5, height=4, dpi=100, nb_bands = -1)
+            self.sc_1 = MyMplCanvas(self, width=5, height=4, dpi=100, nb_bands=-1)
             
-        QtCore.QObject.connect( self.sc_1, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
+        QtCore.QObject.connect(self.sc_1, QtCore.SIGNAL("valueChanged()"), self.valueChanged)
         self.l.addWidget(self.sc_1)
         
         self.dock_opened = False
@@ -357,7 +371,7 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
         
         
     def reset(self):
-        logger.debug( "resset" )
+        logger.debug("resset")
         self.sc_1.draw_reset_percent()
         if self.nb_hist == 3 :
             self.sc_2.draw_reset_percent()
@@ -366,21 +380,21 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject) :#, Ui_Form):
         
     def seuillage(self):
         forms = []
-        forms.append( "\"if(((im1b1>" + str(self.sc_1.x_min) + ") and (im1b1<" + str(self.sc_1.x_max) + ")), im1b1, 0)\"" )
+        forms.append("\"if(((im1b1>" + str(self.sc_1.x_min) + ") and (im1b1<" + str(self.sc_1.x_max) + ")), im1b1, 0)\"")
         if self.nb_hist == 3 :
-            forms.append( "\"if(((im1b2>" + str(self.sc_2.x_min) + ") and (im1b2<" + str(self.sc_2.x_max) + ")), im1b2, 0)\"" )
-            forms.append( "\"if(((im1b3>" + str(self.sc_3.x_min) + ") and (im1b3<" + str(self.sc_3.x_max) + ")), im1b3, 0)\"" )
-        logger.debug( forms )
-        #emit signal
-        self.emit( QtCore.SIGNAL("threshold(PyQt_PyObject)"), forms )
+            forms.append("\"if(((im1b2>" + str(self.sc_2.x_min) + ") and (im1b2<" + str(self.sc_2.x_max) + ")), im1b2, 0)\"")
+            forms.append("\"if(((im1b3>" + str(self.sc_3.x_min) + ") and (im1b3<" + str(self.sc_3.x_max) + ")), im1b3, 0)\"")
+        logger.debug(forms)
+        # emit signal
+        self.emit(QtCore.SIGNAL("threshold(PyQt_PyObject)"), forms)
         
         
         
-class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):        
+class TerreImageHistogram_monoband(TerreImageHistogram) :  # , Ui_Form):        
         
     def __init__(self, layer, canvas, processing=None, specific_band=-1):
-        #super(TerreImageHistogram_monoband, self).__init__(layer, 1) 
-        TerreImageHistogram.__init__( self, layer, 1 )
+        # super(TerreImageHistogram_monoband, self).__init__(layer, 1) 
+        TerreImageHistogram.__init__(self, layer, 1)
         self.canvas = processing.mirror.mainWidget.canvas
         
         self.specific_band = specific_band
@@ -397,51 +411,51 @@ class TerreImageHistogram_monoband(TerreImageHistogram) :#, Ui_Form):
            
            
     def valueChanged(self):
-        logger.debug( "value changed" )
-        values = [ (self.sc_1.x_min, self.sc_1.x_max ) ]
-        logger.debug( "values" + str( values ))
+        logger.debug("value changed")
+        values = [ (self.sc_1.x_min, self.sc_1.x_max) ]
+        logger.debug("values" + str(values))
         manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas, mono=True)
-        #self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
+        # self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
            
            
     def seuillage(self):
         forms = []
         if self.specific_band == -1:
-            forms.append( "\"if(((im1b1>" + str(self.sc_1.x_min) + ") and (im1b1<" + str(self.sc_1.x_max) + ")), im1b1, 0)\"" )
+            forms.append("\"if(((im1b1>" + str(self.sc_1.x_min) + ") and (im1b1<" + str(self.sc_1.x_max) + ")), im1b1, 0)\"")
         else :
-            forms.append( "\"if(((im1b" + str(self.specific_band) +">" + str(self.sc_1.x_min) + ") and (im1b" + str(self.specific_band) +"<" + str(self.sc_1.x_max) + ")), im1b" + str(self.specific_band) +", 0)\"" )
-        #emit signal
-        self.emit( QtCore.SIGNAL("threshold(PyQt_PyObject)"), forms )
+            forms.append("\"if(((im1b" + str(self.specific_band) + ">" + str(self.sc_1.x_min) + ") and (im1b" + str(self.specific_band) + "<" + str(self.sc_1.x_max) + ")), im1b" + str(self.specific_band) + ", 0)\"")
+        # emit signal
+        self.emit(QtCore.SIGNAL("threshold(PyQt_PyObject)"), forms)
            
            
            
-class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):    
+class TerreImageHistogram_multiband(TerreImageHistogram) :  # , Ui_Form):    
       
-    def __init__(self, layer, canvas, nb_bands = 3, processing=None):
-        #super(TerreImageHistogram_monoband, self).__init__(layer, nb_bands)
+    def __init__(self, layer, canvas, nb_bands=3, processing=None):
+        # super(TerreImageHistogram_monoband, self).__init__(layer, nb_bands)
         if processing :
-            TerreImageHistogram.__init__( self, layer, nb_bands )
+            TerreImageHistogram.__init__(self, layer, nb_bands)
         else:
-            TerreImageHistogram.__init__( self, layer, nb_bands, True )
+            TerreImageHistogram.__init__(self, layer, nb_bands, True)
               
         
-        #print "processing", processing
-        logger.debug( "processing" + str(processing))
+        # print "processing", processing
+        logger.debug("processing" + str(processing))
         if processing is None:
-            logger.debug( "processing none")
+            logger.debug("processing none")
             self.canvas = canvas
-            self.processing=None
+            self.processing = None
         else:
-            #print "canvas", canvas
-            #print "processing.mirror.mainWidget.canvas", processing.mirror.mainWidget.canvas
-            logger.debug( "processing not none")
+            # print "canvas", canvas
+            # print "processing.mirror.mainWidget.canvas", processing.mirror.mainWidget.canvas
+            logger.debug("processing not none")
             self.canvas = processing.mirror.mainWidget.canvas
             self.processing = processing
         
         self.sc_2 = MyMplCanvas(self, width=5, height=4, dpi=100)
-        QtCore.QObject.connect( self.sc_2, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
+        QtCore.QObject.connect(self.sc_2, QtCore.SIGNAL("valueChanged()"), self.valueChanged)
         self.sc_3 = MyMplCanvas(self, width=5, height=4, dpi=100)
-        QtCore.QObject.connect( self.sc_3, QtCore.SIGNAL( "valueChanged()" ), self.valueChanged )
+        QtCore.QObject.connect(self.sc_3, QtCore.SIGNAL("valueChanged()"), self.valueChanged)
         self.l.addWidget(self.sc_2)
         self.l.addWidget(self.sc_3)
         
@@ -458,14 +472,18 @@ class TerreImageHistogram_multiband(TerreImageHistogram) :#, Ui_Form):
         
            
     def valueChanged(self):
-        values = [ (self.sc_1.x_min, self.sc_1.x_max ), (self.sc_2.x_min, self.sc_2.x_max ), (self.sc_3.x_min, self.sc_3.x_max )]
-        logger.debug( "values" + str(values))
-        logger.debug( self.canvas )
+        values = [ (self.sc_1.x_min, self.sc_1.x_max), (self.sc_2.x_min, self.sc_2.x_max), (self.sc_3.x_min, self.sc_3.x_max)]
+        logger.debug("values" + str(values))
+        logger.debug(self.canvas)
+        
+                        
+        logger.info("values from valueChanged" + str(values))
+        
         if self.processing:
             manage_QGIS.custom_stretch(self.processing.output_working_layer.get_qgis_layer(), values, self.canvas)
         else:
             manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas)
-        #self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
+        # self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )           
            
 
         
