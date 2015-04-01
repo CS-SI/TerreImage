@@ -11,7 +11,7 @@
 [general]
 name=TerreImage
 qgisMinimumVersion=2.0
-qgisMaximumVersion=2.6.99
+qgisMaximumVersion=2.8.99
 description=TerreImage
 version=2.3.14
 author=CS SI
