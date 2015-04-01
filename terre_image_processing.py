@@ -261,11 +261,11 @@ def get_sensor_id(image):
     currentOs = os.name
     
 #     if currentOs == "posix" :
-    command = "otbcli_ReadImageInfo -in " + image  # + " | grep \"sensor:\""
+    command = "otbcli ReadImageInfo "#-in " + image  # + " | grep \"sensor:\""
 #     else :
 #         command = "otbcli ReadImageInfo -in " + image #+ " | findstr \"sensor:\""
     args = " -in " + image
-        
+
     if currentOs == "posix" :
         command += args
         result_sensor = run_process(command)
@@ -302,11 +302,11 @@ def export_kmz(filenames, working_directory):
         
         
 def run_process(fused_command, read_output=False):
-    # print "run process", fused_command
+    #print "run process", fused_command
     qprocess = QProcess()
     set_process_env(qprocess)
     code_de_retour = qprocess.execute(fused_command)
-    print "code de retour", code_de_retour
+    #print "code de retour", code_de_retour
     logger.info("command : ")
     logger.info(fused_command)
     logger.info("code de retour" + str(code_de_retour))
@@ -334,10 +334,10 @@ def run_process(fused_command, read_output=False):
 
 
 
-    print "get output"
+    #print "get output"
     output = str(qprocess.readAllStandardOutput())
     # print "output", output
-    print 'end output'
+    #print 'end output'
     return output 
 
 
