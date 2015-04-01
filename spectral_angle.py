@@ -5,9 +5,9 @@
                                  A QGIS plugin
  Segmentation using OTB application
                               -------------------
-        begin                : 2014-05-06
-        copyright            : (C) 2014 by CNES
-        email                : alexia.mondot@c-s.fr
+        begin               : 2014-05-06
+        copyright           : (C) 2014 by CNES
+        email               : alexia.mondot@c-s.fr
  ***************************************************************************/
 
 /***************************************************************************
@@ -21,19 +21,15 @@
  """
 
 import os
-
 from qgis.gui import QgsRubberBand, QgsMapToolPan, QgsMapTool
 from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
-
 from PyQt4 import QtCore, QtGui
 
+# import project lib
 # from ptmaptool import ProfiletoolMapTool
-
 import terre_image_processing
-
 # imports for display
 import manage_QGIS
-
 
 # import loggin for debug messages
 import logging
@@ -41,7 +37,6 @@ logging.basicConfig()
 # create logger
 logger = logging.getLogger('TerreImage_SpectralAngle')
 logger.setLevel(logging.DEBUG)
-
 
 
 class SpectralAngleMapTool(QgsMapTool):
@@ -65,7 +60,7 @@ class SpectralAngleMapTool(QgsMapTool):
 
     def deactivate(self):
         # self.emit( SIGNAL("deactivate") )
-        # self.canvas.setCursor( QCursor(Qt.ArrowCursor)) 
+        # self.canvas.setCursor( QCursor(Qt.ArrowCursor))
         QgsMapTool.deactivate(self)
 
     def setCursor(self, cursor):
@@ -73,25 +68,25 @@ class SpectralAngleMapTool(QgsMapTool):
 
 
 class SpectralAngle(QtCore.QObject):
-    
+
     __pyqtSignals__ = ("anglesComputed(PyQt_PyObject)")
-    
+
     def __init__(self, iface, working_dir, layer, mirror_map, rubberband):
         QtCore.QObject.__init__(self)
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.mirrormap_tool = mirror_map
-        
+
         self.working_directory = working_dir
-        if layer :
+        if layer:
             self.layer = layer
-        
+
         # self.tool = ProfiletoolMapTool(self.iface.mapCanvas())        #the mouselistener
         # logger.debug(  "self.tool" + str(self.tool))
         self.pointstoDraw = None  # Polyline in mapcanvas CRS analysed
         self.maptool = self.canvas.mapTool()
         # self.get_point_for_angles()
-        
+
         self.rubberband = rubberband
 #         self.polygon = False
 #         self.rubberband = QgsRubberBand(self.canvas, self.polygon)
@@ -100,7 +95,7 @@ class SpectralAngle(QtCore.QObject):
 
 
     def angles(self, x, y):
-        if self.layer :
+        if self.layer:
             image_output = terre_image_processing.angles(self.layer, self.working_directory, self.iface, x, y)
         # self.tool.deactivate()
         # self.deactivate()
@@ -109,8 +104,8 @@ class SpectralAngle(QtCore.QObject):
             # self.rubberband.addPoint(QgsPoint(mapPos.x(),mapPos.y()))
             self.emit(QtCore.SIGNAL("anglesComputed(PyQt_PyObject)"), image_output)
             # self.display(image_output)
-                    
-                    
+
+
     def freezeCanvas(self, setFreeze):
         if setFreeze:
             if not self.iface.mapCanvas().isFrozen():
@@ -118,9 +113,9 @@ class SpectralAngle(QtCore.QObject):
         else:
             if self.iface.mapCanvas().isFrozen():
                 self.iface.mapCanvas().freeze(False)
-                self.iface.mapCanvas().refresh()    
-                    
-                    
+                self.iface.mapCanvas().refresh()
+
+
     def display(self, output_filename):
         self.freezeCanvas(True)
         # result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
@@ -132,9 +127,9 @@ class SpectralAngle(QtCore.QObject):
         logger.debug(self.mirror)
         self.mirror.mainWidget.addLayer(result_layer.id())
         # 1 mettre image en queue
-        
-        
-        
+
+
+
         ifaceLegend = self.iface.legendInterface()
         ifaceLayers = QgsMapLayerRegistry.instance().mapLayers()
         logger.debug("ifacelayers" + str(ifaceLayers))
@@ -146,25 +141,25 @@ class SpectralAngle(QtCore.QObject):
         ifaceLegend.setLayerVisible(result_layer, False)
         self.iface.mapCanvas().refresh()
         logger.debug(ifaceLegend.isLayerVisible(result_layer))
-        
+
         # thaw the canvas
-        self.freezeCanvas(False)                
-                    
-    
+        self.freezeCanvas(False)
+
+
     def get_point_for_angles(self, layer):
         print "get point for angles"
         self.tool = SpectralAngleMapTool(self.iface.mapCanvas())  # the mouselistener
         print "self.tool", self.tool
-        logger.debug("self.tool" + str(self.tool)) 
+        logger.debug("self.tool" + str(self.tool))
         self.layer = layer
         logger.debug("get point for angles")
         # init the mouse listener comportement and save the classic to restore it on quit
         self.canvas.setMapTool(self.tool)
         QtCore.QObject.connect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.onRightClick)
-        
-        
+
+
         logger.debug("listener set")
-        
+
         # init the temp layer where the polyline is draw
 #         self.polygon = False
 #         self.rubberband = QgsRubberBand(self.canvas, self.polygon)
@@ -173,12 +168,12 @@ class SpectralAngle(QtCore.QObject):
         # init the table where is saved the poyline
         self.pointstoDraw = []
         self.pointstoCal = []
-        
+
     def deactivate(self):  # enable clean exit of the plugin
         QtCore.QObject.disconnect(self.tool, QtCore.SIGNAL("canvas_clicked"), self.onRightClick)
         self.rubberband.reset()
-        
-        
+
+
     def onRightClick(self, position):  # used to quit the current action
         print "right click", position
         mapPos = self.canvas.getCoordinateTransform().toMapCoordinates(position["x"], position["y"])
@@ -194,4 +189,4 @@ class SpectralAngle(QtCore.QObject):
         # create new vlayer ???
         self.angles(mapPos.x(), mapPos.y())
         self.tool = None
- 
+

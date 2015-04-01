@@ -5,9 +5,9 @@
                                  A QGIS plugin
  QGISEducation
                              -------------------
-        begin                : 2014-04-30
-        copyright            : (C) 2014 by CS SI
-        email                : alexia.mondot@c-s.fr
+        begin               : 2014-04-30
+        copyright           : (C) 2014 by CS SI
+        email               : alexia.mondot@c-s.fr
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,13 +20,10 @@
  ***************************************************************************/
 """
 
-
 from PyQt4.QtGui import QDialog, QButtonGroup, QMessageBox
 from PyQt4.QtCore import QObject, SIGNAL, Qt
 
 from ui_bands import Ui_Dialog
-
-
 
 # import loggin for debug messages
 import logging
@@ -36,30 +33,29 @@ logger = logging.getLogger('TerreImage_manage_bands')
 logger.setLevel(logging.INFO)
 
 
-
 class manage_bands:
-    
+
     def __init__(self, type_image=None, nb_bands=None):
-        
+
         # creating interface
         Dialog = QDialog()
         self.bandsUi = Ui_Dialog()
         self.bandsUi.setupUi(Dialog)
         # screen = QApplication.desktop().screenGeometry()
         # self.move( screen.center() - self.rect().center() )
-        
+
         groupButton1 = QButtonGroup()
         groupButton1.addButton(self.bandsUi.radioButton_formosat)
         groupButton1.addButton(self.bandsUi.radioButton_pleiades)
         groupButton1.addButton(self.bandsUi.radioButton_spot)
         groupButton1.addButton(self.bandsUi.radioButton_autre)
-        
+
         self.red = None
         self.green = None
         self.blue = None
         self.pir = None
         self.mir = None
-        
+
         # connect the qdialog button box
         # QObject.connect(self.bandsUi.buttonBox, SIGNAL("accepted()"), self.set_bands)
         # QObject.connect(self.bandsUi.buttonBox, SIGNAL("rejected()"), self.reset_bands)
@@ -69,7 +65,7 @@ class manage_bands:
         self.bandsUi.radioButton_pleiades.toggled.connect(self.define_pleiade)
         self.bandsUi.radioButton_spot.toggled.connect(self.define_spot)
         self.bandsUi.radioButton_autre.toggled.connect(self.define_other)
-        
+
         QObject.connect(self.bandsUi.spinBox_blue, SIGNAL("valueChanged(int)"), self.update_blue)
         QObject.connect(self.bandsUi.spinBox_red, SIGNAL("valueChanged(int)"), self.update_red)
         QObject.connect(self.bandsUi.spinBox_green, SIGNAL("valueChanged(int)"), self.update_green)
@@ -77,18 +73,17 @@ class manage_bands:
         QObject.connect(self.bandsUi.spinBox_mir, SIGNAL("valueChanged(int)"), self.update_mir)
         # QObject.connect( spinBox_mir, SIGNAL( "valueChanged(int)" ), lambda x:self.mir = x)
         QObject.connect(self.bandsUi.buttonBox, SIGNAL("rejected()"), self.cancel)
-        
+
         # settrace()
-        
+
         if nb_bands:
             self.nb_bands = nb_bands
             self.custom_from_nb_of_bands(nb_bands)
-        else :
+        else:
             self.nb_bands = -1
-         
-         
+
         gray_other = False
-        if type_image :
+        if type_image:
             if type_image == "Spot 5" or type_image == "spot":
                 logger.info("define spot")
                 # self.define_spot(False)
@@ -110,73 +105,39 @@ class manage_bands:
                 self.bandsUi.radioButton_spot.setEnabled(False)
                 self.bandsUi.radioButton_pleiades.setEnabled(False)
                 gray_other = True
-            else :
+            else:
                 logger.info("define others")
                 self.bandsUi.radioButton_autre.setChecked(True)
                 self.set_spinbox_read_only(False)
             if gray_other:
                 self.gray_other()
-                
+
         # execute the dialog
         Dialog.exec_()
-    
+
     def cancel(self):
         self.blue = -1
-        self.green = -1 
+        self.green = -1
         self.red = -1
         self.pir = -1
         self.mir = -1
         return None
-    
-    
+
     def update_red(self, value):
-#         print self.bandsUi.radioButton_autre.isChecked()
-#         if self.bandsUi.radioButton_autre.isChecked() == False:
-#             self.bandsUi.radioButton_autre.setChecked(True)
-#         if self.bandsUi.radioButton_autre.isChecked() == True:
-            # print "update red"
-           # print "value", value
         self.red = value
-            # print self.red
-            # self.debug("update red")
-       
-       
+
     def update_green(self, value):
-#         print self.bandsUi.radioButton_autre.isChecked()
-#         if self.bandsUi.radioButton_autre.isChecked() == False:
-#             self.bandsUi.radioButton_autre.setChecked(True)
-#         if self.bandsUi.radioButton_autre.isChecked() == True:
         self.green = value
-            # self.debug("update green")
-      
-          
+
     def update_blue(self, value):
-#         print self.bandsUi.radioButton_autre.isChecked()
-#         if self.bandsUi.radioButton_autre.isChecked() == False:
-#             self.bandsUi.radioButton_autre.setChecked(True)
-#         if self.bandsUi.radioButton_autre.isChecked() == True:
         self.blue = value
-            # self.debug("update blue")
-          
-          
+
     def update_pir(self, value):
-#         print self.bandsUi.radioButton_autre.isChecked()
-#         if self.bandsUi.radioButton_autre.isChecked() == False:
-#             self.bandsUi.radioButton_autre.setChecked(True)
-#         if self.bandsUi.radioButton_autre.isChecked() == True:
         self.pir = value
-            # self.debug("update pir")
-          
+
     def update_mir(self, value):
-#         print self.bandsUi.radioButton_autre.isChecked()
-#         if self.bandsUi.radioButton_autre.isChecked() == False:
-#             self.bandsUi.radioButton_autre.setChecked(True)
-#         if self.bandsUi.radioButton_autre.isChecked() == True:
-        self.mir = value    
-            # self.debug("update mir")   
-    
-    
-    
+        self.mir = value
+
     def custom_from_nb_of_bands(self, number_of_bands):
         self.bandsUi.spinBox_red.setMaximum(number_of_bands)
         self.bandsUi.spinBox_green.setMaximum(number_of_bands)
@@ -199,8 +160,7 @@ class manage_bands:
             self.blue = 0
             self.pir = 0
             self.mir = 0
-            
-        
+
             self.bandsUi.radioButton_formosat.setEnabled(False)
             self.bandsUi.radioButton_spot.setEnabled(False)
             self.bandsUi.radioButton_pleiades.setEnabled(False)
@@ -231,9 +191,7 @@ class manage_bands:
             QMessageBox.critical(None , "Erreur", "L'image en entrée doit avoir 1, 3 ou 4 bandes !", QMessageBox.Ok)
         # print "define by bands"
         # self.debug()
-        
-        
-        
+
     def debug(self, message=""):
         print message
         print "self.blue", self.blue
@@ -241,41 +199,40 @@ class manage_bands:
         print "self.red", self.red
         print "self.pir", self.pir
         print "self.mir", self.mir
-     
-     
+
+
     def set_spinbox_read_only(self, state):
         self.bandsUi.spinBox_blue.setReadOnly(state)
         self.bandsUi.spinBox_red.setReadOnly(state)
         self.bandsUi.spinBox_green.setReadOnly(state)
         self.bandsUi.spinBox_pir.setReadOnly(state)
         self.bandsUi.spinBox_mir.setReadOnly(state)
-         
-     
+
+
     def blue_checkbox_changed(self):
         if self.bandsUi.checkBox_blue.checkState() == Qt.Checked:
             self.update_blue_mir("blue")
-        else :
+        else:
             self.bandsUi.label_mir.setEnabled(True)
             self.bandsUi.spinBox_mir.setEnabled(True)
-         
-     
+
+
     def mir_checkbox_changed(self):
         if self.bandsUi.checkBox_mir.checkState() == Qt.Checked:
             self.update_blue_mir("mir")
-        else :
+        else:
             self.bandsUi.label_blue.setEnabled(True)
             self.bandsUi.spinBox_blue.setEnabled(True)
-     
+
     def define_other(self):
         self.bandsUi.groupBox_other.setEnabled(True)
         self.bandsUi.radioButton_autre.setEnabled(True)
-         
+
     def gray_other(self):
         self.bandsUi.groupBox_other.setEnabled(False)
         self.bandsUi.radioButton_autre.setEnabled(False)
-        
- 
- 
+
+
     def update_blue_mir(self, keyword):
         if keyword == "blue":
             self.bandsUi.label_mir.setEnabled(False)
@@ -291,7 +248,7 @@ class manage_bands:
             self.bandsUi.label_mir.setEnabled(True)
             self.bandsUi.spinBox_mir.setEnabled(True)
             self.bandsUi.spinBox_blue.setValue(0)
-        if keyword == "all" : 
+        if keyword == "all":
             self.bandsUi.label_blue.setEnabled(True)
             self.bandsUi.spinBox_blue.setEnabled(True)
             self.bandsUi.checkBox_blue.setCheckState(Qt.Unchecked)
@@ -305,8 +262,8 @@ class manage_bands:
             self.bandsUi.checkBox_mir.setCheckState(Qt.Unchecked)
             self.bandsUi.label_mir.setEnabled(False)
             self.bandsUi.spinBox_mir.setEnabled(False)
-             
-         
+
+
     def update_spin_box(self):
         # print self.red
         self.bandsUi.spinBox_red.setValue(self.red)
@@ -330,15 +287,15 @@ class manage_bands:
             if self.nb_bands:
                 if self.nb_bands > 3:
                     self.bandsUi.checkBox_blue.setCheckState(Qt.Checked)
-                 
-         
-         
+
+
+
     def define_formosat(self):
         """
-        B1 : 0,45 – 0,52 µm (Bleu)
-        B2 : 0,52 – 0,60 µm (Vert)
-        B3 : 0,63 – 0,69 µm (Rouge)
-        B4 : 0,76 – 0,90 µm (proche Infra Rouge)
+        B1: 0,45 – 0,52 µm (Bleu)
+        B2: 0,52 – 0,60 µm (Vert)
+        B3: 0,63 – 0,69 µm (Rouge)
+        B4: 0,76 – 0,90 µm (proche Infra Rouge)
         """
         self.blue = 3
         self.green = 2
@@ -348,7 +305,7 @@ class manage_bands:
         self.update_blue_mir("blue")
         self.update_spin_box()
         self.bandsUi.radioButton_formosat.setEnabled(True)
-         
+
     def define_pleiade(self):
         """
         Multispectral ???
@@ -365,14 +322,14 @@ class manage_bands:
         self.update_blue_mir("blue")
         self.update_spin_box()
         self.bandsUi.radioButton_pleiades.setEnabled(True)
-        
-    
+
+
     def define_spot(self):
         """
-        Bande 1 : Vert (0,50 - 0,59 µm)
-        Bande 2 : Rouge (0,61 - 0,68 µm)
-        Bande 3 : Proche infrarouge (0,78 - 0,89 µm)
-        Bande 4 : Moyen infrarouge (MIR) (1,58 - 1,75 µm)
+        Bande 1: Vert (0,50 - 0,59 µm)
+        Bande 2: Rouge (0,61 - 0,68 µm)
+        Bande 3: Proche infrarouge (0,78 - 0,89 µm)
+        Bande 4: Moyen infrarouge (MIR) (1,58 - 1,75 µm)
         """
         # print "define spot"
         # spot 4-5
@@ -381,24 +338,20 @@ class manage_bands:
         self.red = 2
         self.pir = 1
         if self.nb_bands:
-            if self.nb_bands > 3 :
+            if self.nb_bands > 3:
                 self.mir = 4
                 self.update_blue_mir("mir")
             else:
                 self.update_blue_mir("none")
         self.update_spin_box()
         self.bandsUi.radioButton_spot.setEnabled(True)
-     
-         
+
+
     def get_values(self):
 #         self.red = self.bandsUi.spinBox_red.value()
 #         self.green = self.bandsUi.spinBox_green.value()
 #         self.blue = self.bandsUi.spinBox_blue.value()
 #         self.pir = self.bandsUi.spinBox_pir.value()
 #         self.mir = self.bandsUi.spinBox_mir.value()
-        
-        
         # print self.red
         return self.red, self.green, self.blue, self.pir, self.mir
-        
-        

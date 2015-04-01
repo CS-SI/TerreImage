@@ -5,9 +5,9 @@
                                  A QGIS plugin
  QGISEducation
                               -------------------
-        begin                : 2014-05-12
-        copyright            : (C) 2014 by CNES
-        email                : alexia.mondot@c-s.fr
+        begin               : 2014-05-12
+        copyright           : (C) 2014 by CNES
+        email               : alexia.mondot@c-s.fr
  ***************************************************************************/
 
 /***************************************************************************
@@ -29,8 +29,8 @@ from qgis.core import QGis, QgsPoint, QgsRaster
 
 from PyQt4.QtGui import QInputDialog, QMessageBox
 from PyQt4.QtCore import QProcessEnvironment, QProcess
-        
- 
+
+
 # #import loggin for debug messages
 # import logging
 # logging.basicConfig()
@@ -52,13 +52,13 @@ fh.setFormatter(formatter)
 fh.setLevel(logging.DEBUG)
 logger.addHandler(fh)
 
-        
+
 def ndvi(layer, working_directory, iface):
     # NDVI= (PIR-R)/(PIR+R)
-    if not layer :
+    if not layer:
         logger.debug("Aucune layer selectionnée")
-    else :
-        if layer.pir and layer.red :
+    else:
+        if layer.pir and layer.red:
             image_in = layer.source_file
             logger.debug("image_in: " + image_in)
             logger.debug(working_directory)
@@ -66,7 +66,7 @@ def ndvi(layer, working_directory, iface):
                                             os.path.basename(os.path.splitext(image_in)[0]) + "_ndvi" + os.path.splitext(image_in)[1]
                                           )
             logger.debug(output_filename)
-            if not os.path.isfile(output_filename) : 
+            if not os.path.isfile(output_filename):
                 layer_pir = "im1b" + str(layer.pir)
                 layer_red = "im1b" + str(layer.red)
                 expression = "\"if((" + layer_pir + "+" + layer_red + ")!=0,(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "),0)\""
@@ -75,20 +75,20 @@ def ndvi(layer, working_directory, iface):
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
             return output_filename
     return ""
-    
-    
+
+
 def ndti(layer, working_directory, iface):
     # SQRT(R+0.5)
     # NDTI= (R-G)/(R+G)
-    if not layer :
+    if not layer:
         logger.debug("Aucune layer selectionnée")
-    else :
-        if layer.red :
+    else:
+        if layer.red:
             image_in = layer.source_file
             logger.debug("image_in" + image_in)
             output_filename = os.path.join(working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_ndti" + os.path.splitext(image_in)[1])
             logger.debug(output_filename)
-            if not os.path.isfile(output_filename) : 
+            if not os.path.isfile(output_filename):
                 layer_red = "im1b" + str(layer.red)
                 layer_green = "im1b" + str(layer.green)
                 # expression = "\"sqrt(" + layer_red + "+0.5)\""
@@ -97,14 +97,14 @@ def ndti(layer, working_directory, iface):
                 logger.debug("image_in" + image_in)
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
             return output_filename
-                
+
 
 def brightness(layer, working_directory, iface):
     # IB = sqrt(RxR+PIRxPIR)
-    if not layer :
+    if not layer:
         logger.debug("Aucune layer selectionnée")
-    else :
-        if layer.pir and layer.red :
+    else:
+        if layer.pir and layer.red:
             image_in = layer.source_file
             logger.debug("image_in" + image_in)
             logger.debug(working_directory)
@@ -112,28 +112,28 @@ def brightness(layer, working_directory, iface):
                                             os.path.basename(os.path.splitext(image_in)[0]) + "_brillance" + os.path.splitext(image_in)[1]
                                           )
             logger.debug(output_filename)
-            if not os.path.isfile(output_filename) : 
+            if not os.path.isfile(output_filename):
                 layer_pir = "im1b" + str(layer.pir)
                 layer_red = "im1b" + str(layer.red)
                 expression = "\"sqrt(" + layer_red + "*" + layer_red + "*" + layer_pir + "*" + layer_pir + ")\""
                 logger.debug(expression)
                 logger.debug("image_in" + image_in)
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
-            return output_filename   
-    
-    
+            return output_filename
+
+
 def threshold(layer, working_directory, forms):
     logger.debug("threshold" + str(forms))
     image_in = layer.get_source()
     temp = []
     i = 1
-    
-    if len(forms) == 1 :
+
+    if len(forms) == 1:
         output_filename = os.path.join(working_directory,
                                             os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + os.path.splitext(image_in)[1])
         OTBApplications.bandmath_cli([image_in], forms[0], output_filename)
     else:
-        for formula in forms :
+        for formula in forms:
             output_filename = os.path.join(working_directory,
                                                 os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + str(i) + os.path.splitext(image_in)[1]
                                               )
@@ -141,25 +141,23 @@ def threshold(layer, working_directory, forms):
             i += 1
             temp.append(output_filename)
         output_filename = os.path.join(working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + os.path.splitext(image_in)[1])
-            
+
         OTBApplications.concatenateImages_cli(temp, output_filename)
-    
+
     return output_filename
-    
-   
+
+
 def angles(layer, working_directory, iface, x, y):
     ident = layer.get_qgis_layer().dataProvider().identify(QgsPoint(x, y), QgsRaster.IdentifyFormatValue)
     logger.debug(ident)
-    if ident is not None :
+    if ident is not None:
         attr = ident.results()
         logger.debug(attr)
         if len(attr) == layer.get_qgis_layer().bandCount():
             image_in = layer.get_qgis_layer().source()
             output_filename = os.path.join(working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x).replace(".", "dot") + "_" + str(y).replace(".", "dot") + os.path.splitext(image_in)[1])
-            
-            if not os.path.isfile(output_filename) :
-            
-                
+
+            if not os.path.isfile(output_filename):
                 num = []
                 denom = []
                 fact = []
@@ -172,10 +170,9 @@ def angles(layer, working_directory, iface, x, y):
                     num.append(current_band + "*" + str(band_value))
                     denom.append(str(band_value) + "*" + str(band_value))
                     fact.append(current_band + "*" + current_band)
-                
-                
+
                 formula = "if(((" + "+".join(fact) + ") != 0),"
-                
+
                 formula += "acos("
                 formula += "(" + "+".join(num) + ")/"
                 formula += "(sqrt("
@@ -183,21 +180,20 @@ def angles(layer, working_directory, iface, x, y):
                 formula += "(" + "+".join(fact) + ")"
                 formula += "))"
                 formula += "), 0)"
-                
+
                 formule_ = "\"if( " + formula + ">0.0001, 1/" + formula + ", 0)\""
-                
+
                 logger.debug("num" + str(num))
                 logger.debug("denom" + str(denom))
                 logger.debug("fact" + str(fact))
                 logger.debug("formula" + str(formula))
-                
+
                 OTBApplications.bandmath_cli([image_in], formule_, output_filename)
                 # rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
                 # manage_QGIS.histogram_stretching( rlayer, iface.mapCanvas())
             return output_filename
-                
-                
-                
+
+
 def kmeans(layer, working_directory, iface, nb_class=None):
     """
     WARNING: nb_valid_pixels à calculer ?
@@ -205,8 +201,7 @@ def kmeans(layer, working_directory, iface, nb_class=None):
     internal_working_directory = os.path.join(working_directory, "Internal")
     if not os.path.exists(internal_working_directory):
         os.makedirs(internal_working_directory)
-    
-    
+
     logger.debug("enntree dans le kmeans")
     bands = []
     if nb_class == None:
@@ -230,92 +225,90 @@ def recompose_image(layer, working_directory):
     band_pir = gdal_translate_get_one_band(image_in, num_band_pir, working_directory)
     band_red = gdal_translate_get_one_band(image_in, num_band_red, working_directory)
     band_green = gdal_translate_get_one_band(image_in, num_band_green, working_directory)
-    
+
     logger.debug("pir" + band_pir)
     logger.debug("red" + band_red)
     logger.debug("green" + band_green)
-    
+
     output_filename = os.path.join(working_directory, os.path.splitext(os.path.basename(image_in))[0] + "pir_red_green" + os.path.splitext(os.path.basename(image_in))[1])
     logger.debug("recomposed image" + output_filename)
     if not os.path.isfile(output_filename):
         OTBApplications.concatenateImages_cli([band_pir, band_red, band_green], output_filename, "uint16")
     return output_filename
-    
-    
-    
+
+
 def gdal_translate_get_one_band(image_in, band_number, working_dir):
     """
     Runs gdal translate to get the band_number of the image_in
-    TODO : working dir
+    TODO: working dir
     """
     output_image_one_band = os.path.join(working_dir, os.path.splitext(os.path.basename(image_in))[0] + "-b" + str(band_number) + os.path.splitext(image_in)[1])
     if not os.path.isfile(output_image_one_band):
-        command_gdal = "gdal_translate -b " + str(band_number) + " " + "\"" + image_in + "\"" + " " + "\"" + output_image_one_band + "\"" 
+        command_gdal = "gdal_translate -b " + str(band_number) + " " + "\"" + image_in + "\"" + " " + "\"" + output_image_one_band + "\""
         logger.info("command_gdal" + command_gdal)
         # os.system( command_gdal )
         run_process(command_gdal)
     return output_image_one_band
-    
-    
+
+
 def get_sensor_id(image):
     currentOs = os.name
-    
-#     if currentOs == "posix" :
-    command = "otbcli ReadImageInfo "#-in " + image  # + " | grep \"sensor:\""
-#     else :
+
+#     if currentOs == "posix":
+    command = "otbcli ReadImageInfo "  # -in " + image  # + " | grep \"sensor:\""
+#     else:
 #         command = "otbcli ReadImageInfo -in " + image #+ " | findstr \"sensor:\""
     args = " -in " + image
 
-    if currentOs == "posix" :
+    if currentOs == "posix":
         command += args
         result_sensor = run_process(command)
     else:
         result_sensor = run_otb_app("ReadImageInfo", args)
-    if result_sensor :
+    if result_sensor:
         for line in result_sensor.splitlines():
             if "sensor" in line:
                 # sensor_line = result_sensor[0]
                 sensor = re.search("sensor: ([a-zA-Z \d]+)$", line)
-                
+
                 if sensor:
                     # group 1 parce qu'on a demande qqchose de particulier a la regexpr a cause des ()
                     sensor = sensor.group(1)
                 return sensor
-    
-    
+
+
 def export_kmz(filenames, working_directory):
     internal_working_directory = os.path.join(working_directory, "Internal")
     if not os.path.exists(internal_working_directory):
         os.makedirs(internal_working_directory)
-    
-    
+
     kmzs = []
     for image in filenames:
-        kmz_tmp = OTBApplications.otbcli_export_kmz(image, internal_working_directory) 
+        kmz_tmp = OTBApplications.otbcli_export_kmz(image, internal_working_directory)
         kmzs.append(kmz_tmp)
-        
+
     # attention rustine
     # kmzs = glob.glob( os.path.join(internal_working_directory, "*.kmz"))
     for kmz in kmzs:
         new_path = os.path.join(working_directory, os.path.basename(kmz))
         shutil.copy(kmz, new_path)
-        
-        
+
+
 def run_process(fused_command, read_output=False):
-    #print "run process", fused_command
+    print "run process", fused_command
     qprocess = QProcess()
     set_process_env(qprocess)
     code_de_retour = qprocess.execute(fused_command)
-    #print "code de retour", code_de_retour
-    logger.info("command : ")
+    print "code de retour", code_de_retour
+    logger.info("command: ")
     logger.info(fused_command)
     logger.info("code de retour" + str(code_de_retour))
-    
+
 #     if not qprocess.waitForStarted():
 #         # handle a failed command here
 #         print "qprocess.waitForStarted()"
 #         return
-# 
+#
 #     if not qprocess.waitForReadyRead():
 #         # handle a timeout or error here
 #         print "qprocess.waitForReadyRead()"
@@ -328,17 +321,15 @@ def run_process(fused_command, read_output=False):
 
     # logger.info("Erreur")
     code_d_erreur = qprocess.error()
-    dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed", 2:"QProcess::TimedOut", 3:"QProcess::WriteError", 4:"QProcess::ReadError", 5:"QProcess::UnknownError" } 
-    logger.info("Code de retour : " + str(code_d_erreur))
+    dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed", 2:"QProcess::TimedOut", 3:"QProcess::WriteError", 4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
+    logger.info("Code de retour: " + str(code_d_erreur))
     logger.info(dic_err[code_d_erreur])
 
-
-
-    #print "get output"
+    print "get output"
     output = str(qprocess.readAllStandardOutput())
     # print "output", output
-    #print 'end output'
-    return output 
+    print 'end output'
+    return output
 
 
 def run_otb_app(app_name, arguments):
@@ -347,12 +338,11 @@ def run_otb_app(app_name, arguments):
     command = launcher + " " + arguments
     output = run_process(command)
     return output
-    
-    
+
 
 def set_OTB_PATH():
     dirname = os.path.dirname(os.path.abspath(__file__))
-    if not os.name == "posix" : 
+    if not os.name == "posix":
         if "PATH" in os.environ.keys():
             os.environ["PATH"] = os.path.join(dirname, "win32", "bin") + ";" + os.environ["PATH"]
         else:
@@ -363,8 +353,8 @@ def set_OTB_PATH():
             os.environ["ITK_AUTOLOAD_PATH"] = os.path.join(dirname, "win32", "plugin")
     # print os.environ["PATH"]
     # print os.environ["ITK_AUTOLOAD_PATH"]
-    
-    
+
+
 def set_process_env(process):
     dirname = os.path.dirname(os.path.abspath(__file__))
     env = QProcessEnvironment.systemEnvironment()
@@ -374,4 +364,3 @@ def set_process_env(process):
     process.setProcessEnvironment(env)
     # print "env ITK_AUTOLOAD_PATH", env.value("ITK_AUTOLOAD_PATH")
     # print "env PATH", env.value("PATH")
-    

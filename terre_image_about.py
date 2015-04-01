@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+"""
+/***************************************************************************
+ QGISEducation
+                                 A QGIS plugin
+ QGISEducation
+                             -------------------
+        begin                : 2014-11-03
+        copyright            : (C) 2014 by CNES
+        email                : alexia.mondot@c-s.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+"""
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -18,12 +38,12 @@ class DlgAbout(QDialog, Ui_DlgAbout):
 		QDialog.__init__(self, parent)
 		self.setupUi(self)
 
-		#self.title.setText( name() + version() )
-		#self.description.setText( description() )
+		# self.title.setText( name() + version() )
+		# self.description.setText( description() )
 
 		text = self.txt.toHtml()
-		text = text.replace( "$PLUGIN_NAME$", name() )
-		text = text.replace( "$PLUGIN_VERSION$", version() )
+		text = text.replace("$PLUGIN_NAME$", name())
+		text = text.replace("$PLUGIN_VERSION$", version())
 
 		subject = "Help: %s" % name()
 		body = """\n\n
@@ -33,14 +53,14 @@ Plugin version: %s
 Python version: %s
 Platform: %s - %s
 --------
-""" % ( name(), version(), platform.python_version(), platform.system(), platform.version() )
+""" % (name(), version(), platform.python_version(), platform.system(), platform.version())
 
-		mail = QUrl( "mailto:abc@abc.com" )
-		mail.addQueryItem( "subject", subject )
-		mail.addQueryItem( "body", body )
+		mail = QUrl("mailto:abc@abc.com")
+		mail.addQueryItem("subject", subject)
+		mail.addQueryItem("body", body)
 
-		text = text.replace( "$MAIL_SUBJECT$", unicode(mail.encodedQueryItemValue( "subject" )) )
-		text = text.replace( "$MAIL_BODY$", unicode(mail.encodedQueryItemValue( "body" )) )
+		text = text.replace("$MAIL_SUBJECT$", unicode(mail.encodedQueryItemValue("subject")))
+		text = text.replace("$MAIL_BODY$", unicode(mail.encodedQueryItemValue("body")))
 
 		self.txt.setHtml(text)
 
