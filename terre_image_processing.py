@@ -28,7 +28,7 @@ import shutil
 from qgis.core import QGis, QgsPoint, QgsRaster
 
 from PyQt4.QtGui import QInputDialog, QMessageBox
-from PyQt4.QtCore import QProcessEnvironment, QProcess
+from PyQt4.QtCore import QProcessEnvironment, QProcess, QByteArray
 
 
 # #import loggin for debug messages
@@ -295,41 +295,66 @@ def export_kmz(filenames, working_directory):
 
 
 def run_process(fused_command, read_output=False):
-    print "run process", fused_command
-    qprocess = QProcess()
-    set_process_env(qprocess)
-    code_de_retour = qprocess.execute(fused_command)
-    print "code de retour", code_de_retour
-    logger.info("command: ")
-    logger.info(fused_command)
-    logger.info("code de retour" + str(code_de_retour))
-
-#     if not qprocess.waitForStarted():
-#         # handle a failed command here
-#         print "qprocess.waitForStarted()"
-#         return
+#     print "run process", fused_command
+#     qprocess = QProcess()
+#     set_process_env(qprocess)
+#     code_de_retour = qprocess.execute(fused_command)
+#     print "code de retour", code_de_retour
+#     logger.info("command: ")
+#     logger.info(fused_command)
+#     logger.info("code de retour" + str(code_de_retour))
 #
-#     if not qprocess.waitForReadyRead():
-#         # handle a timeout or error here
-#         print "qprocess.waitForReadyRead()"
-#         return
-#     #if not qprocess.waitForFinished(1):
-#     #    qprocess.kill()
-#     #    qprocess.waitForFinished(1)
+# #     if not qprocess.waitForStarted():
+# #         # handle a failed command here
+# #         print "qprocess.waitForStarted()"
+# #         return
+# #
+# #     if not qprocess.waitForReadyRead():
+# #         # handle a timeout or error here
+# #         print "qprocess.waitForReadyRead()"
+# #         return
+# #     #if not qprocess.waitForFinished(1):
+# #     #    qprocess.kill()
+# #     #    qprocess.waitForFinished(1)
+#
+# #     if read_output:
+#
+#     # logger.info("Erreur")
+#     code_d_erreur = qprocess.error()
+#     dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed", 2:"QProcess::TimedOut", 3:"QProcess::WriteError", 4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
+#     logger.info("Code de retour: " + str(code_d_erreur))
+#     logger.info(dic_err[code_d_erreur])
+#
+#     print "get output"
+#     output = str(qprocess.readAllStandardOutput())
+#     # print "output", output
+#     print 'end output'
+    process = QProcess()
 
-#     if read_output:
+    data = QByteArray()
+    process.start(fused_command)
+    if process.waitForStarted():
+        process.waitForFinished(-1)
+        exit_code = process.exitCode()
+        logger.info("Code de sortie : " + str(exit_code))
+        if exit_code < 0:
+            code_d_erreur = process.error().data
+            dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed", 2:"QProcess::TimedOut", 3:"QProcess::WriteError", 4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
+            logger.info("Code erreur : " + str(code_d_erreur))
+            logger.info(dic_err[code_d_erreur])
 
-    # logger.info("Erreur")
-    code_d_erreur = qprocess.error()
-    dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed", 2:"QProcess::TimedOut", 3:"QProcess::WriteError", 4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
-    logger.info("Code de retour: " + str(code_d_erreur))
-    logger.info(dic_err[code_d_erreur])
-
-    print "get output"
-    output = str(qprocess.readAllStandardOutput())
-    # print "output", output
-    print 'end output'
-    return output
+        result = process.readAllStandardOutput()
+        # print type(result), result
+        error = process.readAllStandardError().data()
+        # print repr(error)
+        if not error == "\n":
+            logger.info("error : " + "\'" + str(error) + "\'")
+        logger.info("output : " + result.data() + "fin output")
+    else :
+        code_d_erreur = process.error()
+        dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed", 2:"QProcess::TimedOut", 3:"QProcess::WriteError", 4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
+        logger.info("Code erreur : " + str(code_d_erreur))
+        logger.info(dic_err[code_d_erreur])
 
 
 def run_otb_app(app_name, arguments):
