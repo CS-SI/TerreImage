@@ -49,6 +49,22 @@ logger = logging.getLogger('TerreImage_manageQGIS')
 logger.setLevel(logging.INFO)
 
 
+
+# import loggin for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger('TerreImage_manageQGIS')
+logger.setLevel(logging.DEBUG)
+log_file = os.path.join(os.path.expanduser("~"), "log_terr_image_histogram")
+fh = logging.FileHandler(log_file)
+formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
+
+
+
 def addVectorLayerToQGIS(vectorLayer, layername, legendInterface):
     """
     Add a vector layer to QGIS
@@ -331,6 +347,9 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
     """
     Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
     """
+    logger.info("#######################")
+    logger.info("custom stretch: values")
+    logger.info(values)
 
     # print "custom stretch"
     # print canvas
@@ -387,15 +406,28 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
             layerRenderer.setBlueContrastEnhancement(blueEnhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
 
             # print "layer renderer"
+            redEnhancement_debug = layerRenderer.redContrastEnhancement()
+            greenEnhancement_debug = layerRenderer.greenContrastEnhancement()
+            blueEnhancement_debug = layerRenderer.blueContrastEnhancement()
+            logger.info("red : " + str(redEnhancement_debug.minimumValue()) + " " + str(redEnhancement_debug.maximumValue()))
+            logger.info("green : " + str(greenEnhancement_debug.minimumValue()) + " " + str(greenEnhancement_debug.maximumValue()))
+            logger.info("blue : " + str(blueEnhancement_debug.minimumValue()) + " " + str(blueEnhancement_debug.maximumValue()))
 
-
-            # print "end"
+        # print "end"
         theRasterLayer.setCacheImage(None)
         theRasterLayer.triggerRepaint()
         # print "2"
     canvas.refresh()
     canvas.repaint()
     # print "3"
+    # print "layer renderer"
+    redEnhancement_debug = layerRenderer.redContrastEnhancement()
+    greenEnhancement_debug = layerRenderer.greenContrastEnhancement()
+    blueEnhancement_debug = layerRenderer.blueContrastEnhancement()
+    logger.info("red end: " + str(redEnhancement_debug.minimumValue()) + " " + str(redEnhancement_debug.maximumValue()))
+    logger.info("green end: " + str(greenEnhancement_debug.minimumValue()) + " " + str(greenEnhancement_debug.maximumValue()))
+    logger.info("blue end: " + str(blueEnhancement_debug.minimumValue()) + " " + str(blueEnhancement_debug.maximumValue()))
+    logger.info("#######################")
 
 
 def get_raster_layers():
