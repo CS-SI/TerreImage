@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_qgiseducation.ui'
 #
-# Created: Wed Jul  2 10:49:00 2014
+# Created: Tue Apr  7 10:54:47 2015
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,9 +17,13 @@ except AttributeError:
 class Ui_QGISEducation(object):
     def setupUi(self, QGISEducation):
         QGISEducation.setObjectName(_fromUtf8("QGISEducation"))
-        QGISEducation.resize(323, 561)
+        QGISEducation.resize(323, 567)
         self.verticalLayout = QtGui.QVBoxLayout(QGISEducation)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.label_travail_en_cours = QtGui.QLabel(QGISEducation)
+        self.label_travail_en_cours.setText(_fromUtf8(""))
+        self.label_travail_en_cours.setObjectName(_fromUtf8("label_travail_en_cours"))
+        self.verticalLayout.addWidget(self.label_travail_en_cours)
         self.label = QtGui.QLabel(QGISEducation)
         self.label.setObjectName(_fromUtf8("label"))
         self.verticalLayout.addWidget(self.label)

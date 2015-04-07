@@ -116,23 +116,13 @@ class QGISEducation:
             self.educationWidget.disconnectP()
 
 
-    def set_working_message(self, set=True):
-        if set:
-            widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
-            self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
-            self.iface.mainWindow().statusBar().showMessage("Terre Image: Travail en cours...")
-            self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
-        else:
-            self.iface.messageBar().clearWidgets()
-            self.iface.mainWindow().statusBar().clearMessage()
-
     # run method that performs all the real work
     def run(self):
         """
         Defines the behavior of the plugin
         """
         timeBegin = time.time()
-        self.set_working_message(True)
+        # self.educationWidget.set_working_message(True)
 
         self.iface.newProject(True)
 
@@ -147,7 +137,7 @@ class QGISEducation:
 
         self.show_education_widget(bands, working_dir)
 
-        self.set_working_message(False)
+        # self.educationWidget.set_working_message(False)
 
 
     def show_education_widget(self, bands, working_dir):

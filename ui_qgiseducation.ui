@@ -7,13 +7,20 @@
     <x>0</x>
     <y>0</y>
     <width>323</width>
-    <height>561</height>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>QGISEducation</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label_travail_en_cours">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QLabel" name="label">
      <property name="text">

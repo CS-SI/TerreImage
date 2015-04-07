@@ -123,6 +123,11 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.label_a_s_img.hide()
         self.label_a_s_img.setPixmap(QtGui.QPixmap(":/plugins/qgiseducation/img/legende.png"))
 
+        # self.messages = TerrImageDialog()
+        self.label_travail_en_cours.hide()
+        self.label_travail_en_cours.setTextFormat(1)
+        self.label_travail_en_cours.setText('<html><b><font size="4" color="red">Travail en cours...</font></b></html>')
+
 
     def status(self):
         print "############# Status #############"
@@ -474,15 +479,17 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
 
     def set_working_message(self, set=True):
-        if set :
+        if set:
             widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
             self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
             self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
             self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
+            self.label_travail_en_cours.show()
         else :
             self.iface.messageBar().popWidget()
             self.iface.messageBar().clearWidgets()
             self.iface.mainWindow().statusBar().clearMessage()
+            self.label_travail_en_cours.hide()
 
 
     def disconnectP(self):
