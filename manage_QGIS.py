@@ -382,10 +382,17 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
             min_red, max_red = values[0]
             min_green, max_green = values[1]
             min_blue, max_blue = values[2]
+            logger.info("red : " + str(min_red) + " " + str(max_red))
+            logger.info("green : " + str(min_green) + " " + str(max_green))
+            logger.info("blue : " + str(min_blue) + " " + str(max_blue))
 
             redEnhancement = QgsContrastEnhancement(dataProvider.dataType(0))
             greenEnhancement = QgsContrastEnhancement(dataProvider.dataType(1))
             blueEnhancement = QgsContrastEnhancement(dataProvider.dataType(2))
+            logger.info("redEnhancement : " + str(redEnhancement))
+            logger.info("greenEnhancement : " + str(greenEnhancement))
+            logger.info("blueEnhancement : " + str(blueEnhancement))
+
             # set stretch to min max
             redEnhancement.setMinimumValue(min_red)
             redEnhancement.setMaximumValue(max_red)
@@ -393,9 +400,15 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
             greenEnhancement.setMaximumValue(max_green)
             blueEnhancement.setMinimumValue(min_blue)
             blueEnhancement.setMaximumValue(max_blue)
+            logger.info("red (1): " + str(redEnhancement.minimumValue()) + " " + str(redEnhancement.maximumValue()))
+            logger.info("green (1): " + str(greenEnhancement.minimumValue()) + " " + str(greenEnhancement.maximumValue()))
+            logger.info("blue (1): " + str(blueEnhancement.minimumValue()) + " " + str(blueEnhancement.maximumValue()))
             redEnhancement.setContrastEnhancementAlgorithm(1)
             greenEnhancement.setContrastEnhancementAlgorithm(1)
             blueEnhancement.setContrastEnhancementAlgorithm(1)
+            logger.info("red (2): " + str(redEnhancement.minimumValue()) + " " + str(redEnhancement.maximumValue()))
+            logger.info("green (2): " + str(greenEnhancement.minimumValue()) + " " + str(greenEnhancement.maximumValue()))
+            logger.info("blue (2): " + str(blueEnhancement.minimumValue()) + " " + str(blueEnhancement.maximumValue()))
 
             # print "blue enhancement", blueEnhancement
             # print "blue max", blueEnhancement.maximumValue()
@@ -409,9 +422,9 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
             redEnhancement_debug = layerRenderer.redContrastEnhancement()
             greenEnhancement_debug = layerRenderer.greenContrastEnhancement()
             blueEnhancement_debug = layerRenderer.blueContrastEnhancement()
-            logger.info("red : " + str(redEnhancement_debug.minimumValue()) + " " + str(redEnhancement_debug.maximumValue()))
-            logger.info("green : " + str(greenEnhancement_debug.minimumValue()) + " " + str(greenEnhancement_debug.maximumValue()))
-            logger.info("blue : " + str(blueEnhancement_debug.minimumValue()) + " " + str(blueEnhancement_debug.maximumValue()))
+            logger.info("red (3): " + str(redEnhancement_debug.minimumValue()) + " " + str(redEnhancement_debug.maximumValue()))
+            logger.info("green (3): " + str(greenEnhancement_debug.minimumValue()) + " " + str(greenEnhancement_debug.maximumValue()))
+            logger.info("blue (3): " + str(blueEnhancement_debug.minimumValue()) + " " + str(blueEnhancement_debug.maximumValue()))
 
         # print "end"
         theRasterLayer.setCacheImage(None)
@@ -421,12 +434,14 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
     canvas.repaint()
     # print "3"
     # print "layer renderer"
-    redEnhancement_debug = layerRenderer.redContrastEnhancement()
-    greenEnhancement_debug = layerRenderer.greenContrastEnhancement()
-    blueEnhancement_debug = layerRenderer.blueContrastEnhancement()
-    logger.info("red end: " + str(redEnhancement_debug.minimumValue()) + " " + str(redEnhancement_debug.maximumValue()))
-    logger.info("green end: " + str(greenEnhancement_debug.minimumValue()) + " " + str(greenEnhancement_debug.maximumValue()))
-    logger.info("blue end: " + str(blueEnhancement_debug.minimumValue()) + " " + str(blueEnhancement_debug.maximumValue()))
+    if typeOfLayer == 1:
+        if theRasterLayer.rasterType() == 2 and layerRenderer:
+            redEnhancement_debug = layerRenderer.redContrastEnhancement()
+            greenEnhancement_debug = layerRenderer.greenContrastEnhancement()
+            blueEnhancement_debug = layerRenderer.blueContrastEnhancement()
+            logger.info("red end: " + str(redEnhancement_debug.minimumValue()) + " " + str(redEnhancement_debug.maximumValue()))
+            logger.info("green end: " + str(greenEnhancement_debug.minimumValue()) + " " + str(greenEnhancement_debug.maximumValue()))
+            logger.info("blue end: " + str(blueEnhancement_debug.minimumValue()) + " " + str(blueEnhancement_debug.maximumValue()))
     logger.info("#######################")
 
 
