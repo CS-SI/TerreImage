@@ -251,88 +251,89 @@ class QGISEducation:
 
         # restore mirrors?
         wl, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer")
-        if not ok or wl is None:
-            return
+        if not ok or wl == "":
+            pass
+
+        if not wl == "":
+
+            bands, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer_bands")
+            logger.debug("is ok" + str(ok))
+            logger.debug(bands)
+
+            # working_layer = WorkingLayer(wl, None, bands)
+
+            # TODO interpreter bands
+            type, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer_type")
+
+            working_dir, ok = QgsProject.instance().readEntry("QGISEducation", "/working_directory")
+
+            layer, bands = terre_image_utils.restore_working_layer(wl, eval(bands), type)
+            ProcessingManager().working_layer = layer
+
+            self.show_education_widget(bands, working_dir)
+    #         self.qgis_education_manager = TerreImageManager( self.iface )
+    #         self.qgis_education_manager.restore_processing_manager(wl, eval(bands), type, working_dir)
+    #         if self.qgis_education_manager:
 
 
-        bands, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer_bands")
-        logger.debug("is ok" + str(ok))
-        logger.debug(bands)
+            process, ok = QgsProject.instance().readEntry("QGISEducation", "/process")
+            logger.debug(eval(process))
 
-        # working_layer = WorkingLayer(wl, None, bands)
+            index_group, ok = QgsProject.instance().readDoubleEntry("QGISEducation", "/index_group")
+            self.constants.index_group = int(float(index_group))
 
-        # TODO interpreter bands
-        type, ok = QgsProject.instance().readEntry("QGISEducation", "/working_layer_type")
+            process = eval(process)
 
-        working_dir, ok = QgsProject.instance().readEntry("QGISEducation", "/working_directory")
-
-        layer, bands = terre_image_utils.restore_working_layer(wl, eval(bands), type)
-        ProcessingManager().working_layer = layer
-
-        self.show_education_widget(bands, working_dir)
-#         self.qgis_education_manager = TerreImageManager( self.iface )
-#         self.qgis_education_manager.restore_processing_manager(wl, eval(bands), type, working_dir)
-#         if self.qgis_education_manager:
-
-
-        process, ok = QgsProject.instance().readEntry("QGISEducation", "/process")
-        logger.debug(eval(process))
-
-        index_group, ok = QgsProject.instance().readDoubleEntry("QGISEducation", "/index_group")
-        self.constants.index_group = int(float(index_group))
-
-        process = eval(process)
-
-        for qgis_layer in self.iface.legendInterface().layers():
-            # print "layer loading ", qgis_layer.name()
-            if qgis_layer.name() in [ "NDVI", "NDTI", "Indice de brillance", "KMEANS" ]:
-                process = TerreImageProcessing(self.iface, working_dir, ProcessingManager().working_layer, self.educationWidget.qgis_education_manager.mirror_map_tool, qgis_layer.name(), None, qgis_layer)
-            elif "Angle Spectral" in qgis_layer.name():
-                process = TerreImageProcessing(self.iface, working_dir, ProcessingManager().working_layer, self.educationWidget.qgis_education_manager.mirror_map_tool, qgis_layer.name(), qgis_layer.source(), qgis_layer)
-                # ProcessingManager().add_processing(process)
-            elif "couleur_naturelles" in  qgis_layer.name():
-                try:
-                    self.do_display_one_band('nat', qgis_layer, working_dir, self.educationWidget.qgis_education_manager.mirror_map_tool)
-                except AttributeError:
-                    QMessageBox.warning(None , "Erreur", u'Le projet ne peut être lu. Essayez de créer un projet vierge, puis de réouvrir le projet souhaité.', QMessageBox.Ok)
-                    # self.newProject(  )
-                    return None
-                # ProcessingManager().add_display( process )
-
-            else:
-                corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir", "nat":"_couleurs_naturelles" }
-                result = [x for x in corres if qgis_layer.name().endswith(corres[x])]
-                # print result
-                if result:
-                    # print "the couleur", result[0]
+            for qgis_layer in self.iface.legendInterface().layers():
+                # print "layer loading ", qgis_layer.name()
+                if qgis_layer.name() in [ "NDVI", "NDTI", "Indice de brillance", "KMEANS" ]:
+                    process = TerreImageProcessing(self.iface, working_dir, ProcessingManager().working_layer, self.educationWidget.qgis_education_manager.mirror_map_tool, qgis_layer.name(), None, qgis_layer)
+                elif "Angle Spectral" in qgis_layer.name():
+                    process = TerreImageProcessing(self.iface, working_dir, ProcessingManager().working_layer, self.educationWidget.qgis_education_manager.mirror_map_tool, qgis_layer.name(), qgis_layer.source(), qgis_layer)
+                    # ProcessingManager().add_processing(process)
+                elif "couleur_naturelles" in  qgis_layer.name():
                     try:
-                        self.do_display_one_band(result[0], qgis_layer, working_dir, self.educationWidget.qgis_education_manager.mirror_map_tool)
+                        self.do_display_one_band('nat', qgis_layer, working_dir, self.educationWidget.qgis_education_manager.mirror_map_tool)
                     except AttributeError:
                         QMessageBox.warning(None , "Erreur", u'Le projet ne peut être lu. Essayez de créer un projet vierge, puis de réouvrir le projet souhaité.', QMessageBox.Ok)
                         # self.newProject(  )
                         return None
-                # ProcessingManager().add_display( process )
+                    # ProcessingManager().add_display( process )
 
-        angle_spectral_point_x, ok_x = QgsProject.instance().readDoubleEntry("QGISEducation", "/angle_spectral_point_x")
-        angle_spectral_point_y, ok_y = QgsProject.instance().readDoubleEntry("QGISEducation", "/angle_spectral_point_y")
-        # print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
-        if ok_x and ok_y:
+                else:
+                    corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir", "nat":"_couleurs_naturelles" }
+                    result = [x for x in corres if qgis_layer.name().endswith(corres[x])]
+                    # print result
+                    if result:
+                        # print "the couleur", result[0]
+                        try:
+                            self.do_display_one_band(result[0], qgis_layer, working_dir, self.educationWidget.qgis_education_manager.mirror_map_tool)
+                        except AttributeError:
+                            QMessageBox.warning(None , "Erreur", u'Le projet ne peut être lu. Essayez de créer un projet vierge, puis de réouvrir le projet souhaité.', QMessageBox.Ok)
+                            # self.newProject(  )
+                            return None
+                    # ProcessingManager().add_display( process )
+
+            angle_spectral_point_x, ok_x = QgsProject.instance().readDoubleEntry("QGISEducation", "/angle_spectral_point_x")
+            angle_spectral_point_y, ok_y = QgsProject.instance().readDoubleEntry("QGISEducation", "/angle_spectral_point_y")
             # print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
-            p = ProcessingManager().processing_from_name("Angle Spectral")
-            if p:
-                rubberband = p[0].rubberband
-                rubberband.setWidth(10)
-                rubberband.setColor(QColor(Qt.yellow))
-                rubberband.addPoint(QgsPoint(float(angle_spectral_point_x), float(angle_spectral_point_y)))
+            if ok_x and ok_y:
+                # print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
+                p = ProcessingManager().processing_from_name("Angle Spectral")
+                if p:
+                    rubberband = p[0].rubberband
+                    rubberband.setWidth(10)
+                    rubberband.setColor(QColor(Qt.yellow))
+                    rubberband.addPoint(QgsPoint(float(angle_spectral_point_x), float(angle_spectral_point_y)))
 
-        p = TerreImageParamaters()
-        p.red_min = QgsProject.instance().readDoubleEntry("QGISEducation", "/red_x_min")[0]
-        p.red_max = QgsProject.instance().readDoubleEntry("QGISEducation", "/red_x_max")[0]
-        p.green_min = QgsProject.instance().readDoubleEntry("QGISEducation", "/green_x_min")[0]
-        p.green_max = QgsProject.instance().readDoubleEntry("QGISEducation", "/green_x_max")[0]
-        p.blue_min = QgsProject.instance().readDoubleEntry("QGISEducation", "/blue_x_min")[0]
-        p.blue_max = QgsProject.instance().readDoubleEntry("QGISEducation", "/blue_x_max")[0]
+            p = TerreImageParamaters()
+            p.red_min = QgsProject.instance().readDoubleEntry("QGISEducation", "/red_x_min")[0]
+            p.red_max = QgsProject.instance().readDoubleEntry("QGISEducation", "/red_x_max")[0]
+            p.green_min = QgsProject.instance().readDoubleEntry("QGISEducation", "/green_x_min")[0]
+            p.green_max = QgsProject.instance().readDoubleEntry("QGISEducation", "/green_x_max")[0]
+            p.blue_min = QgsProject.instance().readDoubleEntry("QGISEducation", "/blue_x_min")[0]
+            p.blue_max = QgsProject.instance().readDoubleEntry("QGISEducation", "/blue_x_max")[0]
 
-        self.educationWidget.set_combobox_histograms()
-        self.iface.mapCanvas().refresh()
-        self.iface.mapCanvas().repaint()
+            self.educationWidget.set_combobox_histograms()
+            self.iface.mapCanvas().refresh()
+            self.iface.mapCanvas().repaint()
