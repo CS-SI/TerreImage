@@ -386,6 +386,9 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
             logger.info("green : " + str(min_green) + " " + str(max_green))
             logger.info("blue : " + str(min_blue) + " " + str(max_blue))
 
+            logger.info("red data type : " + str(dataProvider.dataType(0)))
+            logger.info("green data type : " + str(dataProvider.dataType(1)))
+            logger.info("blue data type : " + str(dataProvider.dataType(2)))
             redEnhancement = QgsContrastEnhancement(dataProvider.dataType(0))
             greenEnhancement = QgsContrastEnhancement(dataProvider.dataType(1))
             blueEnhancement = QgsContrastEnhancement(dataProvider.dataType(2))
