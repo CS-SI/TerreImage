@@ -369,7 +369,7 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
             min_layer, max_layer = values[0]
             # gray band
             # layerRenderer <qgis.core.QgsSingleBandGrayRenderer object at 0x514caf0>
-            grayEnhancement = QgsContrastEnhancement(dataProvider.dataType(0))
+            grayEnhancement = QgsContrastEnhancement(dataProvider.dataType(1))
             # take the contrast enhancement of the layer threw the renderer
             if grayEnhancement :
                 grayEnhancement.setContrastEnhancementAlgorithm(1)  # qgis 1.9
@@ -389,9 +389,9 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
             logger.info("red data type : " + str(dataProvider.dataType(0)))
             logger.info("green data type : " + str(dataProvider.dataType(1)))
             logger.info("blue data type : " + str(dataProvider.dataType(2)))
-            redEnhancement = QgsContrastEnhancement(dataProvider.dataType(0))
-            greenEnhancement = QgsContrastEnhancement(dataProvider.dataType(1))
-            blueEnhancement = QgsContrastEnhancement(dataProvider.dataType(2))
+            redEnhancement = QgsContrastEnhancement(dataProvider.dataType(1))
+            greenEnhancement = QgsContrastEnhancement(dataProvider.dataType(2))
+            blueEnhancement = QgsContrastEnhancement(dataProvider.dataType(3))
             logger.info("redEnhancement : " + str(redEnhancement))
             logger.info("greenEnhancement : " + str(greenEnhancement))
             logger.info("blueEnhancement : " + str(blueEnhancement))
