@@ -3,5 +3,14 @@
         <file>img/legende.png</file>
         <file>img/splash.jpg</file>
         <file>img/icon.png</file>
+        <file>img/mActionContextHelp.png</file>
+        <file>img/mAction.png</file>
+        <file>img/mActionFullHistogramStretch.png</file>
+        <file>img/mActionInOverview.png</file>
+        <file>img/mIconTableLayer.png</file>
+        <file>img/rendererCategorizedSymbol.png</file>
+        <file>img/mMapserverExport.png</file>
+        <file>img/histogram.png</file>
+        <file>img/mActionOptions.png</file>
     </qresource>
 </RCC>
