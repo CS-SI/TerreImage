@@ -203,7 +203,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         action_classif_s.setWhatsThis(u"Classification supervisée")
         m4.addAction(action_classif_s)
         self.toolButton_classif.setDefaultAction(action_classif_ns)
-        self.action_classif_s.triggered.connect(self.plugin_classification)
+        action_classif_s.triggered.connect(self.plugin_classification)
         
         
         action_kmz = QtGui.QAction(
@@ -220,6 +220,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
           self.iface.mainWindow())
         action_info.setWhatsThis(u"Information")
         self.toolbar.addAction(action_info)  
+        action_info.triggered.connect(self.display_info)
                       
         action_settings = QtGui.QAction(
           QtGui.QIcon(":/plugins/qgiseducation/img/mActionOptions.png"),
@@ -238,6 +239,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         print "layers value tool "
         print self.qgis_education_manager.value_tool.layers_to_display
         print "##########################"
+
+    def display_info(self):
+        QtGui.QMessageBox.information(self.iface.mainWindow(), "QGISEducation", "Fausses couleurs:            Couleurs naturelles:\n" \
+" Plan R <- BS_PIR              Plan R <- BS_R \n Plan V <- BS_R                  Plan V <- BS_V \n Plan B <- BS_V                  Plan B <- BS_B")
 
 
     def plugin_classification(self):
