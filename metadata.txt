@@ -10,10 +10,19 @@
 
 [general]
 name=TerreImage
+description= Greffon de traitement d'images adapté au public scolaire.
+
+about= 
+    Le greffon de traitement d’images « TerreImage » a été développé pour l’Education nationale par le Centre National d’Etudes Spatiales (CNES). Cet outil didactique offre la possibilité de visualiser des images satellite et d’effectuer différentes opérations de traitements sur ces images. Il est développé dans le cadre du projet éducatif « Terr’Image » qui a pour objectif  de sensibiliser ce public à l’étude et la gestion de l’ environnement en utilisant des données d’observation de la Terre satellitaires, plus particulièrement des satellites Pléiades.  Cet outil accompagne la politique active du CNES de diffusion de la culture spatiale auprès des jeunes, des enseignants et des médiateurs de culture scientifique.
+    
+    Copyright (c) Centre National d'Etudes Spatiales. Tous droits réservés.
+
+    License: GPL v3; Fichier de licence disponible dans les sources.
+    
+
 qgisMinimumVersion=2.0
 qgisMaximumVersion=2.8.99
-description=TerreImage
-version=2.3.14
+version=2.3.15
 author=CS SI
 email=alexia.mondot@c-s.fr
 
@@ -27,10 +36,10 @@ email=alexia.mondot@c-s.fr
 # tags are comma separated with spaces allowed
 tags=
 
-homepage=
-tracker=
-repository=
-icon=icon.png
+homepage=https://enseignants-mediateurs.cnes.fr/fr/web/CNES-fr/10884-edutheque.php
+tracker=https://bitbucket.org/CS-SI/terreimage/issues
+repository=https://bitbucket.org/CS-SI/terreimage
+icon=img/icon.png
 # experimental flag
 experimental=False
 
