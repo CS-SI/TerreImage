@@ -961,7 +961,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 csv_file.write("\n\n\n")
                 
     def update_plot(self):
-        print "update plot"
+        # print "update plot"
         self.plot()
 
     def statsNeedChecked(self, indx):

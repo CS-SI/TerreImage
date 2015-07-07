@@ -43,16 +43,16 @@ class SpectralAngleMapTool(QgsMapTool):
     __pyqtSignals__ = ("canvas_clicked(PyQt_PyObject)")
 
     def __init__(self, canvas):
-        print "SpectralAngleMapTool"
+        # print "SpectralAngleMapTool"
         QgsMapTool.__init__(self, canvas)
         self.canvas = canvas
         self.cursor = QtGui.QCursor(QtCore.Qt.CrossCursor)
 
     def canvasReleaseEvent(self, event):
-        print "canvasReleaseEvent before"
-        print "event", event.pos()
+        # print "canvasReleaseEvent before"
+        # print "event", event.pos()
         self.emit(QtCore.SIGNAL("canvas_clicked"), {'x': event.pos().x(), 'y': event.pos().y()})
-        print "canvasReleaseEvent after"
+        # print "canvasReleaseEvent after"
 
     def activate(self):
         QgsMapTool.activate(self)
@@ -147,9 +147,9 @@ class SpectralAngle(QtCore.QObject):
 
 
     def get_point_for_angles(self, layer):
-        print "get point for angles"
+        # print "get point for angles"
         self.tool = SpectralAngleMapTool(self.iface.mapCanvas())  # the mouselistener
-        print "self.tool", self.tool
+        # print "self.tool", self.tool
         logger.debug("self.tool" + str(self.tool))
         self.layer = layer
         logger.debug("get point for angles")
@@ -175,7 +175,7 @@ class SpectralAngle(QtCore.QObject):
 
 
     def onRightClick(self, position):  # used to quit the current action
-        print "right click", position
+        # print "right click", position
         mapPos = self.canvas.getCoordinateTransform().toMapCoordinates(position["x"], position["y"])
         newPoints = [[mapPos.x(), mapPos.y()]]
         # if newPoints == self.lastClicked: return # sometimes a strange "double click" is given
