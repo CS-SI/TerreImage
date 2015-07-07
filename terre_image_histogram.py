@@ -52,12 +52,6 @@ logging.basicConfig()
 # create logger
 logger = logging.getLogger('TerreImage_histogram')
 logger.setLevel(logging.DEBUG)
-log_file = os.path.join(os.path.expanduser("~"), "log_terr_image_histogram")
-fh = logging.FileHandler(log_file)
-formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s - %(message)s')
-fh.setFormatter(formatter)
-fh.setLevel(logging.DEBUG)
-logger.addHandler(fh)
 
 
 class MyMplCanvas(FigureCanvas):

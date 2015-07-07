@@ -45,12 +45,12 @@ logging.basicConfig()
 # create logger
 logger = logging.getLogger('TerreImage_processing')
 logger.setLevel(logging.DEBUG)
-log_file = os.path.join(os.path.expanduser("~"), "log_terr_image_qprocess")
-fh = logging.FileHandler(log_file)
-formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s - %(message)s')
-fh.setFormatter(formatter)
-fh.setLevel(logging.DEBUG)
-logger.addHandler(fh)
+# log_file = os.path.join(os.path.expanduser("~"), "log_terr_image_qprocess")
+# fh = logging.FileHandler(log_file)
+# formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s - %(message)s')
+# fh.setFormatter(formatter)
+# fh.setLevel(logging.DEBUG)
+# logger.addHandler(fh)
 
 
 def ndvi(layer, working_directory, iface):
