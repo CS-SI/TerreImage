@@ -783,7 +783,10 @@ class ValueWidget(QWidget, Ui_Widget):
             self.sc_1.plot(t, numvalues, 'k', 'o-')
             
             self.temp_values = numvalues
-            
+
+        if self.saved_curves:
+            self.extra_plot()
+
             # line = "self.axes.plot(" + str(t) + ", " + str(numvalues) +", ko-)"
             # self.sc_1.plot_line(line)
             
