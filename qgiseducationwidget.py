@@ -43,6 +43,11 @@ logging.basicConfig()
 logger = logging.getLogger('TerreImage_qgiseducationwidget')
 logger.setLevel(logging.INFO)
 
+import sys
+sys.path.append("/home/amondot/.eclipse/org.eclipse.platform_3.8_155965261/plugins/org.python.pydev_4.3.0.201508182223/pysrc/")
+from pydevd import *
+
+
 
 class Terre_Image_Dock_widget(QtGui.QDockWidget):
     __pyqtSignals__ = ("closed(PyQt_PyObject)")
@@ -272,6 +277,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
 
     def do_manage_processing(self, text_changed, args=None):
+
         # print "text_changed", text_changed
         if text_changed == "Angle Spectral":
             # print "text changed angle spectral"
@@ -306,15 +312,15 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     if text_changed == "Angle Spectral":
                         widget = self.iface.messageBar().createMessage("Terre Image", "Cliquez sur un point de l'image pour en obtenir son angle spectral...")
                         self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
+                        self.label_travail_en_cours.show()
                 if do_it:
                     if not text_changed == "Angle Spectral":
                         self.set_working_message(True)
 
-
                     logger.debug("text changed: " + text_changed)
                     my_processing = TerreImageProcessing(self.iface, self.qgis_education_manager.working_directory, ProcessingManager().working_layer, self.qgis_education_manager.mirror_map_tool, text_changed, args)
                     if text_changed == "Angle Spectral":
-                        self.set_working_message(True)
+                        # self.set_working_message(True)
                         self.label_a_s.show()
                         self.label_a_s_img.show()
                         QtCore.QObject.connect(my_processing, QtCore.SIGNAL("display_ok()"), lambda who=my_processing: self.processing_end_display(who))
@@ -480,12 +486,12 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
     def set_working_message(self, set=True):
         if set:
-            widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
-            self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
+#             widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
+#             self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
             self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
             self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
             self.label_travail_en_cours.show()
-        else :
+        else:
             self.iface.messageBar().popWidget()
             self.iface.messageBar().clearWidgets()
             self.iface.mainWindow().statusBar().clearMessage()

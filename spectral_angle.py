@@ -95,6 +95,8 @@ class SpectralAngle(QtCore.QObject):
 
 
     def angles(self, x, y):
+        self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
+        self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
         if self.layer:
             image_output = terre_image_processing.angles(self.layer, self.working_directory, self.iface, x, y)
         # self.tool.deactivate()
