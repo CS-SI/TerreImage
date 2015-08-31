@@ -43,11 +43,6 @@ logging.basicConfig()
 logger = logging.getLogger('TerreImage_qgiseducationwidget')
 logger.setLevel(logging.INFO)
 
-import sys
-sys.path.append("/home/amondot/.eclipse/org.eclipse.platform_3.8_155965261/plugins/org.python.pydev_4.3.0.201508182223/pysrc/")
-from pydevd import *
-
-
 
 class Terre_Image_Dock_widget(QtGui.QDockWidget):
     __pyqtSignals__ = ("closed(PyQt_PyObject)")
