@@ -481,10 +481,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
     def set_working_message(self, set=True):
         if set:
-#             widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
-#             self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
+            widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
+            self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
             self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
-            self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
+#             self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
             self.label_travail_en_cours.show()
         else:
             self.iface.messageBar().popWidget()

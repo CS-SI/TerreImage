@@ -21,7 +21,7 @@
  """
 
 import os
-from qgis.gui import QgsRubberBand, QgsMapToolPan, QgsMapTool
+from qgis.gui import QgsRubberBand, QgsMapToolPan, QgsMapTool, QgsMessageBar
 from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
 from PyQt4 import QtCore, QtGui
 
@@ -95,8 +95,9 @@ class SpectralAngle(QtCore.QObject):
 
 
     def angles(self, x, y):
+        widget = self.iface.messageBar().createMessage("Terre Image", "Travail en cours...")
+        self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
         self.iface.mainWindow().statusBar().showMessage("Terre Image : Travail en cours...")
-        self.iface.messageBar().pushMessage("Terre Image", "Travail en cours...")
         if self.layer:
             image_output = terre_image_processing.angles(self.layer, self.working_directory, self.iface, x, y)
         # self.tool.deactivate()
