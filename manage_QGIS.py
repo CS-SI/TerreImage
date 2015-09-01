@@ -90,22 +90,23 @@ def add_qgis_raser_layer(rasterLayer, canvas, bands=None):
     logger.debug("index_group: " + str(index_group))
 
     if bands:
-        logger.debug(bands)
-        pir = bands['pir']
-        red = bands['red']
-        green = bands['green']
-        logger.debug('pir: ' + str(pir))
-        logger.debug("red: " + str(red))
-        logger.debug("green: " + str(green))
-        if pir and red and green:
-            renderer = rasterLayer.renderer()
-            # rasterLayer.setDrawingStyle("MultiBandColor")
-            renderer.setRedBand(pir)
-            renderer.setGreenBand(red)
-            renderer.setBlueBand(green)
-            # rasterLayer.setRenderer( renderer )
-        # contrastForRasters( rasterLayer, 0, 0, [pir, red, green] )
-        histogram_stretching(rasterLayer, canvas)
+        if rasterLayer.rasterType() == 2:
+            logger.debug(bands)
+            pir = bands['pir']
+            red = bands['red']
+            green = bands['green']
+            logger.debug('pir: ' + str(pir))
+            logger.debug("red: " + str(red))
+            logger.debug("green: " + str(green))
+            if pir and red and green:
+                renderer = rasterLayer.renderer()
+                # rasterLayer.setDrawingStyle("MultiBandColor")
+                renderer.setRedBand(pir)
+                renderer.setGreenBand(red)
+                renderer.setBlueBand(green)
+                # rasterLayer.setRenderer( renderer )
+            # contrastForRasters( rasterLayer, 0, 0, [pir, red, green] )
+            histogram_stretching(rasterLayer, canvas)
 
 
     QgsMapLayerRegistry.instance().addMapLayer(rasterLayer)
