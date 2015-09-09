@@ -341,7 +341,7 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
     """
     Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
     """
-    logger.info("#######################")
+#     logger.info("#######################")
     logger.info("custom stretch: values")
     logger.info(values)
 
@@ -427,16 +427,20 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
     canvas.refresh()
     canvas.repaint()
     # print "3"
-    # print "layer renderer"
-    if typeOfLayer == 1:
-        if theRasterLayer.rasterType() == 2 and layerRenderer:
-            redEnhancement_debug = layerRenderer.redContrastEnhancement()
-            greenEnhancement_debug = layerRenderer.greenContrastEnhancement()
-            blueEnhancement_debug = layerRenderer.blueContrastEnhancement()
-            logger.debug("red end: " + str(redEnhancement_debug.minimumValue()) + " " + str(redEnhancement_debug.maximumValue()))
-            logger.debug("green end: " + str(greenEnhancement_debug.minimumValue()) + " " + str(greenEnhancement_debug.maximumValue()))
-            logger.debug("blue end: " + str(blueEnhancement_debug.minimumValue()) + " " + str(blueEnhancement_debug.maximumValue()))
-    logger.info("#######################")
+    # TODO : pourquoi lorsqu'on fait un histogramme sur la bande pir, on a pour affichage des précédentes valeurs:
+    # layer renderer <qgis._core.QgsSingleBandGrayRenderer object at 0x7fdd144558a0>
+    # theRasterLayer 2
+#     print "layer renderer", layerRenderer
+#     print "theRasterLayer", theRasterLayer.rasterType()
+#     if typeOfLayer == 1:
+#         if theRasterLayer.rasterType() == 2 and layerRenderer:
+#             redEnhancement_debug = layerRenderer.redContrastEnhancement()
+#             greenEnhancement_debug = layerRenderer.greenContrastEnhancement()
+#             blueEnhancement_debug = layerRenderer.blueContrastEnhancement()
+#             logger.debug("red end: " + str(redEnhancement_debug.minimumValue()) + " " + str(redEnhancement_debug.maximumValue()))
+#             logger.debug("green end: " + str(greenEnhancement_debug.minimumValue()) + " " + str(greenEnhancement_debug.maximumValue()))
+#             logger.debug("blue end: " + str(blueEnhancement_debug.minimumValue()) + " " + str(blueEnhancement_debug.maximumValue()))
+#     logger.info("#######################")
 
 
 def get_raster_layers():
