@@ -1,7 +1,8 @@
-Version 2.3.15.1
+Version 2.3.16
 - Correction du problème d'affichage de l'info bulle de l'angle spectral
 - Correction du bug sur l'affichage des courbes
 - Correction du bug de l'étirement d'histogramme sur une image monobande
+- Correction FA 014
 
 Version 2.3.15
 - Amélioration de la gestion des bandes
