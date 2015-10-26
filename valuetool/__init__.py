@@ -4,7 +4,7 @@
                              -------------------
     begin                : 2008-08-26
     copyright            : (C) 2008-2010 by G. Picard
-    email                : 
+    email                :
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,8 +19,9 @@
 """
 # load valuetool class from file valuetool.py
 
-def classFactory(iface): 
-  from valuetool import ValueTool
-  return ValueTool(iface)
+
+def classFactory(iface):
+    from valuetool import ValueTool
+    return ValueTool(iface)
 
 # Display the values of the raster layers at the current mouse position. Values are printed in a table or plotted on a graph. The plugin is dockable like overview or coordinate capture, go to View/Panels to activate it.

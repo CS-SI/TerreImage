@@ -5,7 +5,7 @@
 Copyright (c) Centre National d'Etudes Spatiales
 All rights reserved.
 
-The "ClassificationSupervisee" Quantum GIS plugin is distributed 
+The "ClassificationSupervisee" Quantum GIS plugin is distributed
 under the CeCILL licence version 2.
 See Copyright/Licence_CeCILL_V2-en.txt or
 http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt for more details.
@@ -52,21 +52,25 @@ logger.setLevel(logging.INFO)
 def ensure_clean_dir(d):
     #d = os.path.dirname(f)
     if os.path.exists(d):
-      shutil.rmtree(d)  
+        shutil.rmtree(d)
     os.makedirs(d)
+
 
 def saferemovefile(filename):
     if os.path.exists(filename):
         os.remove(filename)
 
+
 def transform_spaces(filename):
     from copy import deepcopy
     ret = deepcopy(filename)
     return ret.replace(' ', '_')
-	
+
+
 def ensure_dir_exists(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
+
 
 def get_working_dir():
     dir = os.path.join( os.getenv("HOME"), "ClassificationSupervisee", datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
@@ -78,8 +82,8 @@ class StatusChanger():
     def __init__(self, classifdialog):
         self.classifdialog = classifdialog
         self.classifdialog.setClassifyingStatus()
-        
-        
+
+
     def __del__(self):
         self.classifdialog.clearStatus()
 '''
@@ -100,60 +104,58 @@ class GenericThread(QtCore.QThread):
   return
 '''
 
+
 class SupervisedClassificationDialog(QtGui.QDialog):
     def __init__(self, iface, working_dir=None):
         QtGui.QDialog.__init__(self)
         QtGui.QApplication.restoreOverrideCursor()
-        
-       
+
         self.app_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)), "win32", "bin")
         logger.debug( "self.app_dir" + str(self.app_dir) )
-        
+
         #self.setupUi()
         QGisLayers.setInterface(iface)
         self.output_dir = None
 
-        
 #         if not OSIdentifier.isWindows():
 #             QtGui.QMessageBox.critical( self, \
 #                                         u"Erreur", \
 #                                         u"Système d'exploitation non supporté" )
 #             return
 
-
     def setupUi(self):
         self.setWindowTitle(u"Classification Supervisée")
-        
+
         self.mainlayout = QtGui.QVBoxLayout()
-        
+
         #rasterlayers = QGisLayers.getRasterLayers()
         rasterlayers = self.layers
         self.rasterlayerselector = RasterLayerSelectorTable(rasterlayers, self.output_dir, self.main_layer, self.main_layer_bands)
-        
+
         vectorlayers = QGisLayers.getVectorLayers(QGisLayerType.POLYGON)
         self.vectorlayerselector = VectorLayerSelectorTable(vectorlayers)
 
         self.layerlayout = QtGui.QHBoxLayout()
         self.layerlayout.addWidget(self.rasterlayerselector)
         self.layerlayout.addWidget(self.vectorlayerselector)
-        
+
 #         self.outputlayout = QtGui.QHBoxLayout()
-#         
+#
 #         self.outputdirwidget = QtGui.QLineEdit()
 #         self.outputdirselectorbutton = QtGui.QPushButton("...")
 #         #self.setOutputDir( tempfile.mkdtemp(prefix='ClassificationSupervisee_', dir=None) )
 #         self.setOutputDir( self.output_dir )
-# 
+#
 #         self.outputlayout.addWidget( QtGui.QLabel(u"Répertoire de sortie") )
 #         self.outputlayout.addWidget( self.outputdirwidget )
 #         self.outputlayout.addWidget( self.outputdirselectorbutton )
-        
+
         self.buttonBox = QtGui.QDialogButtonBox()
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        
+
         self.classifButton = QtGui.QPushButton("Classification")
         self.cancelButton = QtGui.QPushButton("Annuler")
-        
+
         self.bottomLayout = QtGui.QHBoxLayout()
         self.statusLabel = QtGui.QLabel()
         self.buttonBox.addButton(self.classifButton, QtGui.QDialogButtonBox.AcceptRole)
@@ -161,51 +163,49 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.bottomLayout.addWidget(self.statusLabel)
         self.bottomLayout.addStretch()
         self.bottomLayout.addWidget(self.buttonBox)
-        
+
         self.mainlayout.addLayout(self.layerlayout)
-        #self.mainlayout.addLayout(self.outputlayout)
+        # self.mainlayout.addLayout(self.outputlayout)
         self.mainlayout.addLayout(self.bottomLayout)
         self.setLayout(self.mainlayout)
-        
+
         QtCore.QObject.connect(self.classifButton, QtCore.SIGNAL("clicked()"), self.setClassifyingStatus)
         QtCore.QObject.connect(self.classifButton, QtCore.SIGNAL("clicked()"), self.classify)
-        
+
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancelPressed)
-        
-        #QtCore.QObject.connect(self.outputdirselectorbutton, QtCore.SIGNAL("clicked()"), self.selectOutputDir)
+
+        # QtCore.QObject.connect(self.outputdirselectorbutton, QtCore.SIGNAL("clicked()"), self.selectOutputDir)
 
     def set_layers(self, layers, main_layer=None, main_layer_bands = None):
         self.main_layer = main_layer
         self.main_layer_bands = main_layer_bands
         self.layers = [self.main_layer] + layers
-    
+
     def set_directory(self, working_dir):
         if working_dir is not None:
             self.output_dir = os.path.join( working_dir, "Classification" )
             ensure_dir_exists( self.output_dir )
         else:
             self.output_dir = get_working_dir()
-    
-        
+
     def update_layers(self, layers):
         self.layers = layers
-        #for layer in self.layers:
+        # for layer in self.layers:
         #    print layer.name()
         vectorlayers = QGisLayers.getVectorLayers(QGisLayerType.POLYGON)
         self.vectorlayerselector.set_layers(vectorlayers)
         rasterlayers = layers
         self.rasterlayerselector.set_layers(rasterlayers)
 
-
     def cancelPressed(self):
         self.close()
 
     def setOutputDir(self, dirname):
         self.outputdirwidget.setText(dirname)
-        
+
     def getOutputDir(self):
         return str(self.output_dir) #outputdirwidget.text())
-        
+
     def selectOutputDir(self):
         filedialog = QtGui.QFileDialog()
         filedialog.setConfirmOverwrite(True);
@@ -218,19 +218,19 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.statusLabel.setText(u"<font color=\"Red\">Classification en cours...</font>")
         QtGui.QApplication.processEvents()
         QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-        
+
     def clearStatus(self):
         self.statusLabel.setText("")
-    
+
     def classify(self):
         dirDest = QtGui.QFileDialog.getExistingDirectory( None, str( "Répertoire de destination des fichiers de la classification" ), self.output_dir )
         if dirDest :
             self.output_dir = dirDest
-        
-        
+
+
         logger.debug( "classify" )
         simulation = False
-        
+
         # Get rasters
         selectedrasterlayers = self.rasterlayerselector.getSelectedOptions()
         logger.debug( "selectedrasterlayers" + str(selectedrasterlayers) )
@@ -251,7 +251,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         try:
             errorDuringClassif = False
             outputdir = self.getOutputDir()
-            
+
             # Build list of input raster files
             rasterlist = ""
             for r in selectedrasterlayers:
@@ -271,17 +271,17 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                 inputshpfilepath = v[0].source()
                 classcolor = v[1]
                 classlabel = v[2]
-                
+
                 labeldescriptor[label] = (classcolor, classlabel)
                 logger.debug( "labeldescriptor" + str(labeldescriptor) )
                 label += 1
-                
+
                 # Reprocess input shp file to crop it to firstraster extent
                 vectordir = os.path.join(outputdir, 'class%s' % (str(i)))
                 ensure_clean_dir(vectordir)
                 #preprocessedshpfile = os.path.join(vectordir, transform_spaces(os.path.basename(unicode(inputshpfilepath))))
                 preprocessedshpfile = os.path.join(vectordir, "preprocessed.shp")
-                
+
                 cropcommand = ('%s/cropvectortoimage.bat '
                              '"%s" '
                              '"%s" '
@@ -305,46 +305,46 @@ class SupervisedClassificationDialog(QtGui.QDialog):
 #                                               stdin=subprocess.PIPE,
 #                                               stderr=subprocess.STDOUT,
 #                                               universal_newlines=False)
-#                       
+#
 #                       loglines = []
 #                       for line in iter(proc.stdout.readline, ""):
 #                           loglines.append(line)
-#                           
+#
 #                       proc.wait()
 #                       if proc.returncode != 0:
 #                           raise OSError
-# 
+#
 #                 except OSError:
 #                   errorDuringClassif = True
-#                   
+#
 #                   mbox = QtGui.QMessageBox()
 #                   mbox.setWindowTitle(u"Erreur")
 #                   mbox.setText(u"Une erreur a été rencontrée lors de la préparation des données vecteurs")
-#                   
+#
 #                   # has no effect...
 #                   #mbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 #                   #mbox.setSizeGripEnabled(True)
-#                   
+#
 #                   detailedtext = (u"Code de retour : %s%s"
 #                                   "Commande : %s%s"
 #                                   "Sortie standard :%s%s"
 #                                   % ( proc.returncode, 2*os.linesep,
 #                                       cropcommand, 2*os.linesep,
 #                                       os.linesep, u''.join([u'%s%s' % (unicode(c, 'mbcs'), os.linesep) for c in loglines]) ) )
-# 
+#
 #                   mbox.setDetailedText(detailedtext)
 #                   mbox.setIcon(QtGui.QMessageBox.Critical)
 #                   mbox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
 #                   ret = mbox.exec_()
 #                   raise OSError
-                  
+
                 vectorlist += '"%s" ' % (preprocessedshpfile)
 
-            # Build classifcommand   
+            # Build classifcommand
             outputlog = os.path.join(outputdir, 'output.log')
             outputclassification = os.path.join(outputdir, 'classification.tif')
             outputresults = os.path.join(outputdir, 'classification.resultats.txt')
-            
+
             launcher = "%s/classification.bat" % self.app_dir
             classifcommand = (  '%s '
                                 '-io.il %s '
@@ -353,7 +353,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                                 '-io.results "%s"'
                                 %  (launcher,
                                     rasterlist,
-                                    vectorlist, 
+                                    vectorlist,
                                     outputclassification,
                                     outputresults) )
 
@@ -369,7 +369,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
 #                                             stdin=subprocess.PIPE,
 #                                             stderr=subprocess.STDOUT,
 #                                             universal_newlines=False)
-#                     
+#
 #                     loglines = []
 #                     with open(outputlog, "w") as logfile:
 #                       for line in iter(proc.stdout.readline, ""):
@@ -377,34 +377,34 @@ class SupervisedClassificationDialog(QtGui.QDialog):
 #                           logfile.writelines(line)
 #                           logfile.flush()
 #                           os.fsync(logfile.fileno())
-# 
+#
 #                     proc.wait()
 #                     if proc.returncode != 0:
 #                         raise OSError
-# 
+#
 #             except OSError:
 #                 errorDuringClassif = True
-#                 
+#
 #                 mbox = QtGui.QMessageBox()
 #                 mbox.setWindowTitle(u"Erreur")
 #                 mbox.setText(u"Une erreur a été rencontrée lors de la classification")
-#                 
+#
 #                 # has no effect...
 #                 #mbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 #                 #mbox.setSizeGripEnabled(True)
-#                 
+#
 #                 detailedtext = (u"Code de retour : %s%s"
 #                                 "Commande : %s%s"
 #                                 "Sortie standard :%s%s"
 #                                 % ( proc.returncode, 2*os.linesep,
 #                                     classifcommand, 2*os.linesep,
 #                                     os.linesep, u''.join([u'%s%s' % (unicode(c, 'mbcs'), os.linesep) for c in loglines]) ) )
-# 
+#
 #                 mbox.setDetailedText(detailedtext)
 #                 mbox.setIcon(QtGui.QMessageBox.Critical)
 #                 mbox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
 #                 ret = mbox.exec_()
-#                 
+#
 #                 saferemovefile(outputlog)
 #                 saferemovefile(outputclassification)
 #                 saferemovefile(outputresults)
@@ -413,19 +413,19 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                 QGisLayers.loadLabelImage(outputclassification, labeldescriptor)
 
                 notificationDialog = ConfusionMatrixViewer(selectedvectorlayers, outputresults)
-				
+
                 self.clearStatus()
                 QtGui.QApplication.restoreOverrideCursor()
 
                 notificationDialog.setModal(True)
                 notificationDialog.show()
-                
+
                 pixmap = QtGui.QPixmap(notificationDialog.size())
                 notificationDialog.render(pixmap)
                 pixmap.save(os.path.join(outputdir, 'resultats.png'))
-                
+
                 notificationDialog.exec_()
-                
+
 #        except:
 #            raise
 

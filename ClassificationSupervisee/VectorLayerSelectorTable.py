@@ -5,7 +5,7 @@
 Copyright (c) Centre National d'Etudes Spatiales
 All rights reserved.
 
-The "ClassificationSupervisee" Quantum GIS plugin is distributed 
+The "ClassificationSupervisee" Quantum GIS plugin is distributed
 under the CeCILL licence version 2.
 See Copyright/Licence_CeCILL_V2-en.txt or
 http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt for more details.
@@ -25,19 +25,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 """
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtGui
 from VectorLayerSelectorItem import VectorLayerSelectorItem
+
 
 class VectorLayerSelectorTable(QtGui.QWidget):
     def __init__(self, layers, parent = None):
         super(VectorLayerSelectorTable, self).__init__(parent)
-        
+
         self.layers = layers
-        
+
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setSpacing(2)
         self.verticalLayout.setMargin(0)
-        
+
         self.label = QtGui.QLabel("Echantillons d'apprentissage :")
 
         self.table = QtGui.QTableWidget()
@@ -47,19 +48,19 @@ class VectorLayerSelectorTable(QtGui.QWidget):
         self.table.horizontalHeader().setVisible(False)
         self.table.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
         self.setTableContent()
-        
+
         self.selectallbutton = QtGui.QPushButton(u"(Dé)sélectionner tout")
         self.selectallbutton.clicked.connect(self.selectAll)
-        
+
         self.selectallbuttonlayout = QtGui.QHBoxLayout()
         self.selectallbuttonlayout.addStretch()
         self.selectallbuttonlayout.addWidget(self.selectallbutton)
         self.selectallbuttonlayout.addStretch()
-        
+
         self.verticalLayout.addWidget(self.label)
         self.verticalLayout.addWidget(self.table)
         self.verticalLayout.addLayout(self.selectallbuttonlayout)
-        
+
         self.setLayout(self.verticalLayout)
 
     def selectAll(self):
@@ -87,10 +88,10 @@ class VectorLayerSelectorTable(QtGui.QWidget):
             if widget.isChecked():
                 selectedLayers.append( (self.layers[i], widget.getColor(), widget.getLabel()) )
         return selectedLayers
-    
-    
+
+
     def set_layers(self, layers):
         self.table.clear()
         self.layers = layers
         self.setTableContent()
-        
+

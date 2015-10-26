@@ -5,7 +5,7 @@
 Copyright (c) Centre National d'Etudes Spatiales
 All rights reserved.
 
-The "ClassificationSupervisee" Quantum GIS plugin is distributed 
+The "ClassificationSupervisee" Quantum GIS plugin is distributed
 under the CeCILL licence version 2.
 See Copyright/Licence_CeCILL_V2-en.txt or
 http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt for more details.
@@ -24,9 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 """
-from PyQt4 import QtCore, QtGui
-from qgis.gui import *
-from qgis.core import *
+from PyQt4 import QtGui
+
 
 class RasterLayerSelectorItem(QtGui.QWidget):
 
@@ -36,10 +35,10 @@ class RasterLayerSelectorItem(QtGui.QWidget):
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setSpacing(2)
         self.horizontalLayout.setMargin(0)
-        
+
         self.checkbox = QtGui.QCheckBox()
         self.checkbox.setText(layer.name())
-        
+
         self.horizontalLayout.addWidget(self.checkbox)
         self.horizontalLayout.addStretch()
         self.setLayout(self.horizontalLayout)

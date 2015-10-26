@@ -5,7 +5,7 @@
 Copyright (c) Centre National d'Etudes Spatiales
 All rights reserved.
 
-The "ClassificationSupervisee" Quantum GIS plugin is distributed 
+The "ClassificationSupervisee" Quantum GIS plugin is distributed
 under the CeCILL licence version 2.
 See Copyright/Licence_CeCILL_V2-en.txt or
 http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt for more details.
@@ -26,18 +26,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from PyQt4 import QtCore, QtGui
-import os
 import xml.etree.ElementTree as xml
+
 
 def read_results(outputresults):
     percentage = {}
     root = xml.parse(outputresults).getroot()
-    
+
     # Confusion matrix
     matrix = []
     for row in root.find("Resultats").find("MatriceConfusion").findall("Class"):
         matrix.append(row.text.split())
-    '''  
+    '''
     for line in iter(root.find("Resultats").find("MatriceConfusion").text.splitlines()):
         if not line:
             continue
@@ -46,18 +46,19 @@ def read_results(outputresults):
 
     # Kappa index
     kappa = float(root.find("Resultats").find("IndiceKappa").attrib["value"])
-    
+
     # Class statistics
     for child in root.find("Resultats").find("Statistiques"):
         if child.tag == "Class":
             percentage[ int(child.attrib["label"]) ] = float(child.attrib["pourcentage"])
 
-    return {"percentage" : percentage, "confusion" : matrix, "kappa" : kappa}
+    return {"percentage": percentage, "confusion": matrix, "kappa": kappa}
+
 
 class ColorSquare(QtGui.QPushButton):
     def __init__(self, color, parent = None):
         super(ColorSquare, self).__init__(parent)
-        
+
         pixmap = QtGui.QPixmap(self.size())
         pixmap.fill(color)
         icon = QtGui.QIcon(pixmap)
@@ -65,7 +66,7 @@ class ColorSquare(QtGui.QPushButton):
         self.setFlat(True)
         self.setFocusPolicy(QtCore.Qt.NoFocus)
         self.setCheckable(False)
-    
+
     def mouseMoveEvent(self, e):
         pass
 
@@ -75,21 +76,21 @@ class ColorSquare(QtGui.QPushButton):
     def mouseReleaseEvent(self, e):
         pass
 
+
 class ConfusionMatrixViewer(QtGui.QDialog):
     def __init__(self, selectedvectorlayers, resultsfile, parent = None):
         QtGui.QDialog.__init__(self)
-        
+
         results = read_results(resultsfile)
         n = len(results["confusion"])
-        
-        
+
         self.setWindowTitle(u"Résultats")
         self.verticalLayout = QtGui.QVBoxLayout()
 
         self.verticalLayout.addWidget(QtGui.QLabel(u'La classification a été réalisée avec succès.'))
         self.verticalLayout.addWidget(QtGui.QLabel(''))
         self.verticalLayout.addWidget(QtGui.QLabel(u'Statistiques par classe en % de l\'image classée :'))
-        
+
         self.statgrid = QtGui.QGridLayout()
         for i in range(len(selectedvectorlayers)):
             vectorlayer = selectedvectorlayers[i]
@@ -119,17 +120,17 @@ class ConfusionMatrixViewer(QtGui.QDialog):
 
         for i in range(n):
             layername = selectedvectorlayers[i][2]
-            
+
             label1 = QtGui.QLabel(layername)
             values = "{color}".format(color=selectedvectorlayers[i][1].name())
             label1.setStyleSheet( "QLabel { color : %s; }" % (values) )
-            #label1.setAutoFillBackground(True)
-            
+            # label1.setAutoFillBackground(True)
+
             label2 = QtGui.QLabel(layername)
             values = "{color}".format(color=selectedvectorlayers[i][1].name())
             label2.setStyleSheet( "QLabel { color : %s; }" % (values) )
-            #label2.setAutoFillBackground(True)
-            
+            # label2.setAutoFillBackground(True)
+
             self.confusion.addWidget(label1, 0,     2*i+2)
             self.confusion.addWidget(label2, 2*i+2, 0    )
 
@@ -145,7 +146,7 @@ class ConfusionMatrixViewer(QtGui.QDialog):
             hline.setFrameShape(QtGui.QFrame.HLine)
             hline.setLineWidth(1)
             self.confusion.addWidget(hline, 2*i+1, 0, 1, 2*n+2)
-                
+
         self.verticalLayout.addLayout(self.confusion)
 
         self.verticalLayout.addWidget(QtGui.QLabel(''))

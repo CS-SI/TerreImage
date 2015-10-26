@@ -5,7 +5,7 @@
 Copyright (c) Centre National d'Etudes Spatiales
 All rights reserved.
 
-The "ClassificationSupervisee" Quantum GIS plugin is distributed 
+The "ClassificationSupervisee" Quantum GIS plugin is distributed
 under the CeCILL licence version 2.
 See Copyright/Licence_CeCILL_V2-en.txt or
 http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt for more details.

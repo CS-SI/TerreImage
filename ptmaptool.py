@@ -24,30 +24,31 @@
 #
 #---------------------------------------------------------------------
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from qgis.core import *
-from qgis.gui import *
+from PyQt4.QtCore import Qt, SIGNAL
+from PyQt4.QtGui import QCursor
+# from qgis.core import
+from qgis.gui import QgsMapTool
+
 
 class ProfiletoolMapTool(QgsMapTool):
 
-	def __init__(self, canvas):
-		QgsMapTool.__init__(self,canvas)
-		self.canvas = canvas
-		self.cursor = QCursor(Qt.CrossCursor)
+    def __init__(self, canvas):
+        QgsMapTool.__init__(self, canvas)
+        self.canvas = canvas
+        self.cursor = QCursor(Qt.CrossCursor)
 
-	def canvasReleaseEvent(self,event):
-		#print "canvasReleaseEvent"
-		self.emit( SIGNAL("canvas_clicked"), {'x': event.pos().x(), 'y': event.pos().y()} )
+    def canvasReleaseEvent(self, event):
+        # print "canvasReleaseEvent"
+        self.emit(SIGNAL("canvas_clicked"), {'x': event.pos().x(), 'y': event.pos().y()})
 
-	def activate(self):
-		QgsMapTool.activate(self)
-		self.canvas.setCursor(self.cursor)
+    def activate(self):
+        QgsMapTool.activate(self)
+        self.canvas.setCursor(self.cursor)
 
-	def deactivate(self):
-		#self.emit( SIGNAL("deactivate") )
-		#self.canvas.setCursor( QCursor(Qt.ArrowCursor)) 
-		QgsMapTool.deactivate(self)
+    def deactivate(self):
+        # self.emit( SIGNAL("deactivate") )
+        # self.canvas.setCursor( QCursor(Qt.ArrowCursor))
+        QgsMapTool.deactivate(self)
 
-	def setCursor(self,cursor):
-		self.cursor = QCursor(cursor)
+    def setCursor(self, cursor):
+        self.cursor = QCursor(cursor)

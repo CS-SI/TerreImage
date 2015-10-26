@@ -266,10 +266,11 @@ def get_sensor_id(image):
     else:
         result_sensor = run_otb_app("ReadImageInfo", args)
     if result_sensor:
-        for line in result_sensor.splitlines():
+        # type(result_sensor) = PyQt4.QtCore.QByteArray
+        for line in str(result_sensor).splitlines():
             if "sensor" in line:
                 # sensor_line = result_sensor[0]
-                sensor = re.search("sensor: ([a-zA-Z \d]+)$", line)
+                sensor = re.search('sensor: ([a-zA-Z \d]+)$', line)
 
                 if sensor:
                     # group 1 parce qu'on a demande qqchose de particulier a la regexpr a cause des ()
@@ -278,6 +279,8 @@ def get_sensor_id(image):
 
 
 def export_kmz(filenames, working_directory):
+    """
+    """
     internal_working_directory = os.path.join(working_directory, "Internal")
     if not os.path.exists(internal_working_directory):
         os.makedirs(internal_working_directory)
@@ -289,9 +292,13 @@ def export_kmz(filenames, working_directory):
 
     # attention rustine
     # kmzs = glob.glob( os.path.join(internal_working_directory, "*.kmz"))
+    kmz_to_return = []
     for kmz in kmzs:
         new_path = os.path.join(working_directory, os.path.basename(kmz))
         shutil.copy(kmz, new_path)
+        kmz_to_return.append(new_path)
+
+    return kmz_to_return
 
 
 def run_process(fused_command, read_output=False):
@@ -350,11 +357,13 @@ def run_process(fused_command, read_output=False):
         if not error == "\n":
             logger.info("error : " + "\'" + str(error) + "\'")
         logger.info("output : " + result.data() + "fin output")
-    else :
+        return result
+    else:
         code_d_erreur = process.error()
         dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed", 2:"QProcess::TimedOut", 3:"QProcess::WriteError", 4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
         logger.info("Code erreur : " + str(code_d_erreur))
         logger.info(dic_err[code_d_erreur])
+    return None
 
 
 def run_otb_app(app_name, arguments):

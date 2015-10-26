@@ -64,7 +64,6 @@ class TerreImageManager():
         self.classif_tool = SupervisedClassificationDialog(self.iface)
         # self.classif_tool.setupUi()
 
-
     def set_current_layer(self):
         self.layer, bands = terre_image_utils.get_workinglayer_on_opening(self.iface)
         if self.layer:
@@ -81,11 +80,9 @@ class TerreImageManager():
 
         return self.layer, bands
 
-
     def __str__(self):
         sortie = "working_dir : " + self.working_directory
         return sortie
-
 
     def restore_processing_manager(self, filename, bands, type, working_dir):
         self.layer, bands = terre_image_utils.restore_working_layer(filename, bands, type)
@@ -94,7 +91,6 @@ class TerreImageManager():
         self.working_directory = working_dir
         return self.layer, bands
 
-
     def display_values(self):
 
         self.valuedockwidget.show()
@@ -102,13 +98,12 @@ class TerreImageManager():
         self.value_tool.cbxActive.setCheckState(QtCore.Qt.Checked)
         self.value_tool.set_layers(ProcessingManager().get_working_layers())
 
-
     def view_closed(self, name_of_the_closed_view):
         # print str(name_of_the_closed_view) + " has been closed"
         logger.debug(str(name_of_the_closed_view) + " has been closed")
         process = ProcessingManager().processing_from_name(name_of_the_closed_view)
         # print process
-        if process :
+        if process:
             try:
                 QgsMapLayerRegistry.instance().removeMapLayer(process[0].output_working_layer.qgis_layer.id())
                 ProcessingManager().remove_processing(process[0])
@@ -116,15 +111,13 @@ class TerreImageManager():
             except KeyError:
                 pass
 
-
     def removing_layer(self, layer_id):
         ProcessingManager().remove_process_from_layer_id(layer_id)
-
 
     def disconnect(self):
         # disconnect value tool
         self.iface.mainWindow().statusBar().clearMessage()
-        try :
+        try:
             self.value_tool.changeActive(QtCore.Qt.Unchecked)
             self.value_tool.set_layers([])
             self.value_tool.close()
@@ -132,7 +125,6 @@ class TerreImageManager():
             self.value_tool = None
         except AttributeError:
             pass
-
 
         # disconnect dockable mirror map
         self.mirror_map_tool.unload()

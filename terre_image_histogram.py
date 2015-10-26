@@ -22,9 +22,7 @@
 """
 
 from __future__ import unicode_literals
-import os
-from numpy import arange, sin, pi, cumsum, percentile
-import numpy.ma as ma
+from numpy import arange, cumsum
 import math
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -88,7 +86,6 @@ class MyMplCanvas(FigureCanvas):
             self.multiband = False
         # print "self.multiband0", self.multiband
 
-
     def get_2_98_percent(self, sizeX, sizeY, histogram):
         # get 2 - 98 %
         logger.debug("sizeX, sizeY" + str(sizeX) + " " + str(sizeY))
@@ -113,7 +110,7 @@ class MyMplCanvas(FigureCanvas):
                 self.x_min = index + self.rasterMin
             if hist_cum[index + 1] > nb_pixels_98:
                 self.x_max = index + self.rasterMin
-                break;
+                break
 
         # print "self.x_min, self.x_max", self.x_min, self.x_max
 
@@ -126,14 +123,13 @@ class MyMplCanvas(FigureCanvas):
         # print "self.x_min, self.x_max", self.x_min, self.x_max
 
         if self.multiband:
-            dic = {"r":"red", "g":"green", "b":"blue"}
+            dic = {"r": "red", "g": "green", "b": "blue"}
             p = TerreImageParamaters()
             if not p.is_complete():
                 exec("p." + dic[self.color] + "_min=" + str(self.x_min))
                 # print "p." + dic[self.color] + "_min=" + str(self.x_min)
                 exec("p." + dic[self.color] + "_max=" + str(self.x_max))
                 # print "p." + dic[self.color] + "_max=" + str(self.x_max)
-
 
     def get_GDAL_histogram(self, image, band_number, qgis_layer, no_data=-1):
         """
@@ -196,13 +192,12 @@ class MyMplCanvas(FigureCanvas):
                 p = TerreImageParamaters()
                 if p.is_complete():
                     # print "here"
-                    dic = {"r":"red", "g":"green", "b":"blue"}
+                    dic = {"r": "red", "g": "green", "b": "blue"}
                     exec("self.x_min=int(p." + dic[self.color] + "_min)")
                     exec("self.x_max=int(p." + dic[self.color] + "_max)")
                     # print self.x_min, self.x_max
 
             return histogram
-
 
     def display_histogram(self, filename, band, color, name, qgis_layer, no_data=-1):
         self.color = color
@@ -225,14 +220,12 @@ class MyMplCanvas(FigureCanvas):
         self.axes.figure.canvas.mpl_connect('button_release_event', self.on_release)
         self.draw_min_max_percent()
 
-
     def draw_histogram(self):
         if self.t.any() and self.s and self.color and self.name:
             self.axes.plot(self.t, self.s, self.color)
             xtext = self.axes.set_xlabel('Valeur')  # returns a Text instance
             ytext = self.axes.set_ylabel('Nombre')
             self.axes.set_title(self.name)
-
 
     def draw_reset_percent(self):
         logger.debug("draw reset")
@@ -247,14 +240,12 @@ class MyMplCanvas(FigureCanvas):
         self.x_max = self.ninety_eight_max
         self.emit(QtCore.SIGNAL("valueChanged()"))
 
-
     def draw_min_max_percent(self):
         if self.x_min and self.x_max:
             # print "self.x_min, self.x_max for", self.color, self.x_min, self.x_max
             logger.debug("self.x_min, self.x_max" + str(self.x_min) + str(self.x_max))
             self.axes.axvline(x=self.x_min, c="red", linewidth=2, zorder=0, clip_on=False)
             self.axes.axvline(x=self.x_max, c="red", linewidth=2, zorder=0, clip_on=False)
-
 
     def on_press(self, event):
         """
@@ -272,7 +263,6 @@ class MyMplCanvas(FigureCanvas):
             # self.valueChanged.emit()
         else:
             self.do_change = False
-
 
     def on_release(self, event):
         """
@@ -314,7 +304,7 @@ class MyMplCanvas(FigureCanvas):
             logger.debug(str(self.x_min) + " " + str(self.x_max))
 
             if self.multiband:
-                dic = {"r":"red", "g":"green", "b":"blue"}
+                dic = {"r": "red", "g": "green", "b": "blue"}
                 p = TerreImageParamaters()
                 exec("p." + dic[self.color] + "_min=" + str(self.x_min))
                 # print "p." + dic[self.color] + "_min=" + str(self.x_min)
@@ -322,11 +312,9 @@ class MyMplCanvas(FigureCanvas):
                 # print "p." + dic[self.color] + "_max=" + str(self.x_max)
 
 
-
 class TerreImageHistogram(QtGui.QWidget, QtCore.QObject):  # , Ui_Form):
 
     __pyqtSignals__ = ("valueChanged(PyQt_PyObject)", "threshold(PyQt_PyObject)")
-
 
     def __init__(self, layer, nb_bands=3, main=False):
         QtGui.QWidget.__init__(self)
@@ -351,12 +339,10 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject):  # , Ui_Form):
 
         self.dock_opened = False
 
-
     def set_buttons(self):
         b = QtGui.QPushButton("Remise à zéro")
         b.clicked.connect(self.reset)
         self.l.addWidget(b)
-
 
     def reset(self):
         logger.debug("resset")
@@ -364,7 +350,6 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject):  # , Ui_Form):
         if self.nb_hist == 3:
             self.sc_2.draw_reset_percent()
             self.sc_3.draw_reset_percent()
-
 
     def seuillage(self):
         forms = []
@@ -375,7 +360,6 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject):  # , Ui_Form):
         logger.debug(forms)
         # emit signal
         self.emit(QtCore.SIGNAL("threshold(PyQt_PyObject)"), forms)
-
 
 
 class TerreImageHistogram_monoband(TerreImageHistogram):  # , Ui_Form):
@@ -397,14 +381,12 @@ class TerreImageHistogram_monoband(TerreImageHistogram):  # , Ui_Form):
         seuil.clicked.connect(self.seuillage)
         self.l.addWidget(seuil)
 
-
     def valueChanged(self):
         logger.debug("value changed")
         values = [ (self.sc_1.x_min, self.sc_1.x_max) ]
         logger.debug("values" + str(values))
         manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas, mono=True)
         # self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )
-
 
     def seuillage(self):
         forms = []
@@ -414,7 +396,6 @@ class TerreImageHistogram_monoband(TerreImageHistogram):  # , Ui_Form):
             forms.append("\"if(((im1b" + str(self.specific_band) + ">" + str(self.sc_1.x_min) + ") and (im1b" + str(self.specific_band) + "<" + str(self.sc_1.x_max) + ")), im1b" + str(self.specific_band) + ", 0)\"")
         # emit signal
         self.emit(QtCore.SIGNAL("threshold(PyQt_PyObject)"), forms)
-
 
 
 class TerreImageHistogram_multiband(TerreImageHistogram):  # , Ui_Form):
@@ -456,7 +437,6 @@ class TerreImageHistogram_multiband(TerreImageHistogram):  # , Ui_Form):
             self.sc_3.display_histogram(self.processing.output_working_layer.get_source(), self.layer.blue, 'b', "Plan B: BS B", layer.get_qgis_layer(), 0)
         self.set_buttons()
 
-
     def valueChanged(self):
         values = [ (self.sc_1.x_min, self.sc_1.x_max), (self.sc_2.x_min, self.sc_2.x_max), (self.sc_3.x_min, self.sc_3.x_max)]
         logger.debug("values" + str(values))
@@ -469,8 +449,3 @@ class TerreImageHistogram_multiband(TerreImageHistogram):  # , Ui_Form):
         else:
             manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas)
         # self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )
-
-
-
-
-

@@ -28,15 +28,15 @@ from PyQt4.QtGui import QColor
 
 # import GDAL and QGIS libraries
 from qgis.core import (QgsMapLayerRegistry,
-                        QgsMapLayer,
-                        QgsContrastEnhancement,
-                        QgsVectorLayer,
-                        QgsRasterLayer,
-                        QgsRaster,
-                        QgsField,
-                        QgsFeature,
-                        QgsGeometry,
-                        )
+                       QgsMapLayer,
+                       QgsContrastEnhancement,
+                       QgsVectorLayer,
+                       QgsRasterLayer,
+                       QgsRaster,
+                       QgsField,
+                       QgsFeature,
+                       QgsGeometry,
+                       )
 
 import terre_image_utils
 from terre_image_constant import TerreImageConstant
@@ -47,15 +47,6 @@ logging.basicConfig()
 # create logger
 logger = logging.getLogger('TerreImage_manageQGIS')
 logger.setLevel(logging.INFO)
-
-
-
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_manageQGIS')
-logger.setLevel(logging.DEBUG)
 
 
 def addVectorLayerToQGIS(vectorLayer, layername, legendInterface):
@@ -77,20 +68,21 @@ def addVectorLayerToQGIS(vectorLayer, layername, legendInterface):
     addVectorLayerToQGIS( myvector, os.path.basename(myvector), None, True)
     """
     vector = QgsVectorLayer(vectorLayer, layername, "ogr")
-    layerAdded = QgsMapLayerRegistry.instance().addMapLayer(vector)
+    layer_added = QgsMapLayerRegistry.instance().addMapLayer(vector)
+    return layer_added
 
 
 def get_raster_layer(raster, name):
-    rasterLayer = QgsRasterLayer(raster, name)
-    return rasterLayer
+    raster_layer = QgsRasterLayer(raster, name)
+    return raster_layer
 
 
-def add_qgis_raser_layer(rasterLayer, canvas, bands=None):
+def add_qgis_raser_layer(raster_layer, canvas, bands = None):
     index_group = TerreImageConstant().index_group
     logger.debug("index_group: " + str(index_group))
 
     if bands:
-        if rasterLayer.rasterType() == 2:
+        if raster_layer.rasterType() == 2:
             logger.debug(bands)
             pir = bands['pir']
             red = bands['red']
@@ -99,18 +91,17 @@ def add_qgis_raser_layer(rasterLayer, canvas, bands=None):
             logger.debug("red: " + str(red))
             logger.debug("green: " + str(green))
             if pir and red and green:
-                renderer = rasterLayer.renderer()
-                # rasterLayer.setDrawingStyle("MultiBandColor")
+                renderer = raster_layer.renderer()
+                # raster_layer.setDrawingStyle("MultiBandColor")
                 renderer.setRedBand(pir)
                 renderer.setGreenBand(red)
                 renderer.setBlueBand(green)
-                # rasterLayer.setRenderer( renderer )
-            # contrastForRasters( rasterLayer, 0, 0, [pir, red, green] )
-            histogram_stretching(rasterLayer, canvas)
+                # raster_layer.setRenderer( renderer )
+            # contrastForRasters( raster_layer, 0, 0, [pir, red, green] )
+            histogram_stretching(raster_layer, canvas)
 
-
-    QgsMapLayerRegistry.instance().addMapLayer(rasterLayer)
-    TerreImageConstant().legendInterface.moveLayer(rasterLayer, index_group)
+    QgsMapLayerRegistry.instance().addMapLayer(raster_layer)
+    TerreImageConstant().legendInterface.moveLayer(raster_layer, index_group)
 
 
 def addRasterLayerToQGIS(raster, layername, iface=None):
@@ -128,162 +119,164 @@ def addRasterLayerToQGIS(raster, layername, iface=None):
 
     logger.debug("index_group: " + str(index_group))
 
-    if layername == None :
+    if layername == None:
         layername = os.path.basename(raster)
 
-    rasterLayer = QgsRasterLayer(raster, layername)
-    histogram_stretching(rasterLayer, iface.mapCanvas())
+    raster_layer = QgsRasterLayer(raster, layername)
+    histogram_stretching(raster_layer, iface.mapCanvas())
 
-    QgsMapLayerRegistry.instance().addMapLayer(rasterLayer)
-    TerreImageConstant().legendInterface.moveLayer(rasterLayer, index_group)
-    return rasterLayer
+    QgsMapLayerRegistry.instance().addMapLayer(raster_layer)
+    TerreImageConstant().legendInterface.moveLayer(raster_layer, index_group)
+    return raster_layer
 
 
 def histogram_stretching(raster_layer, canvas):
-# histogramStretch( true, QgsRaster::ContrastEnhancementCumulativeCut );
-# theLimits =QgsRaster::ContrastEnhancementCumulativeCut
-#   QgsRectangle myRectangle;
-#   if ( visibleAreaOnly )
-#     myRectangle = mMapCanvas->mapRenderer()->outputExtentToLayerExtent( myRasterLayer, mMapCanvas->extent() );
-#
-#   myRasterLayer->setContrastEnhancement( QgsContrastEnhancement::StretchToMinimumMaximum, theLimits, myRectangle );
-#
-#   myRasterLayer->setCacheImage( NULL );
-#   mMapCanvas->refresh();
-    theLimits = QgsRaster.ContrastEnhancementCumulativeCut
-    logger.debug("theLimits " + str(theLimits))
-    raster_layer.setContrastEnhancement(QgsContrastEnhancement.StretchToMinimumMaximum, theLimits)
+    # histogramStretch( true, QgsRaster::ContrastEnhancementCumulativeCut );
+    # the_limits =QgsRaster::ContrastEnhancementCumulativeCut
+    #   QgsRectangle myRectangle;
+    #   if ( visibleAreaOnly )
+    #     myRectangle = mMapCanvas->mapRenderer()->outputExtentToLayerExtent( myRasterLayer, mMapCanvas->extent() );
+    #
+    #   myRasterLayer->setContrastEnhancement( QgsContrastEnhancement::StretchToMinimumMaximum, the_limits, myRectangle );
+    #
+    #   myRasterLayer->setCacheImage( NULL );
+    #   mMapCanvas->refresh();
+    the_limits = QgsRaster.ContrastEnhancementCumulativeCut
+    logger.debug("the_limits " + str(the_limits))
+    raster_layer.setContrastEnhancement(QgsContrastEnhancement.StretchToMinimumMaximum, the_limits)
     raster_layer.setCacheImage(None)
     canvas.refresh()
     canvas.repaint()
 
 
 def histogram_stretching_for_threshold(raster_layer, canvas):
-# histogramStretch( true, QgsRaster::ContrastEnhancementCumulativeCut );
-# theLimits =QgsRaster::ContrastEnhancementCumulativeCut
-#   QgsRectangle myRectangle;
-#   if ( visibleAreaOnly )
-#     myRectangle = mMapCanvas->mapRenderer()->outputExtentToLayerExtent( myRasterLayer, mMapCanvas->extent() );
-#
-#   myRasterLayer->setContrastEnhancement( QgsContrastEnhancement::StretchToMinimumMaximum, theLimits, myRectangle );
-#
-#   myRasterLayer->setCacheImage( NULL );
-#   mMapCanvas->refresh();
-    theLimits = QgsRaster. ContrastEnhancementMinMax
-    logger.debug("theLimits " + str(theLimits))
-    raster_layer.setContrastEnhancement(QgsContrastEnhancement.StretchToMinimumMaximum, theLimits)
+    # histogramStretch( true, QgsRaster::ContrastEnhancementCumulativeCut );
+    # the_limits =QgsRaster::ContrastEnhancementCumulativeCut
+    #   QgsRectangle myRectangle;
+    #   if ( visibleAreaOnly )
+    #     myRectangle = mMapCanvas->mapRenderer()->outputExtentToLayerExtent( myRasterLayer, mMapCanvas->extent() );
+    #
+    #   myRasterLayer->setContrastEnhancement( QgsContrastEnhancement::StretchToMinimumMaximum, the_limits, myRectangle );
+    #
+    #   myRasterLayer->setCacheImage( NULL );
+    #   mMapCanvas->refresh();
+    the_limits = QgsRaster. ContrastEnhancementMinMax
+    logger.debug("the_limits " + str(the_limits))
+    raster_layer.setContrastEnhancement(QgsContrastEnhancement.StretchToMinimumMaximum, the_limits)
     raster_layer.setCacheImage(None)
     canvas.refresh()
     canvas.repaint()
 
-def get_min_max_via_qgis(theRasterLayer, num_band):
-#     my_raster_stats = theRasterLayer.dataProvider().bandStatistics( num_band )#, 2, 98  )
-#     my_min = my_raster_stats.minimumValue
-#     my_max = my_raster_stats.maximumValue
-#
-    data_p = theRasterLayer.dataProvider()
-    my_min, my_max = theRasterLayer.dataProvider().cumulativeCut(num_band, 0.2, 0.98);
-    min, max = data_p.cumulativeCut(num_band, 0.02, 0.98)
-    logger.debug("qgis min max :" + str(my_min) + str(my_max))
-    logger.debug("min max 2 : " + str(min) + str(max))
+
+def get_min_max_via_qgis(the_raster_layer, num_band):
+    #     my_raster_stats = the_raster_layer.data_provider().bandStatistics( num_band )#, 2, 98  )
+    #     my_min = my_raster_stats.minimumValue
+    #     my_max = my_raster_stats.maximumValue
+    #
+    #     data_p = the_raster_layer.data_provider()
+    my_min, my_max = the_raster_layer.data_provider().cumulativeCut(num_band, 0.2, 0.98)
+    #     min, max = data_p.cumulativeCut(num_band, 0.02, 0.98)
+    #     logger.debug("qgis min max :" + str(my_min) + str(my_max))
+    #     logger.debug("min max 2 : " + str(min) + str(max))
     return my_min, my_max
 
 
-def contrastForRasters(theRasterLayer, minLayer, maxLayer, band=None):
+def contrastForRasters(the_raster_layer, min_layer, max_layer, band = None):
     """
     Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
     """
     # type of layer : raster, vector, other
-    typeOfLayer = theRasterLayer.type()
+    type_of_layer = the_raster_layer.type()
 
     # take the layer renderer to get the min and max
-    layerRenderer = theRasterLayer.renderer()  # for qgis > 1.9
-    dataProvider = theRasterLayer.dataProvider()
+    layer_renderer = the_raster_layer.renderer()  # for qgis > 1.9
+    data_provider = the_raster_layer.data_provider()
 
     # the layer has to be a raster layer
-    if typeOfLayer == 1 :
-        if theRasterLayer.rasterType() == 0 and layerRenderer:
+    if type_of_layer == 1:
+        if the_raster_layer.rasterType() == 0 and layer_renderer:
             # gray band
-            # layerRenderer <qgis.core.QgsSingleBandGrayRenderer object at 0x514caf0>
-            layerCE = layerRenderer.contrastEnhancement()
+            # layer_renderer <qgis.core.QgsSingleBandGrayRenderer object at 0x514caf0>
+            layerCE = layer_renderer.contrastEnhancement()
             # take the contrast enhancement of the layer threw the renderer
-            if layerCE :
+            if layerCE:
                 layerCE.setContrastEnhancementAlgorithm(3)  # qgis 1.9
-                layerCE.setMinimumValue(minLayer)
-                layerCE.setMaximumValue(maxLayer)
-        elif theRasterLayer.rasterType() == 2  and layerRenderer:
-            if minLayer == 0 and maxLayer == 0 :
+                layerCE.setMinimumValue(min_layer)
+                layerCE.setMaximumValue(max_layer)
+        elif the_raster_layer.rasterType() == 2 and layer_renderer:
+            if min_layer == 0 and max_layer == 0:
                 if band:
-                    min1, max1 = get_min_max_via_qgis(theRasterLayer, band[0])
-                    min2, max2 = get_min_max_via_qgis(theRasterLayer, band[1])
-                    min3, max3 = get_min_max_via_qgis(theRasterLayer, band[2])
+                    min1, max1 = get_min_max_via_qgis(the_raster_layer, band[0])
+                    min2, max2 = get_min_max_via_qgis(the_raster_layer, band[1])
+                    min3, max3 = get_min_max_via_qgis(the_raster_layer, band[2])
 
-# #                     min1, max1, _, _ = terre_image_utils.computeStatistics(theRasterLayer.source(),0, band[0])
-# #                     min2, max2, _, _ = terre_image_utils.computeStatistics(theRasterLayer.source(),0, band[1])
-# #                     min3, max3, _, _ = terre_image_utils.computeStatistics(theRasterLayer.source(),0, band[2])
+# #                     min1, max1, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(),0, band[0])
+# #                     min2, max2, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(),0, band[1])
+# #                     min3, max3, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(),0, band[2])
 # #                     #print min1, max1, min2, max2, min3, max3
                 else:
-                    min1, max1, _, _ = terre_image_utils.computeStatistics(theRasterLayer.source(), 0, 1)
-                    min2, max2, _, _ = terre_image_utils.computeStatistics(theRasterLayer.source(), 0, 2)
-                    min3, max3, _, _ = terre_image_utils.computeStatistics(theRasterLayer.source(), 0, 3)
+                    min1, max1, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(), 0, 1)
+                    min2, max2, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(), 0, 2)
+                    min3, max3, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(), 0, 3)
 
-                redEnhancement = QgsContrastEnhancement(dataProvider.dataType(0))
-                greenEnhancement = QgsContrastEnhancement(dataProvider.dataType(1))
-                blueEnhancement = QgsContrastEnhancement(dataProvider.dataType(2))
+                red_enhancement = QgsContrastEnhancement(data_provider.dataType(0))
+                green_enhancement = QgsContrastEnhancement(data_provider.dataType(1))
+                blue_enhancement = QgsContrastEnhancement(data_provider.dataType(2))
                 # set stretch to min max
-                redEnhancement.setMinimumValue(min1)
-                redEnhancement.setMaximumValue(max1)
-                greenEnhancement.setMinimumValue(min2)
-                greenEnhancement.setMaximumValue(max2)
-                blueEnhancement.setMinimumValue(min3)
-                blueEnhancement.setMaximumValue(max3)
-                redEnhancement.setContrastEnhancementAlgorithm(3)
-                greenEnhancement.setContrastEnhancementAlgorithm(3)
-                blueEnhancement.setContrastEnhancementAlgorithm(3)
-                layerRenderer.setRedContrastEnhancement(redEnhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
-                layerRenderer.setGreenContrastEnhancement(greenEnhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
-                layerRenderer.setBlueContrastEnhancement(blueEnhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
-        theRasterLayer.triggerRepaint()
+                red_enhancement.setMinimumValue(min1)
+                red_enhancement.setMaximumValue(max1)
+                green_enhancement.setMinimumValue(min2)
+                green_enhancement.setMaximumValue(max2)
+                blue_enhancement.setMinimumValue(min3)
+                blue_enhancement.setMaximumValue(max3)
+                red_enhancement.setContrastEnhancementAlgorithm(3)
+                green_enhancement.setContrastEnhancementAlgorithm(3)
+                blue_enhancement.setContrastEnhancementAlgorithm(3)
+                layer_renderer.setRedContrastEnhancement(red_enhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
+                layer_renderer.setGreenContrastEnhancement(green_enhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
+                layer_renderer.setBlueContrastEnhancement(blue_enhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
+        the_raster_layer.triggerRepaint()
 
 
 def display_one_band(layer, keyword, iface):
     index_group = TerreImageConstant().index_group
     logger.debug("keyword " + str(keyword))
-    corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir", "nat":"_couleurs_naturelles" }
+    corres = {'red': "_bande_rouge", 'green': "_bande_verte", 'blue': "_bande_bleue", \
+              'pir': "_bande_pir", 'mir': "_bande_mir", "nat": "_couleurs_naturelles"}
 
-    rasterLayer = QgsRasterLayer(layer.get_source(), layer.name() + corres[keyword])
+    raster_layer = QgsRasterLayer(layer.get_source(), layer.name() + corres[keyword])
 
     if keyword == 'nat':
         logger.debug("display on natural colors")
         band_red = layer.bands['red']
         band_green = layer.bands['green']
         band_blue = layer.bands['blue']
-        renderer = rasterLayer.renderer()
-        # rasterLayer.setDrawingStyle("MultiBandColor")
+        renderer = raster_layer.renderer()
+        # raster_layer.setDrawingStyle("MultiBandColor")
         renderer.setRedBand(band_red)
         renderer.setGreenBand(band_green)
         renderer.setBlueBand(band_blue)
-        # rasterLayer.setRenderer( renderer )
-        # contrastForRasters( rasterLayer, 0, 0, [pir, red, green] )
-        histogram_stretching(rasterLayer, iface.mapCanvas())
-        QgsMapLayerRegistry.instance().addMapLayer(rasterLayer)
-        TerreImageConstant().legendInterface.moveLayer(rasterLayer, index_group)
-        return rasterLayer
+        # raster_layer.setRenderer( renderer )
+        # contrastForRasters( raster_layer, 0, 0, [pir, red, green] )
+        histogram_stretching(raster_layer, iface.mapCanvas())
+        QgsMapLayerRegistry.instance().addMapLayer(raster_layer)
+        TerreImageConstant().legendInterface.moveLayer(raster_layer, index_group)
+        return raster_layer
     else:
 
         band = layer.bands[keyword]
-        if band :
+        if band:
             logger.debug("band num: " + str(band))
-            rasterLayer.setDrawingStyle("MultiBandSingleBandGray")
-            renderer = rasterLayer.renderer()
+            raster_layer.setDrawingStyle("MultiBandSingleBandGray")
+            renderer = raster_layer.renderer()
             logger.debug(renderer)
             renderer.setGrayBand(band)
 
-            # contrastForRasters( rasterLayer, 0, 0 )
-            histogram_stretching(rasterLayer, iface.mapCanvas())
-            QgsMapLayerRegistry.instance().addMapLayer(rasterLayer)
-            TerreImageConstant().legendInterface.moveLayer(rasterLayer, index_group)
-            return rasterLayer
+            # contrastForRasters( raster_layer, 0, 0 )
+            histogram_stretching(raster_layer, iface.mapCanvas())
+            QgsMapLayerRegistry.instance().addMapLayer(raster_layer)
+            TerreImageConstant().legendInterface.moveLayer(raster_layer, index_group)
+            return raster_layer
 
 
 def show_clicked_point(point, name, iface, vl=None):
@@ -294,18 +287,16 @@ def show_clicked_point(point, name, iface, vl=None):
             name              --    name of the layer to display the extent name_extent
             indexGroupProduct --    index of the product group in qgis where to move the layers
     """
-    canvas = iface.mapCanvas()
-
     # set True to set a define color to the extent and the world
     setColor = False
 
     # create layer
     # if vl == None :
     vl = QgsVectorLayer("Point?crs=epsg:4326", name, "memory")
-    pr = vl.dataProvider()
+    pr = vl.data_provider()
 
     # add fields
-    pr.addAttributes([ QgsField("spectral_angle", QVariant.String) ])
+    pr.addAttributes([QgsField("spectral_angle", QVariant.String)])
 
     # add a feature
     fet = QgsFeature()
@@ -317,7 +308,7 @@ def show_clicked_point(point, name, iface, vl=None):
     fet.setGeometry(geometry)
 
     # ( 4.45, 43.95 ) to (5.000403625, 44.400433068 )
-    pr.addFeatures([ fet ])
+    pr.addFeatures([fet])
 
     # set color to the extent
     if setColor:
@@ -328,16 +319,15 @@ def show_clicked_point(point, name, iface, vl=None):
             for i in xrange(symbol.symbolLayerCount()):
                 symbol.symbolLayer(i).setColor(QColor(168, 255, 0))
 
-
     # update layer's extent when new features have been added
     # because change of extent in provider is not propagated to the layer
     vl.updateExtents()
 
-    layersAdded = QgsMapLayerRegistry.instance().addMapLayers([vl])
+    QgsMapLayerRegistry.instance().addMapLayers([vl])
     return vl
 
 
-def custom_stretch(theRasterLayer, values, canvas, mono=False):
+def custom_stretch(the_raster_layer, values, canvas, mono = False):
     """
     Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
     """
@@ -347,31 +337,31 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
 
     # print "custom stretch"
     # print canvas
-    # print "layer :", theRasterLayer
+    # print "layer :", the_raster_layer
 
     # type of layer : raster, vector, other
-    typeOfLayer = theRasterLayer.type()
+    type_of_layer = the_raster_layer.type()
 
     # take the layer renderer to get the min and max
-    layerRenderer = theRasterLayer.renderer()  # for qgis > 1.9
-    dataProvider = theRasterLayer.dataProvider()
+    layer_renderer = the_raster_layer.renderer()  # for qgis > 1.9
+    data_provider = the_raster_layer.dataProvider()
 
     # print "values", values
     # the layer has to be a raster layer
-    if typeOfLayer == 1 :
-        if (theRasterLayer.rasterType() == 0 or mono) and layerRenderer:
+    if type_of_layer == 1:
+        if (the_raster_layer.rasterType() == 0 or mono) and layer_renderer:
             min_layer, max_layer = values[0]
             # gray band
-            # layerRenderer <qgis.core.QgsSingleBandGrayRenderer object at 0x514caf0>
-            grayEnhancement = QgsContrastEnhancement(dataProvider.dataType(1))
+            # layer_renderer <qgis.core.QgsSingleBandGrayRenderer object at 0x514caf0>
+            gray_enhancement = QgsContrastEnhancement(data_provider.dataType(1))
             # take the contrast enhancement of the layer threw the renderer
-            if grayEnhancement :
-                grayEnhancement.setContrastEnhancementAlgorithm(1)  # qgis 1.9
-                grayEnhancement.setMinimumValue(min_layer)
-                grayEnhancement.setMaximumValue(max_layer)
-                layerRenderer.setContrastEnhancement(grayEnhancement)
+            if gray_enhancement:
+                gray_enhancement.setContrastEnhancementAlgorithm(1)  # qgis 1.9
+                gray_enhancement.setMinimumValue(min_layer)
+                gray_enhancement.setMaximumValue(max_layer)
+                layer_renderer.setContrastEnhancement(gray_enhancement)
 
-        elif theRasterLayer.rasterType() == 2  and layerRenderer:
+        elif the_raster_layer.rasterType() == 2 and layer_renderer:
             # print "layer 3 bandes"
             min_red, max_red = values[0]
             min_green, max_green = values[1]
@@ -380,76 +370,76 @@ def custom_stretch(theRasterLayer, values, canvas, mono=False):
             logger.debug("green : " + str(min_green) + " " + str(max_green))
             logger.debug("blue : " + str(min_blue) + " " + str(max_blue))
 
-            redEnhancement = QgsContrastEnhancement(dataProvider.dataType(1))
-            greenEnhancement = QgsContrastEnhancement(dataProvider.dataType(2))
-            blueEnhancement = QgsContrastEnhancement(dataProvider.dataType(3))
-            logger.debug("redEnhancement : " + str(redEnhancement))
-            logger.debug("greenEnhancement : " + str(greenEnhancement))
-            logger.debug("blueEnhancement : " + str(blueEnhancement))
+            red_enhancement = QgsContrastEnhancement(data_provider.dataType(1))
+            green_enhancement = QgsContrastEnhancement(data_provider.dataType(2))
+            blue_enhancement = QgsContrastEnhancement(data_provider.dataType(3))
+            logger.debug("red_enhancement : " + str(red_enhancement))
+            logger.debug("green_enhancement : " + str(green_enhancement))
+            logger.debug("blue_enhancement : " + str(blue_enhancement))
 
             # set stretch to min max
-            redEnhancement.setMinimumValue(min_red)
-            redEnhancement.setMaximumValue(max_red)
-            greenEnhancement.setMinimumValue(min_green)
-            greenEnhancement.setMaximumValue(max_green)
-            blueEnhancement.setMinimumValue(min_blue)
-            blueEnhancement.setMaximumValue(max_blue)
-            logger.debug("red (1): " + str(redEnhancement.minimumValue()) + " " + str(redEnhancement.maximumValue()))
-            logger.debug("green (1): " + str(greenEnhancement.minimumValue()) + " " + str(greenEnhancement.maximumValue()))
-            logger.debug("blue (1): " + str(blueEnhancement.minimumValue()) + " " + str(blueEnhancement.maximumValue()))
-            redEnhancement.setContrastEnhancementAlgorithm(1)
-            greenEnhancement.setContrastEnhancementAlgorithm(1)
-            blueEnhancement.setContrastEnhancementAlgorithm(1)
-            logger.debug("red (2): " + str(redEnhancement.minimumValue()) + " " + str(redEnhancement.maximumValue()))
-            logger.debug("green (2): " + str(greenEnhancement.minimumValue()) + " " + str(greenEnhancement.maximumValue()))
-            logger.debug("blue (2): " + str(blueEnhancement.minimumValue()) + " " + str(blueEnhancement.maximumValue()))
+            red_enhancement.setMinimumValue(min_red)
+            red_enhancement.setMaximumValue(max_red)
+            green_enhancement.setMinimumValue(min_green)
+            green_enhancement.setMaximumValue(max_green)
+            blue_enhancement.setMinimumValue(min_blue)
+            blue_enhancement.setMaximumValue(max_blue)
+            logger.debug("red (1): " + str(red_enhancement.minimumValue()) + " " + str(red_enhancement.maximumValue()))
+            logger.debug("green (1): " + str(green_enhancement.minimumValue()) + " " + str(green_enhancement.maximumValue()))
+            logger.debug("blue (1): " + str(blue_enhancement.minimumValue()) + " " + str(blue_enhancement.maximumValue()))
+            red_enhancement.setContrastEnhancementAlgorithm(1)
+            green_enhancement.setContrastEnhancementAlgorithm(1)
+            blue_enhancement.setContrastEnhancementAlgorithm(1)
+            logger.debug("red (2): " + str(red_enhancement.minimumValue()) + " " + str(red_enhancement.maximumValue()))
+            logger.debug("green (2): " + str(green_enhancement.minimumValue()) + " " + str(green_enhancement.maximumValue()))
+            logger.debug("blue (2): " + str(blue_enhancement.minimumValue()) + " " + str(blue_enhancement.maximumValue()))
 
-            # print "blue enhancement", blueEnhancement
-            # print "blue max", blueEnhancement.maximumValue()
-            # print "blue min", blueEnhancement.minimumValue()
+            # print "blue enhancement", blue_enhancement
+            # print "blue max", blue_enhancement.maximumValue()
+            # print "blue min", blue_enhancement.minimumValue()
 
-            layerRenderer.setRedContrastEnhancement(redEnhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
-            layerRenderer.setGreenContrastEnhancement(greenEnhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
-            layerRenderer.setBlueContrastEnhancement(blueEnhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
+            layer_renderer.setRedContrastEnhancement(red_enhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
+            layer_renderer.setGreenContrastEnhancement(green_enhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
+            layer_renderer.setBlueContrastEnhancement(blue_enhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
 
             # print "layer renderer"
-            redEnhancement_debug = layerRenderer.redContrastEnhancement()
-            greenEnhancement_debug = layerRenderer.greenContrastEnhancement()
-            blueEnhancement_debug = layerRenderer.blueContrastEnhancement()
-            logger.debug("red (3): " + str(redEnhancement_debug.minimumValue()) + " " + str(redEnhancement_debug.maximumValue()))
-            logger.debug("green (3): " + str(greenEnhancement_debug.minimumValue()) + " " + str(greenEnhancement_debug.maximumValue()))
-            logger.debug("blue (3): " + str(blueEnhancement_debug.minimumValue()) + " " + str(blueEnhancement_debug.maximumValue()))
+            red_enhancement_debug = layer_renderer.redContrastEnhancement()
+            green_enhancement_debug = layer_renderer.greenContrastEnhancement()
+            blue_enhancement_debug = layer_renderer.blueContrastEnhancement()
+            logger.debug("red (3): " + str(red_enhancement_debug.minimumValue()) + " " + str(red_enhancement_debug.maximumValue()))
+            logger.debug("green (3): " + str(green_enhancement_debug.minimumValue()) + " " + str(green_enhancement_debug.maximumValue()))
+            logger.debug("blue (3): " + str(blue_enhancement_debug.minimumValue()) + " " + str(blue_enhancement_debug.maximumValue()))
 
         # print "end"
-        theRasterLayer.setCacheImage(None)
-        theRasterLayer.triggerRepaint()
+        the_raster_layer.setCacheImage(None)
+        the_raster_layer.triggerRepaint()
         # print "2"
     canvas.refresh()
     canvas.repaint()
     # print "3"
     # TODO : pourquoi lorsqu'on fait un histogramme sur la bande pir, on a pour affichage des précédentes valeurs:
     # layer renderer <qgis._core.QgsSingleBandGrayRenderer object at 0x7fdd144558a0>
-    # theRasterLayer 2
-#     print "layer renderer", layerRenderer
-#     print "theRasterLayer", theRasterLayer.rasterType()
-#     if typeOfLayer == 1:
-#         if theRasterLayer.rasterType() == 2 and layerRenderer:
-#             redEnhancement_debug = layerRenderer.redContrastEnhancement()
-#             greenEnhancement_debug = layerRenderer.greenContrastEnhancement()
-#             blueEnhancement_debug = layerRenderer.blueContrastEnhancement()
-#             logger.debug("red end: " + str(redEnhancement_debug.minimumValue()) + " " + str(redEnhancement_debug.maximumValue()))
-#             logger.debug("green end: " + str(greenEnhancement_debug.minimumValue()) + " " + str(greenEnhancement_debug.maximumValue()))
-#             logger.debug("blue end: " + str(blueEnhancement_debug.minimumValue()) + " " + str(blueEnhancement_debug.maximumValue()))
+    # the_raster_layer 2
+#     print "layer renderer", layer_renderer
+#     print "the_raster_layer", the_raster_layer.rasterType()
+#     if type_of_layer == 1:
+#         if the_raster_layer.rasterType() == 2 and layer_renderer:
+#             red_enhancement_debug = layer_renderer.redContrastEnhancement()
+#             green_enhancement_debug = layer_renderer.greenContrastEnhancement()
+#             blue_enhancement_debug = layer_renderer.blueContrastEnhancement()
+#             logger.debug("red end: " + str(red_enhancement_debug.minimumValue()) + " " + str(red_enhancement_debug.maximumValue()))
+#             logger.debug("green end: " + str(green_enhancement_debug.minimumValue()) + " " + str(green_enhancement_debug.maximumValue()))
+#             logger.debug("blue end: " + str(blue_enhancement_debug.minimumValue()) + " " + str(blue_enhancement_debug.maximumValue()))
 #     logger.info("#######################")
 
 
 def get_raster_layers():
-    canvas = TerreImageConstant().QGISCanvas
+    canvas = TerreImageConstant().canvas
 
     rasterlayers = []
 
     for i in range(canvas.layerCount()):
         layer = canvas.layer(i)
-        if (layer != None and layer.isValid() and layer.type() == QgsMapLayer.RasterLayer):
+        if layer is not None and layer.isValid() and layer.type() == QgsMapLayer.RasterLayer:
             rasterlayers.append(layer)
     return rasterlayers

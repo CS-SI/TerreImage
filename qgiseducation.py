@@ -115,7 +115,6 @@ class QGISEducation:
             self.qgisedudockwidget.close()
             self.educationWidget.disconnectP()
 
-
     # run method that performs all the real work
     def run(self):
         """
@@ -138,7 +137,6 @@ class QGISEducation:
         self.show_education_widget(bands, working_dir)
 
         # self.educationWidget.set_working_message(False)
-
 
     def show_education_widget(self, bands, working_dir):
         if ProcessingManager().working_layer and bands:
@@ -174,7 +172,6 @@ class QGISEducation:
     def about(self):
         from terre_image_about import DlgAbout
         DlgAbout(self.iface.mainWindow()).exec_()
-
 
     def close_dock(self, object):
         self.qgisedudockwidget = None

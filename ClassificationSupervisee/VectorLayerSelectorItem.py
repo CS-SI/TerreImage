@@ -5,7 +5,7 @@
 Copyright (c) Centre National d'Etudes Spatiales
 All rights reserved.
 
-The "ClassificationSupervisee" Quantum GIS plugin is distributed 
+The "ClassificationSupervisee" Quantum GIS plugin is distributed
 under the CeCILL licence version 2.
 See Copyright/Licence_CeCILL_V2-en.txt or
 http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt for more details.
@@ -26,8 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from PyQt4 import QtCore, QtGui
-from qgis.gui import *
-from qgis.core import *
+from qgis.core import QgsSingleSymbolRendererV2
+
 
 class VectorLayerSelectorItem(QtGui.QWidget):
 
@@ -40,14 +40,14 @@ class VectorLayerSelectorItem(QtGui.QWidget):
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setSpacing(2)
         self.horizontalLayout.setMargin(0)
-        
+
         self.checkbox = QtGui.QCheckBox()
         self.checkbox.setText(layer.name())
-        
+
         self.colorpicker = QtGui.QPushButton()
         self.updateColor()
         self.colorpicker.clicked.connect(self.selectColor)
-        
+
         self.horizontalLayout.addWidget(self.checkbox)
         self.horizontalLayout.addStretch()
         self.horizontalLayout.addWidget(self.colorpicker)
@@ -64,14 +64,14 @@ class VectorLayerSelectorItem(QtGui.QWidget):
         pixmap.fill(self.getColor())
         icon = QtGui.QIcon(pixmap)
         self.colorpicker.setIcon(icon)
-        
+
     def getVectorLayerColor(self, layer):
         color = QtCore.Qt.white
-        #if layer.isUsingRendererV2():
+        # if layer.isUsingRendererV2():
         rendererV2 = layer.rendererV2()
-        if isinstance(rendererV2,QgsSingleSymbolRendererV2):
+        if isinstance(rendererV2, QgsSingleSymbolRendererV2):
             sym = rendererV2.symbol()
-            color = sym.color()          
+            color = sym.color()
 #         else:
 #             renderer = layer.renderer()
 #             if isinstance(renderer,QgsSingleSymbolRenderer):
@@ -87,6 +87,6 @@ class VectorLayerSelectorItem(QtGui.QWidget):
 
     def getColor(self):
         return self.color
-        
+
     def getLabel(self):
         return self.checkbox.text()

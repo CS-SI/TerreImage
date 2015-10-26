@@ -5,7 +5,7 @@
 Copyright (c) Centre National d'Etudes Spatiales
 All rights reserved.
 
-The "ClassificationSupervisee" Quantum GIS plugin is distributed 
+The "ClassificationSupervisee" Quantum GIS plugin is distributed
 under the CeCILL licence version 2.
 See Copyright/Licence_CeCILL_V2-en.txt or
 http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt for more details.
@@ -42,34 +42,36 @@ class TreeWidgetItem(QtGui.QTreeWidgetItem):
     def setData(self, column, role, value):
         state = self.checkState(column)
         QtGui.QTreeWidgetItem.setData(self, column, role, value)
-        if (role == QtCore.Qt.CheckStateRole and
-            state != self.checkState(column)):
+        if role == QtCore.Qt.CheckStateRole and state != self.checkState(column):
             treewidget = self.treeWidget()
             if treewidget is not None:
                 treewidget.itemChecked.emit(self, column)
 
+
 class Window(QtGui.QTreeWidget):
     itemChecked = QtCore.pyqtSignal(object, int)
-    
+
     def __init__(self):
-        QtGui.QTreeWidget.__init__(self)       
-        
+        QtGui.QTreeWidget.__init__(self)
+
+
 class RasterLayerSelectorTable(QtGui.QWidget):
     itemChecked = QtCore.pyqtSignal(object, int)
+
     def __init__(self, layers, working_directory, the_layer, bands_order, parent = None):
         logger.debug( "RasterLayerSelectorTable" )
         super(RasterLayerSelectorTable, self).__init__(parent)
-        
+
         self.layers = layers
         self.the_layer = the_layer
         self.the_layer_bands = bands_order
-        
+
         self.working_dir = working_directory
-        
+
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setSpacing(2)
         self.verticalLayout.setMargin(0)
-        
+
         self.label = QtGui.QLabel("Couches images : ")
 
         self.table = QtGui.QTreeWidget()
@@ -80,21 +82,21 @@ class RasterLayerSelectorTable(QtGui.QWidget):
         self.table.setColumnCount(1)
         self.table.setColumnWidth(0,270)
         self.setTableContent()
-        
+
         self.selectallbutton = QtGui.QPushButton(u"(Dé)sélectionner tout")
         self.selectallbutton.clicked.connect(self.selectAll)
-        
+
         self.selectallbuttonlayout = QtGui.QHBoxLayout()
         self.selectallbuttonlayout.addStretch()
         self.selectallbuttonlayout.addWidget(self.selectallbutton)
         self.selectallbuttonlayout.addStretch()
-        
+
         self.verticalLayout.addWidget(self.label)
         self.verticalLayout.addWidget(self.table)
         self.verticalLayout.addLayout(self.selectallbuttonlayout)
-        
+
         self.setLayout(self.verticalLayout)
-        
+
         #self.itemChecked.connect(self.manageChild)
         #self.table.itemClicked.connect(self.manageChild1)
         self.table.itemChanged.connect(self.manageChild2)
@@ -116,14 +118,14 @@ class RasterLayerSelectorTable(QtGui.QWidget):
 
     def setTableContent(self):
         corres = { 'red':"rouge", 'green':"verte", 'blue':"bleue", 'pir':"pir", 'mir':"mir" }
-        #todo : get the layer[i] if the layer[i] is a multi band layer, add subchild for all bands
-        # todo : connecgt the multiband layer check box to a function which checks/unchecks all children
+        # TODO : get the layer[i] if the layer[i] is a multi band layer, add subchild for all bands
+        # TODO : connecgt the multiband layer check box to a function which checks/unchecks all children
         n = len(self.layers)
-        #self.table.setRowCount(n)
+        # self.table.setRowCount(n)
         for i in range(n):
             rename_bands = False
             layer = self.layers[i]
-            #item = TreeWidgetItem( self.table )
+            # item = TreeWidgetItem( self.table )
             item = QtGui.QTreeWidgetItem( self.table )
             item.setFlags(item.flags()|QtCore.Qt.ItemIsUserCheckable)
             item.setCheckState(0, QtCore.Qt.Unchecked)
@@ -133,8 +135,8 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                 rename_bands = True
             if not layer.rasterType() == 0:
                 logger.debug( "multiband" + str(layer.bandCount()) )
-                for i in range(layer.bandCount() ):
-                    if rename_bands :
+                for i in range(layer.bandCount()):
+                    if rename_bands:
                         logger.debug( self.the_layer_bands[i+1] )
                         child_name = layer.name() + "_band " + corres[self.the_layer_bands[i+1]]
                     else:
@@ -147,7 +149,6 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                     logger.debug( item_child )
                     item.addChild(item_child)
 
-
     def getSelectedOptions(self):
         logger.debug( "get selected options")
         selectedLayers = []
@@ -158,13 +159,13 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             logger.debug( "index_layer" + str(index_layer) )
             logger.debug( it.value().text(0) )
             logger.debug( it.value() )
-            
+
             widget = it.value()
-            if widget.checkState(0) == QtCore.Qt.Checked :
+            if widget.checkState(0) == QtCore.Qt.Checked:
                 logger.debug( "widget checked" )
                 selectedLayers.append(self.layers[index_layer])
                 it += widget.childCount()
-            else :
+            else:
                 logger.debug( "widget unchecked : look children" )
             #uncheked
                 # how many children are checked
@@ -196,16 +197,15 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                         # else add single bands
                         selectedLayers2 = selectedLayers + list_children
                         selectedLayers = selectedLayers2
-            
+
             it += 1
             index_layer += 1
             for item in selectedLayers:
                 logger.debug( item.name() )
-    
+
         return selectedLayers
-        
-        
-    def manageChild1( item, column ):
+
+    def manageChild1(self, item, column):
         #void 	itemClicked ( QTreeWidgetItem * item, int column )
         logger.debug( "managechild1" )
         if item.childCount() > 0:
@@ -215,13 +215,13 @@ class RasterLayerSelectorTable(QtGui.QWidget):
         for i in range( item.childCount() ):
             child_temp = item.child(i)
             child_temp.setCheckState(0, checked)
-            
-    def manageChild2( tree, item ):
+
+    def manageChild2(self, tree, item):
         #void 	itemChanged ( QTreeWidgetItem * item, int column )
         logger.debug(  "managechild2" )
         logger.debug(  "current" + str(tree) )
         logger.debug(  "previous" + str(item) )
-        
+
         if item.childCount() > 0:
             checked = QtCore.Qt.Unchecked
             if item.checkState(0) == QtCore.Qt.Checked:
@@ -229,16 +229,14 @@ class RasterLayerSelectorTable(QtGui.QWidget):
         for i in range( item.childCount() ):
             child_temp = item.child(i)
             child_temp.setCheckState(0, checked)
-            
-            
-           
-    def manageChild3( tree, item ):
+
+    def manageChild3(self, tree, item):
         #void 	currentItemChanged ( QTreeWidgetItem * current, QTreeWidgetItem * previous )
         logger.debug(  "managechild3" )
         logger.debug(  "current" + str(tree) )
         logger.debug(  "previous" + str(item) )
-        
-        
+
+
         if item.childCount() > 0:
             checked = QtCore.Qt.Unchecked
             if item.checkState(0) == QtCore.Qt.Checked:
@@ -246,16 +244,14 @@ class RasterLayerSelectorTable(QtGui.QWidget):
         for i in range( item.childCount() ):
             child_temp = item.child(i)
             child_temp.setCheckState(0, checked)
-            
-       
 
     def rasterToVRT( self, filename, band_number ):
         """Convert a raster layer into a single VRT
         It allow to give a SRC to a focal plane product and display it automatically in (0,0)
-        
+
         Keyword arguments:
                 filenames    --    raster layer to load
-                
+
         Returns a string containing the vrt xml
         """
         logger.debug( filename + str(band_number) )
@@ -263,16 +259,16 @@ class RasterLayerSelectorTable(QtGui.QWidget):
         if ds is not None :
             band = ds.GetRasterBand(band_number)
             rootNode = ET.Element( 'VRTDataset' )
-            
+
             #endif
             bandNode = ET.SubElement( rootNode, "VRTRasterBand", {'band': '1'} )
-        
+
             totalXSize = ds.RasterXSize
             totalYSize = ds.RasterYSize
         #    logger.debug( "totalYSize from rasterToVRT:" + str(totalYSize))
-            
+
             dataType = gdal.GetDataTypeName(band.DataType)
-            
+
             # <SourceFilename relativeToVRT="1">nine_band.dat</SourceFilename>
             sourceNode = ET.SubElement(bandNode, 'SimpleSource')
             node = ET.SubElement(sourceNode, 'SourceFilename', {'relativeToVRT': '1'})
@@ -280,10 +276,10 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             # <SourceBand>1</SourceBand>
             node = ET.SubElement(sourceNode, 'SourceBand')
             node.text = str(band_number)
-        
+
             rootNode.attrib['rasterXSize'] = str(totalXSize)
             rootNode.attrib['rasterYSize'] = str(totalYSize)
-            
+
             geotransform = ds.GetGeoTransform()
             ftuple = tuple(map(str, geotransform))
             logger.debug(  type(geotransform) )
@@ -292,10 +288,10 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             node = ET.SubElement(rootNode, 'SRS')
             node.text = ds.GetProjection() #"EPSG:4326"  # projection
             bandNode.attrib['dataType'] = dataType
-            
+
             logger.debug( 'Projection is ' + str(ds.GetProjection()) )
             logger.debug( "geotransform" + str(ds.GetGeoTransform() ) )
-            
+
             ds = None
             stringToReturn = ET.tostring(rootNode)
 
@@ -304,12 +300,11 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                 writer = open( vrt_name, 'w')
                 writer.write( stringToReturn )
                 writer.close()
-                
+
             layer = QgsRasterLayer( vrt_name, os.path.basename(filename) + "_b" + str(band_number) )
-            
+
             return layer #stringToReturn
-        
-        
+
     def set_layers(self, layers):
         self.table.clear()
         self.layers = layers

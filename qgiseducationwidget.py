@@ -36,6 +36,10 @@ from terre_image_histogram import TerreImageHistogram_monoband
 from terre_image_manager import TerreImageManager
 from processing_manager import ProcessingManager
 
+import sys
+sys.path.append("/home/amondot/.eclipse/org.eclipse.platform_3.8_155965261/plugins/org.python.pydev_4.3.0.201508182223/pysrc/")
+from pydevd import *
+
 # import loggin for debug messages
 import logging
 logging.basicConfig()
@@ -424,6 +428,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
 
     def layer_deleted(self, layer_id):
+
+        settrace()
+
         # logger.debug( str(layer_id) + " deleted")
         # print str(layer_id) + " deleted"
         layer_id = layer_id.encode('utf-8')

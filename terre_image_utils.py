@@ -48,11 +48,11 @@ def fill_default_directory():
     Creates working directory
     Fills the output directory line edit if ui given
     """
-    datetimeNow = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    currentDirectory = os.path.join(os.getenv("HOME"), "TerreImage", datetimeNow)
-    if not os.path.exists(currentDirectory):
-        os.makedirs(currentDirectory)
-    return currentDirectory, datetimeNow
+    datetime_now = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    current_directory = os.path.join(os.getenv("HOME"), "TerreImage", datetime_now)
+    if not os.path.exists(current_directory):
+        os.makedirs(current_directory)
+    return current_directory, datetime_now
 
 
 def getOutputDirectory(ui):
@@ -64,25 +64,24 @@ def getOutputDirectory(ui):
         path = ui.lineEdit_working_dir.text()
     else:
         path = QDir.currentPath()
-    outputDirectory = ""
-    dirDest = QFileDialog.getExistingDirectory(None, str("Répertoire de destination des fichiers de TerreImage"), path)
-    if dirDest :
+    output_directory = ""
+    dir_dest = QFileDialog.getExistingDirectory(None, str("Répertoire de destination des fichiers de TerreImage"), path)
+    if dir_dest:
 #         try :
-#             str(dirDest)
-        ui.lineEdit_working_dir.setText(dirDest)
-        outputDirectory = dirDest
-        update_subdirectories(outputDirectory)
+#             str(dir_dest)
+        ui.lineEdit_working_dir.setText(dir_dest)
+        output_directory = dir_dest
+        update_subdirectories(output_directory)
 
 #         except UnicodeEncodeError:
 #             QMessageBox.warning( None , "Erreur", u'Le répertoire que vous avec sélectionné contient un ou des caractères spéciaux. \
 # La version actuelle du plugin ne gère pas ce type de répertoires. \
 # Veuillez renommer le répertoire ou choisir un autre emplacement.', QMessageBox.Ok )
 
+    return output_directory
 
-    return outputDirectory
 
-
-def update_subdirectories(outputDirectory):
+def update_subdirectories(output_directory):
     """
     Create sub directories for the processings:
 
@@ -92,8 +91,8 @@ def update_subdirectories(outputDirectory):
     """
     sub = ['Classification', 'Internal']
     for item in sub:
-        if not os.path.exists(os.path.join(outputDirectory, item)):
-            os.makedirs(os.path.join(outputDirectory, item))
+        if not os.path.exists(os.path.join(output_directory, item)):
+            os.makedirs(os.path.join(output_directory, item))
 
 
 def working_layer(canvas):
@@ -101,13 +100,13 @@ def working_layer(canvas):
     layer = WorkingLayer(source, canvas.currentLayer())
 
     # self.layer = self.canvas.currentLayer()
-    if layer :
+    if layer:
         # self.define_bands(self.layer)
         # manage_bands()
         # self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
         red, green, blue, pir, mir = manage_bands().get_values()
 
-        bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
+        bands = {'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir}
         layer.set_bands(bands)
 
         logger.debug(str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
@@ -134,44 +133,43 @@ def set_current_layer(iface):
 
 def get_workinglayer_on_opening(iface):
     settings = QSettings()
-    lastFolder = settings.value("terre_image_lastFolder")
+    last_folder = settings.value("terre_image_last_folder")
 
-    if lastFolder:
-        path = lastFolder
+    if last_folder:
+        path = last_folder
     else:
         path = QDir.currentPath()
 
-    fileOpened = QFileDialog.getOpenFileName(None, "Selectionner un fichier raster", path)
+    file_opened = QFileDialog.getOpenFileName(None, "Selectionner un fichier raster", path)
 
-    settings.setValue("terre_image_lastFolder", os.path.dirname(fileOpened))
+    settings.setValue("terre_image_last_folder", os.path.dirname(file_opened))
     settings.sync()
 
-    if fileOpened:
+    if file_opened:
 #         try:
-#             str(fileOpened)
+#             str(file_opened)
 #         except UnicodeEncodeError:
 #             QMessageBox.warning( None , "Erreur", u'L\'image que vous essayez d\'ouvrir contient un ou des caractères spéciaux. \
 # La version actuelle du plugin ne gère pas ce type de fichiers. \
 # Veuillez renommer le fichier et ou les répertoires le contenant.', QMessageBox.Ok )
 #             return None, None
 #         else:
-#             if fileOpened.find(" ") != -1:
+#             if file_opened.find(" ") != -1:
 #                 QMessageBox.warning( None , "Attention", u'L\'image que vous essayez d\'ouvrir contient un ou plusieurs espaces. Les traitements sur cette image provoqueront une erreur.'.encode('utf8'), QMessageBox.Ok )
 
-
-        if fileOpened.endswith(".qgs"):
+        if file_opened.endswith(".qgs"):
             # open new qgis project
             pass
-        else :
-            raster_layer = manage_QGIS.get_raster_layer(fileOpened, os.path.splitext(os.path.basename(fileOpened))[0])
-            if not os.name == "posix" :
+        else:
+            raster_layer = manage_QGIS.get_raster_layer(file_opened, os.path.splitext(os.path.basename(file_opened))[0])
+            if not os.name == "posix":
                 terre_image_processing.set_OTB_PATH()
-            type_image = terre_image_processing.get_sensor_id(fileOpened)
+            type_image = terre_image_processing.get_sensor_id(file_opened)
             logger.debug("type_image " + str(type_image))
-            layer = WorkingLayer(fileOpened, raster_layer)
+            layer = WorkingLayer(file_opened, raster_layer)
             layer.set_type(type_image)
             # self.layer = self.canvas.currentLayer()
-            if layer :
+            if layer:
                 # self.define_bands(self.layer)
                 # manage_bands()
                 # self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
@@ -179,18 +177,16 @@ def get_workinglayer_on_opening(iface):
 
                 if red != -1 or green != -1 or blue != -1 or pir != -1 or mir != -1:
                     all_set = True
-                    bands = { 'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir }
+                    bands = {'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir}
 #                         for i in bands.values():
 #                             if bands.values().count(i) > 1:
 #                                 doublon = True
 #                                 break
 #                         if not doublon :
                     for i in range(1, layer.get_band_number() + 1):
-                        if not i in bands.values():
+                        if i not in bands.values():
                             all_set = False
                     if all_set:
-
-
                         layer.set_bands(bands)
 
                         logger.debug(str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
@@ -198,12 +194,13 @@ def get_workinglayer_on_opening(iface):
                         cst = TerreImageConstant()
                         cst.index_group = cst.iface.legendInterface().addGroup("Terre Image", True, None)
 
-
                         manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
-                        compute_overviews(fileOpened)
+                        compute_overviews(file_opened)
                         return layer, bands
                     else:
-                        QMessageBox.warning(None , "Erreur", u'Il y a un problème dans la définition des bandes spectrales.', QMessageBox.Ok)
+                        QMessageBox.warning(None, "Erreur",
+                                            u'Il y a un problème dans la définition des bandes spectrales.',
+                                            QMessageBox.Ok)
                         return None, None
                 else:
                     return None, None
@@ -211,10 +208,10 @@ def get_workinglayer_on_opening(iface):
         return None, None
 
 
-def restore_working_layer(filename, bands, type):
+def restore_working_layer(filename, bands, layer_type):
     raster_layer = manage_QGIS.get_raster_layer(filename, os.path.splitext(os.path.basename(filename))[0])
     layer = WorkingLayer(filename, raster_layer)
-    layer.set_type(type)
+    layer.set_type(layer_type)
     layer.set_bands(bands)
     return layer, bands
 
@@ -231,21 +228,21 @@ def computeStatistics(OneFeature, i, j=None, nodata=True):
     logger.debug("one feature : " + OneFeature)
 
     # saving the feature only for testing
-    outOne = OneFeature + str(i) + ".tif"
-    shutil.copy(OneFeature, outOne)
-    logger.debug(outOne)
+    out_one = OneFeature + str(i) + ".tif"
+    shutil.copy(OneFeature, out_one)
+    logger.debug(out_one)
     # /testing
 
     dataset = gdal.Open(str(OneFeature), gdal.GA_ReadOnly)
     # dataset  : GDALDataset
     if dataset is None:
         print "Error : Opening file ", OneFeature
-    else :
-        if j == None :
+    else:
+        if j == None:
             band = dataset.GetRasterBand(1)
-        else :
+        else:
             band = dataset.GetRasterBand(j)
-        if nodata :
+        if nodata:
             band.SetNoDataValue(0)
         stats = band.ComputeStatistics(False)
 
@@ -258,6 +255,9 @@ def computeStatistics(OneFeature, i, j=None, nodata=True):
 
 
 def compute_overviews(filename):
+    """
+    Runs gdaladdo on the given filename
+    """
     if not os.path.isfile(filename + ".ovr"):
         command = "gdaladdo "
         command += " -ro "

@@ -26,7 +26,7 @@ import terre_image_utils
 import terre_image_processing
 from processing_manager import ProcessingManager
 
-from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
+from qgis.core import QGis, QgsMapLayerRegistry
 from qgis.gui import QgsRubberBand
 
 from PyQt4.QtGui import QColor
@@ -50,11 +50,6 @@ class TerreImageTask(object):
         self.histogram = None
         self.output_working_layer = None
         self.mirror = None
-
-
-    def get_mirror_map(self):
-        return self.mirrormap
-
 
     def freezeCanvas(self, setFreeze):
         if setFreeze:
@@ -94,15 +89,13 @@ class TerreImageProcessing(TerreImageTask, QObject):
 
         self.run()
 
-
     def __str__(self):
         message = self.processing_name
-        if self.output_working_layer.source_file :
+        if self.output_working_layer.source_file:
             message += " : \t status ok \t image resultante :" + self.output_working_layer.source_file
             message += "\t mirror:" + str(self.mirror)
 
         return message
-
 
     def run(self):
         logger.debug("run, processing name" + str(self.processing_name))
@@ -130,7 +123,7 @@ class TerreImageProcessing(TerreImageTask, QObject):
         if "KMEANS" in self.processing_name:
             if self.arg:
                 output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.iface, self.arg)
-            else :
+            else:
                 output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.iface)
         if "Seuillage" in self.processing_name and self.arg:
             logger.debug("this is thrshold")
@@ -140,10 +133,8 @@ class TerreImageProcessing(TerreImageTask, QObject):
             logger.debug(output_filename)
             self.display(output_filename)
 
-
     def get_filename_result(self):
         return self.output_working_layer.source_file
-
 
     def get_output_working_layer(self):
         if not isinstance(self.output_working_layer, WorkingLayer):
@@ -157,13 +148,13 @@ class TerreImageProcessing(TerreImageTask, QObject):
         else:
             return self.output_working_layer
 
-
     def display(self, output_filename):
 #         if "Angle Spectral" in self.processing_name:
 #             print self.rubberband
 #             print self.rubberband.getPoint(0)
         self.freezeCanvas(True)
-        # result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
+        # result_layer = manage_QGIS.get_raster_layer( output_filename,
+        # os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
         if self.r_layer:
             result_layer = self.r_layer
         else:
@@ -183,17 +174,18 @@ class TerreImageProcessing(TerreImageTask, QObject):
         self.mirror.mainWidget.onExtentsChanged()
         # 1 mettre image en queue
 
-        ifaceLegend = self.iface.legendInterface()
-        ifaceLayers = QgsMapLayerRegistry.instance().mapLayers()
-        logger.debug("ifacelayers" + str(ifaceLayers))
+        iface_legend = self.iface.legendInterface()
+        iface_layers = QgsMapLayerRegistry.instance().mapLayers()
+        logger.debug("ifacelayers" + str(iface_layers))
         id_layer = result_layer.id()
         logger.debug("id_layer" + str(id_layer))
         logger.debug("result layer" + str(result_layer))
         # QgsMapLayerRegistry.instance().mapLayers()
-        # {u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>, u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
-        ifaceLegend.setLayerVisible(result_layer, False)
+        # {u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>,
+        # u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
+        iface_legend.setLayerVisible(result_layer, False)
         self.iface.mapCanvas().refresh()
-        logger.debug(ifaceLegend.isLayerVisible(result_layer))
+        logger.debug(iface_legend.isLayerVisible(result_layer))
 
         ProcessingManager().add_processing(self)
 
@@ -211,7 +203,8 @@ class TerreImageDisplay(TerreImageTask):
         """
         super(TerreImageDisplay, self).__init__(iface, working_dir, layer, mirror_map_tool)
 
-        self.corres = { 'nat':"Couleurs naturelles", 'red':"Bande rouge", 'green':"Bande verte", 'blue':"Bande bleue", 'pir':"Bande pir", 'mir':"Bande mir" }
+        self.corres = {'nat': "Couleurs naturelles", 'red': "Bande rouge", 'green': "Bande verte",
+                       'blue': "Bande bleue", 'pir': "Bande pir", 'mir': "Bande mir"}
 
         self.who = who
         self.processing_name = self.corres[who]
@@ -220,11 +213,8 @@ class TerreImageDisplay(TerreImageTask):
         self.arg = None
         if arg:
             self.arg = arg
-
         self.r_layer = rlayer
-
         self.run()
-
 
     def run(self):
         self.freezeCanvas(True)
@@ -240,26 +230,28 @@ class TerreImageDisplay(TerreImageTask):
             self.mirror.mainWidget.addLayer(result_layer.id())
             self.mirror.mainWidget.onExtentsChanged()
 
-            ifaceLegend = self.iface.legendInterface()
-            ifaceLayers = QgsMapLayerRegistry.instance().mapLayers()
-            logger.debug("ifacelayers" + str(ifaceLayers))
-            id_layer = result_layer.id()
+            iface_legend = self.iface.legendInterface()
+            iface_layers = QgsMapLayerRegistry.instance().mapLayers()
+            logger.debug("ifacelayers" + str(iface_layers))
+            # id_layer = result_layer.id()
             # logger.debug( "id_layer" + str( id_layer ))
             # logger.debug( "result layer" + str( result_layer ))
             # QgsMapLayerRegistry.instance().mapLayers()
-            # {u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>, u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
-            ifaceLegend.setLayerVisible(result_layer, False)
+            # {u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>,
+            # u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
+            iface_legend.setLayerVisible(result_layer, False)
             self.iface.mapCanvas().refresh()
-            logger.debug(ifaceLegend.isLayerVisible(result_layer))
+            logger.debug(iface_legend.isLayerVisible(result_layer))
 
             ProcessingManager().add_display(self)
             # thaw the canvas
             self.freezeCanvas(False)
 
-
     def __str__(self):
+        """
+        Implements str method for debbuging
+        """
         message = self.processing_name
-        if self.output_working_layer.source_file :
+        if self.output_working_layer.source_file:
             message += "\t mirror:" + str(self.mirror)
-
         return message
