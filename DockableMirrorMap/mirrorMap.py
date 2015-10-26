@@ -210,7 +210,8 @@ class MirrorMap(QWidget):
         self.canvas.setRenderFlag(False)
 
         cl = self.layerId2canvasLayer[ layerId ]
-        del self.layerId2canvasLayer[ layerId ]
+        if cl is not None:
+            del self.layerId2canvasLayer[ layerId ]
         self.canvasLayers.remove(cl)
         self.canvas.setLayerSet(self.canvasLayers)
         del cl

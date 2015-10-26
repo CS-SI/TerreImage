@@ -105,7 +105,9 @@ class TerreImageManager():
         # print process
         if process:
             try:
-                QgsMapLayerRegistry.instance().removeMapLayer(process[0].output_working_layer.qgis_layer.id())
+                # WARNING Comment this line to make the plugin work on Windows
+                if process[0].output_working_layer.qgis_layer.id() in self.canvas.layers():
+                    QgsMapLayerRegistry.instance().removeMapLayer(process[0].output_working_layer.qgis_layer.id())
                 ProcessingManager().remove_processing(process[0])
                 ProcessingManager().remove_display(process[0])
             except KeyError:
