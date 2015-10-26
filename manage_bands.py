@@ -55,6 +55,7 @@ class manage_bands:
         self.blue = None
         self.pir = None
         self.mir = None
+        self.satellite = "Non renseigné"
 
         # connect the qdialog button box
         # QObject.connect(self.bandsUi.buttonBox, SIGNAL("accepted()"), self.set_bands)
@@ -304,6 +305,7 @@ class manage_bands:
         self.mir = -1
         self.update_blue_mir("blue")
         self.update_spin_box()
+        self.satellite = "Formosat"
         self.bandsUi.radioButton_formosat.setEnabled(True)
 
     def define_pleiade(self):
@@ -321,6 +323,7 @@ class manage_bands:
         self.mir = -1
         self.update_blue_mir("blue")
         self.update_spin_box()
+        self.satellite = "Pleiade"
         self.bandsUi.radioButton_pleiades.setEnabled(True)
 
 
@@ -344,6 +347,7 @@ class manage_bands:
             else:
                 self.update_blue_mir("none")
         self.update_spin_box()
+        self.satellite = "Spot"
         self.bandsUi.radioButton_spot.setEnabled(True)
 
 
@@ -354,4 +358,4 @@ class manage_bands:
 #         self.pir = self.bandsUi.spinBox_pir.value()
 #         self.mir = self.bandsUi.spinBox_mir.value()
         # print self.red
-        return self.red, self.green, self.blue, self.pir, self.mir
+        return self.red, self.green, self.blue, self.pir, self.mir, self.satellite

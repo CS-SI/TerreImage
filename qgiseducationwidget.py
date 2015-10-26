@@ -23,8 +23,9 @@
 from PyQt4 import QtCore, QtGui
 from ui_qgiseducation import Ui_QGISEducation
 # create the dialog for zoom to point
+# import GDAL and QGIS libraries
+from osgeo import gdal
 from qgis.gui import QgsRubberBand, QgsMessageBar
-
 from qgis.core import QGis, QgsMapLayerRegistry
 
 from terre_image_task import TerreImageProcessing
@@ -35,10 +36,6 @@ from terre_image_histogram import TerreImageHistogram_multiband
 from terre_image_histogram import TerreImageHistogram_monoband
 from terre_image_manager import TerreImageManager
 from processing_manager import ProcessingManager
-
-import sys
-sys.path.append("/home/amondot/.eclipse/org.eclipse.platform_3.8_155965261/plugins/org.python.pydev_4.3.0.201508182223/pysrc/")
-from pydevd import *
 
 # import loggin for debug messages
 import logging
@@ -131,6 +128,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.label_travail_en_cours.hide()
         self.label_travail_en_cours.setTextFormat(1)
         self.label_travail_en_cours.setText('<html><b><font size="4" color="red">Travail en cours...</font></b></html>')
+
+        QtCore.QObject.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.display_metadata)
+
 
 
     def status(self):
@@ -426,10 +426,55 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 #     def spectral_angles( self ):
 #         self.angle_tool.get_point_for_angles(self.layer)
 
+    def display_metadata(self):
+
+        # get image size and resolution
+        dataset = gdal.Open(ProcessingManager().working_layer.source_file)
+        if dataset is not None:
+            total_size_x = dataset.RasterXSize
+            total_size_y = dataset.RasterYSize
+            geotransform = dataset.GetGeoTransform()
+            pixel_size_x = geotransform[1]
+            pixel_size_y = geotransform[5]
+
+        list_to_display = [(u"Satellite", ProcessingManager().working_layer.type),
+                                  (u"Lieu", "TO BE DEFINED"),
+                                  (u"Lignes", str(total_size_x)),
+                                  (u"Colonnes", str(total_size_y)),
+                                  (u"Résolution", "TOBEDEFINED" + str(pixel_size_x))]
+
+
+        # QtableWidget
+        self.tableWidget.setHorizontalHeaderLabels([u"Métadonnée", "Valeur"])
+        line_index = 0
+        self.tableWidget.setRowCount(len(list_to_display))
+
+        for key, value in list_to_display:
+            key_item = QtGui.QTableWidgetItem(key)
+            self.tableWidget.setItem(line_index, 0, key_item)
+            value_item = QtGui.QTableWidgetItem(value)
+            self.tableWidget.setItem(line_index, 1, value_item)
+            line_index += 1
+
+        # QTreeWidget
+        self.treeWidget.clear()
+        header = QtGui.QTreeWidgetItem([u"Métadonnée", "Valeur"])
+        self.treeWidget.setHeaderItem(header)
+
+        root = QtGui.QTreeWidgetItem(self.treeWidget, ["Image de travail"])
+        for key, value in list_to_display:
+            A = QtGui.QTreeWidgetItem(root, [key, str(value)])
+        self.treeWidget.resizeColumnToContents(0)
+        self.treeWidget.resizeColumnToContents(1)
+
+#         A = QtGui.QTreeWidgetItem(root, ["A"])
+#
+#         barA = QtGui.QTreeWidgetItem(A, ["bar", "i", "ii"])
+#         bazA = QtGui.QTreeWidgetItem(A, ["baz", "a", "b"])
+
+        root.setExpanded(True)
 
     def layer_deleted(self, layer_id):
-
-        settrace()
 
         # logger.debug( str(layer_id) + " deleted")
         # print str(layer_id) + " deleted"

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>323</width>
-    <height>567</height>
+    <width>431</width>
+    <height>894</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,23 +22,109 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Fausses couleurs:            Couleurs naturelles:
+    <widget class="QToolBox" name="toolBox">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="page_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>400</width>
+        <height>86</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>Informations sur les bandes</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Fausses couleurs:            Couleurs naturelles:
 Plan R &lt;- BS_PIR              Plan R &lt;- BS_R 
 Plan V &lt;- BS_R                  Plan V &lt;- BS_V 
 Plan B &lt;- BS_V                  Plan B &lt;- BS_B</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_4">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>413</width>
+        <height>146</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>Informations sur l'image</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QTableWidget" name="tableWidget">
+         <property name="columnCount">
+          <number>2</number>
+         </property>
+         <column/>
+         <column/>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Informations sur les bandes</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Fausses couleurs:            Couleurs naturelles:
+Plan R &lt;- BS_PIR              Plan R &lt;- BS_R 
+Plan V &lt;- BS_R                  Plan V &lt;- BS_V 
+Plan B &lt;- BS_V                  Plan B &lt;- BS_B</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Informations sur l'image</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QTreeWidget" name="treeWidget">
+         <column>
+          <property name="text">
+           <string notr="true">1</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
     <widget class="QComboBox" name="comboBox_sprectral_band_display"/>
    </item>
    <item>
-    <widget class="QComboBox" name="comboBox_processing"/>
+    <widget class="QComboBox" name="comboBox_histogrammes"/>
    </item>
    <item>
-    <widget class="QComboBox" name="comboBox_histogrammes"/>
+    <widget class="QComboBox" name="comboBox_processing"/>
    </item>
    <item>
     <widget class="QPushButton" name="pushButton_histogramme">

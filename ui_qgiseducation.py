@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_qgiseducation.ui'
 #
-# Created: Tue Apr  7 10:54:47 2015
-#      by: PyQt4 UI code generator 4.9.1
+# Created: Mon Oct 26 18:37:45 2015
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -12,30 +12,79 @@ from PyQt4 import QtCore, QtGui
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
-    _fromUtf8 = lambda s: s
+    def _fromUtf8(s):
+        return s
+
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
 
 class Ui_QGISEducation(object):
     def setupUi(self, QGISEducation):
         QGISEducation.setObjectName(_fromUtf8("QGISEducation"))
-        QGISEducation.resize(323, 567)
+        QGISEducation.resize(431, 894)
         self.verticalLayout = QtGui.QVBoxLayout(QGISEducation)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.label_travail_en_cours = QtGui.QLabel(QGISEducation)
         self.label_travail_en_cours.setText(_fromUtf8(""))
         self.label_travail_en_cours.setObjectName(_fromUtf8("label_travail_en_cours"))
         self.verticalLayout.addWidget(self.label_travail_en_cours)
-        self.label = QtGui.QLabel(QGISEducation)
+        self.toolBox = QtGui.QToolBox(QGISEducation)
+        self.toolBox.setObjectName(_fromUtf8("toolBox"))
+        self.page_3 = QtGui.QWidget()
+        self.page_3.setGeometry(QtCore.QRect(0, 0, 400, 86))
+        self.page_3.setObjectName(_fromUtf8("page_3"))
+        self.verticalLayout_5 = QtGui.QVBoxLayout(self.page_3)
+        self.verticalLayout_5.setObjectName(_fromUtf8("verticalLayout_5"))
+        self.label = QtGui.QLabel(self.page_3)
         self.label.setObjectName(_fromUtf8("label"))
-        self.verticalLayout.addWidget(self.label)
+        self.verticalLayout_5.addWidget(self.label)
+        self.toolBox.addItem(self.page_3, _fromUtf8(""))
+        self.page_4 = QtGui.QWidget()
+        self.page_4.setGeometry(QtCore.QRect(0, 0, 413, 146))
+        self.page_4.setObjectName(_fromUtf8("page_4"))
+        self.horizontalLayout_4 = QtGui.QHBoxLayout(self.page_4)
+        self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
+        self.tableWidget = QtGui.QTableWidget(self.page_4)
+        self.tableWidget.setColumnCount(2)
+        self.tableWidget.setObjectName(_fromUtf8("tableWidget"))
+        self.tableWidget.setRowCount(0)
+        self.horizontalLayout_4.addWidget(self.tableWidget)
+        self.toolBox.addItem(self.page_4, _fromUtf8(""))
+        self.verticalLayout.addWidget(self.toolBox)
+        self.tabWidget = QtGui.QTabWidget(QGISEducation)
+        self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
+        self.tab = QtGui.QWidget()
+        self.tab.setObjectName(_fromUtf8("tab"))
+        self.verticalLayout_4 = QtGui.QVBoxLayout(self.tab)
+        self.verticalLayout_4.setObjectName(_fromUtf8("verticalLayout_4"))
+        self.label_2 = QtGui.QLabel(self.tab)
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.verticalLayout_4.addWidget(self.label_2)
+        self.tabWidget.addTab(self.tab, _fromUtf8(""))
+        self.tab_2 = QtGui.QWidget()
+        self.tab_2.setObjectName(_fromUtf8("tab_2"))
+        self.verticalLayout_7 = QtGui.QVBoxLayout(self.tab_2)
+        self.verticalLayout_7.setObjectName(_fromUtf8("verticalLayout_7"))
+        self.treeWidget = QtGui.QTreeWidget(self.tab_2)
+        self.treeWidget.setObjectName(_fromUtf8("treeWidget"))
+        self.treeWidget.headerItem().setText(0, _fromUtf8("1"))
+        self.verticalLayout_7.addWidget(self.treeWidget)
+        self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
+        self.verticalLayout.addWidget(self.tabWidget)
         self.comboBox_sprectral_band_display = QtGui.QComboBox(QGISEducation)
         self.comboBox_sprectral_band_display.setObjectName(_fromUtf8("comboBox_sprectral_band_display"))
         self.verticalLayout.addWidget(self.comboBox_sprectral_band_display)
-        self.comboBox_processing = QtGui.QComboBox(QGISEducation)
-        self.comboBox_processing.setObjectName(_fromUtf8("comboBox_processing"))
-        self.verticalLayout.addWidget(self.comboBox_processing)
         self.comboBox_histogrammes = QtGui.QComboBox(QGISEducation)
         self.comboBox_histogrammes.setObjectName(_fromUtf8("comboBox_histogrammes"))
         self.verticalLayout.addWidget(self.comboBox_histogrammes)
+        self.comboBox_processing = QtGui.QComboBox(QGISEducation)
+        self.comboBox_processing.setObjectName(_fromUtf8("comboBox_processing"))
+        self.verticalLayout.addWidget(self.comboBox_processing)
         self.pushButton_histogramme = QtGui.QPushButton(QGISEducation)
         self.pushButton_histogramme.setObjectName(_fromUtf8("pushButton_histogramme"))
         self.verticalLayout.addWidget(self.pushButton_histogramme)
@@ -92,22 +141,32 @@ class Ui_QGISEducation(object):
         self.verticalLayout.addItem(spacerItem)
 
         self.retranslateUi(QGISEducation)
+        self.toolBox.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(QGISEducation)
 
     def retranslateUi(self, QGISEducation):
-        QGISEducation.setWindowTitle(QtGui.QApplication.translate("QGISEducation", "QGISEducation", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("QGISEducation", "Fausses couleurs:            Couleurs naturelles:\n"
+        QGISEducation.setWindowTitle(_translate("QGISEducation", "QGISEducation", None))
+        self.label.setText(_translate("QGISEducation", "Fausses couleurs:            Couleurs naturelles:\n"
 "Plan R <- BS_PIR              Plan R <- BS_R \n"
 "Plan V <- BS_R                  Plan V <- BS_V \n"
-"Plan B <- BS_V                  Plan B <- BS_B", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_histogramme.setText(QtGui.QApplication.translate("QGISEducation", "Histogramme", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_profil_spectral.setText(QtGui.QApplication.translate("QGISEducation", "Profil spectral", None, QtGui.QApplication.UnicodeUTF8))
-        self.groupBox_5.setTitle(QtGui.QApplication.translate("QGISEducation", "Classification", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_kmeans.setText(QtGui.QApplication.translate("QGISEducation", "Classification non supervisée", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_plugin_classification.setText(QtGui.QApplication.translate("QGISEducation", "Classification supervisée", None, QtGui.QApplication.UnicodeUTF8))
-        self.groupBox.setTitle(QtGui.QApplication.translate("QGISEducation", "Répertoire de sortie", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_working_dir.setText(QtGui.QApplication.translate("QGISEducation", "...", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_kmz.setText(QtGui.QApplication.translate("QGISEducation", "Export KMZ", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_status.setText(QtGui.QApplication.translate("QGISEducation", "Status", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_a_s.setText(QtGui.QApplication.translate("QGISEducation", "Légende de l\'angle spectral:", None, QtGui.QApplication.UnicodeUTF8))
+"Plan B <- BS_V                  Plan B <- BS_B", None))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page_3), _translate("QGISEducation", "Informations sur les bandes", None))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page_4), _translate("QGISEducation", "Informations sur l\'image", None))
+        self.label_2.setText(_translate("QGISEducation", "Fausses couleurs:            Couleurs naturelles:\n"
+"Plan R <- BS_PIR              Plan R <- BS_R \n"
+"Plan V <- BS_R                  Plan V <- BS_V \n"
+"Plan B <- BS_V                  Plan B <- BS_B", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("QGISEducation", "Informations sur les bandes", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("QGISEducation", "Informations sur l\'image", None))
+        self.pushButton_histogramme.setText(_translate("QGISEducation", "Histogramme", None))
+        self.pushButton_profil_spectral.setText(_translate("QGISEducation", "Profil spectral", None))
+        self.groupBox_5.setTitle(_translate("QGISEducation", "Classification", None))
+        self.pushButton_kmeans.setText(_translate("QGISEducation", "Classification non supervisée", None))
+        self.pushButton_plugin_classification.setText(_translate("QGISEducation", "Classification supervisée", None))
+        self.groupBox.setTitle(_translate("QGISEducation", "Répertoire de sortie", None))
+        self.pushButton_working_dir.setText(_translate("QGISEducation", "...", None))
+        self.pushButton_kmz.setText(_translate("QGISEducation", "Export KMZ", None))
+        self.pushButton_status.setText(_translate("QGISEducation", "Status", None))
+        self.label_a_s.setText(_translate("QGISEducation", "Légende de l\'angle spectral:", None))
 
