@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_qgiseducation.ui'
 #
-# Created: Mon Oct 26 18:37:45 2015
+# Created: Tue Oct 27 18:49:32 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,36 +26,13 @@ except AttributeError:
 class Ui_QGISEducation(object):
     def setupUi(self, QGISEducation):
         QGISEducation.setObjectName(_fromUtf8("QGISEducation"))
-        QGISEducation.resize(431, 894)
+        QGISEducation.resize(410, 894)
         self.verticalLayout = QtGui.QVBoxLayout(QGISEducation)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.label_travail_en_cours = QtGui.QLabel(QGISEducation)
         self.label_travail_en_cours.setText(_fromUtf8(""))
         self.label_travail_en_cours.setObjectName(_fromUtf8("label_travail_en_cours"))
         self.verticalLayout.addWidget(self.label_travail_en_cours)
-        self.toolBox = QtGui.QToolBox(QGISEducation)
-        self.toolBox.setObjectName(_fromUtf8("toolBox"))
-        self.page_3 = QtGui.QWidget()
-        self.page_3.setGeometry(QtCore.QRect(0, 0, 400, 86))
-        self.page_3.setObjectName(_fromUtf8("page_3"))
-        self.verticalLayout_5 = QtGui.QVBoxLayout(self.page_3)
-        self.verticalLayout_5.setObjectName(_fromUtf8("verticalLayout_5"))
-        self.label = QtGui.QLabel(self.page_3)
-        self.label.setObjectName(_fromUtf8("label"))
-        self.verticalLayout_5.addWidget(self.label)
-        self.toolBox.addItem(self.page_3, _fromUtf8(""))
-        self.page_4 = QtGui.QWidget()
-        self.page_4.setGeometry(QtCore.QRect(0, 0, 413, 146))
-        self.page_4.setObjectName(_fromUtf8("page_4"))
-        self.horizontalLayout_4 = QtGui.QHBoxLayout(self.page_4)
-        self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
-        self.tableWidget = QtGui.QTableWidget(self.page_4)
-        self.tableWidget.setColumnCount(2)
-        self.tableWidget.setObjectName(_fromUtf8("tableWidget"))
-        self.tableWidget.setRowCount(0)
-        self.horizontalLayout_4.addWidget(self.tableWidget)
-        self.toolBox.addItem(self.page_4, _fromUtf8(""))
-        self.verticalLayout.addWidget(self.toolBox)
         self.tabWidget = QtGui.QTabWidget(QGISEducation)
         self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
         self.tab = QtGui.QWidget()
@@ -71,8 +48,10 @@ class Ui_QGISEducation(object):
         self.verticalLayout_7 = QtGui.QVBoxLayout(self.tab_2)
         self.verticalLayout_7.setObjectName(_fromUtf8("verticalLayout_7"))
         self.treeWidget = QtGui.QTreeWidget(self.tab_2)
+        self.treeWidget.setColumnCount(2)
         self.treeWidget.setObjectName(_fromUtf8("treeWidget"))
         self.treeWidget.headerItem().setText(0, _fromUtf8("1"))
+        self.treeWidget.headerItem().setText(1, _fromUtf8("2"))
         self.verticalLayout_7.addWidget(self.treeWidget)
         self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
         self.verticalLayout.addWidget(self.tabWidget)
@@ -141,18 +120,11 @@ class Ui_QGISEducation(object):
         self.verticalLayout.addItem(spacerItem)
 
         self.retranslateUi(QGISEducation)
-        self.toolBox.setCurrentIndex(0)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(QGISEducation)
 
     def retranslateUi(self, QGISEducation):
         QGISEducation.setWindowTitle(_translate("QGISEducation", "QGISEducation", None))
-        self.label.setText(_translate("QGISEducation", "Fausses couleurs:            Couleurs naturelles:\n"
-"Plan R <- BS_PIR              Plan R <- BS_R \n"
-"Plan V <- BS_R                  Plan V <- BS_V \n"
-"Plan B <- BS_V                  Plan B <- BS_B", None))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_3), _translate("QGISEducation", "Informations sur les bandes", None))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_4), _translate("QGISEducation", "Informations sur l\'image", None))
         self.label_2.setText(_translate("QGISEducation", "Fausses couleurs:            Couleurs naturelles:\n"
 "Plan R <- BS_PIR              Plan R <- BS_R \n"
 "Plan V <- BS_R                  Plan V <- BS_V \n"

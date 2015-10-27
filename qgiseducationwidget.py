@@ -438,7 +438,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
     def set_comboBox_sprectral_band_display(self):
         m3 = self.toolButton_display_bands.menu() 
-        
+
         if ProcessingManager().working_layer:
             bands = ProcessingManager().working_layer.bands
             corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
@@ -481,8 +481,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         do_it = True
         if text_changed and text_changed != "Affichage des bandes spectrales...":
             band_to_display = None
-            corres = { 'nat':"Afficher en couleurs naturelles", 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
-            corres_name_view = { 'nat':"Couleurs naturelles", 'red':"Bande rouge", 'green':"Bande verte", 'blue':"Bande bleue", 'pir':"Bande pir", 'mir':"Bande mir" }
+            corres = {'nat': "Afficher en couleurs naturelles", 'red': "Afficher la bande rouge", 'green': "Afficher la bande verte", 'blue': "Afficher la bande bleue", 'pir': "Afficher la bande pir", 'mir':"Afficher la bande mir"}
+            corres_name_view = {'nat': "Couleurs naturelles", 'red': "Bande rouge", 'green': "Bande verte", 'blue': "Bande bleue", 'pir': "Bande pir", 'mir': "Bande mir"}
             for key in corres:
                 if corres[key] == text_changed :
                     who = key
@@ -533,18 +533,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                            (u"Lignes", str(total_size_x)),
                            (u"Colonnes", str(total_size_y)),
                            (u"Résolution", "TOBEDEFINED" + str(pixel_size_x))]
-
-        # QtableWidget
-        self.tableWidget.setHorizontalHeaderLabels([u"Métadonnée", "Valeur"])
-        line_index = 0
-        self.tableWidget.setRowCount(len(list_to_display))
-
-        for key, value in list_to_display:
-            key_item = QtGui.QTableWidgetItem(key)
-            self.tableWidget.setItem(line_index, 0, key_item)
-            value_item = QtGui.QTableWidgetItem(value)
-            self.tableWidget.setItem(line_index, 1, value_item)
-            line_index += 1
 
         # QTreeWidget
         self.treeWidget.clear()

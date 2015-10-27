@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>431</width>
+    <width>410</width>
     <height>894</height>
    </rect>
   </property>
@@ -19,62 +19,6 @@
      <property name="text">
       <string/>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QToolBox" name="toolBox">
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="page_3">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>400</width>
-        <height>86</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Informations sur les bandes</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Fausses couleurs:            Couleurs naturelles:
-Plan R &lt;- BS_PIR              Plan R &lt;- BS_R 
-Plan V &lt;- BS_R                  Plan V &lt;- BS_V 
-Plan B &lt;- BS_V                  Plan B &lt;- BS_B</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_4">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>413</width>
-        <height>146</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Informations sur l'image</string>
-      </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QTableWidget" name="tableWidget">
-         <property name="columnCount">
-          <number>2</number>
-         </property>
-         <column/>
-         <column/>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
    <item>
@@ -106,9 +50,17 @@ Plan B &lt;- BS_V                  Plan B &lt;- BS_B</string>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
         <widget class="QTreeWidget" name="treeWidget">
+         <property name="columnCount">
+          <number>2</number>
+         </property>
          <column>
           <property name="text">
            <string notr="true">1</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string notr="true">2</string>
           </property>
          </column>
         </widget>
