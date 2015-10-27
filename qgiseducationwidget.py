@@ -107,19 +107,57 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         """
         Initialize the interface
         """
-        # processings
+        self.toolbar = self.iface.addToolBar(u'TerrImage')
+        self.toolbar.setObjectName(u'TerrImage')
+
+        #processings
         itemProcessing = [ "Traitements...", "NDVI", "NDTI", "Indice de brillance", "Angle Spectral" ]
-        for index in range(len(itemProcessing)):
-            item = itemProcessing[index]
-            self.comboBox_processing.insertItem (index, item)
+        # toolbar
+        self.toolButton_processing = QtGui.QToolButton()
+        self.toolButton_processing.setMenu(QtGui.QMenu())
+        self.toolButton_processing.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
+        # self.iface.addToolBarWidget(self.toolButton_processing)
+        self.toolbar.addWidget(self.toolButton_processing)
+        m = self.toolButton_processing.menu()
+
+        for index, item in enumerate(itemProcessing):
+            self.comboBox_processing.insertItem(index, item)
+            # toolbar
+            #if index > 0:
+            action_p = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mAction.png"),
+                                     item,
+                                     self.iface.mainWindow())
+            action_p.setWhatsThis(item)
+            m.addAction(action_p)
+            if index == 0:
+                self.toolButton_processing.setDefaultAction(action_p)
+
         self.comboBox_processing.currentIndexChanged[str].connect(self.do_manage_processing)
+        self.toolButton_processing.triggered.connect(self.do_manage_actions_for_processing)
 
         # fill histograms
+        self.toolButton_histograms = QtGui.QToolButton()
+        self.toolButton_histograms.setMenu(QtGui.QMenu())
+        self.toolButton_histograms.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
+        # self.iface.addToolBarWidget(self.toolButton_histograms) 
+        self.toolbar.addWidget(self.toolButton_histograms)
+        m2 = self.toolButton_histograms.menu()
+
         itemHistogrammes = [ "Histogrammes", "Image de travail" ]
-        for index in range(len(itemHistogrammes)):
-            item = itemHistogrammes[index]
-            self.comboBox_histogrammes.insertItem (index, item)
+        for index, item in enumerate(itemHistogrammes):
+            self.comboBox_histogrammes.insertItem(index, item)
+            # toolbar
+            #if index > 0:
+            action_h = QtGui.QAction(
+              QtGui.QIcon(":/plugins/qgiseducation/img/mActionFullHistogramStretch.png"),
+              item,
+              self.iface.mainWindow())
+            action_h.setWhatsThis(item)
+            m2.addAction(action_h)
+            if index == 0:
+                self.toolButton_histograms.setDefaultAction(action_h)
         self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
+        self.toolButton_histograms.triggered.connect(self.do_manage_actions_for_histogram)
 
         # widget puttons signal connections
         self.pushButton_kmeans.clicked.connect(self.kmeans)
@@ -140,6 +178,53 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.label_travail_en_cours.hide()
         self.label_travail_en_cours.setTextFormat(1)
         self.label_travail_en_cours.setText('<html><b><font size="4" color="red">Travail en cours...</font></b></html>')
+
+        # toolbar
+        self.toolButton_display_bands = QtGui.QToolButton()
+        self.toolButton_display_bands.setMenu(QtGui.QMenu())
+        self.toolButton_display_bands.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
+        # self.iface.addToolBarWidget(self.toolButton_display_bands)
+        self.toolbar.addWidget(self.toolButton_display_bands)
+
+        action_ps = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mIconTableLayer.png"),
+                                  "Profil Spectral", self.iface.mainWindow())
+        action_ps.setWhatsThis(u"Profil spectral")
+        self.toolbar.addAction(action_ps)
+        action_ps.triggered.connect(self.display_values)
+
+        self.toolButton_classif = QtGui.QToolButton()
+        self.toolButton_classif.setMenu(QtGui.QMenu())
+        self.toolButton_classif.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
+        # self.iface.addToolBarWidget(self.toolButton_histograms)
+        self.toolbar.addWidget(self.toolButton_classif)
+        m4 = self.toolButton_classif.menu()
+
+        action_classif_ns = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/rendererCategorizedSymbol.png"),
+                                          u"Classification non supervisée", self.iface.mainWindow())
+        action_classif_ns.setWhatsThis(u"Classification non supervisée")
+        m4.addAction(action_classif_ns)
+        action_classif_s = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/rendererCategorizedSymbol.png"),
+                                         u"Classification supervisée", self.iface.mainWindow())
+        action_classif_s.setWhatsThis(u"Classification supervisée")
+        m4.addAction(action_classif_s)
+        self.toolButton_classif.setDefaultAction(action_classif_ns)
+        action_classif_s.triggered.connect(self.plugin_classification)
+
+        action_kmz = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mMapserverExport.png"),
+                                   "Export KMZ", self.iface.mainWindow())
+        action_kmz.setWhatsThis(u"Export KMZ")
+        self.toolbar.addAction(action_kmz)
+        action_kmz.triggered.connect(self.export_kmz)
+
+        action_info = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionContextHelp.png"),
+                                    "Information", self.iface.mainWindow())
+        action_info.setWhatsThis(u"Information")
+        self.toolbar.addAction(action_info)
+
+        action_settings = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionOptions.png"),
+                                        "Configuration", self.iface.mainWindow())
+        action_settings.setWhatsThis(u"Configuration")
+        self.toolbar.addAction(action_settings)
 
     def status(self):
         """
@@ -238,6 +323,13 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         logger.debug("educationwidget forms: " + str(forms))
         self.do_manage_processing("Seuillage", args=forms)
 
+    def do_manage_actions_for_histogram(self, action):
+        """
+        Calls do_manage_processing with action name
+        """
+        histogram_name = action.text()
+        self.do_manage_histograms(histogram_name)
+
     def do_manage_histograms(self, text_changed):
         logger.debug("text changed histogram: " + text_changed)
         if text_changed == "Image de travail":
@@ -280,6 +372,13 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def define_working_dir(self):
         output_dir = terre_image_utils.getOutputDirectory(self)
         self.qgis_education_manager.working_directory = output_dir
+
+    def do_manage_actions_for_processing(self, action):
+        """
+        Calls do_manage_processing with action name
+        """
+        processing_name = action.text()
+        self.do_manage_processing(processing_name)
 
     def do_manage_processing(self, text_changed, args=None):
         if text_changed == "Angle Spectral":
@@ -338,6 +437,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.set_working_message(False)
 
     def set_comboBox_sprectral_band_display(self):
+        m3 = self.toolButton_display_bands.menu() 
+        
         if ProcessingManager().working_layer:
             bands = ProcessingManager().working_layer.bands
             corres = { 'red':"Afficher la bande rouge", 'green':"Afficher la bande verte", 'blue':"Afficher la bande bleue", 'pir':"Afficher la bande pir", 'mir':"Afficher la bande mir" }
@@ -354,6 +455,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                 if y:
                     text = corres[y[0]]
                     self.comboBox_sprectral_band_display.insertItem(i + 2, text)
+                    action_d = QtGui.QAction(
+                      QtGui.QIcon(":/plugins/qgiseducation/img/mActionInOverview.png"),
+                      text,
+                      self.iface.mainWindow())
+                    action_d.setWhatsThis(text)
+                    m3.addAction(action_d)
+                    if i == 0:
+                        self.toolButton_display_bands.setDefaultAction(action_d)
             self.comboBox_sprectral_band_display.currentIndexChanged[str].connect(self.do_manage_sprectral_band_display)
 
     def set_combobox_histograms(self):
