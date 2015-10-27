@@ -192,17 +192,18 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.toolbar.addAction(action_ps)
         action_ps.triggered.connect(self.display_values)
 
+        # toolbar classif
         self.toolButton_classif = QtGui.QToolButton()
         self.toolButton_classif.setMenu(QtGui.QMenu())
         self.toolButton_classif.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
         # self.iface.addToolBarWidget(self.toolButton_histograms)
         self.toolbar.addWidget(self.toolButton_classif)
         m4 = self.toolButton_classif.menu()
-
         action_classif_ns = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/rendererCategorizedSymbol.png"),
                                           u"Classification non supervisée", self.iface.mainWindow())
         action_classif_ns.setWhatsThis(u"Classification non supervisée")
         m4.addAction(action_classif_ns)
+        action_classif_ns.triggered.connect(self.kmeans)
         action_classif_s = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/rendererCategorizedSymbol.png"),
                                          u"Classification supervisée", self.iface.mainWindow())
         action_classif_s.setWhatsThis(u"Classification supervisée")
@@ -437,7 +438,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.set_working_message(False)
 
     def set_comboBox_sprectral_band_display(self):
-        m3 = self.toolButton_display_bands.menu() 
+        m3 = self.toolButton_display_bands.menu()
 
         if ProcessingManager().working_layer:
             bands = ProcessingManager().working_layer.bands
@@ -464,6 +465,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     if i == 0:
                         self.toolButton_display_bands.setDefaultAction(action_d)
             self.comboBox_sprectral_band_display.currentIndexChanged[str].connect(self.do_manage_sprectral_band_display)
+            self.toolButton_display_bands.triggered.connect(self.do_manage_actions_for_display)
 
     def set_combobox_histograms(self):
         if self.qgis_education_manager:
@@ -472,10 +474,24 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                 logger.debug("process: " + str(process))
 
                 self.comboBox_histogrammes.clear()
-
-                for i in range(len(process)):
+                m2 = self.toolButton_histograms.menu()
+                m2.clear()
+                for i, item in enumerate(process):
                     self.comboBox_histogrammes.insertItem(i, process[i])
+                    action_h = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionFullHistogramStretch.png"),
+                                             item, self.iface.mainWindow())
+                    action_h.setWhatsThis(item)
+                    m2.addAction(action_h)
+                    if i == 0:
+                        self.toolButton_histograms.setDefaultAction(action_h)
                 self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
+
+    def do_manage_actions_for_display(self, action):
+        """
+        Calls do_manage_processing with action name
+        """
+        band_name = action.text()
+        self.do_manage_sprectral_band_display(band_name)
 
     def do_manage_sprectral_band_display(self, text_changed):
         do_it = True
@@ -500,7 +516,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
     def kmeans(self):
         self.set_working_message(True)
-
         if ProcessingManager().working_layer == None :
             logger.debug("Aucune layer selectionnée")
         else :
@@ -508,7 +523,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             logger.debug("nb_colass from spinbox: " + str(nb_class))
             my_processing = TerreImageProcessing(self.iface, self.qgis_education_manager.working_directory, ProcessingManager().working_layer, self.qgis_education_manager.mirror_map_tool, "KMEANS", nb_class)
             self.set_combobox_histograms()
-
             self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
             self.set_working_message(False)
 
@@ -533,7 +547,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                            (u"Lignes", str(total_size_x)),
                            (u"Colonnes", str(total_size_y)),
                            (u"Résolution", "TOBEDEFINED" + str(pixel_size_x))]
-
         # QTreeWidget
         self.treeWidget.clear()
         header = QtGui.QTreeWidgetItem([u"Métadonnée", "Valeur"])
