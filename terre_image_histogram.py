@@ -29,12 +29,10 @@ import math
 # import graph libraries
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from matplotlib.patches import Rectangle
-# import matplotlib.pyplot as plt
 # import qt libraries
 from PyQt4 import QtGui, QtCore
 # import gdal libraries
-from osgeo import gdal, gdalconst, ogr
+from osgeo import gdal
 # import project libraries
 import manage_QGIS
 from terre_image_environement import TerreImageParamaters

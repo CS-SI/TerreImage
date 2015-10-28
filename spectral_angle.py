@@ -21,8 +21,8 @@
  """
 
 import os
-from qgis.gui import QgsRubberBand, QgsMapToolPan, QgsMapTool, QgsMessageBar
-from qgis.core import QGis, QgsPoint, QgsRaster, QgsMapLayerRegistry
+from qgis.gui import QgsMapToolPan, QgsMapTool, QgsMessageBar
+from qgis.core import QgsPoint, QgsMapLayerRegistry
 from PyQt4 import QtCore, QtGui
 
 # import project lib

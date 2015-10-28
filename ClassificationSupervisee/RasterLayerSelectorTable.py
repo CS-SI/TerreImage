@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 import os
 from PyQt4 import QtCore, QtGui
-from RasterLayerSelectorItem import RasterLayerSelectorItem
 import xml.etree.ElementTree as ET
 # import GDAL and QGIS libraries
 from osgeo import gdal
@@ -37,6 +36,7 @@ logging.basicConfig()
 # create logger
 logger = logging.getLogger( 'RasterLayerSelectorTable' )
 logger.setLevel(logging.INFO)
+
 
 class TreeWidgetItem(QtGui.QTreeWidgetItem):
     def setData(self, column, role, value):
@@ -78,9 +78,9 @@ class RasterLayerSelectorTable(QtGui.QWidget):
         self.table.setHeaderHidden( True )
         logger.debug(  "self.table.isHeaderHidden()" + str(self.table.isHeaderHidden()) )
         self.table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        #self.table = Window()
+        # self.table = Window()
         self.table.setColumnCount(1)
-        self.table.setColumnWidth(0,270)
+        self.table.setColumnWidth(0, 270)
         self.setTableContent()
 
         self.selectallbutton = QtGui.QPushButton(u"(Dé)sélectionner tout")
@@ -97,10 +97,10 @@ class RasterLayerSelectorTable(QtGui.QWidget):
 
         self.setLayout(self.verticalLayout)
 
-        #self.itemChecked.connect(self.manageChild)
-        #self.table.itemClicked.connect(self.manageChild1)
+        # self.itemChecked.connect(self.manageChild)
+        # self.table.itemClicked.connect(self.manageChild1)
         self.table.itemChanged.connect(self.manageChild2)
-        #self.table.currentItemChanged.connect(self.manageChild3)
+        # self.table.currentItemChanged.connect(self.manageChild3)
 
     def selectAll(self):
         checked = QtCore.Qt.Unchecked
@@ -117,7 +117,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                 child_temp.setCheckState(0, checked)
 
     def setTableContent(self):
-        corres = { 'red':"rouge", 'green':"verte", 'blue':"bleue", 'pir':"pir", 'mir':"mir" }
+        corres = { 'red': "rouge", 'green': "verte", 'blue': "bleue", 'pir': "pir", 'mir': "mir" }
         # TODO : get the layer[i] if the layer[i] is a multi band layer, add subchild for all bands
         # TODO : connecgt the multiband layer check box to a function which checks/unchecks all children
         n = len(self.layers)
@@ -167,7 +167,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                 it += widget.childCount()
             else:
                 logger.debug( "widget unchecked : look children" )
-            #uncheked
+                # uncheked
                 # how many children are checked
                 all_children = 0
                 list_children = []
@@ -206,7 +206,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
         return selectedLayers
 
     def manageChild1(self, item, column):
-        #void 	itemClicked ( QTreeWidgetItem * item, int column )
+        # void 	itemClicked ( QTreeWidgetItem * item, int column )
         logger.debug( "managechild1" )
         if item.childCount() > 0:
             checked = QtCore.Qt.Unchecked
@@ -217,7 +217,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             child_temp.setCheckState(0, checked)
 
     def manageChild2(self, tree, item):
-        #void 	itemChanged ( QTreeWidgetItem * item, int column )
+        # void 	itemChanged ( QTreeWidgetItem * item, int column )
         logger.debug(  "managechild2" )
         logger.debug(  "current" + str(tree) )
         logger.debug(  "previous" + str(item) )
@@ -231,11 +231,10 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             child_temp.setCheckState(0, checked)
 
     def manageChild3(self, tree, item):
-        #void 	currentItemChanged ( QTreeWidgetItem * current, QTreeWidgetItem * previous )
+        # void 	currentItemChanged ( QTreeWidgetItem * current, QTreeWidgetItem * previous )
         logger.debug(  "managechild3" )
         logger.debug(  "current" + str(tree) )
         logger.debug(  "previous" + str(item) )
-
 
         if item.childCount() > 0:
             checked = QtCore.Qt.Unchecked
@@ -284,9 +283,9 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             ftuple = tuple(map(str, geotransform))
             logger.debug(  type(geotransform) )
             geotransform = ET.SubElement( rootNode, "GeoTransform")
-            geotransform.text = ", ".join(ftuple) #"0.0, 1.0, 0.0, 0.0, 0.0, -1.0"
+            geotransform.text = ", ".join(ftuple)  # "0.0, 1.0, 0.0, 0.0, 0.0, -1.0"
             node = ET.SubElement(rootNode, 'SRS')
-            node.text = ds.GetProjection() #"EPSG:4326"  # projection
+            node.text = ds.GetProjection()  # "EPSG:4326"  # projection
             bandNode.attrib['dataType'] = dataType
 
             logger.debug( 'Projection is ' + str(ds.GetProjection()) )

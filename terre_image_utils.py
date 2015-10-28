@@ -22,11 +22,9 @@
 
 import os
 import datetime
-import shutil
 
 from PyQt4.QtGui import QFileDialog, QMessageBox
 from PyQt4.QtCore import QDir, QSettings
-from osgeo import gdal
 
 from working_layer import WorkingLayer
 from manage_bands import manage_bands
@@ -35,6 +33,7 @@ import terre_image_processing
 from terre_image_constant import TerreImageConstant
 from processing_manager import ProcessingManager
 import terre_image_run_process
+import OTBApplications
 
 # import loggin for debug messages
 import logging
@@ -191,7 +190,7 @@ def get_workinglayer_on_opening(iface):
                         cst.index_group = cst.iface.legendInterface().addGroup("Terre Image", True, None)
 
                         manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
-                        compute_overviews(file_opened)
+                        OTBApplications.compute_overviews(file_opened)
                         return layer, bands
                     else:
                         QMessageBox.warning(None, "Erreur",
@@ -212,53 +211,4 @@ def restore_working_layer(filename, bands, layer_type):
     return layer, bands
 
 
-def computeStatistics(OneFeature, i, j=None, nodata=True):
-    """
-    From the given feature, computes its statistics
 
-    Keyword Arguments :
-        OneFeature    --    raster layer to analyze
-        i             --    only for debugging
-    """
-
-    logger.debug("one feature : " + OneFeature)
-
-    # saving the feature only for testing
-    out_one = OneFeature + str(i) + ".tif"
-    shutil.copy(OneFeature, out_one)
-    logger.debug(out_one)
-    # /testing
-
-    dataset = gdal.Open(str(OneFeature), gdal.GA_ReadOnly)
-    # dataset  : GDALDataset
-    if dataset is None:
-        print "Error : Opening file ", OneFeature
-    else:
-        if j is None:
-            band = dataset.GetRasterBand(1)
-        else:
-            band = dataset.GetRasterBand(j)
-        if nodata:
-            band.SetNoDataValue(0)
-        stats = band.ComputeStatistics(False)
-
-        logger.debug("Feature " + str(i) + " : ")
-        logger.debug(stats)
-        return stats
-
-    dataset = None
-    return None
-
-
-def compute_overviews(filename):
-    """
-    Runs gdaladdo on the given filename
-    """
-    if not os.path.isfile(filename + ".ovr"):
-        command = "gdaladdo "
-        command += " -ro "
-        command += "\"" + filename + "\""
-        command += " 2 4 8 16"
-        logger.debug("command to run" + command)
-        # os.system(command)
-        terre_image_run_process.run_process(command)

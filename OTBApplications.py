@@ -21,6 +21,10 @@
  """
 # import system libraries
 import os
+import shutil
+
+from osgeo import gdal
+
 import terre_image_run_process
 
 # import loggin for debug messages
@@ -159,3 +163,55 @@ def otbcli_export_kmz(filename, working_directory):
 
     output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + "xt.kmz")
     return output_kmz
+
+
+def computeStatistics(OneFeature, i, j = None, nodata = True):
+    """
+    From the given feature, computes its statistics
+
+    Keyword Arguments :
+        OneFeature    --    raster layer to analyze
+        i             --    only for debugging
+    """
+
+    logger.debug("one feature : " + OneFeature)
+
+    # saving the feature only for testing
+    out_one = OneFeature + str(i) + ".tif"
+    shutil.copy(OneFeature, out_one)
+    logger.debug(out_one)
+    # /testing
+
+    dataset = gdal.Open(str(OneFeature), gdal.GA_ReadOnly)
+    # dataset  : GDALDataset
+    if dataset is None:
+        print "Error : Opening file ", OneFeature
+    else:
+        if j is None:
+            band = dataset.GetRasterBand(1)
+        else:
+            band = dataset.GetRasterBand(j)
+        if nodata:
+            band.SetNoDataValue(0)
+        stats = band.ComputeStatistics(False)
+
+        logger.debug("Feature " + str(i) + " : ")
+        logger.debug(stats)
+        return stats
+
+    dataset = None
+    return None
+
+
+def compute_overviews(filename):
+    """
+    Runs gdaladdo on the given filename
+    """
+    if not os.path.isfile(filename + ".ovr"):
+        command = "gdaladdo "
+        command += " -ro "
+        command += "\"" + filename + "\""
+        command += " 2 4 8 16"
+        logger.debug("command to run" + command)
+        # os.system(command)
+        terre_image_run_process.run_process(command)

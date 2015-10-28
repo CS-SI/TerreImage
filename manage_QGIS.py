@@ -38,8 +38,8 @@ from qgis.core import (QgsMapLayerRegistry,
                        QgsGeometry,
                        )
 
-import terre_image_utils
 from terre_image_constant import TerreImageConstant
+import OTBApplications
 
 # import loggin for debug messages
 import logging
@@ -215,9 +215,9 @@ def contrastForRasters(the_raster_layer, min_layer, max_layer, band = None):
 # #                     min3, max3, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(),0, band[2])
 # #                     #print min1, max1, min2, max2, min3, max3
                 else:
-                    min1, max1, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(), 0, 1)
-                    min2, max2, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(), 0, 2)
-                    min3, max3, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(), 0, 3)
+                    min1, max1, _, _ = OTBApplications.computeStatistics(the_raster_layer.source(), 0, 1)
+                    min2, max2, _, _ = OTBApplications.computeStatistics(the_raster_layer.source(), 0, 2)
+                    min3, max3, _, _ = OTBApplications.computeStatistics(the_raster_layer.source(), 0, 3)
 
                 red_enhancement = QgsContrastEnhancement(data_provider.dataType(0))
                 green_enhancement = QgsContrastEnhancement(data_provider.dataType(1))

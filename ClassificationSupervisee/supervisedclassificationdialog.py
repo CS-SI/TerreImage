@@ -29,20 +29,14 @@ from PyQt4 import QtCore, QtGui
 from RasterLayerSelectorTable import RasterLayerSelectorTable
 from VectorLayerSelectorTable import VectorLayerSelectorTable
 from ConfusionMatrixViewer import ConfusionMatrixViewer
+from TerreImage import terre_image_run_process
 
 from QGisLayers import QGisLayers
 from QGisLayers import QGisLayerType
 
-from OSIdentifier import OSIdentifier
-
-import tempfile
 import os
-import subprocess
 import shutil
-import time
 import datetime
-
-from TerreImage import terre_image_processing
 
 import logging
 # create logger
