@@ -203,7 +203,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                                           u"Classification non supervisée", self.iface.mainWindow())
         action_classif_ns.setWhatsThis(u"Classification non supervisée")
         m4.addAction(action_classif_ns)
-        action_classif_ns.triggered.connect(self.kmeans)
+        action_classif_ns.triggered.connect(self.kmeans_menu)
         action_classif_s = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/rendererCategorizedSymbol.png"),
                                          u"Classification supervisée", self.iface.mainWindow())
         action_classif_s.setWhatsThis(u"Classification supervisée")
@@ -520,13 +520,19 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def display_values(self):
         self.qgis_education_manager.display_values()
 
-    def kmeans(self):
+    def kmeans_menu(self):
+        self.kmeans(True)
+
+    def kmeans(self, menu = False):
         self.set_working_message(True)
         if ProcessingManager().working_layer == None :
             logger.debug("Aucune layer selectionnée")
-        else :
-            nb_class = self.spinBox_kmeans.value()
-            logger.debug("nb_colass from spinbox: " + str(nb_class))
+        else:
+            if menu:
+                nb_class = None
+            else:
+                nb_class = self.spinBox_kmeans.value()
+            logger.debug("nb_class from spinbox: " + str(nb_class))
             my_processing = TerreImageProcessing(self.iface, self.qgis_education_manager.working_directory, ProcessingManager().working_layer, self.qgis_education_manager.mirror_map_tool, "KMEANS", nb_class)
             self.set_combobox_histograms()
             self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
