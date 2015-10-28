@@ -85,7 +85,8 @@ class TerreImageCurve(QWidget, Ui_Form):
 
         self.points = points
 
-        self.connect(self.lineEdit_curve_name, SIGNAL("textChanged(str)"), self, SIGNAL("curveTitleChanged(str)"))
+        # self.connect(self.lineEdit_curve_name, SIGNAL("textChanged(str)"), self, SIGNAL("curveTitleChanged(str)"))
+        self.connect(self.lineEdit_curve_name, SIGNAL("editingFinished()"), self.set_name)
         self.connect(self.pushButton_color, SIGNAL("clicked()"), self.set_color)
         self.connect(self.pushButton_delete_curve, SIGNAL("clicked()"), self, SIGNAL("deleteCurve()"))
 
@@ -124,6 +125,9 @@ class TerreImageCurve(QWidget, Ui_Form):
         # palette.setColor(10, couleur)
         # self.pushButton_color.setPalette(palette)
         self.emit(SIGNAL("colorChanged"))
+
+    def set_name(self, text = None):
+        self.name = self.lineEdit_curve_name.text()
 
     def __str__(self):
         return self.name + " " + str(self.coordinates) + " " + str(self.color) + " " + str(self.points)
