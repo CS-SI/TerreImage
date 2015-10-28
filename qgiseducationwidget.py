@@ -438,6 +438,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.set_working_message(False)
 
     def set_comboBox_sprectral_band_display(self):
+        """
+        Creates the list of available display
+        """
         m3 = self.toolButton_display_bands.menu()
 
         if ProcessingManager().working_layer:
@@ -468,6 +471,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             self.toolButton_display_bands.triggered.connect(self.do_manage_actions_for_display)
 
     def set_combobox_histograms(self):
+        """
+        Updates the list of available histograms
+        """
         if self.qgis_education_manager:
             if ProcessingManager().working_layer:
                 process = ["Histogrammes", "Image de travail"] + [x for x in ProcessingManager().get_processings_name() if x not in ["KMEANS", "Seuillage"]]

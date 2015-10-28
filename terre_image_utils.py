@@ -61,14 +61,12 @@ def getOutputDirectory(ui):
     """
     current_directory = ui.lineEdit_working_dir.text()
     if ui.lineEdit_working_dir.text():
-        path = ui.lineEdit_working_dir.text()
+        path = current_directory
     else:
         path = QDir.currentPath()
     output_directory = ""
     dir_dest = QFileDialog.getExistingDirectory(None, str("Répertoire de destination des fichiers de TerreImage"), path)
     if dir_dest:
-#         try :
-#             str(dir_dest)
         ui.lineEdit_working_dir.setText(dir_dest)
         output_directory = dir_dest
         update_subdirectories(output_directory)
@@ -106,7 +104,7 @@ def working_layer(canvas):
         # self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
         red, green, blue, pir, mir = manage_bands().get_values()
 
-        bands = {'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir}
+        bands = {'red': red, 'green': green, 'blue': blue, 'pir': pir, 'mir': mir}
         layer.set_bands(bands)
 
         logger.debug(str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
@@ -146,16 +144,16 @@ def get_workinglayer_on_opening(iface):
     settings.sync()
 
     if file_opened:
-#         try:
-#             str(file_opened)
-#         except UnicodeEncodeError:
-#             QMessageBox.warning( None , "Erreur", u'L\'image que vous essayez d\'ouvrir contient un ou des caractères spéciaux. \
-# La version actuelle du plugin ne gère pas ce type de fichiers. \
-# Veuillez renommer le fichier et ou les répertoires le contenant.', QMessageBox.Ok )
-#             return None, None
-#         else:
-#             if file_opened.find(" ") != -1:
-#                 QMessageBox.warning( None , "Attention", u'L\'image que vous essayez d\'ouvrir contient un ou plusieurs espaces. Les traitements sur cette image provoqueront une erreur.'.encode('utf8'), QMessageBox.Ok )
+        #         try:
+        #             str(file_opened)
+        #         except UnicodeEncodeError:
+        #             QMessageBox.warning( None , "Erreur", u'L\'image que vous essayez d\'ouvrir contient un ou des caractères spéciaux. \
+        # La version actuelle du plugin ne gère pas ce type de fichiers. \
+        # Veuillez renommer le fichier et ou les répertoires le contenant.', QMessageBox.Ok )
+        #             return None, None
+        #         else:
+        #             if file_opened.find(" ") != -1:
+        #                 QMessageBox.warning( None , "Attention", u'L\'image que vous essayez d\'ouvrir contient un ou plusieurs espaces. Les traitements sur cette image provoqueront une erreur.'.encode('utf8'), QMessageBox.Ok )
 
         if file_opened.endswith(".qgs"):
             # open new qgis project
@@ -177,12 +175,7 @@ def get_workinglayer_on_opening(iface):
 
                 if red != -1 or green != -1 or blue != -1 or pir != -1 or mir != -1:
                     all_set = True
-                    bands = {'red':red, 'green':green, 'blue':blue, 'pir':pir, 'mir':mir}
-#                         for i in bands.values():
-#                             if bands.values().count(i) > 1:
-#                                 doublon = True
-#                                 break
-#                         if not doublon :
+                    bands = {'red': red, 'green': green, 'blue': blue, 'pir': pir, 'mir': mir}
                     for i in range(1, layer.get_band_number() + 1):
                         if i not in bands.values():
                             all_set = False
@@ -240,7 +233,7 @@ def computeStatistics(OneFeature, i, j=None, nodata=True):
     if dataset is None:
         print "Error : Opening file ", OneFeature
     else:
-        if j == None:
+        if j is None:
             band = dataset.GetRasterBand(1)
         else:
             band = dataset.GetRasterBand(j)

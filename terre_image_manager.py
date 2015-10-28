@@ -44,6 +44,7 @@ class TerreImageManager():
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.working_directory = None  # , _ = terre_image_utils.fill_default_directory()
+        self.layer = None
 
         self.value_tool = ValueWidget(self.iface)  # , self )
         # creating a dock widget
@@ -84,8 +85,8 @@ class TerreImageManager():
         sortie = "working_dir : " + self.working_directory
         return sortie
 
-    def restore_processing_manager(self, filename, bands, type, working_dir):
-        self.layer, bands = terre_image_utils.restore_working_layer(filename, bands, type)
+    def restore_processing_manager(self, filename, bands, layer_type, working_dir):
+        self.layer, bands = terre_image_utils.restore_working_layer(filename, bands, layer_type)
         ProcessingManager().working_layer = self.layer
         # self.layers_for_value_tool.append(self.layer )
         self.working_directory = working_dir

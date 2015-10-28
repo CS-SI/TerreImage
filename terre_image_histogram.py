@@ -22,28 +22,22 @@
 """
 
 from __future__ import unicode_literals
+
+# import math libraries
 from numpy import arange, cumsum
 import math
-
+# import graph libraries
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
 # import matplotlib.pyplot as plt
-
+# import qt libraries
 from PyQt4 import QtGui, QtCore
-
+# import gdal libraries
 from osgeo import gdal, gdalconst, ogr
-
+# import project libraries
 import manage_QGIS
 from terre_image_environement import TerreImageParamaters
-
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_Histograms')
-logger.setLevel(logging.INFO)
-
 # import loggin for debug messages
 import logging
 logging.basicConfig()

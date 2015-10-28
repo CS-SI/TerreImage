@@ -78,6 +78,8 @@ class TerreImageProcessing(TerreImageTask, QObject):
 
         self.processing_name = processing
         self.mirror = None
+        self.rubberband = None
+        self.angle_tool = None
 
         self.r_layer = rlayer
 

@@ -63,8 +63,7 @@ def ndvi(layer, working_directory, iface):
             logger.debug("image_in: " + image_in)
             logger.debug(working_directory)
             output_filename = os.path.join(working_directory,
-                                            os.path.basename(os.path.splitext(image_in)[0]) + "_ndvi" + os.path.splitext(image_in)[1]
-                                          )
+                                           os.path.basename(os.path.splitext(image_in)[0]) + "_ndvi" + os.path.splitext(image_in)[1])
             logger.debug(output_filename)
             if not os.path.isfile(output_filename):
                 layer_pir = "im1b" + str(layer.pir)
@@ -109,8 +108,7 @@ def brightness(layer, working_directory, iface):
             logger.debug("image_in" + image_in)
             logger.debug(working_directory)
             output_filename = os.path.join(working_directory,
-                                            os.path.basename(os.path.splitext(image_in)[0]) + "_brillance" + os.path.splitext(image_in)[1]
-                                          )
+                                           os.path.basename(os.path.splitext(image_in)[0]) + "_brillance" + os.path.splitext(image_in)[1])
             logger.debug(output_filename)
             if not os.path.isfile(output_filename):
                 layer_pir = "im1b" + str(layer.pir)
@@ -130,13 +128,12 @@ def threshold(layer, working_directory, forms):
 
     if len(forms) == 1:
         output_filename = os.path.join(working_directory,
-                                            os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + os.path.splitext(image_in)[1])
+                                       os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + os.path.splitext(image_in)[1])
         OTBApplications.bandmath_cli([image_in], forms[0], output_filename)
     else:
         for formula in forms:
             output_filename = os.path.join(working_directory,
-                                                os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + str(i) + os.path.splitext(image_in)[1]
-                                              )
+                                           os.path.basename(os.path.splitext(image_in)[0]) + "_threshold" + str(i) + os.path.splitext(image_in)[1])
             OTBApplications.bandmath_cli([image_in], formula, output_filename)
             i += 1
             temp.append(output_filename)
@@ -204,7 +201,7 @@ def kmeans(layer, working_directory, iface, nb_class=None):
 
     logger.debug("enntree dans le kmeans")
     bands = []
-    if nb_class == None:
+    if nb_class is None:
         testqt, ok = QInputDialog.getInt(None, "Kmeans", "Nombre de classes", 5)
         if ok:
             nb_class = testqt
@@ -302,40 +299,40 @@ def export_kmz(filenames, working_directory):
 
 
 def run_process(fused_command, read_output=False):
-#     print "run process", fused_command
-#     qprocess = QProcess()
-#     set_process_env(qprocess)
-#     code_de_retour = qprocess.execute(fused_command)
-#     print "code de retour", code_de_retour
-#     logger.info("command: ")
-#     logger.info(fused_command)
-#     logger.info("code de retour" + str(code_de_retour))
-#
-# #     if not qprocess.waitForStarted():
-# #         # handle a failed command here
-# #         print "qprocess.waitForStarted()"
-# #         return
-# #
-# #     if not qprocess.waitForReadyRead():
-# #         # handle a timeout or error here
-# #         print "qprocess.waitForReadyRead()"
-# #         return
-# #     #if not qprocess.waitForFinished(1):
-# #     #    qprocess.kill()
-# #     #    qprocess.waitForFinished(1)
-#
-# #     if read_output:
-#
-#     # logger.info("Erreur")
-#     code_d_erreur = qprocess.error()
-#     dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed", 2:"QProcess::TimedOut", 3:"QProcess::WriteError", 4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
-#     logger.info("Code de retour: " + str(code_d_erreur))
-#     logger.info(dic_err[code_d_erreur])
-#
-#     print "get output"
-#     output = str(qprocess.readAllStandardOutput())
-#     # print "output", output
-#     print 'end output'
+    #     print "run process", fused_command
+    #     qprocess = QProcess()
+    #     set_process_env(qprocess)
+    #     code_de_retour = qprocess.execute(fused_command)
+    #     print "code de retour", code_de_retour
+    #     logger.info("command: ")
+    #     logger.info(fused_command)
+    #     logger.info("code de retour" + str(code_de_retour))
+    #
+    # #     if not qprocess.waitForStarted():
+    # #         # handle a failed command here
+    # #         print "qprocess.waitForStarted()"
+    # #         return
+    # #
+    # #     if not qprocess.waitForReadyRead():
+    # #         # handle a timeout or error here
+    # #         print "qprocess.waitForReadyRead()"
+    # #         return
+    # #     #if not qprocess.waitForFinished(1):
+    # #     #    qprocess.kill()
+    # #     #    qprocess.waitForFinished(1)
+    #
+    # #     if read_output:
+    #
+    #     # logger.info("Erreur")
+    #     code_d_erreur = qprocess.error()
+    #     dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed", 2:"QProcess::TimedOut", 3:"QProcess::WriteError", 4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
+    #     logger.info("Code de retour: " + str(code_d_erreur))
+    #     logger.info(dic_err[code_d_erreur])
+    #
+    #     print "get output"
+    #     output = str(qprocess.readAllStandardOutput())
+    #     # print "output", output
+    #     print 'end output'
     process = QProcess()
 
     data = QByteArray()

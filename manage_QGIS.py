@@ -49,7 +49,7 @@ logger = logging.getLogger('TerreImage_manageQGIS')
 logger.setLevel(logging.INFO)
 
 
-def addVectorLayerToQGIS(vectorLayer, layername, legendInterface):
+def addVectorLayerToQGIS(vectorLayer, layername):
     """
     Add a vector layer to QGIS
 
@@ -65,7 +65,7 @@ def addVectorLayerToQGIS(vectorLayer, layername, legendInterface):
 
     Example of use :
     myvector = "/home/user/myVectorLayer.shp"
-    addVectorLayerToQGIS( myvector, os.path.basename(myvector), None, True)
+    addVectorLayerToQGIS( myvector, os.path.basename(myvector))
     """
     vector = QgsVectorLayer(vectorLayer, layername, "ogr")
     layer_added = QgsMapLayerRegistry.instance().addMapLayer(vector)
@@ -241,7 +241,7 @@ def contrastForRasters(the_raster_layer, min_layer, max_layer, band = None):
 def display_one_band(layer, keyword, iface):
     index_group = TerreImageConstant().index_group
     logger.debug("keyword " + str(keyword))
-    corres = {'red': "_bande_rouge", 'green': "_bande_verte", 'blue': "_bande_bleue", \
+    corres = {'red': "_bande_rouge", 'green': "_bande_verte", 'blue': "_bande_bleue",
               'pir': "_bande_pir", 'mir': "_bande_mir", "nat": "_couleurs_naturelles"}
 
     raster_layer = QgsRasterLayer(layer.get_source(), layer.name() + corres[keyword])

@@ -48,7 +48,7 @@ class ValueTool:
         # create the widget to display information
         self.valuewidget = ValueWidget(self.iface)
         # create the dockwidget with the correct parent and add the valuewidget
-        self.valuedockwidget = QDockWidget("Value Tool" , self.iface.mainWindow())
+        self.valuedockwidget = QDockWidget("Value Tool", self.iface.mainWindow())
         self.valuedockwidget.setObjectName("Value Tool")
         self.valuedockwidget.setWidget(self.valuewidget)
         QObject.connect(self.valuedockwidget, SIGNAL('visibilityChanged ( bool )'), self.showHideDockWidget)

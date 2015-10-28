@@ -26,10 +26,10 @@ logging.basicConfig()
 logger = logging.getLogger('TerreImage_ProcessingManager')
 logger.setLevel(logging.INFO)
 
+
 class ProcessingManager(object):
-
-
     instance = None
+
     def __new__(cls, *args, **kwargs):  # __new__ always a classmethod
         if not cls.instance:
             cls.instance = super(ProcessingManager, cls).__new__(cls, *args, **kwargs)
@@ -47,7 +47,6 @@ class ProcessingManager(object):
     def get_processings_name(self):
         return [x.processing_name for x in self.processings] + [x.processing_name for x in self.displays]
 
-
     def get_layers(self):
         return [self.working_layer] + [x.output_working_layer for x in self.processings] + [x.output_working_layer for x in self.displays]
 
@@ -64,35 +63,29 @@ class ProcessingManager(object):
     def get_processings(self):
         return self.processings
 
-
     def add_processing(self, processing):
         self.processings.append(processing)
-
 
     def get_displays(self):
         return self.displays
 
-
     def add_display(self, processing):
         self.displays.append(processing)
 
-
     def remove_processing(self, process):
-        if process in self.processings :
+        if process in self.processings:
             self.processings.remove(process)
             process.end()
-
 
     def remove_process_from_layer_id(self, layer_id):
         process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
         logger.debug("process" + str(process))
-        if process :
-            try :
+        if process:
+            try:
                 process[0].mirror.close()
             except RuntimeError:
                 pass
             self.remove_processing(process[0])
-
 
     def remove_display(self, process):
         if process in self.displays :
@@ -109,22 +102,17 @@ class ProcessingManager(object):
             process[0].mirror.close()
             self.remove_display(process[0])
 
-
     def remove_all(self):
         pass
-
 
     def has_spectral_angle(self):
         return "Angle Spectral" in [x.processing_name for x in self.processings]
 
-
     def has_seuillage(self):
         return "Seuillage" in [x.processing_name for x in self.processings]
 
-
     def processing_from_name(self, name):
         return [x for x in self.processings if x.processing_name == name] + [x for x in self.displays if x.processing_name == name]
-
 
 #     def get_process_to_display(self):
 #         for x in self.processings:
@@ -134,8 +122,6 @@ class ProcessingManager(object):
 #         temp = [x.output_working_layer.qgis_layer for x in self.processings if isinstance(x, TerreImageProcessing) and x.output_working_layer.qgis_layer is not None]
 #         logger.debug( temp )
 #         return temp
-
-
 
     def __str__(self):
         sortie = "processings : ["
@@ -152,7 +138,6 @@ class ProcessingManager(object):
             sortie += str(l) + "\n"
 
         return sortie
-
 
 #
 #
