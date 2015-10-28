@@ -216,10 +216,9 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             child_temp = item.child(i)
             child_temp.setCheckState(0, checked)
 
-    def manageChild2(self, tree, item):
+    def manageChild2(self, item):
         # void 	itemChanged ( QTreeWidgetItem * item, int column )
         logger.debug(  "managechild2" )
-        logger.debug(  "current" + str(tree) )
         logger.debug(  "previous" + str(item) )
 
         if item.childCount() > 0:
