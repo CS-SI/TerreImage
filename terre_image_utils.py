@@ -34,6 +34,7 @@ import manage_QGIS
 import terre_image_processing
 from terre_image_constant import TerreImageConstant
 from processing_manager import ProcessingManager
+import terre_image_run_process
 
 # import loggin for debug messages
 import logging
@@ -161,7 +162,7 @@ def get_workinglayer_on_opening(iface):
         else:
             raster_layer = manage_QGIS.get_raster_layer(file_opened, os.path.splitext(os.path.basename(file_opened))[0])
             if not os.name == "posix":
-                terre_image_processing.set_OTB_PATH()
+                terre_image_run_process.set_OTB_PATH()
             type_image = terre_image_processing.get_sensor_id(file_opened)
             logger.debug("type_image " + str(type_image))
             layer = WorkingLayer(file_opened, raster_layer)
@@ -260,4 +261,4 @@ def compute_overviews(filename):
         command += " 2 4 8 16"
         logger.debug("command to run" + command)
         # os.system(command)
-        terre_image_processing.run_process(command)
+        terre_image_run_process.run_process(command)

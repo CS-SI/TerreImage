@@ -294,7 +294,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                                  os.path.join(vectordir,"imageenveloppe.shp"),
                                  os.path.join(vectordir,"tmp_reprojected.shp"),
                                  preprocessedshpfile) )
-                terre_image_processing.run_process(cropcommand, True)
+                terre_image_run_process.run_process(cropcommand, True)
 #                 try:
 #                   if (simulation):
 #                       time.sleep(3)
@@ -357,7 +357,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                                     outputclassification,
                                     outputresults) )
 
-            terre_image_processing.run_process(classifcommand, True)
+            terre_image_run_process.run_process(classifcommand, True)
             # Execute commandline
 #             try:
 #                 if (simulation):
