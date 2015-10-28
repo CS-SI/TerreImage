@@ -24,11 +24,10 @@
 #
 #---------------------------------------------------------------------
 
-from PyQt4.QtCore import Qt, SIGNAL
-from PyQt4.QtGui import QCursor
-# from qgis.core import
-from qgis.gui import QgsMapTool
-
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from qgis.core import *
+from qgis.gui import *
 
 class ProfiletoolMapTool_ValueTool(QgsMapTool):
 
@@ -38,9 +37,9 @@ class ProfiletoolMapTool_ValueTool(QgsMapTool):
         self.cursor = QCursor(Qt.CrossCursor)
 
     def canvasReleaseEvent(self, event):
-        # print "canvasReleaseEvent v"
+        # print "canvasReleaseEvent_v"
         # print "event", event
-        self.emit(SIGNAL("canvas_clicked"), {'x': event.pos().x(), 'y': event.pos().y()})
+        self.emit(SIGNAL("canvas_clicked_v"), {'x': event.pos().x(), 'y': event.pos().y()})
         # print "canvasReleaseEvent_v"
 
     def activate(self):
