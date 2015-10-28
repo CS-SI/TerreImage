@@ -314,6 +314,7 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject):  # , Ui_Form):
         # self.setupUi(self)
 
         self.layer = layer
+        self.dock = None
 
         if nb_bands >= 3:
             self.nb_hist = 3
@@ -335,6 +336,9 @@ class TerreImageHistogram(QtGui.QWidget, QtCore.QObject):  # , Ui_Form):
         b = QtGui.QPushButton("Remise à zéro")
         b.clicked.connect(self.reset)
         self.l.addWidget(b)
+
+    def set_dock(self, dock):
+        self.dock = dock
 
     def reset(self):
         logger.debug("resset")

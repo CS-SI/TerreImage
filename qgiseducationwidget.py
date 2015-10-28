@@ -289,6 +289,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, histodockwidget)
             QtCore.QObject.connect(histodockwidget, QtCore.SIGNAL("closed(PyQt_PyObject)"), self.histogram_monoband_closed)
             hist.dock_opened = True
+            hist.set_dock(histodockwidget)
         self.set_working_message(False)
         return hist
 
