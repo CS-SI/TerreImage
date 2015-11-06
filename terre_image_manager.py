@@ -38,6 +38,12 @@ logger = logging.getLogger('TerreImage_TerreImageManager')
 logger.setLevel(logging.INFO)
 
 
+import sys
+sys.path.append("/home/amondot/.eclipse/org.eclipse.platform_3.8_155965261/plugins/org.python.pydev_4.3.0.201508182223/pysrc/")
+from pydevd import *
+
+
+
 class TerreImageManager():
 
     def __init__(self, iface):
@@ -45,16 +51,11 @@ class TerreImageManager():
         self.canvas = self.iface.mapCanvas()
         self.working_directory = None  # , _ = terre_image_utils.fill_default_directory()
         self.layer = None
-
+        # settrace()
+        print "1"
         self.value_tool = ValueWidget(self.iface)  # , self )
-        # creating a dock widget
-        # create the dockwidget with the correct parent and add the valuewidget
-        self.valuedockwidget = QtGui.QDockWidget("Valeurs spectrales", self.iface.mainWindow())
-        self.valuedockwidget.setObjectName("Valeurs spectrales")
-        self.valuedockwidget.setWidget(self.value_tool)
-        self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
-        self.valuedockwidget.hide()
-        logger.info(self.value_tool)
+        self.valuedockwidget = None
+        print "2"
 
         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
         self.mirror_map_tool.initGui()
@@ -64,6 +65,19 @@ class TerreImageManager():
 
         self.classif_tool = SupervisedClassificationDialog(self.iface)
         # self.classif_tool.setupUi()
+
+    def set_value_tool_dock_widget(self):
+        # creating a dock widget
+        # create the dockwidget with the correct parent and add the valuewidget
+        self.valuedockwidget = QtGui.QDockWidget("Valeurs spectrales", self.iface.mainWindow())
+        self.valuedockwidget.setObjectName("Valeurs spectrales")
+        print "3"
+        self.valuedockwidget.setWidget(self.value_tool)
+        print "4"
+        self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
+        self.valuedockwidget.hide()
+        logger.info(self.value_tool)
+
 
     def set_current_layer(self):
         self.layer, bands = terre_image_utils.get_workinglayer_on_opening(self.iface)
@@ -93,7 +107,9 @@ class TerreImageManager():
         return self.layer, bands
 
     def display_values(self):
-
+        if self.valuedockwidget is None :
+            self.set_value_tool_dock_widget()
+        print "dispkay values 123456789"
         self.valuedockwidget.show()
         self.value_tool.changeActive(QtCore.Qt.Checked)
         self.value_tool.cbxActive.setCheckState(QtCore.Qt.Checked)
