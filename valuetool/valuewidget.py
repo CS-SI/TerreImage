@@ -58,6 +58,8 @@ except:
 hasmpl = True
 try:
     import matplotlib
+    from matplotlib.ticker import MultipleLocator
+    from matplotlib.ticker import MaxNLocator
     # import matplotlib.pyplot as plt
     # import matplotlib.ticker as ticker
     # from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
@@ -107,6 +109,13 @@ class ValueWidgetGraph(FigureCanvas):
         xtext = self.axes.set_xlabel('Bandes')  # returns a Text instance
         ytext = self.axes.set_ylabel('Valeur')
         self.axes.figure.canvas.draw()
+        xa = self.axes.get_xaxis()
+
+        xa.set_major_locator(MaxNLocator(integer=True))
+
+
+
+
 
     def update_plot(self):
         self.axes.figure.canvas.draw()
