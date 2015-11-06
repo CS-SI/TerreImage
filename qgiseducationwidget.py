@@ -19,6 +19,10 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os
+import re
+import codecs
+from collections import OrderedDict
 
 from PyQt4 import QtCore, QtGui
 from ui_qgiseducation import Ui_QGISEducation
@@ -546,6 +550,12 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.set_working_message(False)
 
     def display_metadata(self):
+
+        metadata_file = os.path.join(os.path.dirname(ProcessingManager().working_layer.source_file), "terreimage.metadata")
+        print "metadata1", metadata_file
+        #image_file_name_without_extension = os.path.splitext(ProcessingManager().working_layer.source_file)[0]
+        #metadata_file = image_file_name_without_extension + ".MTD"
+        print "metadfata2", metadata_file
         # get image size and resolution
         dataset = gdal.Open(ProcessingManager().working_layer.source_file)
         if dataset is not None:
@@ -554,12 +564,45 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             geotransform = dataset.GetGeoTransform()
             pixel_size_x = geotransform[1]
             pixel_size_y = geotransform[5]
+        dataset = None
 
-        list_to_display = [(u"Satellite", ProcessingManager().working_layer.type),
-                           (u"Lieu", "TO BE DEFINED"),
+        dict_user_metadata = OrderedDict({})
+        if not os.path.exists(metadata_file):
+            print "Fichier metadonnees manquant"
+        else:
+            f=codecs.open(metadata_file, mode="r", encoding='utf-8')
+            for line in f.readlines():
+                split = re.split("\s", line)
+                print "split", split
+                if len(split)<2:
+                    continue
+                key = re.split("\s", line)[0]
+                values = " ".join(re.split("\s", line)[1:])
+                dict_user_metadata[key] = values
+            f.close()
+
+        if not "Lieu" in dict_user_metadata.keys():
+            dict_user_metadata["Lieu"] = "Inconnu"
+
+        sat = ProcessingManager().working_layer.type
+        if sat is None:
+            if not "Satellite" in dict_user_metadata.keys():
+                sat = "Inconnu"
+            else:
+                sat = dict_user_metadata["Satellite"]
+                del dict_user_metadata["Satellite"]
+
+
+        list_to_display = [(u"Satellite", sat),
+                           (u"Lieu", dict_user_metadata["Lieu"]),
                            (u"Lignes", str(total_size_x)),
                            (u"Colonnes", str(total_size_y)),
-                           (u"Résolution", "TOBEDEFINED" + str(pixel_size_x))]
+                           (u"Résolution", str(pixel_size_x))]
+        del dict_user_metadata["Lieu"]
+
+        for key, value in dict_user_metadata.iteritems():
+            list_to_display.append((key, value))
+
         # QTreeWidget
         self.treeWidget.clear()
         header = QtGui.QTreeWidgetItem([u"Métadonnée", "Valeur"])
