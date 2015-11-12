@@ -551,11 +551,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
     def display_metadata(self):
 
-        metadata_file = os.path.join(os.path.dirname(ProcessingManager().working_layer.source_file), "terreimage.metadata")
-        print "metadata1", metadata_file
-        #image_file_name_without_extension = os.path.splitext(ProcessingManager().working_layer.source_file)[0]
-        #metadata_file = image_file_name_without_extension + ".MTD"
-        print "metadfata2", metadata_file
+        image_file_name_without_extension = os.path.splitext(ProcessingManager().working_layer.source_file)[0]
+        metadata_file = image_file_name_without_extension + ".MTD"
         # get image size and resolution
         dataset = gdal.Open(ProcessingManager().working_layer.source_file)
         if dataset is not None:
@@ -573,7 +570,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             f=codecs.open(metadata_file, mode="r", encoding='utf-8')
             for line in f.readlines():
                 split = re.split("\s", line)
-                print "split", split
                 if len(split)<2:
                     continue
                 key = re.split("\s", line)[0]
@@ -623,7 +619,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
     def layer_deleted(self, layer_id):
 
         # logger.debug( str(layer_id) + " deleted")
-        # print str(layer_id) + " deleted"
         layer_id = layer_id.encode('utf-8')
 
         if "Angle_Spectral" in str(layer_id):
