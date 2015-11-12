@@ -606,7 +606,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
         root = QtGui.QTreeWidgetItem(self.treeWidget, ["Image de travail"])
         for key, value in list_to_display:
-            A = QtGui.QTreeWidgetItem(root, [key, str(value)])
+            A = QtGui.QTreeWidgetItem(root, [key, value])
         self.treeWidget.resizeColumnToContents(0)
         self.treeWidget.resizeColumnToContents(1)
 
