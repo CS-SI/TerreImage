@@ -38,12 +38,6 @@ logger = logging.getLogger('TerreImage_TerreImageManager')
 logger.setLevel(logging.INFO)
 
 
-import sys
-sys.path.append("/home/amondot/.eclipse/org.eclipse.platform_3.8_155965261/plugins/org.python.pydev_4.3.0.201508182223/pysrc/")
-from pydevd import *
-
-
-
 class TerreImageManager():
 
     def __init__(self, iface):
@@ -52,10 +46,8 @@ class TerreImageManager():
         self.working_directory = None  # , _ = terre_image_utils.fill_default_directory()
         self.layer = None
         # settrace()
-        print "1"
         self.value_tool = ValueWidget(self.iface)  # , self )
         self.valuedockwidget = None
-        print "2"
 
         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
         self.mirror_map_tool.initGui()
@@ -71,9 +63,7 @@ class TerreImageManager():
         # create the dockwidget with the correct parent and add the valuewidget
         self.valuedockwidget = QtGui.QDockWidget("Valeurs spectrales", self.iface.mainWindow())
         self.valuedockwidget.setObjectName("Valeurs spectrales")
-        print "3"
         self.valuedockwidget.setWidget(self.value_tool)
-        print "4"
         self.iface.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.valuedockwidget)
         self.valuedockwidget.hide()
         logger.info(self.value_tool)
