@@ -1,4 +1,5 @@
 # TerreImage
+<<<<<<< HEAD
 
 ![TerreImage](img/splash.jpg)
 
@@ -10,3 +11,5 @@ TerreImage s'appuie sur la librairie [Orfeo Toolbox](http://orfeo-toolbox.org/ot
 * [ValueTool](http://hub.qgis.org/projects/valuetool)
 
 
+=======
+>>>>>>> 08275cc4bfdc04d879d4a04fc455210490b738fc
