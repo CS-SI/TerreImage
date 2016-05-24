@@ -33,14 +33,14 @@ if( CMAKE_COMPILER_IS_GNUCXX )
 endif( CMAKE_COMPILER_IS_GNUCXX )
 
 # Disable shared libs on win32 plateforms
-IF(WIN32)
+IF(MSVC)
   # do not build shared lib under windows
   SET(BUILD_SHARED_LIBS OFF)
   MESSAGE(STATUS "Disabling build shared lib option on windows like OS.")
-ELSE(WIN32)
+ELSE()
   # on other systems, leave the choice to the user
   OPTION(BUILD_SHARED_LIBS "Build TerreImage with shared libraries." ON)
-ENDIF(WIN32)
+ENDIF()
 
 # Link to the Orfeo ToolBox
 find_package( OTB )
