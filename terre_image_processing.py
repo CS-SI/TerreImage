@@ -35,7 +35,7 @@ from PyQt4.QtGui import QInputDialog
 import OTBApplications
 import terre_image_run_process
 
-# import loggin for debug messages
+# import logging for debug messages
 import logging
 logging.basicConfig()
 # create logger
@@ -49,7 +49,7 @@ logger.setLevel(logging.DEBUG)
 # logger.addHandler(fh)
 
 
-def ndvi(layer, working_directory, iface):
+def ndvi(layer, working_directory):
     # NDVI= (PIR-R)/(PIR+R)
     if not layer:
         logger.debug("Aucune layer selectionnée")
@@ -73,7 +73,7 @@ def ndvi(layer, working_directory, iface):
     return ""
 
 
-def ndti(layer, working_directory, iface):
+def ndti(layer, working_directory):
     # SQRT(R+0.5)
     # NDTI= (R-G)/(R+G)
     if not layer:
@@ -96,7 +96,7 @@ def ndti(layer, working_directory, iface):
             return output_filename
 
 
-def brightness(layer, working_directory, iface):
+def brightness(layer, working_directory):
     # IB = sqrt(RxR+PIRxPIR)
     if not layer:
         logger.debug("Aucune layer selectionnée")
@@ -142,7 +142,7 @@ def threshold(layer, working_directory, forms):
     return output_filename
 
 
-def angles(layer, working_directory, iface, x, y):
+def angles(layer, working_directory, x, y):
     ident = layer.get_qgis_layer().dataProvider().identify(QgsPoint(x, y), QgsRaster.IdentifyFormatValue)
     logger.debug(ident)
     if ident is not None:
@@ -189,7 +189,7 @@ def angles(layer, working_directory, iface, x, y):
             return output_filename
 
 
-def kmeans(layer, working_directory, iface, nb_class=None):
+def kmeans(layer, working_directory, nb_class=None):
     """
     WARNING: nb_valid_pixels à calculer ?
     """
