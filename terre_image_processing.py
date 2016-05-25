@@ -64,7 +64,7 @@ def ndvi(layer, working_directory, iface):
             if not os.path.isfile(output_filename):
                 layer_pir = "im1b" + str(layer.pir)
                 layer_red = "im1b" + str(layer.red)
-                expression = "\"(" + layer_pir + "+" + layer_red + ")!=0?(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "):0)\""
+                expression = "\"((" + layer_pir + "+" + layer_red + ")!=0?(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "):0)\""
                 logger.debug(expression)
                 print "expression", expression
                 logger.debug("image_in" + image_in)
@@ -88,7 +88,7 @@ def ndti(layer, working_directory, iface):
                 layer_red = "im1b" + str(layer.red)
                 layer_green = "im1b" + str(layer.green)
                 # expression = "\"sqrt(" + layer_red + "+0.5)\""
-                expression = "\"(" + layer_red + "+" + layer_green + ")!=0?(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "):0)\""
+                expression = "\"((" + layer_red + "+" + layer_green + ")!=0?(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "):0)\""
                 logger.debug(expression)
                 print "expression", expression
                 logger.debug("image_in" + image_in)
