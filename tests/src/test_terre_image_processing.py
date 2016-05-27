@@ -23,6 +23,7 @@
 
 import unittest
 import os
+from qgis.core import QgsRasterLayer
 from TerreImage import terre_image_processing
 from TerreImage.working_layer import WorkingLayer
 from terre_image_test_case import TerreImageTestCase
@@ -37,7 +38,8 @@ class TestTerreImageProcessingMethods(TerreImageTestCase):
 
         """
         self.image_test = os.path.join(self.data_dir_input, "taredji_extract.TIF")
-        self.terre_image_layer = WorkingLayer(self.image_test, None, {'red':1, 'green':2, 'blue':3, 'pir':4, 'mir':None})
+        self.raster_layer = QgsRasterLayer(self.image_test, "taredji_extract")
+        self.terre_image_layer = WorkingLayer(self.image_test, self.raster_layer, {'red':1, 'green':2, 'blue':3, 'pir':4, 'mir':None})
 
     def test_ndvi(self):
         """
@@ -79,15 +81,19 @@ class TestTerreImageProcessingMethods(TerreImageTestCase):
         baseline = os.path.join(self.data_dir_baseline, "taredji_extract_brightness.tif")
         self.assertTrue(self.checkResult(generated_image, baseline))
 
-    def test_angles(self):
-        """
-        Test the spectral angle function
-        Returns:
 
-        """
-        generated_image = terre_image_processing.brightness(self.terre_image_layer, self.working_dir)
-        baseline = os.path.join(self.data_dir_baseline, "taredji_extract_brightness.tif")
-        self.assertTrue(self.checkResult(generated_image, baseline))
+    # #TODO uses QGIS API to get the value of the image at the given coordinate
+    # #TODO create baseline
+    # def test_angles(self):
+    #     """
+    #     Test the spectral angle function
+    #     Returns:
+    #
+    #     """
+    #     pass
+    #     #generated_image = terre_image_processing.angles(self.terre_image_layer, self.working_dir, 0, 0)
+    #     # baseline = os.path.join(self.data_dir_baseline, "taredji_extract_brightness.tif")
+    #     # self.assertTrue(self.checkResult(generated_image, baseline))
 
     def test_kmeans(self):
         """

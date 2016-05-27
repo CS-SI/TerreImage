@@ -23,6 +23,7 @@
 
 import unittest
 import os
+from qgis.core import QgsRasterLayer
 from TerreImage.working_layer import WorkingLayer
 from terre_image_test_case import TerreImageTestCase
 
@@ -31,14 +32,15 @@ class TestWorkingLayer(TerreImageTestCase):
 
     def setUp(self):
         self.image_test = os.path.join(self.data_dir_input, "taredji_extract.TIF")
+        self.raster_layer = QgsRasterLayer(self.image_test, "taredji_extract")
 
     def testWorkingLayerWithoutQGISLayer_ok(self):
-        self.terre_image_layer = WorkingLayer(self.image_test, None, {'red':1, 'green':2, 'blue':3, 'pir':4, 'mir':None})
+        self.terre_image_layer = WorkingLayer(self.image_test, self.raster_layer, {'red':1, 'green':2, 'blue':3, 'pir':4, 'mir':None})
 
 
     def testWorkingLayerWithoutQGISLayer_colorMissingdef(self):
         with self.assertRaises(KeyError):
-          self.terre_image_layer = WorkingLayer(self.image_test, None, {'red':1, 'green':2, 'blue':3, 'pir':4})
+          self.terre_image_layer = WorkingLayer(self.image_test, self.raster_layer, {'red':1, 'green':2, 'blue':3, 'pir':4})
 
 if __name__ == '__main__':
     unittest.main()
