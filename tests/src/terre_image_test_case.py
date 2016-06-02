@@ -34,7 +34,10 @@ class TerreImageTestCase( unittest.TestCase ):
         self.data_dir_input = os.path.join(self.data_dir, "input")
         self.data_dir_baseline = os.path.join(self.data_dir, "baseline")
         # TBD
-        self.working_dir = "/tmp"
+        self.working_dir = "/tmp/terre-image-tests"
+        if os.path.isdir(self.working_dir):
+            os.system("rm -rf {}".format(self.working_dir))
+        os.makedirs(self.working_dir)
 
 
     def checkResult( self, tested_image, reference_image, input_band=1 ):
