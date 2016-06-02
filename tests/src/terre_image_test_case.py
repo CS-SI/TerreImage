@@ -93,3 +93,34 @@ class TerreImageTestCase( unittest.TestCase ):
         else:
             print "mse: {}, \n mae {}, \n psnr: {}".format(mse, mae, psnr)
             return False
+
+    def checkVector(self, vectorTest, vectorBaseline):
+        """
+
+        Args:
+            vectorTest:
+            vectorBaseline:
+
+        Returns:
+
+        """
+        command = "diff {} {}".format(vectorTest, vectorBaseline)
+        res = run_process(command)
+        lines = str(res).splitlines()
+
+        if len(lines) != 0:
+            print "====================="
+            print "Result of diff:"
+            print lines
+            print "====================="
+
+            command = "ogrinfo -al {} > {}".format(vectorTest, os.path.splitext(vectorTest)[0] + ".ogrinfo")
+            os.system(command)
+            command = "ogrinfo -al {} > {}".format(vectorBaseline, os.path.splitext(vectorBaseline)[0] + ".ogrinfo")
+            os.system(command)
+            command = "diff {} {}".format(os.path.splitext(vectorTest)[0] + ".ogrinfo",
+                                          os.path.splitext(vectorBaseline)[0] + ".ogrinfo")
+            os.system(command)
+
+
+        return len(lines)
