@@ -66,5 +66,17 @@ class TestMergeVectorData(TerreImageTestCase):
         self.assertEqual(int(epsg_code),4326)
 
 
+    def testUnionPolygonsWithOGR_ok(self):
+        """
+        Test on Terre Image unionPolygonsWithOGR
+        Returns:
+
+        """
+        road = os.path.join(self.data_dir_input, "classif", 'samples', "road.shp")
+        union = terre_image_gdal_api.unionPolygonsWithOGR([self.vector_test, road], self.working_dir)
+        print union
+        self.assertEqual(union, "1")
+
+
 if __name__ == '__main__':
     unittest.main()
