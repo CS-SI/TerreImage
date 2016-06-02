@@ -85,6 +85,6 @@ IF(WIN32)
     ENDIF(NOT CYGWIN)
 ENDIF(WIN32)
 
-add_subdirectory(ClassificationSupervisee_cpp)
+#add_subdirectory(ClassificationSupervisee_cpp)
 add_subdirectory(packaging)
 

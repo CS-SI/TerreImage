@@ -1,10 +1,10 @@
-#OTB_CREATE_APPLICATION(NAME           FullSVMClassificationChain
-#                       SOURCES        otbFullSVMClassificationChain.cxx
-#                       LINK_LIBRARIES OTBIO;OTBCommon;OTBBasicFilters;OTBFeatureExtraction;OTBLearning)                                            
+cmake_minimum_required(VERSION 2.8.9)
+project(TerreImage)
 
-add_executable(otbCropVectorDataToImage otbCropVectorDataToImage.cxx)
-target_link_libraries(otbCropVectorDataToImage OTBProjection OTBCommon OTBImageIO OTBVectorDataIO)
-
-OTB_CREATE_APPLICATION(NAME           ComputeLabelImagePopulation
-                       SOURCES        otbComputeLabelImagePopulation.cxx
-                       LINK_LIBRARIES OTBImageIO;OTBCommon;OTBStatistics;OTBTinyXML) 
+if(NOT OTB_SOURCE_DIR)
+  find_package(OTB REQUIRED)
+  list(APPEND CMAKE_MODULE_PATH ${OTB_CMAKE_DIR})
+  include(OTBModuleExternal)
+else()
+  otb_module_impl()
+endif()
