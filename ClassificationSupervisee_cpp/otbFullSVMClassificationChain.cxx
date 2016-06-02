@@ -163,23 +163,6 @@ private:
     AddParameter(ParameterType_OutputFilename, "io.results", "Output results");
     SetParameterDescription("io.results", "XML file containing the classification results");
     
-    // //Group Sample list
-    // AddParameter(ParameterType_Group,"sample","Training and validation samples parameters");
-    // SetParameterDescription("sample",
-    //                         "This group of parameters allows to set training and validation sample lists parameters.");
- 
-    // AddParameter(ParameterType_Int, "sample.mt", "Maximum training sample size");
-    // SetDefaultParameterInt("sample.mt", -1);
-    // SetParameterDescription("sample.mt", "Maximum size of the training sample list (default = -1).");
-    // AddParameter(ParameterType_Int, "sample.mv", "Maximum validation sample size");
-    // SetDefaultParameterInt("sample.mv", -1);
-    // SetParameterDescription("sample.mv", "Maximum size of the validation sample list (default = -1)");
-
-    // AddParameter(ParameterType_Float, "sample.vtr", "training and validation sample ratio");
-    // SetParameterDescription("sample.vtr",
-    //                         "Ratio between training and validation samples (0.0 = all training, 1.0 = all validation) default = 0.5.");
-    // SetParameterFloat("sample.vtr", 0.5);
-
    // Doc example parameter settings
    // SetDocExampleParameterValue("il", "QB_1_ortho.tif");
    // SetDocExampleParameterValue("out", "EstimateImageStatisticsQB1.xml");
@@ -286,30 +269,6 @@ private:
     kappaxml->SetDoubleAttribute("value", confusionMatrixCalc->GetKappaIndex());
     results->LinkEndChild(kappaxml);
     
-/*
-    oss << confusionMatrixCalc->GetConfusionMatrix() << std::endl;
-    {
-      
-      TiXmlText * txt = new TiXmlText(oss.str().c_str());
-      txt->SetCDATA(true);
-      xml->LinkEndChild(txt);
-      elem->LinkEndChild(xml);
-    }
-
-
-
-      std::ofstream file;
-      file.open(GetParameterString("io.confusion").c_str());
-
-      file << matrix << std::endl;
-
-      file << "Precision of the different class: " << confMatCalc->GetPrecisions() << std::endl;
-      file << "Recall of the different class: " << confMatCalc->GetRecalls() << std::endl;
-      file << "F-score of the different class: " << confMatCalc->GetFScores() << std::endl;
-      file << "Kappa index: " << confMatCalc->GetKappaIndex() << std::endl;
-
-      file.close();
-*/
   }
 
   void WriteStatistics(TiXmlElement * elem)
@@ -337,16 +296,12 @@ private:
     TiXmlElement * stats = new TiXmlElement("Statistiques");
     elem->LinkEndChild(stats);
 
-    //StatisticsFilterType::LabelPopulationMapType::const_iterator it;
-    
+   
     FloatVectorImageType::SizeType size = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
     unsigned int total = size[0] * size[1];
     
     for (StatisticsFilterType::LabelPopulationMapType::const_iterator it = populationMap.begin(); it !=populationMap.end() ; ++it)
     {
-        //std::cout << "label : " << it->first << " , ";
-         //         << "mean value : " << it->second << std::endl;
-        // get percentage
       double percent =  (it->second / total) * 100;
       // round to nearest 0.1 %
       percent = static_cast<double>(itk::Math::Round( percent * 10 )) / 10;
