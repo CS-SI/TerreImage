@@ -171,7 +171,7 @@ def get_workinglayer_on_opening(iface):
                 # self.define_bands(self.layer)
                 # manage_bands()
                 # self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
-                red, green, blue, pir, mir, type_satellite = manage_bands(type_image, layer.get_band_number()).get_values()
+                red, green, blue, pir, mir = manage_bands(type_image, layer.get_band_number()).get_values()
 
                 if red != -1 or green != -1 or blue != -1 or pir != -1 or mir != -1:
                     all_set = True
@@ -181,8 +181,6 @@ def get_workinglayer_on_opening(iface):
                             all_set = False
                     if all_set:
                         layer.set_bands(bands)
-                        if layer.type is None:
-                            layer.set_type(type_satellite)
 
                         logger.debug(str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
 
