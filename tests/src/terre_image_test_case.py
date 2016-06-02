@@ -26,6 +26,14 @@ import os
 import re
 from TerreImage.terre_image_run_process import run_process
 
+# import logging for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger('terre_image_test_case')
+logger.setLevel(logging.DEBUG)
+
+
 class TerreImageTestCase( unittest.TestCase ):
     def __init__( self, *args, **kwargs ):
         super( TerreImageTestCase, self ).__init__( *args, **kwargs )
@@ -50,7 +58,7 @@ class TerreImageTestCase( unittest.TestCase ):
 
         @return: True is variables are equal, False otherwise
         """
-        print "Comparing {} and {}".format(reference_image, tested_image)
+        logger.info("Comparing {} and {}".format(reference_image, tested_image))
 
         command = "otbcli_CompareImages -ref.in {} -ref.channel {} " \
                   "-meas.in {} -meas.channel {}".format(reference_image,
@@ -94,7 +102,7 @@ class TerreImageTestCase( unittest.TestCase ):
         if mse == mae == psnr == "0":
             return True
         else:
-            print "mse: {}, \n mae {}, \n psnr: {}".format(mse, mae, psnr)
+            logging.info("mse: {}, \n mae {}, \n psnr: {}".format(mse, mae, psnr))
             return False
 
     def checkVector(self, vectorTest, vectorBaseline):
@@ -112,10 +120,10 @@ class TerreImageTestCase( unittest.TestCase ):
         lines = str(res).splitlines()
 
         if len(lines) != 0:
-            print "====================="
-            print "Result of diff:"
-            print lines
-            print "====================="
+            logging.info( "=====================")
+            logging.info( "Result of diff:")
+            logging.info( lines)
+            logging.info( "=====================")
 
             command = "ogrinfo -al {} > {}".format(vectorTest, os.path.splitext(vectorTest)[0] + ".ogrinfo")
             os.system(command)
