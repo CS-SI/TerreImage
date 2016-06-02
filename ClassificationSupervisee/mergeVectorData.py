@@ -27,7 +27,7 @@ import os
 import sys
 import shutil
 
-from TerreImage.terre_image_gdal_api import get_image_epsg_code_with_gdal, get_vector_epsg_with_ogr
+from TerreImage.terre_image_gdal_system import unionPolygonsWithOGR
 
 # import logging for debug messages
 import logging
@@ -41,10 +41,19 @@ logger.setLevel(logging.DEBUG)
 
 
 def mergeVectorDataFiles(listOfVectorData, outputDirectory):
-    outputFilename = os.path.join(outputDirectory, "merged_vectordata.shp")
-    while os.path.isfile(outputFilename):
-        outputFilename = outputFilename[:-4] + "_" + outputFilename[-4:]
+    """
+    Calls the ogr function unionPolygonsWithOGR to merge the given vector data.
+    Two fields are added :
+        - CLASS containing an id per vector file
+        - Label containing the basename of the vector file
+    Args:
+        listOfVectorData:
+        outputDirectory:
 
+    Returns:
+
+    """
+    unionPolygonsWithOGR(listOfVectorData, outputDirectory)
 
 
 

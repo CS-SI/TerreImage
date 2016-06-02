@@ -38,6 +38,15 @@ class TestMergeVectorData(TerreImageTestCase):
         if not os.path.isdir(self.working_dir1):
             os.makedirs(self.working_dir1)
 
+    def testMergeVectorData(self):
+        green_files = os.path.join(self.data_dir_input, "classif", 'samples', "green.*")
+        os.system("cp {} {}".format(green_files, self.working_dir1))
+        green = os.path.join(self.working_dir, "green.shp")
+        road_files = os.path.join(self.data_dir_input, "classif", 'samples', "road.*")
+        os.system("cp {} {}".format(road_files, self.working_dir1))
+        road = os.path.join(self.working_dir, "road.shp")
+        union = mergeVectorData.unionPolygonsWithOGR([green, road], self.working_dir1)
+
 
 
 
