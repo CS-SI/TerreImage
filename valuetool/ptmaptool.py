@@ -47,7 +47,6 @@ class ProfiletoolMapTool_ValueTool(QgsMapTool):
         self.canvas.setCursor(self.cursor)
 
     def deactivate(self):
-        print "desactivate 123456789"
         # self.emit( SIGNAL("deactivate") )
         # self.canvas.setCursor( QCursor(Qt.ArrowCursor))
         QgsMapTool.deactivate(self)

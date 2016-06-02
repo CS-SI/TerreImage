@@ -189,8 +189,6 @@ class manage_bands:
             self.update_blue_mir("blue")
         else:
             QMessageBox.critical(None , "Erreur", "L'image en entrée doit avoir 1, 3 ou 4 bandes !", QMessageBox.Ok)
-        # print "define by bands"
-        # self.debug()
 
     def debug(self, message=""):
         print message
@@ -265,7 +263,6 @@ class manage_bands:
 
 
     def update_spin_box(self):
-        # print self.red
         self.bandsUi.spinBox_red.setValue(self.red)
         if self.red == -1:
             self.bandsUi.spinBox_red.setEnabled(False)
@@ -331,8 +328,6 @@ class manage_bands:
         Bande 3: Proche infrarouge (0,78 - 0,89 µm)
         Bande 4: Moyen infrarouge (MIR) (1,58 - 1,75 µm)
         """
-        # print "define spot"
-        # spot 4-5
         self.blue = -1
         self.green = 3
         self.red = 2
@@ -348,10 +343,4 @@ class manage_bands:
 
 
     def get_values(self):
-#         self.red = self.bandsUi.spinBox_red.value()
-#         self.green = self.bandsUi.spinBox_green.value()
-#         self.blue = self.bandsUi.spinBox_blue.value()
-#         self.pir = self.bandsUi.spinBox_pir.value()
-#         self.mir = self.bandsUi.spinBox_mir.value()
-        # print self.red
         return self.red, self.green, self.blue, self.pir, self.mir

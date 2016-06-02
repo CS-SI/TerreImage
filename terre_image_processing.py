@@ -66,7 +66,6 @@ def ndvi(layer, working_directory):
                 layer_red = "im1b" + str(layer.red)
                 expression = "\"((" + layer_pir + "+" + layer_red + ")!=0?(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "):0)\""
                 logger.debug(expression)
-                print "expression", expression
                 logger.debug("image_in" + image_in)
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
             return output_filename
@@ -90,7 +89,6 @@ def ndti(layer, working_directory):
                 # expression = "\"sqrt(" + layer_red + "+0.5)\""
                 expression = "\"((" + layer_red + "+" + layer_green + ")!=0?(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "):0)\""
                 logger.debug(expression)
-                print "expression", expression
                 logger.debug("image_in" + image_in)
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
             return output_filename

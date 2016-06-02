@@ -209,11 +209,6 @@ def contrastForRasters(the_raster_layer, min_layer, max_layer, band = None):
                     min1, max1 = get_min_max_via_qgis(the_raster_layer, band[0])
                     min2, max2 = get_min_max_via_qgis(the_raster_layer, band[1])
                     min3, max3 = get_min_max_via_qgis(the_raster_layer, band[2])
-
-# #                     min1, max1, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(),0, band[0])
-# #                     min2, max2, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(),0, band[1])
-# #                     min3, max3, _, _ = terre_image_utils.computeStatistics(the_raster_layer.source(),0, band[2])
-# #                     #print min1, max1, min2, max2, min3, max3
                 else:
                     min1, max1, _, _ = OTBApplications.computeStatistics(the_raster_layer.source(), 0, 1)
                     min2, max2, _, _ = OTBApplications.computeStatistics(the_raster_layer.source(), 0, 2)
@@ -331,13 +326,8 @@ def custom_stretch(the_raster_layer, values, canvas, mono = False):
     """
     Applies a contrast between min and max. If given min and max are 0, then calculates the min and max from gdal.
     """
-#     logger.info("#######################")
     logger.info("custom stretch: values")
     logger.info(values)
-
-    # print "custom stretch"
-    # print canvas
-    # print "layer :", the_raster_layer
 
     # type of layer : raster, vector, other
     type_of_layer = the_raster_layer.type()
@@ -346,7 +336,6 @@ def custom_stretch(the_raster_layer, values, canvas, mono = False):
     layer_renderer = the_raster_layer.renderer()  # for qgis > 1.9
     data_provider = the_raster_layer.dataProvider()
 
-    # print "values", values
     # the layer has to be a raster layer
     if type_of_layer == 1:
         if (the_raster_layer.rasterType() == 0 or mono) and layer_renderer:
@@ -362,7 +351,6 @@ def custom_stretch(the_raster_layer, values, canvas, mono = False):
                 layer_renderer.setContrastEnhancement(gray_enhancement)
 
         elif the_raster_layer.rasterType() == 2 and layer_renderer:
-            # print "layer 3 bandes"
             min_red, max_red = values[0]
             min_green, max_green = values[1]
             min_blue, max_blue = values[2]
@@ -394,15 +382,10 @@ def custom_stretch(the_raster_layer, values, canvas, mono = False):
             logger.debug("green (2): " + str(green_enhancement.minimumValue()) + " " + str(green_enhancement.maximumValue()))
             logger.debug("blue (2): " + str(blue_enhancement.minimumValue()) + " " + str(blue_enhancement.maximumValue()))
 
-            # print "blue enhancement", blue_enhancement
-            # print "blue max", blue_enhancement.maximumValue()
-            # print "blue min", blue_enhancement.minimumValue()
-
             layer_renderer.setRedContrastEnhancement(red_enhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
             layer_renderer.setGreenContrastEnhancement(green_enhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
             layer_renderer.setBlueContrastEnhancement(blue_enhancement)  # , QgsRaster.ContrastEnhancementCumulativeCut  )
 
-            # print "layer renderer"
             red_enhancement_debug = layer_renderer.redContrastEnhancement()
             green_enhancement_debug = layer_renderer.greenContrastEnhancement()
             blue_enhancement_debug = layer_renderer.blueContrastEnhancement()
@@ -410,27 +393,10 @@ def custom_stretch(the_raster_layer, values, canvas, mono = False):
             logger.debug("green (3): " + str(green_enhancement_debug.minimumValue()) + " " + str(green_enhancement_debug.maximumValue()))
             logger.debug("blue (3): " + str(blue_enhancement_debug.minimumValue()) + " " + str(blue_enhancement_debug.maximumValue()))
 
-        # print "end"
         the_raster_layer.setCacheImage(None)
         the_raster_layer.triggerRepaint()
-        # print "2"
     canvas.refresh()
     canvas.repaint()
-    # print "3"
-    # TODO : pourquoi lorsqu'on fait un histogramme sur la bande pir, on a pour affichage des précédentes valeurs:
-    # layer renderer <qgis._core.QgsSingleBandGrayRenderer object at 0x7fdd144558a0>
-    # the_raster_layer 2
-#     print "layer renderer", layer_renderer
-#     print "the_raster_layer", the_raster_layer.rasterType()
-#     if type_of_layer == 1:
-#         if the_raster_layer.rasterType() == 2 and layer_renderer:
-#             red_enhancement_debug = layer_renderer.redContrastEnhancement()
-#             green_enhancement_debug = layer_renderer.greenContrastEnhancement()
-#             blue_enhancement_debug = layer_renderer.blueContrastEnhancement()
-#             logger.debug("red end: " + str(red_enhancement_debug.minimumValue()) + " " + str(red_enhancement_debug.maximumValue()))
-#             logger.debug("green end: " + str(green_enhancement_debug.minimumValue()) + " " + str(green_enhancement_debug.maximumValue()))
-#             logger.debug("blue end: " + str(blue_enhancement_debug.minimumValue()) + " " + str(blue_enhancement_debug.maximumValue()))
-#     logger.info("#######################")
 
 
 def get_raster_layers():
