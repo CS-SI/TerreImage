@@ -33,7 +33,7 @@ from TerreImage.terre_image_gdal_system import unionPolygonsWithOGR
 import logging
 logging.basicConfig()
 # create logger
-logger = logging.getLogger('cropVectorDataToImage')
+logger = logging.getLogger('mergeVectorData')
 logger.setLevel(logging.DEBUG)
 
 
