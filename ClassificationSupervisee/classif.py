@@ -56,8 +56,9 @@ def full_classification(filelist,
                         vd,
                         out,
                         outregul):
-    
-    app_dir="/usr/bin"
+    #TODO manage app dir
+    #app_dir="/usr/bin"
+    app_dir="/home/msavinaud/dev/TerreImage/OTB-5.4.0-Linux64/bin"
          
     # Merge the input images
     create_vrt_from_filelist(vrtfile, filelist)
