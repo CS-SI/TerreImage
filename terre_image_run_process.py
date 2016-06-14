@@ -28,40 +28,6 @@ logger.setLevel(logging.DEBUG)
 
 
 def run_process(fused_command, read_output = False):
-    #     print "run process", fused_command
-    #     qprocess = QProcess()
-    #     set_process_env(qprocess)
-    #     code_de_retour = qprocess.execute(fused_command)
-    #     print "code de retour", code_de_retour
-    #     logger.info("command: ")
-    #     logger.info(fused_command)
-    #     logger.info("code de retour" + str(code_de_retour))
-    #
-    # #     if not qprocess.waitForStarted():
-    # #         # handle a failed command here
-    # #         print "qprocess.waitForStarted()"
-    # #         return
-    # #
-    # #     if not qprocess.waitForReadyRead():
-    # #         # handle a timeout or error here
-    # #         print "qprocess.waitForReadyRead()"
-    # #         return
-    # #     #if not qprocess.waitForFinished(1):
-    # #     #    qprocess.kill()
-    # #     #    qprocess.waitForFinished(1)
-    #
-    # #     if read_output:
-    #
-    #     # logger.info("Erreur")
-    #     code_d_erreur = qprocess.error()
-    #     dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed", 2:"QProcess::TimedOut", 3:"QProcess::WriteError", 4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
-    #     logger.info("Code de retour: " + str(code_d_erreur))
-    #     logger.info(dic_err[code_d_erreur])
-    #
-    #     print "get output"
-    #     output = str(qprocess.readAllStandardOutput())
-    #     # print "output", output
-    #     print 'end output'
     process = QProcess()
     process.start(fused_command)
     if process.waitForStarted():
@@ -109,16 +75,3 @@ def set_OTB_PATH():
             os.environ["ITK_AUTOLOAD_PATH"] = os.path.join(dirname, "win32", "plugin") + ";" + os.environ["ITK_AUTOLOAD_PATH"]
         else:
             os.environ["ITK_AUTOLOAD_PATH"] = os.path.join(dirname, "win32", "plugin")
-    # print os.environ["PATH"]
-    # print os.environ["ITK_AUTOLOAD_PATH"]
-
-
-def set_process_env(process):
-    dirname = os.path.dirname(os.path.abspath(__file__))
-    env = QProcessEnvironment.systemEnvironment()
-
-    env.insert("ITK_AUTOLOAD_PATH", os.path.join(dirname, "win32", "plugin"))  # Add an environment variable
-    env.insert("PATH", os.path.join(dirname, "win32", "bin") + ";" + env.value("Path"))
-    process.setProcessEnvironment(env)
-    # print "env ITK_AUTOLOAD_PATH", env.value("ITK_AUTOLOAD_PATH")
-    # print "env PATH", env.value("PATH")
