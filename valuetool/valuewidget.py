@@ -58,6 +58,8 @@ except:
 hasmpl = True
 try:
     import matplotlib
+    from matplotlib.ticker import MultipleLocator
+    from matplotlib.ticker import MaxNLocator
     # import matplotlib.pyplot as plt
     # import matplotlib.ticker as ticker
     # from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
@@ -107,6 +109,13 @@ class ValueWidgetGraph(FigureCanvas):
         xtext = self.axes.set_xlabel('Bandes')  # returns a Text instance
         ytext = self.axes.set_ylabel('Valeur')
         self.axes.figure.canvas.draw()
+        xa = self.axes.get_xaxis()
+
+        xa.set_major_locator(MaxNLocator(integer=True))
+
+
+
+
 
     def update_plot(self):
         self.axes.figure.canvas.draw()
@@ -155,7 +164,6 @@ class ValueWidget(QWidget, Ui_Widget):
         self.legend = self.iface.legendInterface()
         self.logger = logging.getLogger('.'.join((__name__,
                                         self.__class__.__name__)))
-
         QWidget.__init__(self)
         self.setupUi(self)
         self.setupUi_extra()
@@ -262,7 +270,16 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def disconnect(self):
         self.changeActive(False)
+        self.changeActive(Qt.Unchecked)
         QObject.disconnect(self.canvas, SIGNAL("keyPressed( QKeyEvent * )"), self.pauseDisplay)
+        self.saved_curves = []
+        QObject.disconnect(self.cbxActive, SIGNAL("stateChanged(int)"), self.changeActive)
+        QObject.disconnect(self.cbxGraph, SIGNAL("stateChanged(int)"), self.changePage)
+        QObject.disconnect(self.canvas, SIGNAL("keyPressed( QKeyEvent * )"), self.pauseDisplay)
+        QObject.disconnect(self.plotSelector, SIGNAL("currentIndexChanged ( int )"), self.changePlot)
+        QObject.disconnect(self.pushButton_get_point, SIGNAL("clicked()"), self.on_get_point_button)
+        QObject.disconnect(self.pushButton_csv, SIGNAL("clicked()"), self.export_csv)
+        QObject.disconnect(self.checkBox_hide_current, SIGNAL("stateChanged(int)"), self.update_plot)
 
     def pauseDisplay(self, e):
         pass
@@ -319,13 +336,13 @@ class ValueWidget(QWidget, Ui_Widget):
         if (state == Qt.Checked):
             # QObject.connect(self.legend, SIGNAL( "itemAdded ( QModelIndex )" ), self.statsNeedChecked )
             # QObject.connect(self.legend, SIGNAL( "itemRemoved ()" ), self.invalidatePlot )
-            QObject.connect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
+            #QObject.connect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
             if QGis.QGIS_VERSION_INT >= 10300:  # for QGIS >= 1.3
                 QObject.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint &)"), self.printValue)
             else:
                 QObject.connect(self.canvas, SIGNAL("xyCoordinates(QgsPoint &)"), self.printValue)
         else:
-            QObject.disconnect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
+            #QObject.disconnect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
             if QGis.QGIS_VERSION_INT >= 10300:  # for QGIS >= 1.3
                 QObject.disconnect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint &)"), self.printValue)
             else:
@@ -589,7 +606,7 @@ class ValueWidget(QWidget, Ui_Widget):
             self.printInTable()
 
     def calculateStatistics(self, layersWOStatistics):
-        self.invalidatePlot(False)
+        #self.invalidatePlot(False)
 
         self.statsChecked = True
 
@@ -929,7 +946,9 @@ class ValueWidget(QWidget, Ui_Widget):
         # update empty plot
         if replot and self.cbxGraph.isChecked():
             # self.values=[]
-            self.printValue(None)
+            #self.printValue(None)
+            pass
 
     def resizeEvent(self, event):
-        self.invalidatePlot()
+        pass
+        #self.invalidatePlot()

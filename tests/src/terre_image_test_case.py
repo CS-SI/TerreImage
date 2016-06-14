@@ -37,7 +37,7 @@ class TerreImageTestCase( unittest.TestCase ):
         self.working_dir = "/tmp"
 
 
-    def checkResult( self, tested_image, reference_image ):
+    def checkResult( self, tested_image, reference_image, input_band=1 ):
         """ Check if testVar and refVar are equal with the given precision and the given type
         @param tested_image: variable computed by the test
         @param reference_image: array variable containing the reference value(s), the precision and the type
@@ -49,8 +49,11 @@ class TerreImageTestCase( unittest.TestCase ):
         """
         print "Comparing {} and {}".format(reference_image, tested_image)
 
-        command = "otbcli_CompareImages -ref.in {} -meas.in {}".format(reference_image,
-                                                                       tested_image)
+        command = "otbcli_CompareImages -ref.in {} -ref.channel {} " \
+                  "-meas.in {} -meas.channel {}".format(reference_image,
+                                                        input_band,
+                                                        tested_image,
+                                                        input_band)
         mse = -9999
         mae = -9999
         psnr = -9999
@@ -81,13 +84,12 @@ class TerreImageTestCase( unittest.TestCase ):
         mae_line = lines[-3]
         psnr_line = lines[-2]
 
-        mse = re.search('mse: (\d*)$', mse_line).group(1).replace(" ", "")
-        mae = re.search('mae: (\d*)$', mae_line).group(1).replace(" ", "")
-        psnr = re.search('psnr: (\d*)$', psnr_line).group(1).replace(" ", "")
+        mse = re.search('mse: (\d*[\.\d]+)$', mse_line).group(1).replace(" ", "")
+        mae = re.search('mae: (\d*[\.\d]+)$', mae_line).group(1).replace(" ", "")
+        psnr = re.search('psnr: (\d*[\.\d]+)$', psnr_line).group(1).replace(" ", "")
 
         if mse == mae == psnr == "0":
             return True
         else:
-            print '"{}"'.format(mse)
             print "mse: {}, \n mae {}, \n psnr: {}".format(mse, mae, psnr)
             return False

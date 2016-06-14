@@ -24,7 +24,7 @@
    <item>
     <widget class="QRadioButton" name="radioButton_pleiades">
      <property name="text">
-      <string>Mode image Pleiades</string>
+      <string>Mode image Pleiades - SPOT 6/7</string>
      </property>
     </widget>
    </item>

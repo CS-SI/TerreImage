@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_bands.ui'
 #
-# Created: Mon Jun 23 10:47:52 2014
-#      by: PyQt4 UI code generator 4.9.1
+# Created: Mon Jun  6 08:25:23 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -12,7 +12,16 @@ from PyQt4 import QtCore, QtGui
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
-    _fromUtf8 = lambda s: s
+    def _fromUtf8(s):
+        return s
+
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -100,14 +109,14 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "Terre Image", None, QtGui.QApplication.UnicodeUTF8))
-        self.radioButton_spot.setText(QtGui.QApplication.translate("Dialog", "Mode image spot 4-5", None, QtGui.QApplication.UnicodeUTF8))
-        self.radioButton_pleiades.setText(QtGui.QApplication.translate("Dialog", "Mode image Pleiades", None, QtGui.QApplication.UnicodeUTF8))
-        self.radioButton_formosat.setText(QtGui.QApplication.translate("Dialog", "Mode image Formosat", None, QtGui.QApplication.UnicodeUTF8))
-        self.radioButton_autre.setText(QtGui.QApplication.translate("Dialog", "Autre (mode avancé)", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_4.setText(QtGui.QApplication.translate("Dialog", "Bande proche IR", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_mir.setText(QtGui.QApplication.translate("Dialog", "Bande moyen IR", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_blue.setText(QtGui.QApplication.translate("Dialog", "Bande bleue", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_2.setText(QtGui.QApplication.translate("Dialog", "Bande verte", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_red.setText(QtGui.QApplication.translate("Dialog", "Bande rouge", None, QtGui.QApplication.UnicodeUTF8))
+        Dialog.setWindowTitle(_translate("Dialog", "Terre Image", None))
+        self.radioButton_spot.setText(_translate("Dialog", "Mode image spot 4-5", None))
+        self.radioButton_pleiades.setText(_translate("Dialog", "Mode image Pleiades - SPOT 6/7", None))
+        self.radioButton_formosat.setText(_translate("Dialog", "Mode image Formosat", None))
+        self.radioButton_autre.setText(_translate("Dialog", "Autre (mode avancé)", None))
+        self.label_4.setText(_translate("Dialog", "Bande proche IR", None))
+        self.label_mir.setText(_translate("Dialog", "Bande moyen IR", None))
+        self.label_blue.setText(_translate("Dialog", "Bande bleue", None))
+        self.label_2.setText(_translate("Dialog", "Bande verte", None))
+        self.label_red.setText(_translate("Dialog", "Bande rouge", None))
 

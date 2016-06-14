@@ -18,6 +18,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ With changes in mu parser, formula changes from
+ if(cond, value_if_true, value_if_false)
+ to
+ (cond?value_if_true:value_if_false)
 """
 
 import os
@@ -60,8 +64,9 @@ def ndvi(layer, working_directory):
             if not os.path.isfile(output_filename):
                 layer_pir = "im1b" + str(layer.pir)
                 layer_red = "im1b" + str(layer.red)
-                expression = "\"if((" + layer_pir + "+" + layer_red + ")!=0,(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "),0)\""
+                expression = "\"((" + layer_pir + "+" + layer_red + ")!=0?(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "):0)\""
                 logger.debug(expression)
+                print "expression", expression
                 logger.debug("image_in" + image_in)
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
             return output_filename
@@ -83,8 +88,9 @@ def ndti(layer, working_directory):
                 layer_red = "im1b" + str(layer.red)
                 layer_green = "im1b" + str(layer.green)
                 # expression = "\"sqrt(" + layer_red + "+0.5)\""
-                expression = "\"if((" + layer_red + "+" + layer_green + ")!=0,(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "),0)\""
+                expression = "\"((" + layer_red + "+" + layer_green + ")!=0?(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "):0)\""
                 logger.debug(expression)
+                print "expression", expression
                 logger.debug("image_in" + image_in)
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
             return output_filename
@@ -105,7 +111,7 @@ def brightness(layer, working_directory):
             if not os.path.isfile(output_filename):
                 layer_pir = "im1b" + str(layer.pir)
                 layer_red = "im1b" + str(layer.red)
-                expression = "\"sqrt(" + layer_red + "*" + layer_red + "*" + layer_pir + "*" + layer_pir + ")\""
+                expression = "\"sqrt(" + layer_red + "*" + layer_red + "+" + layer_pir + "*" + layer_pir + ")\""
                 logger.debug(expression)
                 logger.debug("image_in" + image_in)
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
@@ -160,7 +166,7 @@ def angles(layer, working_directory, x, y):
                     denom.append(str(band_value) + "*" + str(band_value))
                     fact.append(current_band + "*" + current_band)
 
-                formula = "if(((" + "+".join(fact) + ") != 0),"
+                formula = "((" + "+".join(fact) + ") != 0)?"
 
                 formula += "acos("
                 formula += "(" + "+".join(num) + ")/"
@@ -168,9 +174,9 @@ def angles(layer, working_directory, x, y):
                 formula += "(" + "+".join(denom) + ")*"
                 formula += "(" + "+".join(fact) + ")"
                 formula += "))"
-                formula += "), 0)"
+                formula += "): 0)"
 
-                formule_ = "\"if( " + formula + ">0.0001, 1/" + formula + ", 0)\""
+                formule_ = "\"" + formula + ">0.0001?1/" + formula + ":0)\""
 
                 logger.debug("num" + str(num))
                 logger.debug("denom" + str(denom))
