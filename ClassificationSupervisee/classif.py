@@ -9,10 +9,6 @@ import terre_image_run_process
 def create_vrt_from_filelist(vrt_name, filelist):
     rootNode = ET.Element( 'VRTDataset' )
 
-    #TODO Get the size of the first dataset
-    totalXSize = 512
-    totalYSize = 512
-
     for filename in filelist:
         print filename
         ds = gdal.Open(filename)
@@ -32,8 +28,9 @@ def create_vrt_from_filelist(vrt_name, filelist):
             dataType = gdal.GetDataTypeName(band.DataType)
             bandNode.attrib['dataType'] = dataType
 
-    rootNode.attrib['rasterXSize'] = str(totalXSize)
-    rootNode.attrib['rasterYSize'] = str(totalYSize)
+    ds1 = gdal.Open(filelist[0])
+    rootNode.attrib['rasterXSize'] = str(ds1.RasterXSize)
+    rootNode.attrib['rasterYSize'] = str(ds1.RasterYSize)
 
     geotransform = ds.GetGeoTransform()
     ftuple = tuple(map(str, geotransform))
