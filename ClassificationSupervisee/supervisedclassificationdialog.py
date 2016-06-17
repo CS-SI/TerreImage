@@ -30,6 +30,7 @@ from RasterLayerSelectorTable import RasterLayerSelectorTable
 from VectorLayerSelectorTable import VectorLayerSelectorTable
 from ConfusionMatrixViewer import ConfusionMatrixViewer
 from TerreImage import terre_image_run_process
+from cropVectorDataToImage import cropVectorDataToImage
 
 from QGisLayers import QGisLayers
 from QGisLayers import QGisLayerType
@@ -257,7 +258,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
             firstraster = '"%s" ' % (selectedrasterlayers[0].source())
 
             # Build list of input vector files
-            vectorlist = ""
+            vectorlist = []
             labeldescriptor = {}
             label = 0
             for i in range(len(selectedvectorlayers)):
@@ -273,66 +274,9 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                 # Reprocess input shp file to crop it to firstraster extent
                 vectordir = os.path.join(outputdir, 'class%s' % (str(i)))
                 ensure_clean_dir(vectordir)
-                #preprocessedshpfile = os.path.join(vectordir, transform_spaces(os.path.basename(unicode(inputshpfilepath))))
-                preprocessedshpfile = os.path.join(vectordir, "preprocessed.shp")
 
-                cropcommand = ('%s/cropvectortoimage.bat '
-                             '"%s" '
-                             '"%s" '
-                             '"%s" '
-                             '"%s" '
-                             '"%s" '
-                             % ( self.app_dir,
-                                 inputshpfilepath,
-                                 selectedrasterlayers[0].source(),
-                                 os.path.join(vectordir,"imageenveloppe.shp"),
-                                 os.path.join(vectordir,"tmp_reprojected.shp"),
-                                 preprocessedshpfile) )
-                terre_image_run_process.run_process(cropcommand, True)
-#                 try:
-#                   if (simulation):
-#                       time.sleep(3)
-#                   else:
-#                       proc = subprocess.Popen(cropcommand.encode('mbcs'),
-#                                               shell=True,
-#                                               stdout=subprocess.PIPE,
-#                                               stdin=subprocess.PIPE,
-#                                               stderr=subprocess.STDOUT,
-#                                               universal_newlines=False)
-#
-#                       loglines = []
-#                       for line in iter(proc.stdout.readline, ""):
-#                           loglines.append(line)
-#
-#                       proc.wait()
-#                       if proc.returncode != 0:
-#                           raise OSError
-#
-#                 except OSError:
-#                   errorDuringClassif = True
-#
-#                   mbox = QtGui.QMessageBox()
-#                   mbox.setWindowTitle(u"Erreur")
-#                   mbox.setText(u"Une erreur a été rencontrée lors de la préparation des données vecteurs")
-#
-#                   # has no effect...
-#                   #mbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-#                   #mbox.setSizeGripEnabled(True)
-#
-#                   detailedtext = (u"Code de retour : %s%s"
-#                                   "Commande : %s%s"
-#                                   "Sortie standard :%s%s"
-#                                   % ( proc.returncode, 2*os.linesep,
-#                                       cropcommand, 2*os.linesep,
-#                                       os.linesep, u''.join([u'%s%s' % (unicode(c, 'mbcs'), os.linesep) for c in loglines]) ) )
-#
-#                   mbox.setDetailedText(detailedtext)
-#                   mbox.setIcon(QtGui.QMessageBox.Critical)
-#                   mbox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
-#                   ret = mbox.exec_()
-#                   raise OSError
-
-                vectorlist += '"%s" ' % (preprocessedshpfile)
+                preprocessedshpfile = cropVectorDataToImage(selectedrasterlayers[0].source(), inputshpfilepath, vectordir)
+                vectorlist.append(preprocessedshpfile)
 
             # Build classifcommand
             outputlog = os.path.join(outputdir, 'output.log')
