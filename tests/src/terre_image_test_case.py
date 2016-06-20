@@ -41,6 +41,7 @@ class TerreImageTestCase( unittest.TestCase ):
         self.data_dir = os.path.join(parent_dir, "data")
         self.data_dir_input = os.path.join(self.data_dir, "input")
         self.data_dir_baseline = os.path.join(self.data_dir, "baseline")
+        self.src_dir = os.path.abspath(os.path.join(parent_dir, os.pardir))
         # TBD
         self.working_dir = "/tmp/terre-image-tests"
         if os.path.isdir(self.working_dir):
