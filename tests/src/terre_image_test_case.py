@@ -24,7 +24,7 @@
 import unittest
 import os
 import re
-from TerreImage.terre_image_run_process import run_process
+from TerreImage.terre_image_run_process import TerreImageProcess
 
 # import logging for debug messages
 import logging
@@ -69,7 +69,8 @@ class TerreImageTestCase( unittest.TestCase ):
         mse = -9999
         mae = -9999
         psnr = -9999
-        res = run_process(command)
+        res = TerreImageProcess().run_process(command)
+
         lines = str(res).splitlines()
         # for line in lines:
         #     # sensor_line = result_sensor[0]
@@ -117,7 +118,7 @@ class TerreImageTestCase( unittest.TestCase ):
 
         """
         command = "diff {} {}".format(vectorTest, vectorBaseline)
-        res = run_process(command)
+        res = TerreImageProcess().run_process(command)
         lines = str(res).splitlines()
 
         if len(lines) != 0:
