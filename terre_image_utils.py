@@ -34,6 +34,7 @@ from terre_image_constant import TerreImageConstant
 from processing_manager import ProcessingManager
 import terre_image_run_process
 import OTBApplications
+import terre_image_gdal_system
 
 # import loggin for debug messages
 import logging
@@ -188,7 +189,7 @@ def get_workinglayer_on_opening(iface):
                         cst.index_group = cst.iface.legendInterface().addGroup("Terre Image", True, None)
 
                         manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
-                        OTBApplications.compute_overviews(file_opened)
+                        terre_image_gdal_system.compute_overviews(file_opened)
                         return layer, bands
                     else:
                         QMessageBox.warning(None, "Erreur",

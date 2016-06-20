@@ -25,6 +25,7 @@ from working_layer import WorkingLayer
 import terre_image_processing
 from processing_manager import ProcessingManager
 import OTBApplications
+import terre_image_gdal_system
 
 from qgis.core import QGis, QgsMapLayerRegistry
 from qgis.gui import QgsRubberBand
@@ -131,7 +132,7 @@ class TerreImageProcessing(TerreImageTask, QObject):
             logger.debug("this is thrshold")
             output_filename = terre_image_processing.threshold(self.layer, self.working_directory, self.arg)
         if output_filename:
-            OTBApplications.compute_overviews(output_filename)
+            terre_image_gdal_system.compute_overviews(output_filename)
             logger.debug(output_filename)
             self.display(output_filename)
 
