@@ -60,7 +60,7 @@ class TestTerreImageProcess(TerreImageTestCase):
         process.set_otb_process_env_custom(otb_app_path=libdir,
                                            path=bindir)
         self.assertEqual(process.env.value("OTB_APPLICATION_PATH"), libdir)
-        self.assertTrue(process.env.value("PATH").startswith(bindir))
+        self.assertTrue(str(process.env.value("PATH")).startswith(bindir))
 
     def test_runWhichLauncher(self):
         """
