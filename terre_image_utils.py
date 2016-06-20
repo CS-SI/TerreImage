@@ -161,8 +161,6 @@ def get_workinglayer_on_opening(iface):
             pass
         else:
             raster_layer = manage_QGIS.get_raster_layer(file_opened, os.path.splitext(os.path.basename(file_opened))[0])
-            if not os.name == "posix":
-                terre_image_run_process.set_OTB_PATH()
             type_image = terre_image_processing.get_sensor_id(file_opened)
             logger.debug("type_image " + str(type_image))
             layer = WorkingLayer(file_opened, raster_layer)

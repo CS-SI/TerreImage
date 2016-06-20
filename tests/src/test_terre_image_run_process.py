@@ -18,8 +18,6 @@
  ***************************************************************************
 """
 
-
-
 import unittest
 import os
 from qgis.core import QgsRasterLayer
@@ -62,6 +60,7 @@ class TestTerreImageProcess(TerreImageTestCase):
         self.assertEqual(process.env.value("OTB_APPLICATION_PATH"), libdir)
         self.assertTrue(str(process.env.value("PATH")).startswith(bindir))
 
+
     def test_runWhichLauncher(self):
         """
         Test environement...
@@ -78,7 +77,8 @@ class TestTerreImageProcess(TerreImageTestCase):
         command = "which otbApplicationLauncherCommandLine"
         result = process.run_process(command)
         self.assertIsNotNone(result)
-        self.assertEqual(result.data().replace("\n", ""), os.path.join(self.otb_dir, "bin", "otbApplicationLauncherCommandLine"))
+        self.assertEqual(result.data().replace("\n", ""),
+                         os.path.join(self.otb_dir, "bin", "otbApplicationLauncherCommandLine"))
 
 
     def test_runReadImageInfo(self):

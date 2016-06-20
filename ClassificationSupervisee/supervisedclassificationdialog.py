@@ -29,7 +29,7 @@ from PyQt4 import QtCore, QtGui
 from RasterLayerSelectorTable import RasterLayerSelectorTable
 from VectorLayerSelectorTable import VectorLayerSelectorTable
 from ConfusionMatrixViewer import ConfusionMatrixViewer
-from TerreImage import terre_image_run_process
+from TerreImage.terre_image_run_process import TerreImageProcess
 from cropVectorDataToImage import cropVectorDataToImage
 
 from QGisLayers import QGisLayers
@@ -294,8 +294,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                                     vectorlist,
                                     outputclassification,
                                     outputresults) )
-
-            terre_image_run_process.run_process(classifcommand, True)
+            TerreImageProcess().run_process(classifcommand)
             # Execute commandline
 #             try:
 #                 if (simulation):
