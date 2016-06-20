@@ -21,7 +21,14 @@
 """
 
 import os
+from terre_image_run_process import TerreImageProcess
 
+# import logging for debug messages
+import logging
+logging.basicConfig()
+# create logger
+logger = logging.getLogger('TerreImage_GDALSystem')
+logger.setLevel(logging.INFO)
 
 def unionPolygonsWithOGR(filenames, outputDirectory):
     """
@@ -48,3 +55,18 @@ def unionPolygonsWithOGR(filenames, outputDirectory):
         command = 'ogr2ogr -update -append {} {}'.format(outputFilename, f)
         os.system(command)
         indexClass+=1
+
+
+def compute_overviews(filename):
+    """
+    Runs gdaladdo on the given filename
+    """
+    if not os.path.isfile(filename + ".ovr"):
+        command = "gdaladdo "
+        command += " -ro "
+        command += "\"" + filename + "\""
+        command += " 2 4 8 16"
+        logger.debug("command to run" + command)
+        TerreImageProcess().run_process(command)
+
+

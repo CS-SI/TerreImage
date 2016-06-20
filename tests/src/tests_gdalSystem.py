@@ -29,6 +29,15 @@ from TerreImage import terre_image_gdal_system
 
 class TestGdalSystem(TerreImageTestCase):
 
+
+    def setUp(self):
+        """
+        Defines the test image
+        Returns:
+
+        """
+        self.image_test = os.path.join(self.data_dir_input, "taredji_extract.TIF")
+
     def testUnionPolygonsWithOGR_ok(self):
         """
         Test on Terre Image unionPolygonsWithOGR
@@ -42,6 +51,21 @@ class TestGdalSystem(TerreImageTestCase):
         os.system("cp {} {}".format(road_files, self.working_dir))
         road = os.path.join(self.working_dir, "road.shp")
         union = terre_image_gdal_system.unionPolygonsWithOGR([green, road], self.working_dir)
+
+    def test_Gdaladdo(self):
+        """
+        Test call of gdaladdo
+        Returns:
+
+        """
+        copy_image_test = os.path.join(self.working_dir, os.path.basename(self.image_test))
+        shutil.copy(self.image_test, copy_image_test)
+        output_image = terre_image_gdal_system.compute_overviews(copy_image_test)
+        split = os.path.splitext(os.path.basename(self.image_test))
+        ovr_file = os.path.join(self.working_dir, os.path.basename(self.image_test) + ".ovr")
+        print "Test existence of {}".format(ovr_file)
+        self.assertTrue(os.path.exists(ovr_file))
+
 
 
 if __name__ == '__main__':
