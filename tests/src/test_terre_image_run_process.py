@@ -65,6 +65,7 @@ class TestTerreImageProcess(TerreImageTestCase):
     def test_runWhichLauncher(self):
         """
         Test environement...
+        Uncomment to test an other environement than the one defined in the configuration file
 
         Returns:
 
@@ -81,6 +82,12 @@ class TestTerreImageProcess(TerreImageTestCase):
 
 
     def test_runReadImageInfo(self):
+        """
+        Test of a OTB application and get the output.
+        Uncomment to test an other environement than the one defined in the configuration file
+        Returns:
+
+        """
         process = TerreImageProcess()
         # libdir = os.path.join(self.otb_dir, "lib", "otb", "applications")
         # bindir = os.path.join(self.otb_dir, "bin")
