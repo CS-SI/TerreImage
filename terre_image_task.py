@@ -105,11 +105,11 @@ class TerreImageProcessing(TerreImageTask, QObject):
         logger.debug("self.arg" + str(self.arg))
         output_filename = ""
         if "NDVI" in self.processing_name:
-            output_filename = terre_image_processing.ndvi(self.layer, self.working_directory, self.iface)
+            output_filename = terre_image_processing.ndvi(self.layer, self.working_directory)
         if "NDTI" in self.processing_name:
-            output_filename = terre_image_processing.ndti(self.layer, self.working_directory, self.iface)
+            output_filename = terre_image_processing.ndti(self.layer, self.working_directory)
         if "Indice de brillance" in self.processing_name:
-            output_filename = terre_image_processing.brightness(self.layer, self.working_directory, self.iface)
+            output_filename = terre_image_processing.brightness(self.layer, self.working_directory)
         if "Angle Spectral" in self.processing_name:
             self.rubberband = QgsRubberBand(self.canvas, QGis.Point)
             self.rubberband.setWidth(10)
@@ -125,9 +125,9 @@ class TerreImageProcessing(TerreImageTask, QObject):
                 output_filename = self.arg
         if "KMEANS" in self.processing_name:
             if self.arg:
-                output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.iface, self.arg)
+                output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.arg)
             else:
-                output_filename = terre_image_processing.kmeans(self.layer, self.working_directory, self.iface)
+                output_filename = terre_image_processing.kmeans(self.layer, self.working_directory)
         if "Seuillage" in self.processing_name and self.arg:
             logger.debug("this is thrshold")
             output_filename = terre_image_processing.threshold(self.layer, self.working_directory, self.arg)
