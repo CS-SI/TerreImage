@@ -25,7 +25,6 @@ import shutil
 
 from osgeo import gdal
 
-import terre_image_run_process
 from terre_image_run_process import TerreImageProcess, get_otb_command
 
 # import GDAL and QGIS libraries
@@ -33,7 +32,7 @@ from osgeo import gdal, osr, ogr
 gdal.UseExceptions()
 import gdalconst
 
-# import loggin for debug messages
+# import logging for debug messages
 import logging
 logging.basicConfig()
 # create logger
@@ -148,17 +147,17 @@ def otbcli_export_kmz(filename, working_directory):
         return output_kmz
 
 
-
-def compute_overviews(filename):
+def read_image_info_cli(image_in):
     """
-    Runs gdaladdo on the given filename
+    Returns the output of OTB Application ReadImageInfo
+    Args:
+        image_in:
+
+    Returns:
+
     """
-    if not os.path.isfile(filename + ".ovr"):
-        command = "gdaladdo "
-        command += " -ro "
-        command += "\"" + filename + "\""
-        command += " 2 4 8 16"
-        logger.debug("command to run" + command)
-        TerreImageProcess().run_process(command)
 
-
+    args = " -in {}".format(image_in)
+    command = get_otb_command("ReadImageInfo", args)
+    result = TerreImageProcess().run_process(command)
+    return result

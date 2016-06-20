@@ -33,7 +33,8 @@ from qgis.core import QgsPoint, QgsRaster
 from PyQt4.QtGui import QInputDialog
 
 import OTBApplications
-import terre_image_run_process
+from terre_image_run_process import TerreImageProcess
+
 
 # import logging for debug messages
 import logging
@@ -241,25 +242,20 @@ def gdal_translate_get_one_band(image_in, band_number, working_dir):
     if not os.path.isfile(output_image_one_band):
         command_gdal = "gdal_translate -b " + str(band_number) + " " + "\"" + image_in + "\"" + " " + "\"" + output_image_one_band + "\""
         logger.info("command_gdal" + command_gdal)
-        # os.system( command_gdal )
-        terre_image_run_process.run_process(command_gdal)
+        TerreImageProcess().run_process(command_gdal)
     return output_image_one_band
 
 
 def get_sensor_id(image):
-    currentOs = os.name
+    """
+    Returns the sensor of the given image if found by ReadImageInfo
+    Args:
+        image:
 
-#     if currentOs == "posix":
-    command = "otbcli ReadImageInfo "  # -in " + image  # + " | grep \"sensor:\""
-#     else:
-#         command = "otbcli ReadImageInfo -in " + image #+ " | findstr \"sensor:\""
-    args = " -in " + image
+    Returns:
 
-    if currentOs == "posix":
-        command += args
-        result_sensor = terre_image_run_process.run_process(command)
-    else:
-        result_sensor = terre_image_run_process.run_otb_app("ReadImageInfo", args)
+    """
+    result_sensor = OTBApplications.read_image_info_cli(image)
     if result_sensor:
         # type(result_sensor) = PyQt4.QtCore.QByteArray
         for line in str(result_sensor).splitlines():

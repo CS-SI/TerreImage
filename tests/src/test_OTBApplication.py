@@ -79,26 +79,23 @@ class TestTerreImageOTBApplications(TerreImageTestCase):
         self.assertTrue(os.path.exists(output_image))
 
 
-    def test_KmzExport(self):
+    # def test_KmzExport(self):
+    #     """
+    #     Test call of OTBApplication KmzExport
+    #     Returns:
+    #
+    #     """
+    #     output_image = OTBApplications.otbcli_export_kmz(self.image_test, self.working_dir)
+    #     self.assertTrue(os.path.exists(output_image))
+
+
+    def test_ReadImageInfo(self):
         """
-        Test call of OTBApplication KmzExport
+        Test call of OTBApplication ReadImageInfo
         Returns:
 
         """
-        output_image = OTBApplications.otbcli_export_kmz(self.image_test, self.working_dir)
-        self.assertTrue(os.path.exists(output_image))
+        result = OTBApplications.read_image_info_cli(self.image_test)
+        self.assertIsNotNone(result)
+        self.assertIn("Image general information", result.data())
 
-
-    def test_KmzExport(self):
-        """
-        Test call of OTBApplication KmzExport
-        Returns:
-
-        """
-        copy_image_test = os.path.join(self.working_dir, os.path.basename(self.image_test))
-        shutil.copy(self.image_test, copy_image_test)
-        output_image = OTBApplications.compute_overviews(copy_image_test)
-        split = os.path.splitext(os.path.basename(self.image_test))
-        ovr_file = os.path.join(self.working_dir, os.path.basename(self.image_test) + ".ovr")
-        print "Test existence of {}".format(ovr_file)
-        self.assertTrue(os.path.exists(ovr_file))
