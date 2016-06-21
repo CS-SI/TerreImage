@@ -74,6 +74,7 @@ class TestTerreImageProcess(TerreImageTestCase):
         # bindir = os.path.join(self.otb_dir, "bin")
         # process.set_otb_process_env_custom(otb_app_path=libdir,
         #                                    path=bindir)
+        print os.environ.get("PATH")
         command = "which otbApplicationLauncherCommandLine"
         result = process.run_process(command)
         self.assertIsNotNone(result)
@@ -100,6 +101,24 @@ class TestTerreImageProcess(TerreImageTestCase):
         self.assertIn("Image general information", result.data())
 
 
+    # def test_runReadImageInfoFail(self):
+    #     """
+    #     Test of a OTB application this test should fail
+    #     Returns:
+    #
+    #     """
+    #     process = TerreImageProcess()
+    #     # libdir = os.path.join(self.otb_dir, "lib", "otb", "applications")
+    #     # bindir = os.path.join(self.otb_dir, "bin")
+    #     # process.set_otb_process_env_custom(otb_app_path=libdir,
+    #     #                                    path=bindir)
+    #     app_name = "ReadImageInfo"
+    #     arguments = ""
+    #     result = process.run_process("otbApplicationLauncherCommandLine ReadImageInfo") #(get_otb_command(app_name, arguments))
+    #     self.assertIsNotNone(result)
+    #     self.assertIn("Image general information", result)
+
+
 
 class TestTerreImageRunProcess(TerreImageTestCase):
 
@@ -110,6 +129,7 @@ class TestTerreImageRunProcess(TerreImageTestCase):
 
         """
         self.image_test = os.path.join(self.data_dir_input, "taredji_extract.TIF")
+        self.otb_dir = "/home/amondot/Downloads/OTB-5.2.1-Linux64/"
 
 
     def test_get_otb_command(self):
@@ -121,7 +141,10 @@ class TestTerreImageRunProcess(TerreImageTestCase):
         app_name = "ReadImageInfo"
         arguments = "-in {}".format(self.image_test)
         command_otb = get_otb_command(app_name, arguments)
-        command_baseline = "{} ReadImageInfo -in {}".format("otbApplicationLauncherCommandLine",
+        # command_baseline = "{} ReadImageInfo -in {}".format("otbApplicationLauncherCommandLine",
+        #                                                        self.image_test)
+        command_baseline = "{} ReadImageInfo -in {}".format(os.path.join(self.otb_dir, "bin",
+                                                                         "otbApplicationLauncherCommandLine"),
                                                                self.image_test)
         self.assertEqual(command_otb, command_baseline)
 
