@@ -36,7 +36,7 @@ class TerreImageProcess():
 
     def __init__(self):
         self.process = QProcess()
-        self.env = QProcessEnvironment.systemEnvironment()
+        self.env = QProcessEnvironment().systemEnvironment()
         self.set_otb_process_env_default()
 
     def run_process(self, command):
@@ -54,8 +54,8 @@ class TerreImageProcess():
             exit_code = self.process.exitCode()
             logger.info("Code de sortie : " + str(exit_code))
             print "exit code", exit_code
-            if exit_code < 0:
-                code_d_erreur = self.process.error().data
+            if exit_code != 0:
+                code_d_erreur = self.process.error()
                 dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed",
                             2:"QProcess::TimedOut", 3:"QProcess::WriteError",
                             4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
@@ -83,7 +83,7 @@ class TerreImageProcess():
     def set_env_var(self, varname, varval, append = False, pre = False):
 
         if append == True:
-            if pre == True:
+            if pre == False:
                 # insert value at the end of the variable
                 self.env.insert(varname, self.env.value(varname) + os.pathsep + varval)
             else:
@@ -91,14 +91,13 @@ class TerreImageProcess():
                 self.env.insert(varname, varval + os.pathsep + self.env.value(varname))
         else:
             # replace value if existing
-            self.env.remove(varname)
             self.env.insert(varname, varval)
         print "env {} {}".format(varname, self.env.value(varname))
 
     def set_otb_process_env(self):
         dirname = os.path.dirname(os.path.abspath(__file__))
-        self.set_env_var("OTB_APPLICATION_PATH", os.path.join(dirname, "win32", "plugin"), pre=False)
-        self.set_env_var("PATH", os.path.join(dirname, "win32", "bin"), append = False, pre=False)
+        self.set_env_var("OTB_APPLICATION_PATH", os.path.join(dirname, "win32", "plugin"), pre=True)
+        self.set_env_var("PATH", os.path.join(dirname, "win32", "bin"), append = False, pre=True)
 
 
     def set_otb_process_env_custom(self, otb_app_path="", path=""):
@@ -111,8 +110,8 @@ class TerreImageProcess():
         Returns:
 
         """
-        self.set_env_var("OTB_APPLICATION_PATH", otb_app_path, pre=False)
-        self.set_env_var("PATH", path, append = False, pre=False)
+        self.set_env_var("OTB_APPLICATION_PATH", otb_app_path, pre=True)
+        self.set_env_var("PATH", path, append = False, pre=True)
 
 
     def set_otb_process_env_default(self):
@@ -125,10 +124,9 @@ class TerreImageProcess():
         Returns:
 
         """
-
         self.set_env_var("OTB_APPLICATION_PATH",
-                         terre_image_configuration.OTB_APPLICATION_PATH, pre=False)
-        self.set_env_var("PATH", terre_image_configuration.PATH, append = False, pre=True)
+                         terre_image_configuration.OTB_APPLICATION_PATH, pre=True)
+        self.set_env_var("PATH", terre_image_configuration.PATH, append = True, pre=True)
         # print os.listdir(terre_image_configuration.PATH)
 
 
