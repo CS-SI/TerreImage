@@ -19,9 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-import os
-
-# import GDAL and QGIS libraries
+# import GDAL libraries
 from osgeo import gdal, osr, ogr
 gdal.UseExceptions()
 import gdalconst

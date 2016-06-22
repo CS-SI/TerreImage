@@ -188,7 +188,7 @@ def get_workinglayer_on_opening(iface):
                         cst = TerreImageConstant()
                         cst.index_group = cst.iface.legendInterface().addGroup("Terre Image", True, None)
 
-                        manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
+                        manage_QGIS.add_qgis_raster_layer(raster_layer, iface.mapCanvas(), bands)
                         terre_image_gdal_system.compute_overviews(file_opened)
                         return layer, bands
                     else:

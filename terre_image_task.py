@@ -24,7 +24,6 @@ import manage_QGIS
 from working_layer import WorkingLayer
 import terre_image_processing
 from processing_manager import ProcessingManager
-import OTBApplications
 import terre_image_gdal_system
 
 from qgis.core import QGis, QgsMapLayerRegistry
@@ -33,7 +32,7 @@ from qgis.gui import QgsRubberBand
 from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QObject, SIGNAL, Qt
 
-# import loggin for debug messages
+# import logging for debug messages
 import logging
 logging.basicConfig()
 # create logger
@@ -85,9 +84,7 @@ class TerreImageProcessing(TerreImageTask, QObject):
         self.r_layer = rlayer
 
         self.arg = None
-        # print "arg", arg
         if arg:
-            # print processing, "gave ", arg
             self.arg = arg
 
         self.run()
