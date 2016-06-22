@@ -112,12 +112,6 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         QGisLayers.setInterface(iface)
         self.output_dir = None
 
-#         if not OSIdentifier.isWindows():
-#             QtGui.QMessageBox.critical( self, \
-#                                         u"Erreur", \
-#                                         u"Système d'exploitation non supporté" )
-#             return
-
     def setupUi(self):
         self.setWindowTitle(u"Classification Supervisée")
 
@@ -134,17 +128,6 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.layerlayout.addWidget(self.rasterlayerselector)
         self.layerlayout.addWidget(self.vectorlayerselector)
 
-#         self.outputlayout = QtGui.QHBoxLayout()
-#
-#         self.outputdirwidget = QtGui.QLineEdit()
-#         self.outputdirselectorbutton = QtGui.QPushButton("...")
-#         #self.setOutputDir( tempfile.mkdtemp(prefix='ClassificationSupervisee_', dir=None) )
-#         self.setOutputDir( self.output_dir )
-#
-#         self.outputlayout.addWidget( QtGui.QLabel(u"Répertoire de sortie") )
-#         self.outputlayout.addWidget( self.outputdirwidget )
-#         self.outputlayout.addWidget( self.outputdirselectorbutton )
-
         self.buttonBox = QtGui.QDialogButtonBox()
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
 
@@ -160,7 +143,6 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.bottomLayout.addWidget(self.buttonBox)
 
         self.mainlayout.addLayout(self.layerlayout)
-        # self.mainlayout.addLayout(self.outputlayout)
         self.mainlayout.addLayout(self.bottomLayout)
         self.setLayout(self.mainlayout)
 
@@ -168,8 +150,6 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         QtCore.QObject.connect(self.classifButton, QtCore.SIGNAL("clicked()"), self.classify)
 
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancelPressed)
-
-        # QtCore.QObject.connect(self.outputdirselectorbutton, QtCore.SIGNAL("clicked()"), self.selectOutputDir)
 
     def set_layers(self, layers, main_layer=None, main_layer_bands = None):
         self.main_layer = main_layer
@@ -184,9 +164,18 @@ class SupervisedClassificationDialog(QtGui.QDialog):
             self.output_dir = get_working_dir()
 
     def update_layers(self, layers):
+        """
+        Sets self.layers to the given layers
+        Load the polygon vector layers into the interface
+        Load the given raster layers into the interface
+
+        Args:
+            layers:
+
+        Returns:
+
+        """
         self.layers = layers
-        # for layer in self.layers:
-        #    print layer.name()
         vectorlayers = QGisLayers.getVectorLayers(QGisLayerType.POLYGON)
         self.vectorlayerselector.set_layers(vectorlayers)
         rasterlayers = layers
@@ -218,10 +207,11 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.statusLabel.setText("")
 
     def classify(self):
-        dirDest = QtGui.QFileDialog.getExistingDirectory( None, str( "Répertoire de destination des fichiers de la classification" ), self.output_dir )
+        dirDest = QtGui.QFileDialog.getExistingDirectory(None,
+                                                         str( "Répertoire de destination des fichiers de la classification" ),
+                                                         self.output_dir)
         if dirDest :
             self.output_dir = dirDest
-
 
         logger.debug( "classify" )
         simulation = False
@@ -297,29 +287,6 @@ class SupervisedClassificationDialog(QtGui.QDialog):
 
             terre_image_run_process.run_process(classifcommand, True)
             # Execute commandline
-#             try:
-#                 if (simulation):
-#                     time.sleep(3)
-#                 else:
-#                     proc = subprocess.Popen(classifcommand.encode('mbcs'),
-#                                             shell=True,
-#                                             stdout=subprocess.PIPE,
-#                                             stdin=subprocess.PIPE,
-#                                             stderr=subprocess.STDOUT,
-#                                             universal_newlines=False)
-#
-#                     loglines = []
-#                     with open(outputlog, "w") as logfile:
-#                       for line in iter(proc.stdout.readline, ""):
-#                           loglines.append(line)
-#                           logfile.writelines(line)
-#                           logfile.flush()
-#                           os.fsync(logfile.fileno())
-#
-#                     proc.wait()
-#                     if proc.returncode != 0:
-#                         raise OSError
-#
 #             except OSError:
 #                 errorDuringClassif = True
 #
@@ -363,9 +330,6 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                 pixmap.save(os.path.join(outputdir, 'resultats.png'))
 
                 notificationDialog.exec_()
-
-#        except:
-#            raise
 
         finally:
             self.clearStatus()

@@ -34,7 +34,7 @@ class VectorLayerSelectorItem(QtGui.QWidget):
     def __init__(self, layer, parent = None):
         super(VectorLayerSelectorItem, self).__init__(parent)
 
-        # init color from Qgis layer proeperties
+        # init color from Qgis layer properties
         self.color = self.getVectorLayerColor(layer)
 
         self.horizontalLayout = QtGui.QHBoxLayout()
@@ -72,11 +72,6 @@ class VectorLayerSelectorItem(QtGui.QWidget):
         if isinstance(rendererV2, QgsSingleSymbolRendererV2):
             sym = rendererV2.symbol()
             color = sym.color()
-#         else:
-#             renderer = layer.renderer()
-#             if isinstance(renderer,QgsSingleSymbolRenderer):
-#                 sym = renderer.symbol()
-#                 color = sym.fillColor()
         return color
 
     def setChecked(self, val):

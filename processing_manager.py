@@ -48,17 +48,22 @@ class ProcessingManager(object):
         return [x.processing_name for x in self.processings] + [x.processing_name for x in self.displays]
 
     def get_layers(self):
-        return [self.working_layer] + [x.output_working_layer for x in self.processings] + [x.output_working_layer for x in self.displays]
+        return [self.working_layer] + [x.output_working_layer for x in self.processings] + \
+               [x.output_working_layer for x in self.displays]
 
     def get_working_layers(self):
-        return [self.working_layer] + [x.output_working_layer for x in self.processings if not x.processing_name == 'KMEANS']  # if isinstance(x, TerreImageProcessing)]
+        return [self.working_layer] + \
+               [x.output_working_layer for x in self.processings if not x.processing_name == 'KMEANS']
+        # if isinstance(x, TerreImageProcessing)]
 
     def get_layers_for_kmz(self):
         return [self.working_layer.get_source()] + [x.output_working_layer.get_source() for x in self.processings]
 
     def get_qgis_working_layers(self):
         # return [self.working_layer.get_qgis_layer()] +
-        return [self.working_layer.get_qgis_layer()] + [x.output_working_layer.get_qgis_layer() for x in self.processings if not x.processing_name == 'KMEANS']  # if isinstance(x, TerreImageProcessing)]
+        return [self.working_layer.get_qgis_layer()] + \
+               [x.output_working_layer.get_qgis_layer() for x in self.processings if not x.processing_name == 'KMEANS']
+        # if isinstance(x, TerreImageProcessing)]
 
     def get_processings(self):
         return self.processings
@@ -112,14 +117,16 @@ class ProcessingManager(object):
         return "Seuillage" in [x.processing_name for x in self.processings]
 
     def processing_from_name(self, name):
-        return [x for x in self.processings if x.processing_name == name] + [x for x in self.displays if x.processing_name == name]
+        return [x for x in self.processings if x.processing_name == name] + \
+               [x for x in self.displays if x.processing_name == name]
 
 #     def get_process_to_display(self):
 #         for x in self.processings:
 #             logger.debug( x )
 #             logger.debug( x.output_working_layer.qgis_layer )
 #
-#         temp = [x.output_working_layer.qgis_layer for x in self.processings if isinstance(x, TerreImageProcessing) and x.output_working_layer.qgis_layer is not None]
+#         temp = [x.output_working_layer.qgis_layer for x in self.processings
+    # if isinstance(x, TerreImageProcessing) and x.output_working_layer.qgis_layer is not None]
 #         logger.debug( temp )
 #         return temp
 

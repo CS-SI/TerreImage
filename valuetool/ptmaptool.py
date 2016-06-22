@@ -24,10 +24,9 @@
 #
 #---------------------------------------------------------------------
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from qgis.core import *
-from qgis.gui import *
+from PyQt4.QtCore import Qt, SIGNAL
+from PyQt4.QtGui import QCursor
+from qgis.gui import QgsMapTool
 
 class ProfiletoolMapTool_ValueTool(QgsMapTool):
 
@@ -47,6 +46,7 @@ class ProfiletoolMapTool_ValueTool(QgsMapTool):
         self.canvas.setCursor(self.cursor)
 
     def deactivate(self):
+        # print "desactivate 123456789"
         # self.emit( SIGNAL("deactivate") )
         # self.canvas.setCursor( QCursor(Qt.ArrowCursor))
         QgsMapTool.deactivate(self)

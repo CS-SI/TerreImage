@@ -121,8 +121,11 @@ class SpectralAngle(QtCore.QObject):
 
     def display(self, output_filename):
         self.freezeCanvas(True)
-        # result_layer = manage_QGIS.get_raster_layer( output_filename, os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
-        result_layer = manage_QGIS.addRasterLayerToQGIS(output_filename, os.path.basename(os.path.splitext(output_filename)[0]) , self.iface)
+        # result_layer = manage_QGIS.get_raster_layer( output_filename,
+        # os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )
+        result_layer = manage_QGIS.addRasterLayerToQGIS(output_filename,
+                                                        os.path.basename(os.path.splitext(output_filename)[0]) ,
+                                                        self.iface)
         manage_QGIS.histogram_stretching(result_layer, self.iface.mapCanvas())
         self.output_layer = result_layer
         # 2 ouvrir une nouvelle vue
@@ -140,7 +143,8 @@ class SpectralAngle(QtCore.QObject):
         logger.debug("id_layer" + str(id_layer))
         logger.debug("result layer" + str(result_layer))
         # QgsMapLayerRegistry.instance().mapLayers()
-        # {u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>, u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
+        # {u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>,
+        # u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
         ifaceLegend.setLayerVisible(result_layer, False)
         self.iface.mapCanvas().refresh()
         logger.debug(ifaceLegend.isLayerVisible(result_layer))
