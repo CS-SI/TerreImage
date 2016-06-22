@@ -22,6 +22,8 @@ import unittest
 import os
 from qgis.core import QgsRasterLayer
 from TerreImage.terre_image_run_process import TerreImageProcess, get_otb_command
+from TerreImage import terre_image_configuration
+
 from terre_image_test_case import TerreImageTestCase
 
 
@@ -34,7 +36,7 @@ class TestTerreImageProcess(TerreImageTestCase):
 
         """
         self.image_test = os.path.join(self.data_dir_input, "taredji_extract.TIF")
-        self.otb_dir = "/home/amondot/Downloads/OTB-5.2.1-Linux64/"
+        self.otb_dir = terre_image_configuration.otb_dir
 
     def test_getProcessObject(self):
         """
@@ -101,6 +103,28 @@ class TestTerreImageProcess(TerreImageTestCase):
         self.assertIn("Image general information", result.data())
 
 
+
+    def test_runReadImageInfoFail(self):
+        """
+        Test of a OTB application and get the output.
+        Uncomment to test an other environement than the one defined in the configuration file
+        Returns:
+
+        """
+        process = TerreImageProcess()
+        # libdir = os.path.join(self.otb_dir, "lib", "otb", "applications")
+        # bindir = os.path.join(self.otb_dir, "bin")
+        # process.set_otb_process_env_custom(otb_app_path=libdir,
+        #                                    path=bindir)
+        app_name = "ReadImageInfo"
+        arguments = "-inb {}".format(self.image_test)
+        result = process.run_process(get_otb_command(app_name, arguments))
+        self.assertIsNotNone(result)
+        self.assertEqual("", result.data())
+
+
+
+
     # def test_runReadImageInfoFail(self):
     #     """
     #     Test of a OTB application this test should fail
@@ -129,7 +153,7 @@ class TestTerreImageRunProcess(TerreImageTestCase):
 
         """
         self.image_test = os.path.join(self.data_dir_input, "taredji_extract.TIF")
-        self.otb_dir = "/home/amondot/Downloads/OTB-5.2.1-Linux64/"
+        self.otb_dir = terre_image_configuration.otb_dir
 
 
     def test_get_otb_command(self):
