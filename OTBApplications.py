@@ -105,10 +105,18 @@ def concatenateImages_cli(listImagesIn, outputname, options=None):
 
 def kmeans_cli(image, nbClass, outputDirectory):
     """
-    pass
+    Runs the KMeansClassification OTB application.
+
+    Args:
+        image:
+        nbClass:
+        outputDirectory:
+
+    Returns:
+
     """
     filenameWithoutExtension = os.path.basename(os.path.splitext(image)[0])
-    output = os.path.join(outputDirectory, filenameWithoutExtension + "_kmeans_" + str(nbClass) + ".tif")  # + temp[index:]
+    output = os.path.join(outputDirectory, filenameWithoutExtension + "_kmeans_" + str(nbClass) + ".tif")
     if not os.path.isfile(output):
         if image and nbClass and outputDirectory:
             command = os.path.join(prefix, "otbcli")
@@ -129,7 +137,18 @@ def kmeans_cli(image, nbClass, outputDirectory):
 
 
 def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
-    output_filename = os.path.join(working_dir, os.path.splitext(os.path.basename(image_to_color))[0]) + "colored.tif"  # + os.path.splitext(image_to_color)[0]
+    """
+    Runs the ColorMapping OTB application.
+
+    Args:
+        image_to_color:
+        reference_image:
+        working_dir:
+
+    Returns:
+
+    """
+    output_filename = os.path.join(working_dir, os.path.splitext(os.path.basename(image_to_color))[0]) + "colored.tif"
 
     if not os.path.isfile(output_filename):
         logger.info(output_filename)
@@ -151,6 +170,16 @@ def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
 
 
 def otbcli_export_kmz(filename, working_directory):
+    """
+    Runs the KmzExport OTB application.
+
+    Args:
+        filename:
+        working_directory:
+
+    Returns:
+
+    """
     output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + ".kmz")
     if not os.path.isfile(output_kmz):
         command = os.path.join(prefix, "otbcli ")
@@ -174,6 +203,12 @@ def otbcli_export_kmz(filename, working_directory):
 def compute_overviews(filename):
     """
     Runs gdaladdo on the given filename
+
+    Args:
+        filename:
+
+    Returns:
+
     """
     if not os.path.isfile(filename + ".ovr"):
         command = "gdaladdo "
@@ -181,7 +216,6 @@ def compute_overviews(filename):
         command += "\"" + filename + "\""
         command += " 2 4 8 16"
         logger.debug("command to run" + command)
-        # os.system(command)
         terre_image_run_process.run_process(command)
 
 
