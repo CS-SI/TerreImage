@@ -37,10 +37,12 @@ PATH = os.path.join(dirname, "win32", "bin")
 
 # OTB_APPLICATION_PATH =  os.path.join(otb_dir, "lib", "otb", "applications")
 # PATH = os.path.join(otb_dir, "bin")
+# LD_LIBRARY_PATH = ""
 
 
 # custom
-# otb_dir = "/home/amondot/Downloads/OTB-5.2.1-Linux64/"
+# otb_dir = "/home/amondot/dev/OTB/install-5.4.0-classic"
 # OTB_APPLICATION_PATH =  os.path.join(otb_dir, "lib", "otb", "applications")
 # PATH = os.path.join(otb_dir, "bin")
+# LD_LIBRARY_PATH = os.path.join(otb_dir, "lib")
 
