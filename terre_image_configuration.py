@@ -27,7 +27,20 @@ dirname = os.path.dirname(os.path.abspath(__file__))
 OTB_APPLICATION_PATH =  os.path.join(dirname, "win32", "plugin")
 PATH = os.path.join(dirname, "win32", "bin")
 
-#custom
-# otb_dir = "/home/user/Downloads/OTB-5.2.1-Linux64/"
+
+# # configuration system for linux
+# otb_dir = "/usr"
+
+# Configuration for linux standalone package
+# otb_dir = "/home/amondot/Downloads/OTB-5.2.1-Linux64/"
+
+
 # OTB_APPLICATION_PATH =  os.path.join(otb_dir, "lib", "otb", "applications")
 # PATH = os.path.join(otb_dir, "bin")
+
+
+# custom
+# otb_dir = "/home/amondot/Downloads/OTB-5.2.1-Linux64/"
+# OTB_APPLICATION_PATH =  os.path.join(otb_dir, "lib", "otb", "applications")
+# PATH = os.path.join(otb_dir, "bin")
+
