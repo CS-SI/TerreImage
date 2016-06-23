@@ -74,11 +74,11 @@ private:
     AddParameter(ParameterType_InputImage, "in1", "Input image");
     SetParameterDescription( "in1", "Input image" );
     
-    AddParameter(ParameterType_InputImage, "in2", "Input image");
-    SetParameterDescription( "in2", "Input image" );
+    AddParameter(ParameterType_InputImage, "in2", "Input labeled image");
+    SetParameterDescription( "in2", "Input labeled image" );
 
     AddParameter(ParameterType_OutputFilename, "out", "Output results");
-    SetParameterDescription("out", "XML file containing the cpopulation results");
+    SetParameterDescription("out", "XML file containing the population results");
     
    // Doc example parameter settings
    // SetDocExampleParameterValue("il", "QB_1_ortho.tif");
