@@ -34,6 +34,7 @@ from terre_image_constant import TerreImageConstant
 from processing_manager import ProcessingManager
 import terre_image_run_process
 import OTBApplications
+import terre_image_gdal_system
 
 # import loggin for debug messages
 import logging
@@ -160,8 +161,6 @@ def get_workinglayer_on_opening(iface):
             pass
         else:
             raster_layer = manage_QGIS.get_raster_layer(file_opened, os.path.splitext(os.path.basename(file_opened))[0])
-            if not os.name == "posix":
-                terre_image_run_process.set_OTB_PATH()
             type_image = terre_image_processing.get_sensor_id(file_opened)
             logger.debug("type_image " + str(type_image))
             layer = WorkingLayer(file_opened, raster_layer)
@@ -188,7 +187,7 @@ def get_workinglayer_on_opening(iface):
                         cst.index_group = cst.iface.legendInterface().addGroup("Terre Image", True, None)
 
                         manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
-                        OTBApplications.compute_overviews(file_opened)
+                        terre_image_gdal_system.compute_overviews(file_opened)
                         return layer, bands
                     else:
                         QMessageBox.warning(None, "Erreur",

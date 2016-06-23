@@ -24,7 +24,7 @@
 import unittest
 import os
 import re
-from TerreImage.terre_image_run_process import run_process
+from TerreImage.terre_image_run_process import TerreImageProcess
 
 # import logging for debug messages
 import logging
@@ -41,6 +41,7 @@ class TerreImageTestCase( unittest.TestCase ):
         self.data_dir = os.path.join(parent_dir, "data")
         self.data_dir_input = os.path.join(self.data_dir, "input")
         self.data_dir_baseline = os.path.join(self.data_dir, "baseline")
+        self.src_dir = os.path.abspath(os.path.join(parent_dir, os.pardir))
         # TBD
         self.working_dir = "/tmp/terre-image-tests"
         if os.path.isdir(self.working_dir):
@@ -68,7 +69,8 @@ class TerreImageTestCase( unittest.TestCase ):
         mse = -9999
         mae = -9999
         psnr = -9999
-        res = run_process(command)
+        res = TerreImageProcess().run_process(command)
+
         lines = str(res).splitlines()
         # for line in lines:
         #     # sensor_line = result_sensor[0]
@@ -116,7 +118,7 @@ class TerreImageTestCase( unittest.TestCase ):
 
         """
         command = "diff {} {}".format(vectorTest, vectorBaseline)
-        res = run_process(command)
+        res = TerreImageProcess().run_process(command)
         lines = str(res).splitlines()
 
         if len(lines) != 0:

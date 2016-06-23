@@ -25,14 +25,14 @@ import shutil
 
 from osgeo import gdal
 
-import terre_image_run_process
+from terre_image_run_process import TerreImageProcess, get_otb_command
 
 # import GDAL and QGIS libraries
 from osgeo import gdal, osr, ogr
 gdal.UseExceptions()
 import gdalconst
 
-# import loggin for debug messages
+# import logging for debug messages
 import logging
 logging.basicConfig()
 # create logger
@@ -68,11 +68,8 @@ def bandmath_cli(images, expression, output_filename):
     args += " -out " + "\"" + output_filename + "\""
 
     logger.info("command: " + command)
-    if os.name == "posix":
-        command += args
-        terre_image_run_process.run_process(command)
-    else:
-        terre_image_run_process.run_otb_app("BandMath", args)
+    command = get_otb_command("BandMath", args)
+    TerreImageProcess().run_process(command)
 
 
 def concatenateImages_cli(listImagesIn, outputname, options=None):
@@ -93,14 +90,8 @@ def concatenateImages_cli(listImagesIn, outputname, options=None):
             args += " uint16 "
 
         logger.info("command: " + command)
-        # os.system( command )
-        # terre_image_utils.run_process(command)
-        if os.name == "posix":
-            # os.system( command )
-            command += args
-            terre_image_run_process.run_process(command)
-        else:
-            terre_image_run_process.run_otb_app("ConcatenateImages", args)
+        command = get_otb_command("ConcatenateImages", args)
+        TerreImageProcess().run_process(command)
 
 
 def kmeans_cli(image, nbClass, outputDirectory):
@@ -119,13 +110,9 @@ def kmeans_cli(image, nbClass, outputDirectory):
             args += " -rand " + str(42)
 
             logger.info("command: " + command)
-
-            if os.name == "posix":
-                command += args
-                terre_image_run_process.run_process(command)
-            else:
-                terre_image_run_process.run_otb_app("KMeansClassification", args)
-    return output
+            command = get_otb_command("KMeansClassification", args)
+            TerreImageProcess().run_process(command)
+            return output
 
 
 def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
@@ -140,14 +127,9 @@ def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
         args += " -method \"image\""
         args += " -method.image.in " + "\"" + reference_image + "\""
         logger.info("command: " + command)
-
-        if os.name == "posix":
-            command += args
-            terre_image_run_process.run_process(command)
-        else:
-            terre_image_run_process.run_otb_app("ColorMapping", args)
-
-    return output_filename
+        command = get_otb_command("ColorMapping", args)
+        TerreImageProcess().run_process(command)
+        return output_filename
 
 
 def otbcli_export_kmz(filename, working_directory):
@@ -159,29 +141,23 @@ def otbcli_export_kmz(filename, working_directory):
         args += " -out " + "\"" + output_kmz + "\""
 
         logger.info("command: " + command)
-        terre_image_run_process.run_process(command)
-        if os.name == "posix":
-            command += args
-            terre_image_run_process.run_process(command)
-        else:
-            terre_image_run_process.run_otb_app("KmzExport", args)
-
-    output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + "xt.kmz")
-    return output_kmz
+        command = get_otb_command("KmzExport", args)
+        TerreImageProcess().run_process(command)
+        output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + "xt.kmz")
+        return output_kmz
 
 
-
-def compute_overviews(filename):
+def read_image_info_cli(image_in):
     """
-    Runs gdaladdo on the given filename
+    Returns the output of OTB Application ReadImageInfo
+    Args:
+        image_in:
+
+    Returns:
+
     """
-    if not os.path.isfile(filename + ".ovr"):
-        command = "gdaladdo "
-        command += " -ro "
-        command += "\"" + filename + "\""
-        command += " 2 4 8 16"
-        logger.debug("command to run" + command)
-        # os.system(command)
-        terre_image_run_process.run_process(command)
 
-
+    args = " -in {}".format(image_in)
+    command = get_otb_command("ReadImageInfo", args)
+    result = TerreImageProcess().run_process(command)
+    return result
