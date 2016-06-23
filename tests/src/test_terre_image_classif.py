@@ -68,10 +68,11 @@ class TestTerreImageClassif(TerreImageTestCase):
 
         outputclassification = os.path.join(self.working_dir1, "out_classif.tif")
         out_pop = os.path.join(self.working_dir1, "out_classif_pop.tif")
-        baseline = os.path.join(self.data_dir_baseline, "taredji_extract_ndvi.tif")
+        baseline = os.path.join(self.data_dir_baseline, "classif", "Classification", "classification.tif")
         confMat, kappa = classif.full_classification([self.image_test], self.vector_test,
                                                      outputclassification, out_pop, self.working_dir1)
         self.assertEqual(kappa, 1)
+        self.assertTrue(self.checkResult(out_pop, baseline))
 
 
 
