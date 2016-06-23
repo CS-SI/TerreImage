@@ -91,12 +91,12 @@ def full_classification(rasterlist, vectorlist, outputclassification, out_pop, w
     create_vrt_from_filelist(rasterlist, vrt_file)
     
     #compute stats
-    print("----COMPUTE STATS----")
+    logging.info("----COMPUTE STATS----")
     out_stat_file = os.path.join(working_directory, "stats.xml")
     OTBApplications.compute_statistics_cli(vrt_file, out_stat_file)
 
     # Train images
-    print("----TRAIN----")
+    logging.info("----TRAIN----")
     out_rf_file = os.path.join(working_directory, "rf.model")
     conf_mat = os.path.join(working_directory, "rf.mat")
     result = OTBApplications.train_image_classifier_cli(vrt_file, vectorlist, out_stat_file, out_rf_file, conf_mat)
@@ -118,16 +118,16 @@ def full_classification(rasterlist, vectorlist, outputclassification, out_pop, w
         return
 
     # Image Classification 
-    print("----CLASSIF----")
+    logging.info("----CLASSIF----")
     out = os.path.join(working_directory, "out_classifier.TIF")
     OTBApplications.image_classifier_cli(vrt_file, out_stat_file, out_rf_file, out)
 
     # Regularization
-    print("----REGULARISATION----")
+    logging.info("----REGULARISATION----")
     OTBApplications.classification_map_regularization_cli(out, outputclassification)
 
     # Population stats
-    print("----POPULATION STATS----")
+    logging.info("----POPULATION STATS----")
     OTBApplications.ComputeLabelImagePopulation_cli(outputclassification, outputclassification, out)
 
     #TODO ajout de la sauvegarde des parameters
