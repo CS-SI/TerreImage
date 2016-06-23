@@ -58,23 +58,27 @@ def full_classification(filelist,
                         outregul):
     #TODO manage app dir
     #app_dir="/usr/bin"
-    app_dir="/home/msavinaud/dev/TerreImage/OTB-5.4.0-Linux64/bin"
+    #app_dir="/home/msavinaud/dev/TerreImage/OTB-5.4.0-Linux64/bin"
+    app_dir=""
          
     # Merge the input images
     create_vrt_from_filelist(vrtfile, filelist)
     
+    otbALCL="/home/otbval/Dashboard/nightly/OTB-Release/install/bin/otbApplicationLauncherCommandLine"
+    
     #compute stats
     print("----COMPUTE STATS----")
-    statlauncher = "%s/otbcli_ComputeImagesStatistics" % app_dir
-    statcommand = ('%s'
+    appstat="ComputeImagesStatistics"
+    statcommand = (' %s %s'
                    ' -il "%s" '
                    ' -out "%s" '
-                   % (statlauncher, vrtfile, outstatfile))
+                   % (otbALCL, appstat, vrtfile, outstatfile))
+    print statcommand
     terre_image_run_process.run_process(statcommand, True)
 
     # Train images
     print("----TRAIN----")
-    trainlauncher = "%s/otbcli_TrainImagesClassifier" % app_dir
+    trainlauncher = "{}otbcli_TrainImagesClassifier".format(app_dir)
     traincommand = ('%s'
                     ' -io.il "%s" '
                     ' -io.vd "%s" '
@@ -88,7 +92,7 @@ def full_classification(filelist,
 
     # Image Classification 
     print("----CLASSIF----")
-    classiflauncher="%s/otbcli_ImageClassifier" % app_dir
+    classiflauncher="{}otbcli_ImageClassifier".format(app_dir)
     classifcommand = ('%s'
                       ' -in "%s" '
                       ' -imstat "%s" '
@@ -99,7 +103,7 @@ def full_classification(filelist,
 
     # Regularization
     print("----REGULARISATION----")
-    regullauncher="%s/otbcli_ClassificationMapRegularization" % app_dir
+    regullauncher="{}otbcli_ClassificationMapRegularization".format(app_dir)
     regulcommand=('%s'
                   ' -io.in "%s" '
                   ' -io.out "%s" '
