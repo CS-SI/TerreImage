@@ -34,6 +34,7 @@ from cropVectorDataToImage import cropVectorDataToImage
 
 from QGisLayers import QGisLayers
 from QGisLayers import QGisLayerType
+from classif import full_classification
 
 import os
 import shutil
@@ -281,70 +282,10 @@ class SupervisedClassificationDialog(QtGui.QDialog):
             # Build classifcommand
             outputlog = os.path.join(outputdir, 'output.log')
             outputclassification = os.path.join(outputdir, 'classification.tif')
-            outputresults = os.path.join(outputdir, 'classification.resultats.txt')
+            out_pop = os.path.join(outputdir, 'classification.resultats.txt')
 
-            launcher = "%s/classification.bat" % self.app_dir
-            classifcommand = (  '%s '
-                                '-io.il %s '
-                                '-io.vd %s '
-                                '-io.out "%s" '
-                                '-io.results "%s"'
-                                %  (launcher,
-                                    rasterlist,
-                                    vectorlist,
-                                    outputclassification,
-                                    outputresults) )
-            TerreImageProcess().run_process(classifcommand)
-            # Execute commandline
-#             try:
-#                 if (simulation):
-#                     time.sleep(3)
-#                 else:
-#                     proc = subprocess.Popen(classifcommand.encode('mbcs'),
-#                                             shell=True,
-#                                             stdout=subprocess.PIPE,
-#                                             stdin=subprocess.PIPE,
-#                                             stderr=subprocess.STDOUT,
-#                                             universal_newlines=False)
-#
-#                     loglines = []
-#                     with open(outputlog, "w") as logfile:
-#                       for line in iter(proc.stdout.readline, ""):
-#                           loglines.append(line)
-#                           logfile.writelines(line)
-#                           logfile.flush()
-#                           os.fsync(logfile.fileno())
-#
-#                     proc.wait()
-#                     if proc.returncode != 0:
-#                         raise OSError
-#
-#             except OSError:
-#                 errorDuringClassif = True
-#
-#                 mbox = QtGui.QMessageBox()
-#                 mbox.setWindowTitle(u"Erreur")
-#                 mbox.setText(u"Une erreur a été rencontrée lors de la classification")
-#
-#                 # has no effect...
-#                 #mbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-#                 #mbox.setSizeGripEnabled(True)
-#
-#                 detailedtext = (u"Code de retour : %s%s"
-#                                 "Commande : %s%s"
-#                                 "Sortie standard :%s%s"
-#                                 % ( proc.returncode, 2*os.linesep,
-#                                     classifcommand, 2*os.linesep,
-#                                     os.linesep, u''.join([u'%s%s' % (unicode(c, 'mbcs'), os.linesep) for c in loglines]) ) )
-#
-#                 mbox.setDetailedText(detailedtext)
-#                 mbox.setIcon(QtGui.QMessageBox.Critical)
-#                 mbox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
-#                 ret = mbox.exec_()
-#
-#                 saferemovefile(outputlog)
-#                 saferemovefile(outputclassification)
-#                 saferemovefile(outputresults)
+
+            confmat, kappa = full_classification(rasterlist, vectorlist, outputclassification, out_pop)
 
             if (not simulation and not errorDuringClassif):
                 QGisLayers.loadLabelImage(outputclassification, labeldescriptor)
