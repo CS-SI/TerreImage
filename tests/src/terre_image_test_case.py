@@ -137,3 +137,28 @@ class TerreImageTestCase( unittest.TestCase ):
 
 
         return len(lines)
+
+
+    def checkFiles(self, fileTest, fileBaseline):
+        """
+
+        Args:
+            fileTest:
+            fileBaseline:
+
+        Returns:
+
+        """
+        command = "diff {} {}".format(fileTest, fileBaseline)
+        res = TerreImageProcess().run_process(command)
+        lines = str(res).splitlines()
+
+        if len(lines) != 0:
+            logging.info( "=====================")
+            logging.info( "Result of diff:")
+            logging.info( lines)
+            logging.info( "=====================")
+
+            return False
+        else:
+            return True

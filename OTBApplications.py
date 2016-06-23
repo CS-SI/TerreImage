@@ -161,3 +161,88 @@ def read_image_info_cli(image_in):
     command = get_otb_command("ReadImageInfo", args)
     result = TerreImageProcess().run_process(command)
     return result
+
+
+
+def compute_statistics_cli(image_in, xml_output):
+    """
+    Returns the output of OTB Application ComputeImagesStatistics
+    Args:
+        image_in:
+
+    Returns:
+
+    """
+
+    args = " -il {} -out {}".format(image_in, xml_output)
+    command = get_otb_command("ComputeImagesStatistics", args)
+    result = TerreImageProcess().run_process(command)
+    return result
+
+
+def train_image_classifier_cli(vrtfile, vd, outstatfile, outsvmfile, confmat):
+    """
+    Returns the output of OTB Application TrainImagesClassifier
+    Args:
+        image_in:
+
+    Returns:
+
+    """
+    args = " -io.il {} -io.vd {} -io.imstat {} -io.out {}" \
+           " -io.confmatout {} -classifier libsvm -sample.vtr 0.1".format(vrtfile,
+                                                           vd,
+                                                           outstatfile,
+                                                           outsvmfile,
+                                                           confmat)
+    command = get_otb_command("TrainImagesClassifier", args)
+    result = TerreImageProcess().run_process(command)
+    return result
+
+
+def image_classifier_cli(vrtfile, outstatfile, outsvmfile, out):
+    """
+    Returns the output of OTB Application ImageClassifier
+    Args:
+        image_in:
+
+    Returns:
+
+    """
+
+    args = "-in {} -imstat {} -model {} -out {}".format(vrtfile, outstatfile, outsvmfile, out)
+    command = get_otb_command("ImageClassifier", args)
+    result = TerreImageProcess().run_process(command)
+    return result
+
+
+def classification_map_regularization_cli(out, outregul):
+    """
+    Returns the output of OTB Application ClassificationMapRegularization
+    Args:
+        image_in:
+
+    Returns:
+
+    """
+
+    args = "-io.in {} -io.out {} -ip.radius 1 -ip.suvbool false".format(out, outregul)
+    command = get_otb_command("ClassificationMapRegularization", args)
+    result = TerreImageProcess().run_process(command)
+    return result
+
+
+def ComputeLabelImagePopulation_cli(im1, im2, out):
+    """
+
+    Args:
+        im1:
+        im2:
+
+    Returns:
+
+    """
+    args = "-in1 {} -in2 {} -out {}".format(im1, im2, out)
+    command = get_otb_command("ComputeLabelImagePopulation", args)
+    result = TerreImageProcess().run_process(command)
+    return result

@@ -99,3 +99,37 @@ class TestTerreImageOTBApplications(TerreImageTestCase):
         self.assertIsNotNone(result)
         self.assertIn("Image general information", result.data())
 
+
+
+    def test_ComputeImagesStatistics(self):
+        """
+        Test call of OTBApplication ComputeImagesStatistics
+        Returns:
+
+        """
+        outxml = os.path.join(self.working_dir, "test_compute_statistics.xml")
+        baseline = os.path.join(self.data_dir_baseline, "taredji_extract_statistics.xml")
+        result = OTBApplications.compute_statistics_cli(self.image_test, outxml)
+        self.assertIsNotNone(result)
+        self.assertTrue(self.checkFiles(outxml, baseline))
+
+
+
+    # def test_TrainImagesClassifier(self):
+    #     """
+    #     Test call of OTBApplication TrainImagesClassifier
+    #     Returns:
+    #
+    #     """
+    #     outxml = os.path.join(self.working_dir, "test_compute_statistics.xml")
+    #     baseline = os.path.join(self.data_dir_baseline, "taredji_extract_statistics.xml")
+    #     result = OTBApplications.compute_statistics_cli(vrtfile, vd, outstatfile, outsvmfile, confmat)
+    #     self.assertIsNotNone(result)
+    #     self.assertTrue(self.checkFiles(outxml, baseline))
+
+    # def test_ImageClassifier(self):
+    #     #TBD
+
+
+
+
