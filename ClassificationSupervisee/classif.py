@@ -1,19 +1,43 @@
+# -*- coding: utf-8 -*-
+"""
+/***************************************************************************
+ TerreImage
+                    -------------------
+        begin               : 2016-06-20
+        copyright           : (C) 2016 by CNES
+        email               : mickael.savinaud@c-s.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************
+"""
 
 from osgeo import gdal
 import xml.etree.ElementTree as ET
 import os
 import argparse
-#from TerreImage import terre_image_run_process
-import terre_image_run_process
+import re
+from TerreImage import OTBApplications
 
-def create_vrt_from_filelist(vrt_name, filelist):
+import logging
+# create logger
+logger = logging.getLogger( 'Classif' )
+logger.setLevel(logging.INFO)
+
+def create_vrt_from_filelist(filelist, vrt_name):
     rootNode = ET.Element( 'VRTDataset' )
 
     for filename in filelist:
-        print filename
+        logging.debug(filename)
         ds = gdal.Open(filename)
 
-        print "[ RASTER BAND COUNT ]: ", ds.RasterCount
+        logging.debug("[ RASTER BAND COUNT ]: {}".format(ds.RasterCount))
         for band_number in range( ds.RasterCount ):
             band_number += 1
             bandNode = ET.SubElement( rootNode, "VRTRasterBand", {'band': '1'} )
@@ -40,104 +64,91 @@ def create_vrt_from_filelist(vrt_name, filelist):
     node.text = ds.GetProjection() # projection
 
     stringToReturn = ET.tostring(rootNode)
-    print stringToReturn
-
+    logging.debug(stringToReturn)
 
     #if not os.path.isfile( vrt_name):
     writer = open( vrt_name, 'w')
     writer.write( stringToReturn )
     writer.close()
-    
-def full_classification(filelist, 
-                        vrtfile, 
-                        outstatfile, 
-                        outsvmfile, 
-                        confmat,
-                        vd,
-                        out,
-                        outregul):
-    #TODO manage app dir
-    #app_dir="/usr/bin"
-    #app_dir="/home/msavinaud/dev/TerreImage/OTB-5.4.0-Linux64/bin"
-    app_dir=""
-         
+
+
+def full_classification(rasterlist, vectorlist, outputclassification, out_pop, working_directory):
+    """
+
+    Args:
+        filelist:
+        vd:
+        out:
+        outregul:
+        working_directory:
+
+    Returns:
+
+    """
+
     # Merge the input images
-    create_vrt_from_filelist(vrtfile, filelist)
-    
-    otbALCL="/home/otbval/Dashboard/nightly/OTB-Release/install/bin/otbApplicationLauncherCommandLine"
+    vrt_file = os.path.join(working_directory, "classif.VRT")
+    create_vrt_from_filelist(rasterlist, vrt_file)
     
     #compute stats
     print("----COMPUTE STATS----")
-    appstat="ComputeImagesStatistics"
-    statcommand = (' %s %s'
-                   ' -il "%s" '
-                   ' -out "%s" '
-                   % (otbALCL, appstat, vrtfile, outstatfile))
-    print statcommand
-    terre_image_run_process.run_process(statcommand, True)
+    out_stat_file = os.path.join(working_directory, "stats.xml")
+    OTBApplications.compute_statistics_cli(vrt_file, out_stat_file)
 
     # Train images
     print("----TRAIN----")
-    trainlauncher = "{}otbcli_TrainImagesClassifier".format(app_dir)
-    traincommand = ('%s'
-                    ' -io.il "%s" '
-                    ' -io.vd "%s" '
-                    ' -io.imstat "%s" '
-                    ' -io.out "%s" '
-                    ' -io.confmatout "%s"'
-                    ' -classifier rf'
-                    ' -sample.vtr 0.1' 
-                    % (trainlauncher, vrtfile, vd, outstatfile, outsvmfile, confmat))
-    terre_image_run_process.run_process(traincommand, True)
+    out_rf_file = os.path.join(working_directory, "rf.model")
+    conf_mat = os.path.join(working_directory, "rf.mat")
+    result = OTBApplications.train_image_classifier_cli(vrt_file, vectorlist, out_stat_file, out_rf_file, conf_mat)
+
+    kappa = None
+    if result:
+        # type(result_sensor) = PyQt4.QtCore.QByteArray
+        for line in str(result).splitlines():
+            if "Kappa" in line:
+                # sensor_line = result_sensor[0]
+                kappa = re.search('Kappa index: ([\d.]+)$', line)
+                if kappa:
+                    # group 1 parce qu'on a demande qqchose de particulier a la regexpr a cause des ()
+                    try :
+                        kappa = int(kappa.group(1))
+                    except ValueError:
+                        kappa = None
+    if not kappa:
+        return
 
     # Image Classification 
     print("----CLASSIF----")
-    classiflauncher="{}otbcli_ImageClassifier".format(app_dir)
-    classifcommand = ('%s'
-                      ' -in "%s" '
-                      ' -imstat "%s" '
-                      ' -model "%s" '
-                      ' -out "%s" '
-                      % (classiflauncher, vrtfile, outstatfile, outsvmfile, out))
-    terre_image_run_process.run_process(classifcommand, True)
+    out = os.path.join(working_directory, "out_classifier.TIF")
+    OTBApplications.image_classifier_cli(vrt_file, out_stat_file, out_rf_file, out)
 
     # Regularization
     print("----REGULARISATION----")
-    regullauncher="{}otbcli_ClassificationMapRegularization".format(app_dir)
-    regulcommand=('%s'
-                  ' -io.in "%s" '
-                  ' -io.out "%s" '
-                  ' -ip.radius 1 '
-                  ' -ip.suvbool false '
-                  % (regullauncher, out, outregul))
-    terre_image_run_process.run_process(regulcommand, True)
-    
-    #TODO Population stats
-    #statpoplauncher=""
-    #statpopcmmand=""
-    #terre_image_run_process.run_process(statpopcmmand, True)
-    
+    OTBApplications.classification_map_regularization_cli(out, outputclassification)
+
+    # Population stats
+    print("----POPULATION STATS----")
+    OTBApplications.ComputeLabelImagePopulation_cli(outputclassification, outputclassification, out)
+
     #TODO ajout de la sauvegarde des parameters
+
+    return conf_mat, kappa
+
+
     
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
     #parser.add_argument('--filelist', nargs='*', type=argparse.FileType('r'))
     parser.add_argument('--filelist', nargs='*')
-    parser.add_argument('--vrtfile')
-    parser.add_argument('--outstatfile')
-    parser.add_argument('--outsvmfile') 
-    parser.add_argument('--confmat')
     parser.add_argument('--vd')
     parser.add_argument('--out')
     parser.add_argument('--outregul')
+    parser.add_argument('--working_dir')
     args = parser.parse_args()
     
     full_classification(args.filelist, 
-                        args.vrtfile, 
-                        args.outstatfile, 
-                        args.outsvmfile, 
-                        args.confmat,
-                        args.vd, 
+                        args.vd,
                         args.out, 
-                        args.outregul)
+                        args.outregul,
+                        args.working_dir)
