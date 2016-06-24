@@ -31,10 +31,14 @@ logger = logging.getLogger( 'Classif' )
 logger.setLevel(logging.INFO)
 
 def create_vrt_from_filelist(filelist, vrt_name):
+    logger.info("----CREATE VRT----")
+    logger.debug("filelist {}".format(filelist))
+    logger.debug("vrt_name {}".format(vrt_name))
+
     rootNode = ET.Element( 'VRTDataset' )
 
     for filename in filelist:
-        logging.debug(filename)
+        logger.debug(filename)
         ds = gdal.Open(filename)
 
         logging.debug("[ RASTER BAND COUNT ]: {}".format(ds.RasterCount))
@@ -85,18 +89,18 @@ def full_classification(rasterlist, vectorlist, outputclassification, out_pop, w
     Returns:
 
     """
-
     # Merge the input images
+    # logger.info("----CREATE VRT----")
     vrt_file = os.path.join(working_directory, "classif.VRT")
     create_vrt_from_filelist(rasterlist, vrt_file)
     
     #compute stats
-    logging.info("----COMPUTE STATS----")
+    logger.info("----COMPUTE STATS----")
     out_stat_file = os.path.join(working_directory, "stats.xml")
     OTBApplications.compute_statistics_cli(vrt_file, out_stat_file)
 
     # Train images
-    logging.info("----TRAIN----")
+    logger.info("----TRAIN----")
     out_rf_file = os.path.join(working_directory, "rf.model")
     conf_mat = os.path.join(working_directory, "rf.mat")
     result = OTBApplications.train_image_classifier_cli(vrt_file, vectorlist, out_stat_file, out_rf_file, conf_mat)
@@ -118,26 +122,24 @@ def full_classification(rasterlist, vectorlist, outputclassification, out_pop, w
         return
 
     # Image Classification 
-    logging.info("----CLASSIF----")
+    logger.info("----CLASSIF----")
     out_image_classifier = os.path.join(working_directory, "out_image_classifier.TIF")
     OTBApplications.image_classifier_cli(vrt_file, out_stat_file, out_rf_file, out_image_classifier)
 
     # Regularization
-    logging.info("----REGULARISATION----")
+    logger.info("----REGULARISATION----")
     OTBApplications.classification_map_regularization_cli(out_image_classifier, outputclassification)
 
     # Population stats
-    logging.info("----POPULATION STATS----")
+    logger.info("----POPULATION STATS----")
     OTBApplications.ComputeLabelImagePopulation_cli(outputclassification, outputclassification, out_pop)
-
-    #TODO ajout de la sauvegarde des parameters
 
     return conf_mat, kappa
 
 
-    
+
 if __name__ == '__main__':
-    
+
     parser = argparse.ArgumentParser()
     #parser.add_argument('--filelist', nargs='*', type=argparse.FileType('r'))
     parser.add_argument('--filelist', nargs='*')
@@ -146,9 +148,9 @@ if __name__ == '__main__':
     parser.add_argument('--outregul')
     parser.add_argument('--working_dir')
     args = parser.parse_args()
-    
-    full_classification(args.filelist, 
+
+    full_classification(args.filelist,
                         args.vd,
-                        args.out, 
+                        args.out,
                         args.outregul,
                         args.working_dir)
