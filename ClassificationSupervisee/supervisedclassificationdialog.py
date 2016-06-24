@@ -227,84 +227,84 @@ class SupervisedClassificationDialog(QtGui.QDialog):
 
         logger.debug( "classify" )
         simulation = False
+        try:
+            # Get rasters
+            selectedrasterlayers = self.rasterlayerselector.getSelectedOptions()
+            logger.debug( "selectedrasterlayers" + str(selectedrasterlayers) )
+            if len(selectedrasterlayers) < 1:
+                QtGui.QMessageBox.critical( self, \
+                                            u"Erreur", \
+                                            u"Aucune couche raster sélectionnée" )
+                return
 
-        # Get rasters
-        selectedrasterlayers = self.rasterlayerselector.getSelectedOptions()
-        logger.debug( "selectedrasterlayers" + str(selectedrasterlayers) )
-        if len(selectedrasterlayers) < 1:
-            QtGui.QMessageBox.critical( self, \
-                                        u"Erreur", \
-                                        u"Aucune couche raster sélectionnée" )
-            return
+            # Get vectors
+            selectedvectorlayers = self.vectorlayerselector.getSelectedOptions()
+            if len(selectedvectorlayers) < 2:
+                QtGui.QMessageBox.critical( self, \
+                                            u"Erreur", \
+                                            u"Au minimum deux couches vecteur doivent être sélectionnées" )
+                return
 
-        # Get vectors
-        selectedvectorlayers = self.vectorlayerselector.getSelectedOptions()
-        if len(selectedvectorlayers) < 2:
-            QtGui.QMessageBox.critical( self, \
-                                        u"Erreur", \
-                                        u"Au minimum deux couches vecteur doivent être sélectionnées" )
-            return
+            errorDuringClassif = False
+            outputdir = self.getOutputDir()
 
-        errorDuringClassif = False
-        outputdir = self.getOutputDir()
+            # Build list of input vector files
+            vectorlist = []
+            labeldescriptor = {}
+            label = 0
 
-        # Build list of input vector files
-        vectorlist = []
-        labeldescriptor = {}
-        label = 0
+            logger.info("Crop and reproject vector data")
+            for i in range(len(selectedvectorlayers)):
+                v = selectedvectorlayers[i]
+                inputshpfilepath = v[0].source()
+                classcolor = v[1]
+                classlabel = v[2]
 
-        logger.info("Crop and reproject vector data")
-        for i in range(len(selectedvectorlayers)):
-            v = selectedvectorlayers[i]
-            inputshpfilepath = v[0].source()
-            classcolor = v[1]
-            classlabel = v[2]
+                labeldescriptor[label] = (classcolor, classlabel)
+                logger.debug( "labeldescriptor" + str(labeldescriptor) )
+                label += 1
 
-            labeldescriptor[label] = (classcolor, classlabel)
-            logger.debug( "labeldescriptor" + str(labeldescriptor) )
-            label += 1
+                # Reprocess input shp file to crop it to firstraster extent
+                vectordir = os.path.join(outputdir, 'class%s' % (str(i)))
+                ensure_clean_dir(vectordir)
 
-            # Reprocess input shp file to crop it to firstraster extent
-            vectordir = os.path.join(outputdir, 'class%s' % (str(i)))
-            ensure_clean_dir(vectordir)
+                preprocessedshpfile = cropVectorDataToImage(selectedrasterlayers[0].source(), inputshpfilepath, vectordir)
+                vectorlist.append(preprocessedshpfile)
 
-            preprocessedshpfile = cropVectorDataToImage(selectedrasterlayers[0].source(), inputshpfilepath, vectordir)
-            vectorlist.append(preprocessedshpfile)
+            logger.info("Merge vector data")
+            union = mergeVectorData.unionPolygonsWithOGR(vectorlist, outputdir)
 
-        logger.info("Merge vector data")
-        union = mergeVectorData.unionPolygonsWithOGR(vectorlist, outputdir)
+            logger.info("Run classification")
+            # Build classifcommand
+            outputlog = os.path.join(outputdir, 'output.log')
+            outputclassification = os.path.join(outputdir, 'classification.tif')
+            out_pop = os.path.join(outputdir, 'classification.resultats.txt')
 
-        logger.info("Run classification")
-        # Build classifcommand
-        outputlog = os.path.join(outputdir, 'output.log')
-        outputclassification = os.path.join(outputdir, 'classification.tif')
-        out_pop = os.path.join(outputdir, 'classification.resultats.txt')
+            confmat, kappa = full_classification([r.source() for r in selectedrasterlayers],
+                                                 union, outputclassification, out_pop, outputdir)
 
-        confmat, kappa = full_classification([r.source() for r in selectedrasterlayers],
-                                             union, outputclassification, out_pop, outputdir)
+            logger.info("Run confusion matrix viewer")
+            if (not simulation and not errorDuringClassif):
+                QGisLayers.loadLabelImage(outputclassification, labeldescriptor)
 
-        logger.info("Run confusion matrix viewer")
-        if (not simulation and not errorDuringClassif):
-            QGisLayers.loadLabelImage(outputclassification, labeldescriptor)
+                notificationDialog = ConfusionMatrixViewer(selectedvectorlayers, confmat, kappa, out_pop)
 
-            notificationDialog = ConfusionMatrixViewer(selectedvectorlayers, confmat, kappa, out_pop)
+                self.clearStatus()
+                QtGui.QApplication.restoreOverrideCursor()
 
-            self.clearStatus()
-            QtGui.QApplication.restoreOverrideCursor()
+                notificationDialog.setModal(True)
+                notificationDialog.show()
 
-            notificationDialog.setModal(True)
-            notificationDialog.show()
+                pixmap = QtGui.QPixmap(notificationDialog.size())
+                notificationDialog.render(pixmap)
+                pixmap.save(os.path.join(outputdir, 'resultats.png'))
 
-            pixmap = QtGui.QPixmap(notificationDialog.size())
-            notificationDialog.render(pixmap)
-            pixmap.save(os.path.join(outputdir, 'resultats.png'))
-
-            notificationDialog.exec_()
+                notificationDialog.exec_()
 
 #        except:
 #            raise
 
-        # finally:
-        #     self.clearStatus()
-        #     QtGui.QApplication.restoreOverrideCursor()
+        finally:
+            self.clearStatus()
+            QtGui.QApplication.restoreOverrideCursor()
         #     return # this discards exception
