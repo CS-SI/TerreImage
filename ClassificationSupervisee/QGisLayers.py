@@ -28,7 +28,8 @@ from qgis.core import (QgsRasterLayer,
                        QgsMapLayerRegistry,
                        QgsColorRampShader,
                        QgsRasterShader,
-                       QgsSingleBandPseudoColorRenderer)
+                       QgsSingleBandPseudoColorRenderer,
+                       QgsRasterTransparency)
 # from PyQt4.QtCore import
 # from PyQt4.QtGui import
 from PyQt4 import QtGui
@@ -127,6 +128,9 @@ class QGisLayers:
         s.setRasterShaderFunction(c)
         ps = QgsSingleBandPseudoColorRenderer(qgslayer.dataProvider(), 1, s)
         qgslayer.setRenderer(ps)
+
+        for bandNo in range(1,qgslayer.dataProvider().bandCount()+1):
+            qgslayer.dataProvider().setUseSrcNoDataValue( bandNo, False )
 
         QGisLayers.iface.legendInterface().refreshLayerSymbology(qgslayer)
         if hasattr(qgslayer, "setCacheImage"):
