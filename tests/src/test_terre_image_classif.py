@@ -36,7 +36,7 @@ class TestTerreImageClassif(TerreImageTestCase):
         """
         self.image_test = os.path.join(self.data_dir_input, "classif", "taredji_extract_1024.tif")
         self.image_test_ndvi = os.path.join(self.data_dir_input, "classif", "taredji_extract_1024_ndvi.tif")
-        self.vector_test = os.path.join(self.data_dir_input, "classif", 'samples', "green.shp")
+        self.vector_test = os.path.join(self.data_dir_input, "classif", 'samples', "samples.shp")
         self.working_dir1 = os.path.join(self.working_dir, "1")
         if os.path.isdir(self.working_dir1):
             os.system("rm -rf {}".format(self.working_dir1))
@@ -67,11 +67,11 @@ class TestTerreImageClassif(TerreImageTestCase):
         """
 
         outputclassification = os.path.join(self.working_dir1, "out_classif.tif")
-        out_pop = os.path.join(self.working_dir1, "out_classif_pop.tif")
+        out_pop = os.path.join(self.working_dir1, "out_classif_pop.xml")
         baseline = os.path.join(self.data_dir_baseline, "classif", "Classification", "classification.tif")
         confMat, kappa = classif.full_classification([self.image_test], self.vector_test,
                                                      outputclassification, out_pop, self.working_dir1)
-        self.assertEqual(kappa, 1)
+        self.assertEqual(kappa, 0.999485)
         self.assertTrue(self.checkResult(out_pop, baseline))
 
 
