@@ -33,7 +33,6 @@ namespace otb
 namespace Wrapper
 {
 
-  typedef FloatImageType::PixelType PixelType;
   typedef UInt8ImageType LabelImageType;
 
   typedef otb::StreamingStatisticsMapFromLabelImageFilter<FloatImageType, LabelImageType> StatisticsFilterType;
@@ -120,8 +119,7 @@ private:
     TiXmlElement * stats = new TiXmlElement("Statistiques");
     resultat->LinkEndChild(stats);
 
-   
-    FloatVectorImageType::SizeType size = GetParameterImage("in1")->GetLargestPossibleRegion().GetSize();
+    FloatImageType::SizeType size = GetParameterFloatImage("in1")->GetLargestPossibleRegion().GetSize();
     unsigned int total = size[0] * size[1];
     
     for (StatisticsFilterType::LabelPopulationMapType::const_iterator it = populationMap.begin(); it !=populationMap.end() ; ++it)
@@ -137,11 +135,9 @@ private:
       stats->LinkEndChild( classpercentage );
          
     }
-   
 
     // Finally, write the file
     doc.SaveFile( GetParameterAsString("out").c_str() );
-
 
   } //end DoExecute
   StatisticsFilterType::Pointer m_Statistics;
