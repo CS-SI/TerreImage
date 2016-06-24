@@ -72,7 +72,7 @@ class TerreImageProcess():
             if not error in ["\n", ""]:
                 logger.info("error : " + "\'" + str(error) + "\'")
                 logging.debug("************".format(error))
-            logger.info("output : " + result.data() + "fin output")
+            logger.info("output : {}".format(result.data()))
             return result
         else:
             code_d_erreur = self.process.error()
