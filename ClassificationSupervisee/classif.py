@@ -119,16 +119,16 @@ def full_classification(rasterlist, vectorlist, outputclassification, out_pop, w
 
     # Image Classification 
     logging.info("----CLASSIF----")
-    out = os.path.join(working_directory, "out_classifier.TIF")
-    OTBApplications.image_classifier_cli(vrt_file, out_stat_file, out_rf_file, out)
+    out_image_classifier = os.path.join(working_directory, "out_image_classifier.TIF")
+    OTBApplications.image_classifier_cli(vrt_file, out_stat_file, out_rf_file, out_image_classifier)
 
     # Regularization
     logging.info("----REGULARISATION----")
-    OTBApplications.classification_map_regularization_cli(out, outputclassification)
+    OTBApplications.classification_map_regularization_cli(out_image_classifier, outputclassification)
 
     # Population stats
     logging.info("----POPULATION STATS----")
-    OTBApplications.ComputeLabelImagePopulation_cli(outputclassification, outputclassification, out)
+    OTBApplications.ComputeLabelImagePopulation_cli(outputclassification, outputclassification, out_pop)
 
     #TODO ajout de la sauvegarde des parameters
 
