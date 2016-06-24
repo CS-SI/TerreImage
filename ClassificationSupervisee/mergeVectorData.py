@@ -53,7 +53,8 @@ def mergeVectorDataFiles(listOfVectorData, outputDirectory):
     Returns:
 
     """
-    unionPolygonsWithOGR(listOfVectorData, outputDirectory)
+    union = unionPolygonsWithOGR(listOfVectorData, outputDirectory)
+    return union
 
 
 
