@@ -58,12 +58,12 @@ class TestTerreImageClassif(TerreImageTestCase):
 
         """
         confmat = os.path.join(self.data_dir_baseline, "classif_new", "svm.mat")
+        out_classif_pop = os.path.join(self.data_dir_baseline, "classif_new", "out_classif_pop.xml")
         kappa = 0.957278
-        dic_info = ConfusionMatrixViewer.read_results(confmat, kappa, None)
+        dic_info = ConfusionMatrixViewer.read_results(confmat, kappa, out_classif_pop)
         self.assertEqual(dic_info["kappa"], 0.957278)
-        self.assertEqual(dic_info["percentage"], {0:24.2, 1:12.2, 2:8.2, 3:55.3})
-        self.assertEqual(dic_info["confusion"], [["2041", "0", "0", "0"], ["0", "1949", "0", "0"],
-                                                 ["0", "20", "1743", "227"], ["0", "3", "6", "2002"]])
+        self.assertEqual(dic_info["percentage"], {0:15.1, 1:24., 2:61.})
+        self.assertEqual(dic_info["confusion"], [["1045", "0", "0"], ["0", "1016", "0"], ["0", "0", "987"]])
 
 
 if __name__ == '__main__':

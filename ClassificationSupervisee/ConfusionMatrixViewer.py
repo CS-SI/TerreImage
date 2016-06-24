@@ -59,6 +59,10 @@ def read_results(confmat, kappa, out_pop):
 
     # Class statistics
     percentage = {}
+    root = xml.parse(out_pop).getroot()
+    for child in root.find("Resultats").find("Statistiques"):
+        if child.tag == "Class":
+            percentage[ int(child.attrib["label"]) ] = float(child.attrib["pourcentage"])
 
     # Confusion matrix
     matrix = []
@@ -66,7 +70,7 @@ def read_results(confmat, kappa, out_pop):
     lines = f.readlines()
     for line in lines:
         if not line.startswith("#"):
-            matrix.append(line.split())
+            matrix.append([x.replace("\n", "") for x in line.split(",")])
 
     # Kappa index
 
