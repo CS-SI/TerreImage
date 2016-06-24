@@ -290,7 +290,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
             if (not simulation and not errorDuringClassif):
                 QGisLayers.loadLabelImage(outputclassification, labeldescriptor)
 
-                notificationDialog = ConfusionMatrixViewer(selectedvectorlayers, outputresults)
+                notificationDialog = ConfusionMatrixViewer(selectedvectorlayers, confmat, kappa, out_pop)
 
                 self.clearStatus()
                 QtGui.QApplication.restoreOverrideCursor()

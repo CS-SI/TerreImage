@@ -29,7 +29,7 @@ from PyQt4 import QtCore, QtGui
 import xml.etree.ElementTree as xml
 
 
-def read_results(outputresults):
+def read_results_old(outputresults):
     percentage = {}
     root = xml.parse(outputresults).getroot()
 
@@ -51,6 +51,24 @@ def read_results(outputresults):
     for child in root.find("Resultats").find("Statistiques"):
         if child.tag == "Class":
             percentage[ int(child.attrib["label"]) ] = float(child.attrib["pourcentage"])
+
+    return {"percentage": percentage, "confusion": matrix, "kappa": kappa}
+
+
+def read_results(confmat, kappa, out_pop):
+
+    # Class statistics
+    percentage = {}
+
+    # Confusion matrix
+    matrix = []
+    f=open(confmat, "r")
+    lines = f.readlines()
+    for line in lines:
+        if not line.startswith("#"):
+            matrix.append(line.split())
+
+    # Kappa index
 
     return {"percentage": percentage, "confusion": matrix, "kappa": kappa}
 
@@ -78,10 +96,10 @@ class ColorSquare(QtGui.QPushButton):
 
 
 class ConfusionMatrixViewer(QtGui.QDialog):
-    def __init__(self, selectedvectorlayers, resultsfile, parent = None):
+    def __init__(self, selectedvectorlayers, confmat, kappa, out_pop, parent = None):
         QtGui.QDialog.__init__(self)
 
-        results = read_results(resultsfile)
+        results = read_results(confmat, kappa, out_pop)
         n = len(results["confusion"])
 
         self.setWindowTitle(u"Résultats")
