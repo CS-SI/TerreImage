@@ -38,13 +38,13 @@ def unionPolygonsWithOGR(filenames, outputDirectory):
         filenames -- list of masks filenames
     """
     outputFilename = os.path.join(outputDirectory, "vectorMerged.shp")
-    indexClass=1
+    indexClass=0
     for f in filenames:
         base = os.path.basename(os.path.splitext(f)[0])
         #Add class
-        command = 'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN CLASS numeric(15)"'.format(f, base)
+        command = 'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Class numeric(15)"'.format(f, base)
         os.system(command)
-        command = 'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET CLASS = {}"'.format(f, base, indexClass)
+        command = 'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Class = {}"'.format(f, base, indexClass)
         os.system(command)
         #Add Label
         command = 'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Label character(15)"'.format(f, base)
@@ -55,6 +55,8 @@ def unionPolygonsWithOGR(filenames, outputDirectory):
         command = 'ogr2ogr -update -append {} {}'.format(outputFilename, f)
         os.system(command)
         indexClass+=1
+
+    return outputFilename
 
 
 def compute_overviews(filename):
