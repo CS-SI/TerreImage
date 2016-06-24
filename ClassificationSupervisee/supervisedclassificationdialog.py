@@ -31,6 +31,7 @@ from VectorLayerSelectorTable import VectorLayerSelectorTable
 from ConfusionMatrixViewer import ConfusionMatrixViewer
 from TerreImage.terre_image_run_process import TerreImageProcess
 from cropVectorDataToImage import cropVectorDataToImage
+import mergeVectorData
 
 from QGisLayers import QGisLayers
 from QGisLayers import QGisLayerType
@@ -244,70 +245,66 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                                         u"Au minimum deux couches vecteur doivent être sélectionnées" )
             return
 
-        try:
-            errorDuringClassif = False
-            outputdir = self.getOutputDir()
+        errorDuringClassif = False
+        outputdir = self.getOutputDir()
 
-            # Build list of input raster files
-            rasterlist = ""
-            for r in selectedrasterlayers:
-                rasterlist += '"%s" ' % (r.source())
-            #logger.debug( "rasterlist" + str( rasterlist ) )
+        # Build list of input vector files
+        vectorlist = []
+        labeldescriptor = {}
+        label = 0
 
-            #firstraster = '"%s" ' % (unicode(selectedrasterlayers[0].source()))
-            logger.debug( "selectedrasterlayers[0]" + str(selectedrasterlayers[0]) )
-            firstraster = '"%s" ' % (selectedrasterlayers[0].source())
+        logger.info("Crop and reproject vector data")
+        for i in range(len(selectedvectorlayers)):
+            v = selectedvectorlayers[i]
+            inputshpfilepath = v[0].source()
+            classcolor = v[1]
+            classlabel = v[2]
 
-            # Build list of input vector files
-            vectorlist = []
-            labeldescriptor = {}
-            label = 0
-            for i in range(len(selectedvectorlayers)):
-                v = selectedvectorlayers[i]
-                inputshpfilepath = v[0].source()
-                classcolor = v[1]
-                classlabel = v[2]
+            labeldescriptor[label] = (classcolor, classlabel)
+            logger.debug( "labeldescriptor" + str(labeldescriptor) )
+            label += 1
 
-                labeldescriptor[label] = (classcolor, classlabel)
-                logger.debug( "labeldescriptor" + str(labeldescriptor) )
-                label += 1
+            # Reprocess input shp file to crop it to firstraster extent
+            vectordir = os.path.join(outputdir, 'class%s' % (str(i)))
+            ensure_clean_dir(vectordir)
 
-                # Reprocess input shp file to crop it to firstraster extent
-                vectordir = os.path.join(outputdir, 'class%s' % (str(i)))
-                ensure_clean_dir(vectordir)
+            preprocessedshpfile = cropVectorDataToImage(selectedrasterlayers[0].source(), inputshpfilepath, vectordir)
+            vectorlist.append(preprocessedshpfile)
 
-                preprocessedshpfile = cropVectorDataToImage(selectedrasterlayers[0].source(), inputshpfilepath, vectordir)
-                vectorlist.append(preprocessedshpfile)
+        logger.info("Merge vector data")
+        union = mergeVectorData.unionPolygonsWithOGR(vectorlist, outputdir)
 
-            # Build classifcommand
-            outputlog = os.path.join(outputdir, 'output.log')
-            outputclassification = os.path.join(outputdir, 'classification.tif')
-            out_pop = os.path.join(outputdir, 'classification.resultats.txt')
+        logger.info("Run classification")
+        # Build classifcommand
+        outputlog = os.path.join(outputdir, 'output.log')
+        outputclassification = os.path.join(outputdir, 'classification.tif')
+        out_pop = os.path.join(outputdir, 'classification.resultats.txt')
 
+        confmat, kappa = full_classification([r.source() for r in selectedrasterlayers],
+                                             union, outputclassification, out_pop, outputdir)
 
-            confmat, kappa = full_classification(rasterlist, vectorlist, outputclassification, out_pop)
+        logger.info("Run confusion matrix viewer")
+        if (not simulation and not errorDuringClassif):
+            QGisLayers.loadLabelImage(outputclassification, labeldescriptor)
 
-            if (not simulation and not errorDuringClassif):
-                QGisLayers.loadLabelImage(outputclassification, labeldescriptor)
+            notificationDialog = ConfusionMatrixViewer(selectedvectorlayers, confmat, kappa, out_pop)
 
-                notificationDialog = ConfusionMatrixViewer(selectedvectorlayers, confmat, kappa, out_pop)
+            self.clearStatus()
+            QtGui.QApplication.restoreOverrideCursor()
 
-                self.clearStatus()
-                QtGui.QApplication.restoreOverrideCursor()
+            notificationDialog.setModal(True)
+            notificationDialog.show()
 
-                notificationDialog.setModal(True)
-                notificationDialog.show()
+            pixmap = QtGui.QPixmap(notificationDialog.size())
+            notificationDialog.render(pixmap)
+            pixmap.save(os.path.join(outputdir, 'resultats.png'))
 
-                pixmap = QtGui.QPixmap(notificationDialog.size())
-                notificationDialog.render(pixmap)
-                pixmap.save(os.path.join(outputdir, 'resultats.png'))
-
-                notificationDialog.exec_()
+            notificationDialog.exec_()
 
 #        except:
 #            raise
 
-        finally:
-            self.clearStatus()
-            QtGui.QApplication.restoreOverrideCursor()
-            return # this discards exception
+        # finally:
+        #     self.clearStatus()
+        #     QtGui.QApplication.restoreOverrideCursor()
+        #     return # this discards exception
