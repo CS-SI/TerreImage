@@ -72,3 +72,29 @@ def compute_overviews(filename):
         TerreImageProcess().run_process(command)
 
 
+def gdal_edit_remove_no_data(image_in):
+    """
+    Runs gdal_edit to remove the no data value of the given image
+    Args:
+        image_in:
+
+    Returns:
+
+    """
+    command = "gdal_edit.py -a_nodata None {}".format(image_in)
+    TerreImageProcess().run_process(command)
+
+
+def gdal_translate_remove_no_data(image_in, image_out):
+    """
+    Runs gdal_translate to remove the no data value of the given image
+
+    Args:
+        image_in:
+        image_out:
+
+    Returns:
+
+    """
+    command = "gdal_translate -a_nodata None {} {}".format(image_in, image_out)
+    TerreImageProcess().run_process(command)

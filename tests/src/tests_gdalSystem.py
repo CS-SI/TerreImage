@@ -66,6 +66,18 @@ class TestGdalSystem(TerreImageTestCase):
         print "Test existence of {}".format(ovr_file)
         self.assertTrue(os.path.exists(ovr_file))
 
+    def test_gdal_edit_remove_no_data(self):
+        """
+        Test on removing no data value
+        Returns:
+
+        """
+        copy_image_test = os.path.join(self.working_dir, os.path.basename(self.image_test))
+        shutil.copy(self.image_test, copy_image_test)
+        terre_image_gdal_system.gdal_edit_remove_no_data(copy_image_test)
+        self.assertTrue(os.path.isfile(copy_image_test))
+        #TO DO: add a assertion on no data
+
 
 
 if __name__ == '__main__':

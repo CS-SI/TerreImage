@@ -24,6 +24,7 @@ import os
 import argparse
 import re
 from TerreImage import OTBApplications
+from TerreImage import terre_image_gdal_system
 
 import logging
 # create logger
@@ -128,7 +129,11 @@ def full_classification(rasterlist, vectorlist, outputclassification, out_pop, w
 
     # Regularization
     logger.info("----REGULARISATION----")
-    OTBApplications.classification_map_regularization_cli(out_image_classifier, outputclassification)
+    out_image_classifier_with_nodata = "{}_with_no_data{}".format(os.path.splitext(outputclassification)[0],
+                                                                  os.path.splitext(outputclassification)[1])
+    OTBApplications.classification_map_regularization_cli(out_image_classifier, out_image_classifier_with_nodata)
+    # remove no data (Bug OTB)
+    terre_image_gdal_system.gdal_translate_remove_no_data(out_image_classifier_with_nodata, outputclassification)
 
     # Population stats
     logger.info("----POPULATION STATS----")
