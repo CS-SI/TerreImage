@@ -22,6 +22,7 @@ import os
 from PyQt4.QtCore import QProcessEnvironment, QProcess
 
 import terre_image_configuration
+import terre_image_exceptions
 
 import logging
 # logging.basicConfig()
@@ -39,6 +40,7 @@ class TerreImageProcess():
         self.process.error[QProcess.ProcessError].connect(self.error_management)
         self.env = QProcessEnvironment().systemEnvironment()
         self.set_otb_process_env_default()
+        self.command = ""
 
     def run_process(self, command):
         logging.info("Running {}".format(command))
@@ -48,7 +50,7 @@ class TerreImageProcess():
         # print "..............", self.process.processEnvironment().value("PATH")
         # print "Environ : PATH {}".format(os.environ["PATH"])
         # print "Environ : OTB_APPLICATION_PATH {}".format(os.environ.get("OTB_APPLICATION_PATH", "Empty"))
-
+        self.command = command
         self.process.start(command)
         if self.process.waitForStarted():
             self.process.waitForFinished(-1)
@@ -92,6 +94,9 @@ class TerreImageProcess():
         error = self.process.readAllStandardError().data()
         logging.info("{}".format(error))
         logging.info( self.process.readAllStandardOutput())
+        raise terre_image_exceptions.TerreImageRunProcessError("Error running : {}\n {}{}".format(self.command,
+                                                                                  dic_err[errorCode], error
+                                                                                  ))
 
     def set_env_var(self, varname, varval, append = False, pre = False):
 
