@@ -24,9 +24,9 @@ import os
 # windows
 # comment the following lines when the custom path are used
 dirname = os.path.dirname(os.path.abspath(__file__))
-OTB_APPLICATION_PATH =  os.path.join(dirname, "win32", "plugin")
+OTB_APPLICATION_PATH =  os.path.join(dirname, "win32", "lib", "otb", "applications")
 PATH = os.path.join(dirname, "win32", "bin")
-
+LD_LIBRARY_PATH = ""
 
 # # configuration system for linux
 # otb_dir = "/usr"
