@@ -26,15 +26,14 @@ import glob
 import os
 import sys
 import shutil
+from TerreImage.terre_image_run_process import TerreImageProcess
+from TerreImage import OTBApplications
 
 from TerreImage.terre_image_gdal_api import get_image_epsg_code_with_gdal, get_vector_epsg_with_ogr
 
 # import logging for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('cropVectorDataToImage')
-logger.setLevel(logging.DEBUG)
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 def usage(argParser, return_code = 1):
@@ -108,8 +107,7 @@ def GenerateEnvelope(inputImageFileName, output_directory):
 
     """
     outputImageEnvelopeVector = os.path.join(output_directory, "image_envelope.shp")
-    command = "otbcli_ImageEnvelope -in {} -out {}".format(inputImageFileName, outputImageEnvelopeVector)
-    os.system(command)
+    OTBApplications.ImageEnvelope_cli(inputImageFileName, outputImageEnvelopeVector)
     return outputImageEnvelopeVector
 
 
@@ -143,7 +141,7 @@ def ReprojectVector(inputVectorFileName,  inputImageFileName, output_directory):
     #command = "ogr2ogr -t_srs {} -s_srs {} {} {}".format(epsg_code, None, tmpReprojectedVector, inputVectorFileName)
     command = "ogr2ogr -t_srs EPSG:{} {} {}".format(epsg_code, tmpReprojectedVector, inputVectorFileName)
 
-    os.system(command)
+    TerreImageProcess().run_process(command)
     return tmpReprojectedVector
 
 
@@ -162,7 +160,7 @@ def IntersectLayers(tmpReprojectedVector, outputImageEnvelopeVector, output_dire
     commandOGR = "ogr2ogr -f 'ESRI Shapefile' -clipsrc {} {} {}".format(outputImageEnvelopeVector,
                                                                         outputVectorFileName,
                                                                         tmpReprojectedVector)
-    os.system( commandOGR )
+    TerreImageProcess().run_process(commandOGR)
     return outputVectorFileName
 
 

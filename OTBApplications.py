@@ -33,11 +33,8 @@ gdal.UseExceptions()
 import gdalconst
 
 # import logging for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_OTBApplications')
-logger.setLevel(logging.INFO)
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 currentOs = os.name
 if currentOs == "posix":
@@ -244,5 +241,21 @@ def ComputeLabelImagePopulation_cli(im1, im2, out):
     """
     args = "-in1 {} -in2 {} -out {}".format(im1, im2, out)
     command = get_otb_command("ComputeLabelImagePopulation", args)
+    result = TerreImageProcess().run_process(command)
+    return result
+
+
+def ImageEnvelope_cli(image_in, vector_out):
+    """
+
+    Args:
+        im1:
+        im2:
+
+    Returns:
+
+    """
+    args = "-in {} -out {}".format(image_in, vector_out)
+    command = get_otb_command("ImageEnvelope", args)
     result = TerreImageProcess().run_process(command)
     return result
