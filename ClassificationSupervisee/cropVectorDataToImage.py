@@ -96,7 +96,7 @@ def get_arguments():
 
 
 
-def GenerateEnvelope(inputImageFileName, output_directory):
+def GenerateEnvelope(inputImageFileName, epsg_code, output_directory):
     """
     Computes the envelope of the given image
     Args:
@@ -107,11 +107,11 @@ def GenerateEnvelope(inputImageFileName, output_directory):
 
     """
     outputImageEnvelopeVector = os.path.join(output_directory, "image_envelope.shp")
-    OTBApplications.ImageEnvelope_cli(inputImageFileName, outputImageEnvelopeVector)
+    OTBApplications.ImageEnvelope_cli(inputImageFileName, outputImageEnvelopeVector, epsg_code)
     return outputImageEnvelopeVector
 
 
-def ReprojectVector(inputVectorFileName,  inputImageFileName, output_directory):
+def ReprojectVector(inputVectorFileName,  inputImageFileName, epsg_code, output_directory):
     """
     Reprojects the given vector in the coordinate system of the given image
     Args:
@@ -122,7 +122,6 @@ def ReprojectVector(inputVectorFileName,  inputImageFileName, output_directory):
     Returns:
 
     """
-    epsg_code = get_image_epsg_code_with_gdal(inputImageFileName)
 
     # use of .qpj instead of incomplete .prj
     if os.path.isfile(os.path.splitext(inputVectorFileName)[0] + ".qpj"):
@@ -157,7 +156,7 @@ def IntersectLayers(tmpReprojectedVector, outputImageEnvelopeVector, output_dire
 
     """
     outputVectorFileName = os.path.join(output_directory, "preprocessed.shp")
-    commandOGR = "ogr2ogr -f 'ESRI Shapefile' -clipsrc {} {} {}".format(outputImageEnvelopeVector,
+    commandOGR = 'ogr2ogr -f "ESRI Shapefile" -clipsrc {} {} {}'.format(outputImageEnvelopeVector,
                                                                         outputVectorFileName,
                                                                         tmpReprojectedVector)
     TerreImageProcess().run_process(commandOGR)
@@ -168,13 +167,15 @@ def cropVectorDataToImage(inputImageFileName, inputVectorFileName, output_direct
       # const char* tmpReprojectedVector = argv[4];
       # const char* outputVectorFileName = argv[5];
 
+
+    epsg_code = get_image_epsg_code_with_gdal(inputImageFileName)
     # Generate a shp file with image envelope
     # CRS is the image CRS
-    outputImageEnvelopeVector = GenerateEnvelope(inputImageFileName, output_directory)
+    outputImageEnvelopeVector = GenerateEnvelope(inputImageFileName, epsg_code, output_directory)
 
 
     # Reproject input vector into image CRS
-    tmpReprojectedVector = ReprojectVector(inputVectorFileName,  inputImageFileName, output_directory)
+    tmpReprojectedVector = ReprojectVector(inputVectorFileName,  inputImageFileName, epsg_code, output_directory)
 
 
     # Generate intersection between reprojected input vector and image envelope

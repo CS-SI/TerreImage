@@ -245,7 +245,7 @@ def ComputeLabelImagePopulation_cli(im1, im2, out):
     return result
 
 
-def ImageEnvelope_cli(image_in, vector_out):
+def ImageEnvelope_cli(image_in, vector_out, epsg_code=""):
     """
 
     Args:
@@ -256,6 +256,8 @@ def ImageEnvelope_cli(image_in, vector_out):
 
     """
     args = "-in {} -out {}".format(image_in, vector_out)
+    if epsg_code:
+        args += ' -proj "EPSG:{}"'.format(epsg_code)
     command = get_otb_command("ImageEnvelope", args)
     result = TerreImageProcess().run_process(command)
     return result
