@@ -24,12 +24,9 @@ from PyQt4.QtCore import QProcessEnvironment, QProcess
 import terre_image_configuration
 import terre_image_exceptions
 
-import logging
-# logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_RunProcess')
-logger.setLevel(logging.DEBUG)
-
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 
@@ -43,7 +40,7 @@ class TerreImageProcess():
         self.command = ""
 
     def run_process(self, command):
-        logging.info("Running {}".format(command))
+        logger.info("Running {}".format(command))
         self.process.setProcessEnvironment(self.env)
 
         # print "..............", self.process.processEnvironment().value("OTB_APPLICATION_PATH")
@@ -57,23 +54,13 @@ class TerreImageProcess():
             exit_code = self.process.exitCode()
             if exit_code != 0:
                 self.error_management(exit_code)
-            # logger.info("Code de sortie : " + str(exit_code))
-            # logging.debug("exit code".format(exit_code))
-            # if exit_code != 0:
-            #     code_d_erreur = self.process.error()
-            #     dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed",
-            #                 2:"QProcess::TimedOut", 3:"QProcess::WriteError",
-            #                 4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
-            #     logger.info("Code erreur : " + str(code_d_erreur))
-            #     logger.info(dic_err[code_d_erreur])
-
             result = self.process.readAllStandardOutput()
             # print type(result), result
             error = self.process.readAllStandardError().data()
             # print repr(error)
             if not error in ["\n", ""]:
-                logger.info("error : " + "\'" + str(error) + "\'")
-                logging.debug("************".format(error))
+                logger.error("error : " + "\'" + str(error) + "\'")
+                logger.debug("************".format(error))
             logger.info("output : {}".format(result.data()))
             return result
         else:
@@ -81,8 +68,8 @@ class TerreImageProcess():
             dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed",
                         2:"QProcess::TimedOut", 3:"QProcess::WriteError",
                         4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
-            logger.info("Code erreur : " + str(code_d_erreur))
-            logger.info(dic_err[code_d_erreur])
+            logger.error("Code erreur : " + str(code_d_erreur))
+            logger.error(dic_err[code_d_erreur])
         return None
 
     def error_management(self, errorCode):
@@ -90,10 +77,10 @@ class TerreImageProcess():
             2:"QProcess::TimedOut", 3:"QProcess::WriteError",
             4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
 
-        logging.info("Error {} {}".format(errorCode, dic_err[errorCode]))
+        logger.error("Error {} {}".format(errorCode, dic_err[errorCode]))
         error = self.process.readAllStandardError().data()
-        logging.info("{}".format(error))
-        logging.info( self.process.readAllStandardOutput())
+        logger.error("{}".format(error))
+        logger.error( self.process.readAllStandardOutput())
         raise terre_image_exceptions.TerreImageRunProcessError("Error running : {}\n {}{}".format(self.command,
                                                                                   dic_err[errorCode], error
                                                                                   ))

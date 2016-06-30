@@ -25,12 +25,9 @@ from PyQt4.QtCore import QObject, SIGNAL, Qt
 
 from ui_bands import Ui_Dialog
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_manage_bands')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class manage_bands:

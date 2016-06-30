@@ -35,19 +35,9 @@ from PyQt4.QtGui import QInputDialog
 import OTBApplications
 from terre_image_run_process import TerreImageProcess
 
-
 # import logging for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_processing')
-logger.setLevel(logging.DEBUG)
-# log_file = os.path.join(os.path.expanduser("~"), "log_terr_image_qprocess")
-# fh = logging.FileHandler(log_file)
-# formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s - %(message)s')
-# fh.setFormatter(formatter)
-# fh.setLevel(logging.DEBUG)
-# logger.addHandler(fh)
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 def ndvi(layer, working_directory):

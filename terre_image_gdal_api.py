@@ -26,12 +26,9 @@ from osgeo import gdal, osr, ogr
 gdal.UseExceptions()
 import gdalconst
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_gdal_api')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 def get_image_epsg_code_with_gdal(image_in):

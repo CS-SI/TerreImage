@@ -29,12 +29,9 @@ from PyQt4.QtGui import QAction, QIcon, QGridLayout
 
 import resources_rc
 
-#import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger( 'DockableMirrorMap_plugin' )
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class DockableMirrorMapPlugin(QObject):

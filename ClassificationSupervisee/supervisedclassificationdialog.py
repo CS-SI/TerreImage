@@ -41,10 +41,9 @@ import os
 import shutil
 import datetime
 
-import logging
-# create logger
-logger = logging.getLogger( 'SupervisedClassificationDialog' )
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 def ensure_clean_dir(d):
     #d = os.path.dirname(f)

@@ -26,10 +26,9 @@ import re
 from TerreImage import OTBApplications
 from TerreImage import terre_image_gdal_system
 
-import logging
-# create logger
-logger = logging.getLogger( 'Classif' )
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 def create_vrt_from_filelist(filelist, vrt_name):
     logger.info("----CREATE VRT----")
@@ -42,7 +41,7 @@ def create_vrt_from_filelist(filelist, vrt_name):
         logger.debug(filename)
         ds = gdal.Open(filename)
 
-        logging.debug("[ RASTER BAND COUNT ]: {}".format(ds.RasterCount))
+        logger.debug("[ RASTER BAND COUNT ]: {}".format(ds.RasterCount))
         for band_number in range( ds.RasterCount ):
             band_number += 1
             bandNode = ET.SubElement( rootNode, "VRTRasterBand", {'band': '1'} )
@@ -69,7 +68,7 @@ def create_vrt_from_filelist(filelist, vrt_name):
     node.text = ds.GetProjection() # projection
 
     stringToReturn = ET.tostring(rootNode)
-    logging.debug(stringToReturn)
+    logger.debug(stringToReturn)
 
     #if not os.path.isfile( vrt_name):
     writer = open( vrt_name, 'w')

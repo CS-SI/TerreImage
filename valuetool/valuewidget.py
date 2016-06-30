@@ -71,12 +71,9 @@ if hasmpl:
     if int(matplotlib.__version__[0]) < 1:
         hasmpl = False
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('ValueTool_valueWidget')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class ValueWidgetGraph(FigureCanvas):
@@ -162,8 +159,7 @@ class ValueWidget(QWidget, Ui_Widget):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.legend = self.iface.legendInterface()
-        self.logger = logging.getLogger('.'.join((__name__,
-                                        self.__class__.__name__)))
+
         QWidget.__init__(self)
         self.setupUi(self)
         self.setupUi_extra()

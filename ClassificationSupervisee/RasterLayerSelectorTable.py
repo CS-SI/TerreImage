@@ -31,11 +31,9 @@ import xml.etree.ElementTree as ET
 from osgeo import gdal
 from qgis.core import QgsRasterLayer
 
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger( 'RasterLayerSelectorTable' )
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class TreeWidgetItem(QtGui.QTreeWidgetItem):

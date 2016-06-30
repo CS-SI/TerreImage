@@ -27,12 +27,9 @@ from ui_terre_image_curve import Ui_Form
 
 import random
 
-#import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger( 'TerreImage_Curve' )
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class TerreImageCurve(QWidget, Ui_Form):

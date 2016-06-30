@@ -20,10 +20,9 @@
  ***************************************************************************/
 """
 
-# import loggin for debug messages
-import logging
-# create logger
-logger = logging.getLogger('s2constant')
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class TerreImageConstant(object):

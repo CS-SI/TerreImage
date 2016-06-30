@@ -30,12 +30,9 @@ from valuetool.valuewidget import ValueWidget
 from DockableMirrorMap.dockableMirrorMapPlugin import DockableMirrorMapPlugin
 from ClassificationSupervisee.supervisedclassificationdialog import SupervisedClassificationDialog
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_TerreImageManager')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class TerreImageManager():

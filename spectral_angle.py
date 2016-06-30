@@ -31,12 +31,9 @@ import terre_image_processing
 # imports for display
 import manage_QGIS
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_SpectralAngle')
-logger.setLevel(logging.DEBUG)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class SpectralAngleMapTool(QgsMapTool):

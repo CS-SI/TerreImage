@@ -30,11 +30,8 @@ import shutil
 from TerreImage.terre_image_gdal_system import unionPolygonsWithOGR
 
 # import logging for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('mergeVectorData')
-logger.setLevel(logging.DEBUG)
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 # TODO argparse

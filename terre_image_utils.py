@@ -36,12 +36,9 @@ import terre_image_run_process
 import OTBApplications
 import terre_image_gdal_system
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('Terre_Image_Utils')
-logger.setLevel(logging.DEBUG)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 def fill_default_directory():

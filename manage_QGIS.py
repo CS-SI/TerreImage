@@ -42,12 +42,9 @@ from terre_image_constant import TerreImageConstant
 import OTBApplications
 import terre_image_gdal_api
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_manageQGIS')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 def addVectorLayerToQGIS(vectorLayer, layername):

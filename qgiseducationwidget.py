@@ -42,12 +42,9 @@ from terre_image_histogram import TerreImageHistogram_monoband
 from terre_image_manager import TerreImageManager
 from processing_manager import ProcessingManager
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_qgiseducationwidget')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class Terre_Image_Dock_widget(QtGui.QDockWidget):

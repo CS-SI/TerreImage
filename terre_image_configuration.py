@@ -46,3 +46,8 @@ LD_LIBRARY_PATH = ""
 # PATH = os.path.join(otb_dir, "bin")
 # LD_LIBRARY_PATH = os.path.join(otb_dir, "lib")
 
+log_directory = os.path.join(os.path.dirname(__file__), "logs")
+if not os.path.exists(log_directory):
+    os.makedirs(log_directory)
+
+log_file = os.path.join(log_directory, "terre_image.log")
