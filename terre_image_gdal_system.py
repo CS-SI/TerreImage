@@ -24,11 +24,8 @@ import os
 from terre_image_run_process import TerreImageProcess
 
 # import logging for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_GDALSystem')
-logger.setLevel(logging.INFO)
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 def unionPolygonsWithOGR(filenames, outputDirectory):
     """
@@ -43,17 +40,17 @@ def unionPolygonsWithOGR(filenames, outputDirectory):
         base = os.path.basename(os.path.splitext(f)[0])
         #Add class
         command = 'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Class numeric(15)"'.format(f, base)
-        os.system(command)
+        TerreImageProcess().run_process(command)
         command = 'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Class = {}"'.format(f, base, indexClass)
-        os.system(command)
+        TerreImageProcess().run_process(command)
         #Add Label
         command = 'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Label character(15)"'.format(f, base)
-        os.system(command)
+        TerreImageProcess().run_process(command)
         command = 'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Label = \'{}\'"'.format(f, base, base)
-        os.system(command)
+        TerreImageProcess().run_process(command)
         #update output
         command = 'ogr2ogr -update -append {} {}'.format(outputFilename, f)
-        os.system(command)
+        TerreImageProcess().run_process(command)
         indexClass+=1
 
     return outputFilename
