@@ -164,15 +164,11 @@ def IntersectLayers(tmpReprojectedVector, outputImageEnvelopeVector, output_dire
 
 
 def cropVectorDataToImage(inputImageFileName, inputVectorFileName, output_directory):
-      # const char* tmpReprojectedVector = argv[4];
-      # const char* outputVectorFileName = argv[5];
-
 
     epsg_code = get_image_epsg_code_with_gdal(inputImageFileName)
     # Generate a shp file with image envelope
     # CRS is the image CRS
     outputImageEnvelopeVector = GenerateEnvelope(inputImageFileName, epsg_code, output_directory)
-
 
     # Reproject input vector into image CRS
     tmpReprojectedVector = ReprojectVector(inputVectorFileName,  inputImageFileName, epsg_code, output_directory)
