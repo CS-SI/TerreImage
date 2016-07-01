@@ -29,3 +29,5 @@ class ExceptionTemplate(Exception):
 class TerreImageError(ExceptionTemplate): pass
 
 class TerreImageRunProcessError(ExceptionTemplate): pass
+
+class TerreImageClassificationError(ExceptionTemplate): pass

@@ -25,6 +25,7 @@ import argparse
 import re
 from TerreImage import OTBApplications
 from TerreImage import terre_image_gdal_system
+from TerreImage import terre_image_exceptions
 
 # import logging for debug messages
 from TerreImage import terre_image_logging
@@ -115,11 +116,11 @@ def full_classification(rasterlist, vectorlist, outputclassification, out_pop, w
                 if kappa:
                     # group 1 parce qu'on a demande qqchose de particulier a la regexpr a cause des ()
                     try :
-                        kappa = int(kappa.group(1))
+                        kappa = float(kappa.group(1))
                     except ValueError:
                         kappa = None
-    if not kappa:
-        return
+    if kappa == None:
+        raise terre_image_exceptions.TerreImageClassificationError("Could not find kappa in train image classifier result")
 
     # Image Classification 
     logger.info("----CLASSIF----")
