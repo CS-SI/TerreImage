@@ -50,7 +50,7 @@ def configure_logger(name="", log_path=""):
         },
         'loggers': {
             'default': {
-                'level': 'DEBUG',
+                'level': 'INFO',
                 'handlers': ['console', 'file']
             }
         },

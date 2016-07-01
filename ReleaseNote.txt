@@ -1,3 +1,13 @@
+Version 2.4
+- Migration à l'OTB 5.4
+- Passage de la chaîne de classif en utilisant des OTB Applications
+- Refactoring
+- Correction de la formule de la brillance
+- Amélioration de la gestion des lancements d'applications
+- Ajout de tests
+- Ajout d'un gestionnaire de logging
+
+
 Version 2.3.16
 - Correction du problème d'affichage de l'info bulle de l'angle spectral
 - Correction du bug sur l'affichage des courbes
