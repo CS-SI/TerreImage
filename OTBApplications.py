@@ -257,7 +257,7 @@ def ImageEnvelope_cli(image_in, vector_out, epsg_code=""):
     """
     args = "-in {} -out {}".format(image_in, vector_out)
     if epsg_code:
-        args += ' -proj "EPSG:{}"'.format(epsg_code)
+        args += ' -proj "{}"'.format(epsg_code)
     command = get_otb_command("ImageEnvelope", args)
     result = TerreImageProcess().run_process(command)
     return result
