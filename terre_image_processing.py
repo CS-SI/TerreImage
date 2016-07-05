@@ -165,9 +165,9 @@ def angles(layer, working_directory, x, y):
                 formula += "(" + "+".join(denom) + ")*"
                 formula += "(" + "+".join(fact) + ")"
                 formula += "))"
-                formula += "): 0)"
+                formula += "): 0"
 
-                formule_ = "\"" + formula + ">0.0001?1/" + formula + ":0)\""
+                formule_ = "\"(" + formula + ">0.0001?1/" + formula + ":0)\""
 
                 logger.debug("num" + str(num))
                 logger.debug("denom" + str(denom))
