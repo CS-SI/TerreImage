@@ -387,9 +387,9 @@ class TerreImageHistogram_monoband(TerreImageHistogram):  # , Ui_Form):
     def seuillage(self):
         forms = []
         if self.specific_band == -1:
-            forms.append("\"if(((im1b1>" + str(self.sc_1.x_min) + ") and (im1b1<" + str(self.sc_1.x_max) + ")), im1b1, 0)\"")
+            forms.append("\"(((im1b1>" + str(self.sc_1.x_min) + ") and (im1b1<" + str(self.sc_1.x_max) + "))?im1b1:0)\"")
         else:
-            forms.append("\"if(((im1b" + str(self.specific_band) + ">" + str(self.sc_1.x_min) + ") and (im1b" + str(self.specific_band) + "<" + str(self.sc_1.x_max) + ")), im1b" + str(self.specific_band) + ", 0)\"")
+            forms.append("\"(((im1b" + str(self.specific_band) + ">" + str(self.sc_1.x_min) + ") and (im1b" + str(self.specific_band) + "<" + str(self.sc_1.x_max) + "))?im1b" + str(self.specific_band) + ":0)\"")
         # emit signal
         self.emit(QtCore.SIGNAL("threshold(PyQt_PyObject)"), forms)
 
