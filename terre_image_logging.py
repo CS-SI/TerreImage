@@ -44,7 +44,7 @@ def configure_logger(name="", log_path=""):
                 'class': 'logging.handlers.RotatingFileHandler',
                 'formatter': 'verbose',
                 'filename': terre_image_configuration.log_file,
-                'maxBytes': 1024,
+                'maxBytes': 4096,
                 'backupCount': 3
             }
         },
@@ -60,3 +60,17 @@ def configure_logger(name="", log_path=""):
         return logging.getLogger(name)
     else:
         return logging.getLogger('default')
+
+
+def display_parameters(dictParameters, functionName, logger):
+    """
+    Display parameters of the functionName.
+    Used as follows :
+        display_parameters(locals(), "color_mapping_cli_ref_image")
+    """
+    # print "dictParameters", dictParameters
+    logger.debug("--------------------------------")
+    logger.debug( "\t {}".format(functionName))
+    for argument, value in dictParameters.iteritems():
+        logger.debug( "\t\t {}: {}".format(argument,value))
+    logger.debug( "--------------------------------")

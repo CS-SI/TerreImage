@@ -95,6 +95,7 @@ def kmeans_cli(image, nbClass, outputDirectory):
     """
     pass
     """
+    terre_image_logging.display_parameters(locals(), "kmeans_cli", logger)
     filenameWithoutExtension = os.path.basename(os.path.splitext(image)[0])
     output = os.path.join(outputDirectory, filenameWithoutExtension + "_kmeans_" + str(nbClass) + ".tif")  # + temp[index:]
     if not os.path.isfile(output):
@@ -109,11 +110,12 @@ def kmeans_cli(image, nbClass, outputDirectory):
             logger.info("command: " + command)
             command = get_otb_command("KMeansClassification", args)
             TerreImageProcess().run_process(command)
-            return output
+    return output
 
 
 def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
-    output_filename = os.path.join(working_dir, os.path.splitext(os.path.basename(image_to_color))[0]) + "colored.tif"  # + os.path.splitext(image_to_color)[0]
+    terre_image_logging.display_parameters(locals(), "color_mapping_cli_ref_image", logger)
+    output_filename = os.path.join(working_dir, os.path.splitext(os.path.basename(image_to_color))[0] + "colored.tif")
 
     if not os.path.isfile(output_filename):
         logger.info(output_filename)
@@ -126,7 +128,7 @@ def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
         logger.info("command: " + command)
         command = get_otb_command("ColorMapping", args)
         TerreImageProcess().run_process(command)
-        return output_filename
+    return output_filename
 
 
 def otbcli_export_kmz(filename, working_directory):
