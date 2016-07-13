@@ -44,7 +44,7 @@ def configure_logger(name="", log_path=""):
                 'class': 'logging.handlers.RotatingFileHandler',
                 'formatter': 'verbose',
                 'filename': terre_image_configuration.log_file,
-                'maxBytes': 4096,
+                'maxBytes': 1048576,
                 'backupCount': 3
             }
         },
