@@ -19,9 +19,10 @@
  *                                                                         *
  ***************************************************************************/
 """
-
+import os
+import ConfigParser
 from PyQt4.QtCore import QUrl
-from PyQt4.QtGui import QDialog
+from PyQt4.QtGui import QDialog, QPixmap
 
 from ui_dlg import Ui_DlgAbout
 from TerreImage import name, description, version
@@ -38,14 +39,21 @@ class DlgAbout(QDialog, Ui_DlgAbout):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
-        # self.title.setText( name() + version() )
-        # self.description.setText( description() )
+        config = ConfigParser.ConfigParser()
+        config.read(os.path.join(os.path.dirname(__file__),'metadata.txt'))
+
+        name        = config.get('general', 'name')
+        description = config.get('general', 'description')
+        version     = config.get('general', 'version')
+
+        # self.title.setText( name )
+        # self.description.setText( description )
 
         text = self.txt.toHtml()
-        text = text.replace("$PLUGIN_NAME$", name())
-        text = text.replace("$PLUGIN_VERSION$", version())
+        text = text.replace("$PLUGIN_NAME$", name)
+        text = text.replace("$PLUGIN_VERSION$", version)
 
-        subject = "Help: %s" % name()
+        subject = "Help: %s" % name
         body = """\n\n
 --------
 Plugin name: %s
@@ -53,7 +61,7 @@ Plugin version: %s
 Python version: %s
 Platform: %s - %s
 --------
-""" % (name(), version(), platform.python_version(), platform.system(), platform.version())
+""" % (name, version, platform.python_version(), platform.system(), platform.version())
 
         mail = QUrl("mailto:abc@abc.com")
         mail.addQueryItem("subject", subject)
