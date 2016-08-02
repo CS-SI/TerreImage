@@ -70,7 +70,7 @@ def display_parameters(dictParameters, functionName, logger):
     """
     # print "dictParameters", dictParameters
     logger.debug("--------------------------------")
-    logger.debug( "\t {}".format(functionName))
+    logger.debug( u"\t {}".format(functionName))
     for argument, value in dictParameters.iteritems():
-        logger.debug( "\t\t {}: {}".format(argument,value))
+        logger.debug( u"\t\t {}: {}".format(argument,value))
     logger.debug( "--------------------------------")

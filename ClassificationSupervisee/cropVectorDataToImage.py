@@ -138,7 +138,7 @@ def ReprojectVector(inputVectorFileName,  inputImageFileName, epsg_code, output_
     #                                                                                             inputImageFileName,
     #                                                                                             tmpReprojectedVector)
     #command = "ogr2ogr -t_srs {} -s_srs {} {} {}".format(epsg_code, None, tmpReprojectedVector, inputVectorFileName)
-    command = "ogr2ogr -t_srs EPSG:{} {} {}".format(epsg_code, tmpReprojectedVector, inputVectorFileName)
+    command = u"ogr2ogr -t_srs EPSG:{} {} {}".format(epsg_code, tmpReprojectedVector, inputVectorFileName)
 
     TerreImageProcess().run_process(command)
     return tmpReprojectedVector
@@ -156,7 +156,7 @@ def IntersectLayers(tmpReprojectedVector, outputImageEnvelopeVector, output_dire
 
     """
     outputVectorFileName = os.path.join(output_directory, "preprocessed.shp")
-    commandOGR = 'ogr2ogr -f "ESRI Shapefile" -clipsrc {} {} {}'.format(outputImageEnvelopeVector,
+    commandOGR = u'ogr2ogr -f "ESRI Shapefile" -clipsrc {} {} {}'.format(outputImageEnvelopeVector,
                                                                         outputVectorFileName,
                                                                         tmpReprojectedVector)
     TerreImageProcess().run_process(commandOGR)

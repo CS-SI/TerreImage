@@ -32,9 +32,9 @@ from TerreImage import terre_image_logging
 logger = terre_image_logging.configure_logger()
 
 def create_vrt_from_filelist(filelist, vrt_name):
-    logger.info("----CREATE VRT----")
-    logger.debug("filelist {}".format(filelist))
-    logger.debug("vrt_name {}".format(vrt_name))
+    logger.info(u"----CREATE VRT----")
+    logger.debug(u"filelist {}".format(filelist))
+    logger.debug(u"vrt_name {}".format(vrt_name))
 
     rootNode = ET.Element( 'VRTDataset' )
 
@@ -42,7 +42,7 @@ def create_vrt_from_filelist(filelist, vrt_name):
         logger.debug(filename)
         ds = gdal.Open(filename)
 
-        logger.debug("[ RASTER BAND COUNT ]: {}".format(ds.RasterCount))
+        logger.debug(u"[ RASTER BAND COUNT ]: {}".format(ds.RasterCount))
         for band_number in range( ds.RasterCount ):
             band_number += 1
             bandNode = ET.SubElement( rootNode, "VRTRasterBand", {'band': '1'} )
@@ -129,7 +129,7 @@ def full_classification(rasterlist, vectorlist, outputclassification, out_pop, w
 
     # Regularization
     logger.info("----REGULARISATION----")
-    out_image_classifier_with_nodata = "{}_with_no_data{}".format(os.path.splitext(outputclassification)[0],
+    out_image_classifier_with_nodata = u"{}_with_no_data{}".format(os.path.splitext(outputclassification)[0],
                                                                   os.path.splitext(outputclassification)[1])
     OTBApplications.classification_map_regularization_cli(out_image_classifier, out_image_classifier_with_nodata)
     # remove no data (Bug OTB)

@@ -39,17 +39,17 @@ def unionPolygonsWithOGR(filenames, outputDirectory):
     for f in filenames:
         base = os.path.basename(os.path.splitext(f)[0])
         #Add class
-        command = 'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Class numeric(15)"'.format(f, base)
+        command = u'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Class numeric(15)"'.format(f, base)
         TerreImageProcess().run_process(command)
-        command = 'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Class = {}"'.format(f, base, indexClass)
+        command = u'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Class = {}"'.format(f, base, indexClass)
         TerreImageProcess().run_process(command)
         #Add Label
-        command = 'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Label character(15)"'.format(f, base)
+        command = u'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Label character(15)"'.format(f, base)
         TerreImageProcess().run_process(command)
-        command = 'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Label = \'{}\'"'.format(f, base, base)
+        command = u'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Label = \'{}\'"'.format(f, base, base)
         TerreImageProcess().run_process(command)
         #update output
-        command = 'ogr2ogr -update -append {} {}'.format(outputFilename, f)
+        command = u'ogr2ogr -update -append {} {}'.format(outputFilename, f)
         TerreImageProcess().run_process(command)
         indexClass+=1
 
@@ -78,7 +78,7 @@ def gdal_edit_remove_no_data(image_in):
     Returns:
 
     """
-    command = "gdal_edit.py -a_nodata None {}".format(image_in)
+    command = u"gdal_edit.py -a_nodata None {}".format(image_in)
     TerreImageProcess().run_process(command)
 
 
@@ -93,5 +93,5 @@ def gdal_translate_remove_no_data(image_in, image_out):
     Returns:
 
     """
-    command = "gdal_translate -a_nodata None {} {}".format(image_in, image_out)
+    command = u"gdal_translate -a_nodata None {} {}".format(image_in, image_out)
     TerreImageProcess().run_process(command)

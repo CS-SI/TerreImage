@@ -33,7 +33,7 @@ class WorkingLayer():
         self.type = None
 
     def __str__(self):
-        message = "{} {} {}".format(self.source_file, self.qgis_layer.name(), self.bands)
+        message = u"{} {} {}".format(self.source_file, self.qgis_layer.name(), self.bands)
         return message
 
     def set_bands(self, bands):

@@ -40,7 +40,7 @@ class TerreImageProcess():
         self.command = ""
 
     def run_process(self, command):
-        logger.info("Running {}".format(command))
+        logger.info(u"Running {}".format(command))
         self.process.setProcessEnvironment(self.env)
 
         # print "..............", self.process.processEnvironment().value("OTB_APPLICATION_PATH")
@@ -59,9 +59,11 @@ class TerreImageProcess():
             error = self.process.readAllStandardError().data()
             # print repr(error)
             if not error in ["\n", ""]:
-                logger.error("error : " + "\'" + str(error) + "\'")
-                logger.debug("************".format(error))
-            logger.info("output : {}".format(result.data()))
+                logger.error(u"error : " + "\'" + str(error) + "\'")
+                logger.debug(u"************".format(error))
+            output = result.data()
+            print output
+            logger.info(output)
             return result
         else:
             code_d_erreur = self.process.error()
@@ -77,11 +79,11 @@ class TerreImageProcess():
             2:"QProcess::TimedOut", 3:"QProcess::WriteError",
             4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
 
-        logger.error("Error {} {}".format(errorCode, dic_err[errorCode]))
+        logger.error(u"Error {} {}".format(errorCode, dic_err[errorCode]))
         error = self.process.readAllStandardError().data()
-        logger.error("{}".format(error))
+        logger.error(u"{}".format(error))
         logger.error( self.process.readAllStandardOutput())
-        raise terre_image_exceptions.TerreImageRunProcessError("Error running : {}\n {}{}".format(self.command,
+        raise terre_image_exceptions.TerreImageRunProcessError(u"Error running : {}\n {}{}".format(self.command,
                                                                                   dic_err[errorCode], error
                                                                                   ))
 
@@ -149,7 +151,7 @@ def get_otb_command(app_name, arguments):
 
     """
     # command = "otbApplicationLauncherCommandLine {} {}".format(app_name, arguments)
-    command = "{} {} {}".format(os.path.join(terre_image_configuration.PATH, "otbApplicationLauncherCommandLine"),
+    command = u"{} {} {}".format(os.path.join(terre_image_configuration.PATH, "otbApplicationLauncherCommandLine"),
                                 app_name, arguments)
     return command
 

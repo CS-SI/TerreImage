@@ -156,7 +156,7 @@ def read_image_info_cli(image_in):
 
     """
 
-    args = " -in {}".format(image_in)
+    args = u" -in %s"%(unicode(image_in))
     command = get_otb_command("ReadImageInfo", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -173,7 +173,7 @@ def compute_statistics_cli(image_in, xml_output):
 
     """
 
-    args = " -il {} -out {}".format(image_in, xml_output)
+    args = u" -il {} -out {}".format(image_in, xml_output)
     command = get_otb_command("ComputeImagesStatistics", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -188,8 +188,8 @@ def train_image_classifier_cli(vrtfile, vd, outstatfile, outsvmfile, confmat):
     Returns:
 
     """
-    args = " -io.il {} -io.vd {} -io.imstat {} -io.out {}" \
-           " -io.confmatout {} -classifier libsvm -sample.vtr 0.1".format(vrtfile,
+    args = u" -io.il {} -io.vd {} -io.imstat {} -io.out {}" \
+           u" -io.confmatout {} -classifier libsvm -sample.vtr 0.1".format(vrtfile,
                                                            vd,
                                                            outstatfile,
                                                            outsvmfile,
@@ -209,7 +209,7 @@ def image_classifier_cli(vrtfile, outstatfile, outsvmfile, out):
 
     """
 
-    args = "-in {} -imstat {} -model {} -out {}".format(vrtfile, outstatfile, outsvmfile, out)
+    args = u"-in {} -imstat {} -model {} -out {}".format(vrtfile, outstatfile, outsvmfile, out)
     command = get_otb_command("ImageClassifier", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -225,7 +225,7 @@ def classification_map_regularization_cli(out, outregul):
 
     """
 
-    args = "-io.in {} -io.out {} -ip.radius 1 -ip.suvbool false".format(out, outregul)
+    args = u"-io.in {} -io.out {} -ip.radius 1 -ip.suvbool false".format(out, outregul)
     command = get_otb_command("ClassificationMapRegularization", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -241,7 +241,7 @@ def ComputeLabelImagePopulation_cli(im1, im2, out):
     Returns:
 
     """
-    args = "-in1 {} -in2 {} -out {}".format(im1, im2, out)
+    args = u"-in1 {} -in2 {} -out {}".format(im1, im2, out)
     command = get_otb_command("ComputeLabelImagePopulation", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -257,9 +257,9 @@ def ImageEnvelope_cli(image_in, vector_out, epsg_code=""):
     Returns:
 
     """
-    args = "-in {} -out {}".format(image_in, vector_out)
+    args = u"-in {} -out {}".format(image_in, vector_out)
     if epsg_code:
-        args += ' -proj "{}"'.format(epsg_code)
+        args += u' -proj "{}"'.format(epsg_code)
     command = get_otb_command("ImageEnvelope", args)
     result = TerreImageProcess().run_process(command)
     return result
