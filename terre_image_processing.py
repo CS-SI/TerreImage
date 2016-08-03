@@ -34,6 +34,7 @@ from PyQt4.QtGui import QInputDialog
 
 import OTBApplications
 from terre_image_run_process import TerreImageProcess
+from terre_image_gdal_api import get_image_size_with_gdal
 
 # import logging for debug messages
 import terre_image_logging
@@ -268,7 +269,13 @@ def export_kmz(filenames, working_directory):
 
     kmzs = []
     for image in filenames:
-        kmz_tmp = OTBApplications.otbcli_export_kmz(image, internal_working_directory)
+        size = get_image_size_with_gdal(image)
+        warning_size = 0
+        # by default, tile size of kmz export is 512
+        # if the image size is smaller than 512, the application does not work properly
+        if size[0] < 512 or size[1] < 512:
+            warning_size = size[0] if (size[0]<size[1]) else size[1]
+        kmz_tmp = OTBApplications.otbcli_export_kmz(image, internal_working_directory, warning_size)
         kmzs.append(kmz_tmp)
 
     # attention rustine

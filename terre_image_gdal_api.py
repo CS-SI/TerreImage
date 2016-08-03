@@ -35,13 +35,6 @@ def get_image_epsg_code_with_gdal(image_in):
     """
     Extract the following information from the given image:
         - epsg code
-        - up left corner
-        - bottom right corner
-        - spacing x
-        - spacing y
-        - size x
-        - size y
-        - min of the band if asked
     """
     try:
         dataset = gdal.Open(image_in, gdalconst.GA_ReadOnly)
@@ -101,3 +94,19 @@ def computeStatistics(OneFeature, i, j = None, nodata = True):
 
     dataset = None
     return None
+
+
+def get_image_size_with_gdal(image_in):
+    """
+    Extract the following information from the given image:
+        - size x
+        - size y
+    """
+    try:
+        dataset = gdal.Open(image_in, gdalconst.GA_ReadOnly)
+    except RuntimeError:  # OSError is get when the access to a folder is refused
+        logger.exception("Error: Opening " + image_in)
+        return
+
+    size = [dataset.RasterXSize, dataset.RasterYSize]
+    return size

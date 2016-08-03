@@ -121,10 +121,12 @@ def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
     return output_filename
 
 
-def otbcli_export_kmz(filename, working_directory):
+def otbcli_export_kmz(filename, working_directory, warning_size=0):
     output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + ".kmz")
     if not os.path.isfile(output_kmz):
         args = u' -in "{}" -out "{}"'.format(filename, output_kmz)
+        if warning_size != 0:
+            args += " -tilesize {}".format(warning_size)
 
         command = get_otb_command("KmzExport", args)
         logger.info("command: " + command)
