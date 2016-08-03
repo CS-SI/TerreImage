@@ -6,7 +6,8 @@ Version 2.4
 - Amélioration de la gestion des lancements d'applications
 - Ajout de tests
 - Ajout d'un gestionnaire de logging
-
+- Correction de la regression sur les accents
+- Ajout d'un test sur l'export KMZ de très petites images
 
 Version 2.3.16
 - Correction du problème d'affichage de l'info bulle de l'angle spectral
