@@ -59,7 +59,7 @@ class TerreImageProcess():
             error = self.process.readAllStandardError().data()
             # print repr(error)
             if not error in ["\n", ""]:
-                logger.error(u"error : " + "\'" + str(error) + "\'")
+                logger.error(u"error :  {}".format(error))
                 logger.debug(u"************".format(error))
             output = result.data()
             print output
@@ -70,7 +70,7 @@ class TerreImageProcess():
             dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed",
                         2:"QProcess::TimedOut", 3:"QProcess::WriteError",
                         4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
-            logger.error("Code erreur : " + str(code_d_erreur))
+            logger.error("Code erreur : {}".format(code_d_erreur))
             logger.error(dic_err[code_d_erreur])
         return None
 

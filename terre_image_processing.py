@@ -53,8 +53,8 @@ def ndvi(layer, working_directory):
                                            os.path.basename(os.path.splitext(image_in)[0]) + "_ndvi" + os.path.splitext(image_in)[1])
             logger.debug(output_filename)
             if not os.path.isfile(output_filename):
-                layer_pir = "im1b" + str(layer.pir)
-                layer_red = "im1b" + str(layer.red)
+                layer_pir = "im1b{}".format(layer.pir)
+                layer_red = "im1b{}".format(layer.red)
                 expression = "\"((" + layer_pir + "+" + layer_red + ")!=0?(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "):0)\""
                 logger.debug(expression)
                 print "expression", expression
@@ -76,8 +76,8 @@ def ndti(layer, working_directory):
             output_filename = os.path.join(working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_ndti" + os.path.splitext(image_in)[1])
             logger.debug(output_filename)
             if not os.path.isfile(output_filename):
-                layer_red = "im1b" + str(layer.red)
-                layer_green = "im1b" + str(layer.green)
+                layer_red = "im1b{}".format(layer.red)
+                layer_green = "im1b{}".format(layer.green)
                 # expression = "\"sqrt(" + layer_red + "+0.5)\""
                 expression = "\"((" + layer_red + "+" + layer_green + ")!=0?(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "):0)\""
                 logger.debug(expression)
@@ -100,8 +100,8 @@ def brightness(layer, working_directory):
                                            os.path.basename(os.path.splitext(image_in)[0]) + "_brillance" + os.path.splitext(image_in)[1])
             logger.debug(output_filename)
             if not os.path.isfile(output_filename):
-                layer_pir = "im1b" + str(layer.pir)
-                layer_red = "im1b" + str(layer.red)
+                layer_pir = "im1b{}".format(layer.pir)
+                layer_red = "im1b{}".format(layer.red)
                 expression = "\"sqrt(" + layer_red + "*" + layer_red + "+" + layer_pir + "*" + layer_pir + ")\""
                 logger.debug(expression)
                 logger.debug("image_in" + image_in)
@@ -110,7 +110,7 @@ def brightness(layer, working_directory):
 
 
 def threshold(layer, working_directory, forms):
-    logger.debug("threshold" + str(forms))
+    logger.debug("threshold {}".format(forms))
     image_in = layer.get_source()
     temp = []
     i = 1
@@ -151,7 +151,7 @@ def angles(layer, working_directory, x, y):
                 # (sqrt((1269*1269+1060*1060+974*974+1576*1576)*
                 # (im1b1*im1b1+im1b2*im1b2+im1b3*im1b3+im1b4*im1b4))))
                 for index in range(1, layer.get_qgis_layer().bandCount() + 1):
-                    current_band = "im1b" + str(index)
+                    current_band = "im1b{}".format(index)
                     band_value = attr[index]
                     num.append(current_band + "*" + str(band_value))
                     denom.append(str(band_value) + "*" + str(band_value))
@@ -169,10 +169,10 @@ def angles(layer, working_directory, x, y):
 
                 formule_ = "\"(" + formula + ">0.0001?1/" + formula + ":0)\""
 
-                logger.debug("num" + str(num))
-                logger.debug("denom" + str(denom))
-                logger.debug("fact" + str(fact))
-                logger.debug("formula" + str(formula))
+                logger.debug("num {}".format(num))
+                logger.debug("denom {}".format(denom))
+                logger.debug("fact {}".format(fact))
+                logger.debug("formula {}".format(formula))
 
                 OTBApplications.bandmath_cli([image_in], formule_, output_filename)
                 # rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
@@ -230,8 +230,8 @@ def gdal_translate_get_one_band(image_in, band_number, working_dir):
     """
     output_image_one_band = os.path.join(working_dir, os.path.splitext(os.path.basename(image_in))[0] + "-b" + str(band_number) + os.path.splitext(image_in)[1])
     if not os.path.isfile(output_image_one_band):
-        command_gdal = "gdal_translate -b " + str(band_number) + " " + "\"" + image_in + "\"" + " " + "\"" + output_image_one_band + "\""
-        logger.info("command_gdal" + command_gdal)
+        command_gdal = u'gdal_translate -b {} "{}" "{}"'.format(band_number, image_in, output_image_one_band)
+        logger.info(u"command_gdal {}".format(command_gdal))
         TerreImageProcess().run_process(command_gdal)
     return output_image_one_band
 

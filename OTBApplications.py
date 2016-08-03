@@ -54,18 +54,14 @@ def bandmath_cli(images, expression, output_filename):
         keyword             --    keyword for output file name
     """
 
-    command = os.path.join(prefix, "otbcli ")
-    command += " BandMath "
-
     args = " -il "
     for image in images:
-        args += "\"" + image + "\"" + " "
+        args += u'"{}" '.format(image)
 
-    args += " -exp " + str(expression)
-    args += " -out " + "\"" + output_filename + "\""
+    args += u'-exp {} -out "{}"' .format(expression, output_filename)
 
-    logger.info("command: " + command)
     command = get_otb_command("BandMath", args)
+    logger.info("command: " + command)
     TerreImageProcess().run_process(command)
 
 
@@ -79,15 +75,13 @@ def concatenateImages_cli(listImagesIn, outputname, options=None):
     """
 
     if listImagesIn and outputname:
-        command = os.path.join(prefix, "otbcli ")
-        command += " ConcatenateImages "
-        args = " -il " + " ".join(["\"" + f + "\"" for f in listImagesIn])
-        args += " -out " + "\"" + outputname + "\""
+        args = u' -il {}'.format(" ".join(["\"" + f + "\"" for f in listImagesIn]))
+        args += u' -out "{}"'.format(outputname)
         if options:
-            args += " uint16 "
+            args += u" uint16 "
 
-        logger.info("command: " + command)
         command = get_otb_command("ConcatenateImages", args)
+        logger.info("command: " + command)
         TerreImageProcess().run_process(command)
 
 
@@ -97,18 +91,15 @@ def kmeans_cli(image, nbClass, outputDirectory):
     """
     terre_image_logging.display_parameters(locals(), "kmeans_cli", logger)
     filenameWithoutExtension = os.path.basename(os.path.splitext(image)[0])
-    output = os.path.join(outputDirectory, filenameWithoutExtension + "_kmeans_" + str(nbClass) + ".tif")  # + temp[index:]
+    output = os.path.join(outputDirectory, u"{}_kmeans_{}.tif".format(filenameWithoutExtension, nbClass))  # + temp[index:]
     if not os.path.isfile(output):
         if image and nbClass and outputDirectory:
-            command = os.path.join(prefix, "otbcli")
-            command += " KMeansClassification "
-            args = " -in " + "\"" + image + "\""
-            args += " -out " + "\"" + output + "\""
-            args += " -nc " + str(nbClass)
-            args += " -rand " + str(42)
-
-            logger.info("command: " + command)
+            args = u' -in "{}" -out "{}" -nc {} -rand {} '.format(image,
+                                                                  output,
+                                                                  nbClass,
+                                                                  42)
             command = get_otb_command("KMeansClassification", args)
+            logger.info("command: " + command)
             TerreImageProcess().run_process(command)
     return output
 
@@ -121,12 +112,11 @@ def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
         logger.info(output_filename)
         command = os.path.join(prefix, "otbcli")
         command += " ColorMapping "
-        args = " -in " + "\"" + image_to_color + "\""
-        args += " -out " + "\"" + output_filename + "\" uint8"
-        args += " -method \"image\""
-        args += " -method.image.in " + "\"" + reference_image + "\""
-        logger.info("command: " + command)
+        args = u' -in "{}" -out "{}" uint8 -method "image" -method.image.in "{}" '.format(image_to_color,
+                                                                                    output_filename,
+                                                                                    reference_image)
         command = get_otb_command("ColorMapping", args)
+        logger.info("command: " + command)
         TerreImageProcess().run_process(command)
     return output_filename
 
@@ -134,13 +124,10 @@ def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
 def otbcli_export_kmz(filename, working_directory):
     output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + ".kmz")
     if not os.path.isfile(output_kmz):
-        command = os.path.join(prefix, "otbcli ")
-        command += "KmzExport "
-        args = " -in " + "\"" + filename + "\""
-        args += " -out " + "\"" + output_kmz + "\""
+        args = u' -in "{}" -out "{}"'.format(filename, output_kmz)
 
-        logger.info("command: " + command)
         command = get_otb_command("KmzExport", args)
+        logger.info("command: " + command)
         TerreImageProcess().run_process(command)
         output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + "xt.kmz")
         return output_kmz

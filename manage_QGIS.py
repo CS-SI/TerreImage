@@ -77,7 +77,7 @@ def get_raster_layer(raster, name):
 
 def add_qgis_raser_layer(raster_layer, canvas, bands = None):
     index_group = TerreImageConstant().index_group
-    logger.debug("index_group: " + str(index_group))
+    logger.debug("index_group: {}".format(index_group))
 
     if bands:
         if raster_layer.rasterType() == 2:
@@ -85,9 +85,9 @@ def add_qgis_raser_layer(raster_layer, canvas, bands = None):
             pir = bands['pir']
             red = bands['red']
             green = bands['green']
-            logger.debug('pir: ' + str(pir))
-            logger.debug("red: " + str(red))
-            logger.debug("green: " + str(green))
+            logger.debug("pir:  {}".format(pir))
+            logger.debug("red:  {}".format(red))
+            logger.debug("green:  {}".format(green))
             if pir and red and green:
                 renderer = raster_layer.renderer()
                 # raster_layer.setDrawingStyle("MultiBandColor")
@@ -115,7 +115,7 @@ def addRasterLayerToQGIS(raster, layername, iface=None):
     if not index_group:
         index_group = 0
 
-    logger.debug("index_group: " + str(index_group))
+    logger.debug("index_group: {}".format(index_group))
 
     if layername == None:
         layername = os.path.basename(raster)
@@ -140,7 +140,7 @@ def histogram_stretching(raster_layer, canvas):
     #   myRasterLayer->setCacheImage( NULL );
     #   mMapCanvas->refresh();
     the_limits = QgsRaster.ContrastEnhancementCumulativeCut
-    logger.debug("the_limits " + str(the_limits))
+    logger.debug("the_limits {}".format(the_limits))
     raster_layer.setContrastEnhancement(QgsContrastEnhancement.StretchToMinimumMaximum, the_limits)
     raster_layer.setCacheImage(None)
     canvas.refresh()
@@ -159,7 +159,7 @@ def histogram_stretching_for_threshold(raster_layer, canvas):
     #   myRasterLayer->setCacheImage( NULL );
     #   mMapCanvas->refresh();
     the_limits = QgsRaster. ContrastEnhancementMinMax
-    logger.debug("the_limits " + str(the_limits))
+    logger.debug("the_limits {}".format(the_limits))
     raster_layer.setContrastEnhancement(QgsContrastEnhancement.StretchToMinimumMaximum, the_limits)
     raster_layer.setCacheImage(None)
     canvas.refresh()
@@ -238,7 +238,7 @@ def contrastForRasters(the_raster_layer, min_layer, max_layer, band = None):
 
 def display_one_band(layer, keyword, iface):
     index_group = TerreImageConstant().index_group
-    logger.debug("keyword " + str(keyword))
+    logger.debug("keyword {}".format(keyword))
     corres = {'red': "_bande_rouge", 'green': "_bande_verte", 'blue': "_bande_bleue",
               'pir': "_bande_pir", 'mir': "_bande_mir", "nat": "_couleurs_naturelles"}
 
@@ -264,7 +264,7 @@ def display_one_band(layer, keyword, iface):
 
         band = layer.bands[keyword]
         if band:
-            logger.debug("band num: " + str(band))
+            logger.debug("band num: {}".format(band))
             raster_layer.setDrawingStyle("MultiBandSingleBandGray")
             renderer = raster_layer.renderer()
             logger.debug(renderer)
@@ -364,16 +364,16 @@ def custom_stretch(the_raster_layer, values, canvas, mono = False):
             min_red, max_red = values[0]
             min_green, max_green = values[1]
             min_blue, max_blue = values[2]
-            logger.debug("red : " + str(min_red) + " " + str(max_red))
-            logger.debug("green : " + str(min_green) + " " + str(max_green))
-            logger.debug("blue : " + str(min_blue) + " " + str(max_blue))
+            logger.debug("red : {} {}".format(min_red, max_red))
+            logger.debug("green : {} {}".format(min_green, max_green))
+            logger.debug("blue : {} {}".format(min_blue, max_blue))
 
             red_enhancement = QgsContrastEnhancement(data_provider.dataType(1))
             green_enhancement = QgsContrastEnhancement(data_provider.dataType(2))
             blue_enhancement = QgsContrastEnhancement(data_provider.dataType(3))
-            logger.debug("red_enhancement : " + str(red_enhancement))
-            logger.debug("green_enhancement : " + str(green_enhancement))
-            logger.debug("blue_enhancement : " + str(blue_enhancement))
+            logger.debug("red_enhancement : {}".format(red_enhancement))
+            logger.debug("green_enhancement : {}".format(green_enhancement))
+            logger.debug("blue_enhancement : {}".format(blue_enhancement))
 
             # set stretch to min max
             red_enhancement.setMinimumValue(min_red)
@@ -382,15 +382,15 @@ def custom_stretch(the_raster_layer, values, canvas, mono = False):
             green_enhancement.setMaximumValue(max_green)
             blue_enhancement.setMinimumValue(min_blue)
             blue_enhancement.setMaximumValue(max_blue)
-            logger.debug("red (1): " + str(red_enhancement.minimumValue()) + " " + str(red_enhancement.maximumValue()))
-            logger.debug("green (1): " + str(green_enhancement.minimumValue()) + " " + str(green_enhancement.maximumValue()))
-            logger.debug("blue (1): " + str(blue_enhancement.minimumValue()) + " " + str(blue_enhancement.maximumValue()))
+            logger.debug("red (1): {} {}".format(red_enhancement.minimumValue(), red_enhancement.maximumValue()))
+            logger.debug("green (1): {} {}".format(green_enhancement.minimumValue(), green_enhancement.maximumValue()))
+            logger.debug("blue (1): {} {}".format(blue_enhancement.minimumValue(), blue_enhancement.maximumValue()))
             red_enhancement.setContrastEnhancementAlgorithm(1)
             green_enhancement.setContrastEnhancementAlgorithm(1)
             blue_enhancement.setContrastEnhancementAlgorithm(1)
-            logger.debug("red (2): " + str(red_enhancement.minimumValue()) + " " + str(red_enhancement.maximumValue()))
-            logger.debug("green (2): " + str(green_enhancement.minimumValue()) + " " + str(green_enhancement.maximumValue()))
-            logger.debug("blue (2): " + str(blue_enhancement.minimumValue()) + " " + str(blue_enhancement.maximumValue()))
+            logger.debug("red (2): {} {}".format(red_enhancement.minimumValue(), red_enhancement.maximumValue()))
+            logger.debug("green (2): {} {}".format(green_enhancement.minimumValue(), green_enhancement.maximumValue()))
+            logger.debug("blue (2): {} {}".format(blue_enhancement.minimumValue(), blue_enhancement.maximumValue()))
 
             # print "blue enhancement", blue_enhancement
             # print "blue max", blue_enhancement.maximumValue()
@@ -404,9 +404,9 @@ def custom_stretch(the_raster_layer, values, canvas, mono = False):
             red_enhancement_debug = layer_renderer.redContrastEnhancement()
             green_enhancement_debug = layer_renderer.greenContrastEnhancement()
             blue_enhancement_debug = layer_renderer.blueContrastEnhancement()
-            logger.debug("red (3): " + str(red_enhancement_debug.minimumValue()) + " " + str(red_enhancement_debug.maximumValue()))
-            logger.debug("green (3): " + str(green_enhancement_debug.minimumValue()) + " " + str(green_enhancement_debug.maximumValue()))
-            logger.debug("blue (3): " + str(blue_enhancement_debug.minimumValue()) + " " + str(blue_enhancement_debug.maximumValue()))
+            logger.debug("red (3): {} {}".format(red_enhancement.minimumValue(), red_enhancement.maximumValue()))
+            logger.debug("green (3): {} {}".format(green_enhancement.minimumValue(), green_enhancement.maximumValue()))
+            logger.debug("blue (3): {} {}".format(blue_enhancement.minimumValue(), blue_enhancement.maximumValue()))
 
         # print "end"
         the_raster_layer.setCacheImage(None)

@@ -80,14 +80,14 @@ class MyMplCanvas(FigureCanvas):
 
     def get_2_98_percent(self, sizeX, sizeY, histogram):
         # get 2 - 98 %
-        logger.debug("sizeX, sizeY" + str(sizeX) + " " + str(sizeY))
+        logger.debug("sizeX: {}, sizeY: {}".format(sizeX, sizeY))
         nb_pixels = sizeX * sizeY
-        logger.debug("nb_pixels: " + str(nb_pixels))
+        logger.debug("nb_pixels: {}".format(nb_pixels))
 
         nb_pixels_2 = int(float(nb_pixels * 0.02))
         nb_pixels_98 = int(float(nb_pixels * 0.98))
 
-        logger.debug("nb_pixels_2, nb_pixels_98: " + str(nb_pixels_2) + " " + str(nb_pixels_98))
+        logger.debug("nb_pixels_2: {}, nb_pixels_98: {}".format(nb_pixels_2, nb_pixels_98))
 
         hist_cum = cumsum(histogram)
         # print "histogram", histogram
@@ -106,7 +106,7 @@ class MyMplCanvas(FigureCanvas):
 
         # print "self.x_min, self.x_max", self.x_min, self.x_max
 
-        logger.debug("self.x_min, self.x_max" + str(self.x_min) + " " + str(self.x_max))
+        logger.debug("self.x_min: {}, self.x_max: {}".format(self.x_min, self.x_max))
         self.x_min = (self.x_min - self.rasterMin) * self.bin_witdh + self.rasterMin
         self.x_max = (self.x_max - self.rasterMin) * self.bin_witdh + self.rasterMin
         self.two_min = self.x_min
@@ -149,7 +149,7 @@ class MyMplCanvas(FigureCanvas):
             # get overview statistics
             self.rasterMin, self.rasterMax, mean, stddev = band_overview.ComputeStatistics(False)
             # print self.rasterMin, self.rasterMax, mean, stddev
-            logger.debug("self.rasterMax, self.rasterMin" + str(self.rasterMax) + " " + str(self.rasterMin))
+            logger.debug("self.rasterMax: {}, self.rasterMin: {}".format(self.rasterMax, self.rasterMin))
             nbVal = self.rasterMax - self.rasterMin
             # print "nbVal", nbVal
 
@@ -204,7 +204,7 @@ class MyMplCanvas(FigureCanvas):
         # setting plot axis
         self.t = arange(0, len(histogram)) * self.bin_witdh + self.rasterMin  # *(self.rasterMax - self.rasterMin)/self.nb_bin + self.rasterMin #range(0, len(histogram))
         self.s = histogram
-        logger.debug("len s and len t" + str(len(self.s)) + " " + str(len(self.t)))
+        logger.debug("len s: {} and len t: {}".format(len(self.s),len(self.t)))
 
         # draw histogram, 2, 98 % and connect canvas
         self.draw_histogram()
@@ -224,7 +224,7 @@ class MyMplCanvas(FigureCanvas):
         self.axes.clear()
         self.draw_histogram()
         if self.two_min and self.ninety_eight_max:
-            logger.debug("self.two_min, self.ninety_eight_max" + str(self.two_min) + str(self.ninety_eight_max))
+            logger.debug("self.two_min: {}, self.ninety_eight_max: {}".format(self.two_min, self.ninety_eight_max))
             self.axes.axvline(x=self.two_min, c="red", linewidth=2, zorder=0, clip_on=False)
             self.axes.axvline(x=self.ninety_eight_max, c="red", linewidth=2, zorder=0, clip_on=False)
         self.axes.figure.canvas.draw()
@@ -235,7 +235,7 @@ class MyMplCanvas(FigureCanvas):
     def draw_min_max_percent(self):
         if self.x_min and self.x_max:
             # print "self.x_min, self.x_max for", self.color, self.x_min, self.x_max
-            logger.debug("self.x_min, self.x_max" + str(self.x_min) + str(self.x_max))
+            logger.debug("self.x_min: {}, self.x_max: {}".format(self.x_min, self.x_max))
             self.axes.axvline(x=self.x_min, c="red", linewidth=2, zorder=0, clip_on=False)
             self.axes.axvline(x=self.x_max, c="red", linewidth=2, zorder=0, clip_on=False)
 
@@ -279,8 +279,8 @@ class MyMplCanvas(FigureCanvas):
             if self.x_max > self.rasterMax:
                 self.x_max = self.rasterMax
 
-            logger.info("on release: x_min" + str(self.x_min))
-            logger.info("on release: x_max" + str(self.x_max))
+            logger.info("on release: x_min {}".format(self.x_min))
+            logger.info("on release: x_max {}".format(self.x_max))
 
             self.axes.clear()
             self.draw_histogram()
@@ -293,7 +293,7 @@ class MyMplCanvas(FigureCanvas):
 
             self.axes.figure.canvas.draw()
             self.emit(QtCore.SIGNAL("valueChanged()"))
-            logger.debug(str(self.x_min) + " " + str(self.x_max))
+            logger.debug("{} {}".format(self.x_min, self.x_max))
 
             if self.multiband:
                 dic = {"r": "red", "g": "green", "b": "blue"}
@@ -380,7 +380,7 @@ class TerreImageHistogram_monoband(TerreImageHistogram):  # , Ui_Form):
     def valueChanged(self):
         logger.debug("value changed")
         values = [ (self.sc_1.x_min, self.sc_1.x_max) ]
-        logger.debug("values" + str(values))
+        logger.debug("values {}".format(values))
         manage_QGIS.custom_stretch(self.layer.qgis_layer, values, self.canvas, mono=True)
         # self.emit( QtCore.SIGNAL("valueChanged(PyQt_PyObject)"), values )
 
@@ -404,7 +404,7 @@ class TerreImageHistogram_multiband(TerreImageHistogram):  # , Ui_Form):
             TerreImageHistogram.__init__(self, layer, nb_bands, True)
 
         # print "processing", processing
-        logger.debug("processing" + str(processing))
+        logger.debug("processing {}".format(processing))
         if processing is None:
             logger.debug("processing none")
             self.canvas = canvas
@@ -435,10 +435,10 @@ class TerreImageHistogram_multiband(TerreImageHistogram):  # , Ui_Form):
 
     def valueChanged(self):
         values = [ (self.sc_1.x_min, self.sc_1.x_max), (self.sc_2.x_min, self.sc_2.x_max), (self.sc_3.x_min, self.sc_3.x_max)]
-        logger.debug("values" + str(values))
+        logger.debug("values {}".format(values))
         logger.debug(self.canvas)
 
-        logger.info("values from valueChanged" + str(values))
+        logger.info("values from valueChanged: {}".format(values))
 
         if self.processing:
             manage_QGIS.custom_stretch(self.processing.output_working_layer.get_qgis_layer(), values, self.canvas)

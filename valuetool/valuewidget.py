@@ -477,7 +477,7 @@ class ValueWidget(QWidget, Ui_Widget):
                     if not layer.dataProvider().extent().contains(pos):
                         ident = dict()
                         for iband in range(1, layer.bandCount() + 1):
-                            ident[iband] = str(self.tr('En dehors de l\'image'))
+                            ident[iband] = self.tr('En dehors de l\'image')
                     # we can only use context if layer is not projected
                     elif canvas.hasCrsTransformEnabled() and layer.dataProvider().crs() != canvas.mapRenderer().destinationCrs():
                         ident = layer.dataProvider().identify(pos, QgsRaster.IdentifyFormatValue).results()
@@ -893,9 +893,9 @@ class ValueWidget(QWidget, Ui_Widget):
 #             points = self.order_values(new_points)
 
             points_for_curve = [ t[1] for t in new_points ]
-            logger.debug("points_for_curve: " + str(points_for_curve))
+            logger.debug("points_for_curve: {}".format(points_for_curve))
             abs = [ t[0] for t in new_points ]
-            logger.debug("abs: " + str(abs))
+            logger.debug("abs: {}".format(abs))
 
     #         colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
     #         print "len(colors)", len(colors)
@@ -912,7 +912,7 @@ class ValueWidget(QWidget, Ui_Widget):
         self.on_get_point_button()
 
     def export_csv(self):
-        csv = QFileDialog.getSaveFileName(None, str("Fichier CSV"))
+        csv = QFileDialog.getSaveFileName(None, "Fichier CSV")
         if not csv.endswith(".csv"):
             csv += ".csv"
         csv_file = open(csv, "w")
@@ -922,7 +922,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 csv_file.write(str(curve.name) + u';Coordonnées pixel '.encode('utf8') + curve.coordinates + "\n")
                 csv_file.write(u'Bande spectrale; Intensité \n'.encode('utf8'))
                 for i in range(1, len(curve.points) + 1):
-                    csv_file.write(str(i) + ";" + str(int(curve.points[i - 1])) + "\n")
+                    csv_file.write("{};{}\n".format(i, int(curve.points[i - 1])))
 
                 csv_file.write("\n\n\n")
 

@@ -104,7 +104,7 @@ class TerreImageManager():
 
     def view_closed(self, name_of_the_closed_view):
         # print str(name_of_the_closed_view) + " has been closed"
-        logger.debug(str(name_of_the_closed_view) + " has been closed")
+        logger.debug("{} has been closed".format(name_of_the_closed_view))
         process = ProcessingManager().processing_from_name(name_of_the_closed_view)
         # print process
         if process:

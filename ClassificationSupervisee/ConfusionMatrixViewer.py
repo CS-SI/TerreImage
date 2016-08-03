@@ -73,7 +73,7 @@ def read_results(confmat, kappa, out_pop):
             matrix.append([x.replace("\n", "") for x in line.split(",")])
 
     # Kappa index
-
+    print '{"percentage": percentage, "confusion": matrix, "kappa": kappa}', {"percentage": percentage, "confusion": matrix, "kappa": kappa}
     return {"percentage": percentage, "confusion": matrix, "kappa": kappa}
 
 

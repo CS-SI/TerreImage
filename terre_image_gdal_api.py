@@ -44,15 +44,15 @@ def get_image_epsg_code_with_gdal(image_in):
         - min of the band if asked
     """
     try:
-        dataset = gdal.Open(str(image_in), gdalconst.GA_ReadOnly)
+        dataset = gdal.Open(image_in, gdalconst.GA_ReadOnly)
     except RuntimeError:  # OSError is get when the access to a folder is refused
-        logger.exception("Error: Opening " + str(image_in))
+        logger.exception("Error: Opening " + image_in)
         return
 
     spatialReference = osr.SpatialReference()
     spatialReference.ImportFromWkt(dataset.GetProjectionRef())
     codeEPSG = str(spatialReference.GetAttrValue("AUTHORITY", 1))
-    logger.debug("EPSG: " + str(codeEPSG))
+    logger.debug("EPSG: {}".format(codeEPSG))
     return codeEPSG
 
 
@@ -83,7 +83,7 @@ def computeStatistics(OneFeature, i, j = None, nodata = True):
     # logger.debug(out_one)
     # /testing
 
-    dataset = gdal.Open(str(OneFeature), gdal.GA_ReadOnly)
+    dataset = gdal.Open(OneFeature, gdal.GA_ReadOnly)
     # dataset  : GDALDataset
     if dataset is None:
         print "Error : Opening file ", OneFeature
@@ -96,8 +96,7 @@ def computeStatistics(OneFeature, i, j = None, nodata = True):
             band.SetNoDataValue(0)
         stats = band.ComputeStatistics(False)
 
-        logger.debug("Feature " + str(i) + " : ")
-        logger.debug(stats)
+        logger.debug("Feature {} : {}".format(i, stats))
         return stats
 
     dataset = None

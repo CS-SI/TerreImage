@@ -43,7 +43,7 @@ class TerreImageCurve(QWidget, Ui_Form):
         self.name = name
         self.lineEdit_curve_name.setText(name)
 
-        logger.debug("from curve: " + str(x) + " " + str(y))
+        logger.debug("from curve: {} {}".format(x, y))
         self.coordinates = "[x=" + str(x) + ", y=" + str(y) + "]"
         self.label_coordinates.setText(self.coordinates)
 
@@ -65,9 +65,9 @@ class TerreImageCurve(QWidget, Ui_Form):
 
         if color is None:
             colors = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
-            logger.debug("len(colors): " + str(len(colors)))
+            logger.debug("len(colors): {}".format(len(colors)))
             color = colors[ random.randint(0, len(colors) - 1) ]
-            logger.debug('color from creation courbe: ' + str(color))
+            logger.debug("color from creation courbe: {}".format(color))
         self.color = color
 
         if abs:
@@ -127,7 +127,7 @@ class TerreImageCurve(QWidget, Ui_Form):
         self.name = self.lineEdit_curve_name.text()
 
     def __str__(self):
-        return self.name + " " + str(self.coordinates) + " " + str(self.color) + " " + str(self.points)
+        return "{} {} {} {}".format(self.name, self.coordinates, self.color, self.points)
 
     def has_abs(self):
         return self.abs is not None

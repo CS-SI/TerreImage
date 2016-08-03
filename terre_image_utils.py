@@ -63,7 +63,7 @@ def getOutputDirectory(ui):
     else:
         path = QDir.currentPath()
     output_directory = ""
-    dir_dest = QFileDialog.getExistingDirectory(None, str("Répertoire de destination des fichiers de TerreImage"), path)
+    dir_dest = QFileDialog.getExistingDirectory(None, u"Répertoire de destination des fichiers de TerreImage", path)
     if dir_dest:
         ui.lineEdit_working_dir.setText(dir_dest)
         output_directory = dir_dest
@@ -105,7 +105,7 @@ def working_layer(canvas):
         bands = {'red': red, 'green': green, 'blue': blue, 'pir': pir, 'mir': mir}
         layer.set_bands(bands)
 
-        logger.debug(str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+        logger.debug("{} {} {} {} {}".format(red, green, blue, pir, mir))
         return layer
 
 
@@ -159,7 +159,7 @@ def get_workinglayer_on_opening(iface):
         else:
             raster_layer = manage_QGIS.get_raster_layer(file_opened, os.path.splitext(os.path.basename(file_opened))[0])
             type_image = terre_image_processing.get_sensor_id(file_opened)
-            logger.debug("type_image " + str(type_image))
+            logger.debug("type_image {}".format(type_image))
             layer = WorkingLayer(file_opened, raster_layer)
             layer.set_type(type_image)
             # self.layer = self.canvas.currentLayer()
@@ -178,7 +178,7 @@ def get_workinglayer_on_opening(iface):
                     if all_set:
                         layer.set_bands(bands)
 
-                        logger.debug(str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+                        logger.debug("{} {} {} {} {}".format(red, green, blue, pir, mir))
 
                         cst = TerreImageConstant()
                         cst.index_group = cst.iface.legendInterface().addGroup("Terre Image", True, None)

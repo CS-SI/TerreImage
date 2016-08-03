@@ -107,7 +107,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         QtGui.QApplication.restoreOverrideCursor()
 
         self.app_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)), "win32", "bin")
-        logger.debug( "self.app_dir" + str(self.app_dir) )
+        logger.debug( "self.app_dir {}".format(self.app_dir) )
 
         #self.setupUi()
         QGisLayers.setInterface(iface)
@@ -200,7 +200,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.outputdirwidget.setText(dirname)
 
     def getOutputDir(self):
-        return str(self.output_dir) #outputdirwidget.text())
+        return self.output_dir #outputdirwidget.text())
 
     def selectOutputDir(self):
         filedialog = QtGui.QFileDialog()
@@ -219,7 +219,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.statusLabel.setText("")
 
     def classify(self):
-        dirDest = QtGui.QFileDialog.getExistingDirectory( None, str( "Répertoire de destination des fichiers de la classification" ), self.output_dir )
+        dirDest = QtGui.QFileDialog.getExistingDirectory( None, u"Répertoire de destination des fichiers de la classification", self.output_dir )
         if dirDest :
             self.output_dir = dirDest
 
@@ -229,7 +229,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         try:
             # Get rasters
             selectedrasterlayers = self.rasterlayerselector.getSelectedOptions()
-            logger.debug( "selectedrasterlayers" + str(selectedrasterlayers) )
+            logger.debug( "selectedrasterlayers {}".format(selectedrasterlayers) )
             if len(selectedrasterlayers) < 1:
                 QtGui.QMessageBox.critical( self, \
                                             u"Erreur", \
@@ -260,7 +260,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                 classlabel = v[2]
 
                 labeldescriptor[label] = (classcolor, classlabel)
-                logger.debug( "labeldescriptor" + str(labeldescriptor) )
+                logger.debug( "labeldescriptor {}".format(labeldescriptor) )
                 label += 1
 
                 # Reprocess input shp file to crop it to firstraster extent

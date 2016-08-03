@@ -476,6 +476,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         """
         Updates the list of available histograms
         """
+        print "set_combobox_histograms"
         if self.qgis_education_manager:
             if ProcessingManager().working_layer:
                 process = ["Histogrammes", "Image de travail"] + [x for x in ProcessingManager().get_processings_name() if x not in ["KMEANS", "Seuillage"]]
@@ -484,6 +485,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                 self.comboBox_histogrammes.clear()
                 m2 = self.toolButton_histograms.menu()
                 m2.clear()
+                print "process {}".format(process)
                 for i, item in enumerate(process):
                     self.comboBox_histogrammes.insertItem(i, process[i])
                     action_h = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionFullHistogramStretch.png"),
@@ -629,8 +631,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
         if self.qgis_education_manager:
             # logger.debug( "ProcessingManager().working_layer.get_qgis_layer().id(): " +  str(ProcessingManager().working_layer.get_qgis_layer().id()))
-            if ProcessingManager().working_layer.get_qgis_layer().id() == layer_id:
-                self.disconnect_interface()
+            if ProcessingManager().working_layer:
+                if ProcessingManager().working_layer.get_qgis_layer().id() == layer_id:
+                    self.disconnect_interface()
 
         ProcessingManager().remove_process_from_layer_id(layer_id)
         ProcessingManager().remove_displays_from_layer_id(layer_id)

@@ -76,7 +76,7 @@ class ProcessingManager(object):
 
     def remove_process_from_layer_id(self, layer_id):
         process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
-        logger.debug("process" + str(process))
+        logger.debug("process {}".format(process))
         if process:
             try:
                 process[0].mirror.close()
@@ -93,7 +93,7 @@ class ProcessingManager(object):
         # for p in self.displays:
         #    print p.output_working_layer.qgis_layer.id()
         process = [ p for p in self.displays if p.output_working_layer.qgis_layer.id() == layer_id ]
-        logger.debug("process" + str(process))
+        logger.debug("process {}".format(process))
         if process :
             # print "process trouvé"
             process[0].mirror.close()

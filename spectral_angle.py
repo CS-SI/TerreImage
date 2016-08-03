@@ -132,10 +132,10 @@ class SpectralAngle(QtCore.QObject):
 
         ifaceLegend = self.iface.legendInterface()
         ifaceLayers = QgsMapLayerRegistry.instance().mapLayers()
-        logger.debug("ifacelayers" + str(ifaceLayers))
+        logger.debug("ifacelayers {}".format(ifaceLayers))
         id_layer = result_layer.id()
-        logger.debug("id_layer" + str(id_layer))
-        logger.debug("result layer" + str(result_layer))
+        logger.debug("id_layer {}".format(id_layer))
+        logger.debug("result layer {}".format(result_layer))
         # QgsMapLayerRegistry.instance().mapLayers()
         # {u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>, u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
         ifaceLegend.setLayerVisible(result_layer, False)
@@ -150,7 +150,7 @@ class SpectralAngle(QtCore.QObject):
         # print "get point for angles"
         self.tool = SpectralAngleMapTool(self.iface.mapCanvas())  # the mouselistener
         # print "self.tool", self.tool
-        logger.debug("self.tool" + str(self.tool))
+        logger.debug("self.tool {}".format(self.tool))
         self.layer = layer
         logger.debug("get point for angles")
         # init the mouse listener comportement and save the classic to restore it on quit

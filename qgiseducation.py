@@ -87,7 +87,7 @@ class QGISEducation:
 
 
     def do_display_one_band(self, who, qgis_layer, working_directory, mirror_tool):
-        logger.debug("who" + str(who))
+        logger.debug("who {}".format(who))
         # manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
         if qgis_layer:
             my_process = TerreImageDisplay(self.iface, working_directory, ProcessingManager().working_layer, mirror_tool, who, None, qgis_layer)
@@ -128,7 +128,7 @@ class QGISEducation:
 
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
-        logger.info("temps de chargement: " + str(timeExec))
+        logger.info("temps de chargement: {}".format(timeExec))
 
         self.show_education_widget(bands, working_dir)
 
@@ -204,7 +204,7 @@ class QGISEducation:
         QgsProject.instance().writeEntry("QGISEducation", "/working_layer", ProcessingManager().working_layer.source_file)
         # write band orders
         QgsProject.instance().writeEntry("QGISEducation", "/working_layer_bands", str(ProcessingManager().working_layer.bands))
-        logger.debug(str(ProcessingManager().working_layer.bands))
+        logger.debug("{}".format(ProcessingManager().working_layer.bands))
         QgsProject.instance().writeEntry("QGISEducation", "/working_layer_type", ProcessingManager().working_layer.type)
         QgsProject.instance().writeEntry("QGISEducation", "/working_directory", self.educationWidget.qgis_education_manager.working_directory)
         p = []

@@ -93,13 +93,13 @@ class TerreImageProcessing(TerreImageTask, QObject):
         message = self.processing_name
         if self.output_working_layer.source_file:
             message += " : \t status ok \t image resultante :" + self.output_working_layer.source_file
-            message += "\t mirror:" + str(self.mirror)
+            message += "\t mirror: {}".format(self.mirror)
 
         return message
 
     def run(self):
-        logger.debug("run, processing name" + str(self.processing_name))
-        logger.debug("self.arg" + str(self.arg))
+        logger.debug("run, processing name {}".format(self.processing_name))
+        logger.debug("self.arg {}".format(self.arg))
         output_filename = ""
         if "NDVI" in self.processing_name:
             output_filename = terre_image_processing.ndvi(self.layer, self.working_directory)
@@ -114,7 +114,7 @@ class TerreImageProcessing(TerreImageTask, QObject):
             if not self.arg:
                 from spectral_angle import SpectralAngle
                 self.angle_tool = SpectralAngle(self.iface, self.working_directory, self.layer, self.mirrormap_tool, self.rubberband)
-                logger.debug("self.angle_tool" + str(self.angle_tool))
+                logger.debug("self.angle_tool {}".format(self.angle_tool))
                 QObject.connect(self.angle_tool, SIGNAL("anglesComputed(PyQt_PyObject)"), self.display)
                 self.angle_tool.get_point_for_angles(self.layer)
                 # spectral_angles(self.layer, self.working_directory, self.iface)
@@ -176,10 +176,10 @@ class TerreImageProcessing(TerreImageTask, QObject):
 
         iface_legend = self.iface.legendInterface()
         iface_layers = QgsMapLayerRegistry.instance().mapLayers()
-        logger.debug("ifacelayers" + str(iface_layers))
+        logger.debug("ifacelayers {}".format(iface_layers))
         id_layer = result_layer.id()
-        logger.debug("id_layer" + str(id_layer))
-        logger.debug("result layer" + str(result_layer))
+        logger.debug("id_layer {}".format(id_layer))
+        logger.debug("result layer {}".format(result_layer))
         # QgsMapLayerRegistry.instance().mapLayers()
         # {u'QB_1_ortho20140521141641682': <qgis.core.QgsRasterLayer object at 0x6592b00>,
         # u'QB_1_ortho_bande_bleue20140521141927295': <qgis.core.QgsRasterLayer object at 0x6592950>}
@@ -218,7 +218,7 @@ class TerreImageDisplay(TerreImageTask):
 
     def run(self):
         self.freezeCanvas(True)
-        logger.debug("self.who" + str(self.who))
+        logger.debug("self.who {}".format(self.who))
         if not self.r_layer:
             result_layer = manage_QGIS.display_one_band(self.layer, self.who, self.iface)
         else:
@@ -232,7 +232,7 @@ class TerreImageDisplay(TerreImageTask):
 
             iface_legend = self.iface.legendInterface()
             iface_layers = QgsMapLayerRegistry.instance().mapLayers()
-            logger.debug("ifacelayers" + str(iface_layers))
+            logger.debug("ifacelayers {}".format(iface_layers))
             # id_layer = result_layer.id()
             # logger.debug( "id_layer" + str( id_layer ))
             # logger.debug( "result layer" + str( result_layer ))
@@ -253,5 +253,5 @@ class TerreImageDisplay(TerreImageTask):
         """
         message = self.processing_name
         if self.output_working_layer.source_file:
-            message += "\t mirror:" + str(self.mirror)
+            message += "\t mirror: {}".format(self.mirror)
         return message
