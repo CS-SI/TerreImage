@@ -61,7 +61,6 @@ class TerreImageProcess():
             if not error in ["\n", ""]:
                 logger.error("error : %s"%(error))
             output = result.data()
-            print output
             logger.info(output)
             return result
         else:
