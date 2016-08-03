@@ -616,7 +616,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         root.setExpanded(True)
 
     def layer_deleted(self, layer_id):
-
+        logger.debug("Layer deleted")
         # logger.debug( str(layer_id) + " deleted")
         layer_id = layer_id.encode('utf-8')
 
@@ -629,12 +629,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             self.label_a_s.hide()
             self.label_a_s_img.hide()
 
+        logger.debug("Disconnect interface if layer is working layer")
         if self.qgis_education_manager:
             # logger.debug( "ProcessingManager().working_layer.get_qgis_layer().id(): " +  str(ProcessingManager().working_layer.get_qgis_layer().id()))
             if ProcessingManager().working_layer:
                 if ProcessingManager().working_layer.get_qgis_layer().id() == layer_id:
                     self.disconnect_interface()
 
+        logger.debug("Empty processing manager")
         ProcessingManager().remove_process_from_layer_id(layer_id)
         ProcessingManager().remove_displays_from_layer_id(layer_id)
 
@@ -643,15 +645,19 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         except AttributeError:
             pass
 
+        logger.debug("Update combobox")
         self.set_combobox_histograms()
 
     def disconnect_interface(self):
+        logger.debug("Disconnect interface")
         if self.qgis_education_manager:
             self.qgis_education_manager.disconnect()
+            logger.debug("Disconnect qgis eduction manager")
         # histograms
         try:
             self.hist.close()
             self.hist = None
+            logger.debug("Close histograms")
         except AttributeError:
             pass
         # rubberband
