@@ -107,11 +107,12 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             if not widget.checkState(0) == QtCore.Qt.Checked:
                 checked = QtCore.Qt.Checked
                 break
-        for i in range(len(self.layers)):
-            widget = self.table.itemAt(i, 0)
-            widget.setCheckState(0, checked)
-            for i in range( widget.childCount() ):
-                child_temp = widget.child(i)
+
+        for i in range(self.table.topLevelItemCount()):
+            item = self.table.topLevelItem(i)
+            item.setCheckState(0, checked)
+            for i in range(item.childCount()):
+                child_temp = item.child(i)
                 child_temp.setCheckState(0, checked)
 
     def setTableContent(self):
