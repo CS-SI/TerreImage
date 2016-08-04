@@ -106,11 +106,11 @@ class TerreImageManager():
         # print str(name_of_the_closed_view) + " has been closed"
         logger.debug("{} has been closed".format(name_of_the_closed_view))
         process = ProcessingManager().processing_from_name(name_of_the_closed_view)
-        # print process
+        logger.debug("{}".format(process))
         if process:
             try:
-                # WARNING Comment this line to make the plugin work on Windows
-                if process[0].output_working_layer.qgis_layer.id() in self.canvas.layers():
+                loaded_layers_id = [x.id() for x in self.iface.legendInterface().layers()]
+                if process[0].output_working_layer.qgis_layer.id() in loaded_layers_id:
                     QgsMapLayerRegistry.instance().removeMapLayer(process[0].output_working_layer.qgis_layer.id())
                 ProcessingManager().remove_processing(process[0])
                 ProcessingManager().remove_display(process[0])
