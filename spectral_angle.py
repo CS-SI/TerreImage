@@ -58,7 +58,8 @@ class SpectralAngleMapTool(QgsMapTool):
     def deactivate(self):
         # self.emit( SIGNAL("deactivate") )
         # self.canvas.setCursor( QCursor(Qt.ArrowCursor))
-        QgsMapTool.deactivate(self)
+        if QgsMapTool:
+            QgsMapTool.deactivate(self)
 
     def setCursor(self, cursor):
         self.cursor = QtGui.QCursor(cursor)
