@@ -121,8 +121,10 @@ class TerreImageManager():
         ProcessingManager().remove_process_from_layer_id(layer_id)
 
     def disconnect(self):
+        logger.debug("Disconnect")
         # disconnect value tool
         self.iface.mainWindow().statusBar().clearMessage()
+        logger.debug("Statusbar cleared")
         try:
             self.value_tool.changeActive(QtCore.Qt.Unchecked)
             self.value_tool.set_layers([])
@@ -131,9 +133,13 @@ class TerreImageManager():
             self.value_tool = None
         except AttributeError:
             pass
+        logger.debug("ValueTool cleared")
 
         # disconnect dockable mirror map
         self.mirror_map_tool.unload()
+        logger.debug("Mirror map tool unloaded")
 
         # remove the dockwidget from iface
-        self.iface.removeDockWidget(self.valuedockwidget)
+        if self.valuedockwidget:
+            self.iface.removeDockWidget(self.valuedockwidget)
+            logger.debug("Remove dock widget")
