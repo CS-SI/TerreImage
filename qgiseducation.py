@@ -107,8 +107,9 @@ class QGISEducation:
         self.iface.removeToolBarIcon(self.action)
 
     def unload_interface(self):
-        if self.qgisedudockwidget is not None and self.educationWidget is not None:
+        if self.qgisedudockwidget is not None:
             self.qgisedudockwidget.close()
+        if self.educationWidget is not None:
             self.educationWidget.disconnectP()
 
     # run method that performs all the real work
