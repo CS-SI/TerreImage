@@ -65,21 +65,19 @@ class TerreImageProcess():
             return result
         else:
             code_d_erreur = self.process.error()
-            dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed",
-                        2:"QProcess::TimedOut", 3:"QProcess::WriteError",
-                        4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
-            logger.error("Code erreur : {}".format(code_d_erreur))
-            logger.error(dic_err[code_d_erreur])
+            self.error_management(code_d_erreur)
         return None
 
     def error_management(self, errorCode):
         dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed",
             2:"QProcess::TimedOut", 3:"QProcess::WriteError",
             4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
-
-        logger.error(u"Error {} {}".format(errorCode, dic_err[errorCode]))
+        try:
+            logger.error(u"Error {} {}".format(errorCode, dic_err[errorCode]))
+        except KeyError:
+            pass
         error = self.process.readAllStandardError().data()
-        logger.error(u"{}".format(error))
+        logger.error(error)
         logger.error( self.process.readAllStandardOutput())
         raise terre_image_exceptions.TerreImageRunProcessError(u"Error running : {}\n {}{}".format(self.command,
                                                                                   dic_err[errorCode], error
