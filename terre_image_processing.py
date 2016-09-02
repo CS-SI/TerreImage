@@ -158,24 +158,23 @@ def angles(layer, working_directory, x, y):
                     denom.append(str(band_value) + "*" + str(band_value))
                     fact.append(current_band + "*" + current_band)
 
-                formula = "((" + "+".join(fact) + ") != 0)?"
-
-                formula += "acos("
-                formula += "(" + "+".join(num) + ")/"
-                formula += "(sqrt("
-                formula += "(" + "+".join(denom) + ")*"
-                formula += "(" + "+".join(fact) + ")"
-                formula += "))"
-                formula += "): 0"
-
-                formule_ = "\"(" + formula + ">0.0001?1/" + formula + ":0)\""
+                #compute denom for testing != 0
+                mult_denom = "({})*({})".format("+".join(denom),
+                                                "+".join(fact))
+                #raw formula
+                formula = "acos(({})/(sqrt({})))".format("+".join(num),
+                                                        mult_denom)
+                #add threshold
+                formule_ = '"({}>0.0001?1/{}:0)"'.format(formula, formula)
+                #add test on denom
+                formula_with_test_denom_diff_0 = "({}!=0?{}:0)".format(mult_denom, formule_)
 
                 logger.debug("num {}".format(num))
                 logger.debug("denom {}".format(denom))
                 logger.debug("fact {}".format(fact))
-                logger.debug("formula {}".format(formula))
+                logger.debug("formula {}".format(formula_with_test_denom_diff_0))
 
-                OTBApplications.bandmath_cli([image_in], formule_, output_filename)
+                OTBApplications.bandmath_cli([image_in], formula_with_test_denom_diff_0, output_filename)
                 # rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
                 # manage_QGIS.histogram_stretching( rlayer, iface.mapCanvas())
             return output_filename
