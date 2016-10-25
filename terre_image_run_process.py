@@ -152,4 +152,16 @@ def get_otb_command(app_name, arguments):
                                 app_name, arguments)
     return command
 
+def get_osgeo_command(app_name, args=[]):
+    """
+    Returns a command composed with app_name + 'key "value"' for each key, value in args
+    Args:
+        command:
+        args:
 
+    Returns:
+
+    """
+    command_to_return = u'{} "{}"'.format(app_name, '" "'.join(args))
+    logger.debug(u"command to return {}".format(command_to_return))
+    return command_to_return

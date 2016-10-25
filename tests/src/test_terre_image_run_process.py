@@ -21,9 +21,9 @@
 import unittest
 import os
 from qgis.core import QgsRasterLayer
-from TerreImage.terre_image_run_process import TerreImageProcess, get_otb_command
+from TerreImage.terre_image_run_process import TerreImageProcess, get_otb_command, get_osgeo_command
 from TerreImage import terre_image_configuration
-
+from TerreImage.terre_image_exceptions import TerreImageRunProcessError
 from terre_image_test_case import TerreImageTestCase
 
 
@@ -118,9 +118,10 @@ class TestTerreImageProcess(TerreImageTestCase):
         #                                    path=bindir)
         app_name = "ReadImageInfo"
         arguments = "-inb {}".format(self.image_test)
-        result = process.run_process(get_otb_command(app_name, arguments))
-        self.assertIsNotNone(result)
-        self.assertEqual("", result.data())
+        with self.assertRaises(TerreImageRunProcessError):
+            result = process.run_process(get_otb_command(app_name, arguments))
+            self.assertIsNotNone(result)
+            self.assertEqual("", result.data())
 
 
 
@@ -171,5 +172,12 @@ class TestTerreImageRunProcess(TerreImageTestCase):
                                                                          "otbApplicationLauncherCommandLine"),
                                                                self.image_test)
         self.assertEqual(command_otb, command_baseline)
+
+    def test_get_osgeo_command(self):
+        app_name = "ogr2ogr"
+        args = ["-f", "ESRI Shapefile", "-clipsrc", "mymask.shp", "input", "output"]
+        command = get_osgeo_command(app_name, args)
+        command_baseline = u'ogr2ogr "-f" "ESRI Shapefile" "-clipsrc" "mymask.shp" "input" "output"'
+        self.assertEqual(command, command_baseline)
 
 
