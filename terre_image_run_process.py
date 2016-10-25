@@ -71,7 +71,8 @@ class TerreImageProcess():
     def error_management(self, errorCode):
         dic_err = { 0:"QProcess::FailedToStart", 1:"QProcess::Crashed",
             2:"QProcess::TimedOut", 3:"QProcess::WriteError",
-            4:"QProcess::ReadError", 5:"QProcess::UnknownError" }
+            4:"QProcess::ReadError", 5:"QProcess::UnknownError",
+            127:"Other, The application may not have been found"}
         try:
             logger.error(u"Error {} {}".format(errorCode, dic_err[errorCode]))
         except KeyError:
