@@ -22,6 +22,7 @@
 
 import os
 from terre_image_run_process import TerreImageProcess
+from TerreImage.terre_image_run_process import get_osgeo_command
 
 # import logging for debug messages
 import terre_image_logging
@@ -39,17 +40,24 @@ def unionPolygonsWithOGR(filenames, outputDirectory):
     for f in filenames:
         base = os.path.basename(os.path.splitext(f)[0])
         #Add class
-        command = u'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Class numeric(15)"'.format(f, base)
+        # command = u'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Class numeric(15)"'.format(f, base)
+        command = get_osgeo_command("ogrinfo", [f, "-sql", "ALTER TABLE {} ADD COLUMN Class numeric(15)".format(base)])
         TerreImageProcess().run_process(command)
-        command = u'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Class = {}"'.format(f, base, indexClass)
+        # command = u'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Class = {}"'.format(f, base, indexClass)
+        command = get_osgeo_command("ogrinfo", [f, "-dialect", "SQLite", "-sql",
+                                                "UPDATE {} SET Class = {}".format(base, indexClass)])
         TerreImageProcess().run_process(command)
         #Add Label
-        command = u'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Label character(15)"'.format(f, base)
+        # command = u'ogrinfo {} -sql "ALTER TABLE {} ADD COLUMN Label character(15)"'.format(f, base)
+        command = get_osgeo_command("ogrinfo", [f, "-sql", "ALTER TABLE {} ADD COLUMN Label character(15)".format(base)])
         TerreImageProcess().run_process(command)
-        command = u'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Label = \'{}\'"'.format(f, base, base)
+        # command = u'ogrinfo {} -dialect SQLite -sql "UPDATE {} SET Label = \'{}\'"'.format(f, base, base)
+        command = get_osgeo_command("ogrinfo", [f, "-dialect", "SQLite", "-sql",
+                                                "UPDATE {} SET Label = \'{}\'".format(base, base)])
         TerreImageProcess().run_process(command)
         #update output
-        command = u'ogr2ogr -update -append {} {}'.format(outputFilename, f)
+        # command = u'ogr2ogr -update -append {} {}'.format(outputFilename, f)
+        command = get_osgeo_command("ogr2ogr", ["-update", "-append", outputFilename, f])
         TerreImageProcess().run_process(command)
         indexClass+=1
 
@@ -61,10 +69,12 @@ def compute_overviews(filename):
     Runs gdaladdo on the given filename
     """
     if not os.path.isfile(filename + ".ovr"):
-        command = "gdaladdo "
-        command += " -ro "
-        command += "\"" + filename + "\""
-        command += " 2 4 8 16"
+        # command = "gdaladdo "
+        # command += " -ro "
+        # command += "\"" + filename + "\""
+        # command += " 2 4 8 16"
+
+        command = get_osgeo_command("gdaladdo", ["-ro", filename, "2 4 8 16"])
         logger.debug("command to run" + command)
         TerreImageProcess().run_process(command)
 
@@ -78,7 +88,8 @@ def gdal_edit_remove_no_data(image_in):
     Returns:
 
     """
-    command = u"gdal_edit.py -a_nodata None {}".format(image_in)
+    #command = u"gdal_edit.py -a_nodata None {}".format(image_in)
+    command = get_osgeo_command("gdal_edit.py", ["-a_nodata", "None", image_in])
     TerreImageProcess().run_process(command)
 
 
@@ -93,5 +104,7 @@ def gdal_translate_remove_no_data(image_in, image_out):
     Returns:
 
     """
-    command = u"gdal_translate -a_nodata None {} {}".format(image_in, image_out)
+    #command = u"gdal_translate -a_nodata None {} {}".format(image_in, image_out)
+
+    command = get_osgeo_command("gdal_translate", ["-a_nodata", "None", image_in, image_out])
     TerreImageProcess().run_process(command)

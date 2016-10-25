@@ -26,7 +26,7 @@ import glob
 import os
 import sys
 import shutil
-from TerreImage.terre_image_run_process import TerreImageProcess
+from TerreImage.terre_image_run_process import TerreImageProcess, get_osgeo_command
 from TerreImage import OTBApplications
 
 from TerreImage.terre_image_gdal_api import get_image_epsg_code_with_gdal, get_vector_epsg_with_ogr
@@ -138,7 +138,9 @@ def ReprojectVector(inputVectorFileName,  inputImageFileName, epsg_code, output_
     #                                                                                             inputImageFileName,
     #                                                                                             tmpReprojectedVector)
     #command = "ogr2ogr -t_srs {} -s_srs {} {} {}".format(epsg_code, None, tmpReprojectedVector, inputVectorFileName)
-    command = u"ogr2ogr -t_srs EPSG:{} {} {}".format(epsg_code, tmpReprojectedVector, inputVectorFileName)
+    #command = u"ogr2ogr -t_srs EPSG:{} {} {}".format(epsg_code, tmpReprojectedVector, inputVectorFileName)
+    command = get_osgeo_command("ogr2ogr", ["-t_srs", "EPSG:{}".format(epsg_code),
+                                            tmpReprojectedVector, inputVectorFileName])
 
     TerreImageProcess().run_process(command)
     return tmpReprojectedVector
@@ -156,9 +158,11 @@ def IntersectLayers(tmpReprojectedVector, outputImageEnvelopeVector, output_dire
 
     """
     outputVectorFileName = os.path.join(output_directory, "preprocessed.shp")
-    commandOGR = u'ogr2ogr -f "ESRI Shapefile" -clipsrc {} {} {}'.format(outputImageEnvelopeVector,
-                                                                        outputVectorFileName,
-                                                                        tmpReprojectedVector)
+    # commandOGR = u'ogr2ogr -f "ESRI Shapefile" -clipsrc {} {} {}'.format(outputImageEnvelopeVector,
+    #                                                                     outputVectorFileName,
+    #                                                                     tmpReprojectedVector)
+    commandOGR = get_osgeo_command("ogr2ogr", ["-f", "ESRI Shapefile", "-clipsrc", outputImageEnvelopeVector,
+                                            outputVectorFileName, tmpReprojectedVector])
     TerreImageProcess().run_process(commandOGR)
     return outputVectorFileName
 
