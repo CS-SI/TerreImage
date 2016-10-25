@@ -58,7 +58,7 @@ class TestWorkingLayer(TerreImageTestCase):
 
         """
         with self.assertRaises(KeyError):
-          self.terre_image_layer = WorkingLayer(self.image_test, self.raster_layer, {'red':1, 'green':2, 'blue':3, 'pir':4})
+            self.terre_image_layer = WorkingLayer(self.image_test, self.raster_layer, {'red':1, 'green':2, 'blue':3, 'pir':4})
 
 if __name__ == '__main__':
     unittest.main()

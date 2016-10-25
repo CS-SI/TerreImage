@@ -41,4 +41,4 @@ class TestTerreImageLogging(TerreImageTestCase):
         logger.warn('warn message')
         logger.error('error message')
         logger.critical('critical message')
-        self.assertTrue(False)
+        # self.assertTrue(False)

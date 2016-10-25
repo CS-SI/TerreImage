@@ -25,6 +25,7 @@ import os
 import shutil
 from terre_image_test_case import TerreImageTestCase
 from TerreImage import terre_image_gdal_system
+from TerreImage.terre_image_exceptions import TerreImageRunProcessError
 
 
 class TestGdalSystem(TerreImageTestCase):
@@ -74,8 +75,9 @@ class TestGdalSystem(TerreImageTestCase):
         """
         copy_image_test = os.path.join(self.working_dir, os.path.basename(self.image_test))
         shutil.copy(self.image_test, copy_image_test)
-        terre_image_gdal_system.gdal_edit_remove_no_data(copy_image_test)
-        self.assertTrue(os.path.isfile(copy_image_test))
+        with self.assertRaises(TerreImageRunProcessError):
+            terre_image_gdal_system.gdal_edit_remove_no_data(copy_image_test)
+
         #TO DO: add a assertion on no data
 
 

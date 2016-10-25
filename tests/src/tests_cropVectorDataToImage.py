@@ -25,6 +25,7 @@ import unittest
 import os
 from terre_image_test_case import TerreImageTestCase
 from TerreImage.ClassificationSupervisee import cropVectorDataToImage
+from TerreImage.terre_image_gdal_api import get_image_epsg_code_with_gdal
 
 
 class TestCropVectorDataToImage(TerreImageTestCase):
@@ -43,7 +44,8 @@ class TestCropVectorDataToImage(TerreImageTestCase):
         Returns:
 
         """
-        generated_vector = cropVectorDataToImage.GenerateEnvelope(self.image_test, self.working_dir1)
+        epsg_code = get_image_epsg_code_with_gdal(self.image_test)
+        generated_vector = cropVectorDataToImage.GenerateEnvelope(self.image_test, epsg_code, self.working_dir1)
         baseline = os.path.join(self.data_dir_baseline, "classif", "Classification", "class0", "imageenveloppe.shp")
         self.assertEqual(self.checkVector(generated_vector, baseline),0)
 

@@ -156,7 +156,7 @@ class TerreImageTestCase( unittest.TestCase ):
         Returns:
 
         """
-        command = "diff {} {}".format(fileTest, fileBaseline)
+        command = 'diff "{}" "{}"'.format(fileTest, fileBaseline)
         res = TerreImageProcess().run_process(command)
         lines = str(res).splitlines()
 
