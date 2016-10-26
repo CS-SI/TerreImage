@@ -25,7 +25,7 @@ import shutil
 
 from osgeo import gdal
 
-from terre_image_run_process import TerreImageProcess, get_otb_command
+from terre_image_run_process import TerreImageProcess, get_otb_command, get_osgeo_command
 
 # import GDAL and QGIS libraries
 from osgeo import gdal, osr, ogr
@@ -54,11 +54,12 @@ def bandmath_cli(images, expression, output_filename):
         keyword             --    keyword for output file name
     """
 
-    args = " -il "
-    for image in images:
-        args += u'"{}" '.format(image)
+    # args = " -il "
+    # for image in images:
+    #     args += u'"{}" '.format(image)
 
-    args += u'-exp {} -out "{}"' .format(expression, output_filename)
+    # args += u'-exp {} -out "{}"' .format(expression, output_filename)
+    args = get_osgeo_command("", ["-il"] + images + ["-exp", expression, "-out", output_filename])
 
     command = get_otb_command("BandMath", args)
     logger.info("command: " + command)
@@ -75,10 +76,12 @@ def concatenateImages_cli(listImagesIn, outputname, options=None):
     """
 
     if listImagesIn and outputname:
-        args = u' -il {}'.format(" ".join(["\"" + f + "\"" for f in listImagesIn]))
-        args += u' -out "{}"'.format(outputname)
-        if options:
-            args += u" uint16 "
+        # args = u' -il {}'.format(" ".join(["\"" + f + "\"" for f in listImagesIn]))
+        # args += u' -out "{}"'.format(outputname)
+
+        args = get_osgeo_command("", ["-il"] + listImagesIn + ["-out", outputname, "uint16" if options else ""])
+        # if options:
+            # args += u" uint16 "
 
         command = get_otb_command("ConcatenateImages", args)
         logger.info("command: " + command)
@@ -94,10 +97,11 @@ def kmeans_cli(image, nbClass, outputDirectory):
     output = os.path.join(outputDirectory, u"{}_kmeans_{}.tif".format(filenameWithoutExtension, nbClass))  # + temp[index:]
     if not os.path.isfile(output):
         if image and nbClass and outputDirectory:
-            args = u' -in "{}" -out "{}" -nc {} -rand {} '.format(image,
-                                                                  output,
-                                                                  nbClass,
-                                                                  42)
+            # args = u' -in "{}" -out "{}" -nc {} -rand {} '.format(image,
+            #                                                       output,
+            #                                                       nbClass,
+            #                                                       42)
+            args = get_osgeo_command("", ["-in", image, "-out", output, "-nc", str(nbClass), "-rand", "42"])
             command = get_otb_command("KMeansClassification", args)
             logger.info("command: " + command)
             TerreImageProcess().run_process(command)
@@ -112,9 +116,11 @@ def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
         logger.info(output_filename)
         command = os.path.join(prefix, "otbcli")
         command += " ColorMapping "
-        args = u' -in "{}" -out "{}" uint8 -method "image" -method.image.in "{}" '.format(image_to_color,
-                                                                                    output_filename,
-                                                                                    reference_image)
+        # args = u' -in "{}" -out "{}" uint8 -method "image" -method.image.in "{}" '.format(image_to_color,
+        #                                                                             output_filename,
+        #                                                                             reference_image)
+        args = get_osgeo_command("", ["-in", image_to_color, "-out", output_filename, "uint8",
+                                      "-method", "image", "-method.image.in", reference_image])
         command = get_otb_command("ColorMapping", args)
         logger.info("command: " + command)
         TerreImageProcess().run_process(command)
@@ -124,9 +130,13 @@ def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
 def otbcli_export_kmz(filename, working_directory, warning_size=0):
     output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + ".kmz")
     if not os.path.isfile(output_kmz):
-        args = u' -in "{}" -out "{}"'.format(filename, output_kmz)
-        if warning_size != 0:
-            args += " -tilesize {}".format(warning_size)
+        # args = u' -in "{}" -out "{}"'.format(filename, output_kmz)
+        # if warning_size != 0:
+        #     args += " -tilesize {}".format(warning_size)
+
+        args = get_osgeo_command("", ["-in", filename, "-out", output_kmz] +
+                                     ["-tilesize", str(warning_size)] if warning_size != 0 else "")
+
 
         command = get_otb_command("KmzExport", args)
         logger.info("command: " + command)
@@ -145,7 +155,7 @@ def read_image_info_cli(image_in):
 
     """
 
-    args = u" -in %s"%(unicode(image_in))
+    args = u' -in "%s"'%(unicode(image_in))
     command = get_otb_command("ReadImageInfo", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -162,7 +172,7 @@ def compute_statistics_cli(image_in, xml_output):
 
     """
 
-    args = u" -il {} -out {}".format(image_in, xml_output)
+    args = u' -il "{}" -out "{}"'.format(image_in, xml_output)
     command = get_otb_command("ComputeImagesStatistics", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -177,12 +187,12 @@ def train_image_classifier_cli(vrtfile, vd, outstatfile, outsvmfile, confmat):
     Returns:
 
     """
-    args = u" -io.il {} -io.vd {} -io.imstat {} -io.out {}" \
-           u" -io.confmatout {} -classifier libsvm -sample.vtr 0.1".format(vrtfile,
-                                                           vd,
-                                                           outstatfile,
-                                                           outsvmfile,
-                                                           confmat)
+    args = u' -io.il "{}" -io.vd "{}" -io.imstat "{}" -io.out "{}"' \
+           u' -io.confmatout "{}" -classifier libsvm -sample.vtr 0.1'.format(vrtfile,
+                                                                            vd,
+                                                                            outstatfile,
+                                                                            outsvmfile,
+                                                                            confmat)
     command = get_otb_command("TrainImagesClassifier", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -198,7 +208,7 @@ def image_classifier_cli(vrtfile, outstatfile, outsvmfile, out):
 
     """
 
-    args = u"-in {} -imstat {} -model {} -out {}".format(vrtfile, outstatfile, outsvmfile, out)
+    args = u'-in "{}" -imstat "{}" -model "{}" -out "{}"'.format(vrtfile, outstatfile, outsvmfile, out)
     command = get_otb_command("ImageClassifier", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -214,7 +224,7 @@ def classification_map_regularization_cli(out, outregul):
 
     """
 
-    args = u"-io.in {} -io.out {} -ip.radius 1 -ip.suvbool false".format(out, outregul)
+    args = u'-io.in "{}" -io.out "{}" -ip.radius 1 -ip.suvbool false'.format(out, outregul)
     command = get_otb_command("ClassificationMapRegularization", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -230,7 +240,7 @@ def ComputeLabelImagePopulation_cli(im1, im2, out):
     Returns:
 
     """
-    args = u"-in1 {} -in2 {} -out {}".format(im1, im2, out)
+    args = u'-in1 "{}" -in2 "{}" -out "{}"'.format(im1, im2, out)
     command = get_otb_command("ComputeLabelImagePopulation", args)
     result = TerreImageProcess().run_process(command)
     return result
@@ -246,7 +256,7 @@ def ImageEnvelope_cli(image_in, vector_out, epsg_code=""):
     Returns:
 
     """
-    args = u"-in {} -out {}".format(image_in, vector_out)
+    args = u'-in "{}" -out "{}"'.format(image_in, vector_out)
     if epsg_code:
         args += u' -proj "{}"'.format(epsg_code)
     command = get_otb_command("ImageEnvelope", args)
