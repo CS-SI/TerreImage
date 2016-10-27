@@ -20,7 +20,7 @@
  ***************************************************************************/
 """
 
-import os
+import sys, os
 import logging
 import logging.config
 import terre_image_configuration
@@ -46,12 +46,24 @@ def configure_logger(name="", log_path=""):
                 'filename': terre_image_configuration.log_file,
                 'maxBytes': 1048576,
                 'backupCount': 3
+            },
+            'file2': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'formatter': 'console',
+                'filename': terre_image_configuration.log_file,
+                'maxBytes': 1048576,
+                'backupCount': 3
             }
         },
         'loggers': {
             'default': {
-                'level': 'INFO',
+                'level': 'DEBUG',
                 'handlers': ['console', 'file']
+            },
+            'debug': {
+                'level': 'DEBUG',
+                'handlers': ['file2']
             }
         },
         'disable_existing_loggers': False
@@ -74,3 +86,53 @@ def display_parameters(dictParameters, functionName, logger):
     for argument, value in dictParameters.iteritems():
         logger.debug( u"\t\t {}: {}".format(argument,value))
     logger.debug( "--------------------------------")
+
+
+logger = configure_logger("debug")
+def decorate_debug(func):
+    """
+    Decorator to trace entering and exiting a function
+    Args:
+        func:
+
+    Returns:
+
+    """
+    def wrapper(*arg,**kwargs):
+        sys.stdout.flush()
+        try :
+            frame = sys._getframe(1)
+        except ValueError:
+            frame = sys._getframe(0)
+
+        logger.debug("Launching {} from {}, {}:{}".format(func.__name__, frame.f_code.co_name,
+                                                         os.path.basename(frame.f_code.co_filename), frame.f_lineno))
+        response=func(*arg,**kwargs)
+        logger.debug("Exiting {} from {}, {}:{}".format(func.__name__, frame.f_code.co_name,
+                                                         os.path.basename(frame.f_code.co_filename), frame.f_lineno))
+        return response
+    return wrapper
+
+def trace(frame, event, arg):
+    """
+    Trace all functions called by python.
+    To be used like this :
+    from terre_image_logging import trace
+    import sys
+
+    #add the break point
+    sys.settrace(trace)
+    Args:
+        frame:
+        event:
+        arg:
+
+    Returns:
+
+    """
+    if event == "call":
+        filename = frame.f_code.co_filename
+        lineno = frame.f_lineno
+        # Here I'm printing the file and line number,
+        # but you can examine the frame, locals, etc too.
+        logger.debug("%s @ %s" % (filename, lineno))
