@@ -27,9 +27,10 @@
 # from __future__ import unicode_literals
 
 
+import gdalconst
+import qgis.gui
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import SIGNAL, QObject, QSize, Qt
-from PyQt4.QtGui import QWidget, QBrush, QPen, QTableWidgetItem, QFileDialog
+from osgeo import osr, gdal
 from qgis.core import (QGis,
                        QgsMapLayer,
                        QgsRasterDataProvider,
@@ -39,14 +40,13 @@ from qgis.core import (QGis,
                        QgsCoordinateTransform,
                        QgsRasterBandStats,
                        QgsRectangle)
-import qgis.gui
 
-from ui_valuewidgetbase import Ui_ValueWidgetBase as Ui_Widget
-from terre_image_curve import TerreImageCurve
+from PyQt4.QtCore import SIGNAL, QObject, QSize, Qt
+from PyQt4.QtGui import QWidget, QBrush, QPen, QTableWidgetItem, QFileDialog
+
 from ptmaptool import ProfiletoolMapTool_ValueTool
-
-from osgeo import osr, gdal
-import gdalconst
+from terre_image_curve import TerreImageCurve
+from ui_valuewidgetbase import Ui_ValueWidgetBase as Ui_Widget
 
 hasqwt = False
 try:
@@ -237,30 +237,12 @@ class ValueWidget(QWidget, Ui_Widget):
             # mpl stuff
             # should make figure light gray
             self.sc_1 = ValueWidgetGraph(self, width=5, height=4, dpi=100)
-
-#             self.mplBackground = None #http://www.scipy.org/Cookbook/Matplotlib/Animations
-#             self.mplFig = plt.Figure(facecolor='w', edgecolor='w')
-#             self.mplFig.subplots_adjust(left=0.1, right=0.975, bottom=0.13, top=0.95)
-#             self.mplPlt = self.mplFig.add_subplot(111)
-#             self.mplPlt.tick_params(axis='both', which='major', labelsize=12)
-#             self.mplPlt.tick_params(axis='both', which='minor', labelsize=10)
-#             # qt stuff
-#             self.pltCanvas = FigureCanvasQTAgg(self.mplFig)
-#             self.pltCanvas.setParent(self.stackedWidget)
-#             self.pltCanvas.setAutoFillBackground(False)
-#             self.pltCanvas.setObjectName("mplPlot")
-#             self.mplPlot = self.pltCanvas
-#             self.mplPlot.setVisible(False)
         else:
             self.mplPlot = QtGui.QLabel("Need Qwt >= 5.0 or matplotlib >= 1.0 !")
 
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-#         sizePolicy.setHeightForWidth(self.mplPlot.sizePolicy().hasHeightForWidth())
-#         self.mplPlot.setSizePolicy(sizePolicy)
-#         self.qwtPlot.setObjectName("qwtPlot")
-#         self.mplPlot.updateGeometry()
         self.stackedWidget.addWidget(self.sc_1)
         self.stackedWidget.setCurrentIndex(0)
 
@@ -303,9 +285,6 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def changePage(self, state):
         if (state == Qt.Checked):
-            # self.plotSelector.setVisible( True )
-            # self.cbxStats.setVisible( True )
-            # self.graphControls.setVisible( True )
             self.groupBox_saved_layers.setVisible(True)
             self.checkBox_hide_current.setVisible(True)
             self.pushButton_get_point.show()
@@ -330,15 +309,13 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def changeActive(self, state):
         if (state == Qt.Checked):
-            # QObject.connect(self.legend, SIGNAL( "itemAdded ( QModelIndex )" ), self.statsNeedChecked )
-            # QObject.connect(self.legend, SIGNAL( "itemRemoved ()" ), self.invalidatePlot )
-            #QObject.connect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
+            # QObject.connect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
             if QGis.QGIS_VERSION_INT >= 10300:  # for QGIS >= 1.3
                 QObject.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint &)"), self.printValue)
             else:
                 QObject.connect(self.canvas, SIGNAL("xyCoordinates(QgsPoint &)"), self.printValue)
         else:
-            #QObject.disconnect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
+            # QObject.disconnect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
             if QGis.QGIS_VERSION_INT >= 10300:  # for QGIS >= 1.3
                 QObject.disconnect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint &)"), self.printValue)
             else:
@@ -415,9 +392,6 @@ class ValueWidget(QWidget, Ui_Widget):
                 rasterlayers = self.layers_to_display
             else:
                 rasterlayers = self.get_raster_layers()
-#         else:
-#             print "position", position
-#             rasterlayers = self.get_raster_layers()
 
         irow = 0
         self.values = []
@@ -612,12 +586,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 layerNames.append(layer.name())
 
         if (len(layerNames) != 0):
-#            res = QMessageBox.warning( self, self.tr( 'Warning' ),
-#                                       self.tr( 'There are no statistics in the following rasters:\n%1\n\nCalculate?' ).arg(layerNames.join('\n')),
-#                                       QMessageBox.Yes | QMessageBox.No )
-#            if res != QMessageBox.Yes:
             if not self.cbxStats.isChecked():
-                # self.cbxActive.setCheckState(Qt.Unchecked)
                 for layer in layersWOStatistics:
                     self.layerMap[layer.id()] = True
                 return
@@ -706,19 +675,15 @@ class ValueWidget(QWidget, Ui_Widget):
                 # create the item
                 self.tableWidget.setItem(irow, 0, QTableWidgetItem())
                 self.tableWidget.setItem(irow, 1, QTableWidgetItem())
-                # self.tableWidget.setItem(irow, 2, QTableWidgetItem())
-                # self.tableWidget.setItem(irow, 3, QTableWidgetItem())
 
             self.tableWidget.item(irow, 0).setText(layername)
             self.tableWidget.item(irow, 1).setText(value)
-            # self.tableWidget.item(irow, 2).setText( x )
-            # self.tableWidget.item(irow, 3).setText( y )
             irow += 1
 
     def plot(self):
         items = self.values
         new_items = self.order_values(items)
-        # print "items", new_items
+        logger.debug("items {}".format(new_items))
 
         pixel = 0
         ligne = 0
@@ -733,19 +698,6 @@ class ValueWidget(QWidget, Ui_Widget):
                     numvalues.append(float(value))
                 except:
                     numvalues.append(0)
-
-        # print numvalues
-
-
-#         if self.memorize_curve:
-#             print "num values curve temp", numvalues
-#             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), pixel, ligne, numvalues)
-#             QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
-#             self.saved_curves.append(curve_temp)
-#             self.memorize_curve = False
-#             self.verticalLayout_curves.addWidget( curve_temp )
-#             self.groupBox_saved_layers.show()
-#             print curve_temp
 
         ymin = self.ymin
         ymax = self.ymax
@@ -776,37 +728,6 @@ class ValueWidget(QWidget, Ui_Widget):
 
         if self.saved_curves:
             self.extra_plot()
-
-            # line = "self.axes.plot(" + str(t) + ", " + str(numvalues) +", ko-)"
-            # self.sc_1.plot_line(line)
-
-#             self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color='k', mfc='b', mec='b')
-#             self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-#             self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-#             self.mplPlt.set_xlim( (1-0.25,len(new_items)+0.25 ) )
-#             self.mplPlt.set_ylim( (ymin, ymax) )
-#             self.mplFig.canvas.draw()
-
-            # disable optimizations - too many bugs, depending on mpl version!
-#             if self.mplLine is None:
-#                 self.mplPlt.clear()
-#                 self.mplLine, = self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color='k', mfc='b', mec='b', animated=True)
-#                 self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-#                 self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-#                 self.mplPlt.set_xlim( (1-0.25,len(self.values)+0.25 ) )
-#                 self.mplPlt.set_ylim( (self.ymin, self.ymax) )
-#                 self.mplFig.canvas.draw()
-#                 self.mplBackground = self.mplFig.canvas.copy_from_bbox(self.mplFig.bbox)
-#             else:
-#                 # restore the clean slate background
-#                 self.mplFig.canvas.restore_region(self.mplBackground)
-#                 # update the data
-#                 self.mplLine.set_xdata(range(1,len(numvalues)+1))
-#                 self.mplLine.set_ydata(numvalues)
-#                 self.mplPlt.draw_artist(self.mplLine)
-#                 # just redraw the axes rectangle
-#                 self.mplFig.canvas.blit(self.mplFig.bbox)
-#             self.mplPlot.setVisible(len(numvalues)>0)
 
     def del_extra_curve(self, curve):
         self.saved_curves.remove(curve)
@@ -847,13 +768,6 @@ class ValueWidget(QWidget, Ui_Widget):
         # print "line", line
         self.sc_1.plot_line(line)
 
-#                 self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color=color_curve, mfc='b', mec='b')
-#                 self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-#                 self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-#                 self.mplPlt.set_xlim( (1-0.25,len(numvalues)+0.25 ) )
-#                 self.mplPlt.set_ylim( (ymin, ymax) )
-#                 self.mplFig.canvas.draw()
-
     def on_get_point_button(self):
         if self.tool is None:
             # if self.pushButton_get_point.isFlat() == False:
@@ -885,23 +799,11 @@ class ValueWidget(QWidget, Ui_Widget):
             attr = ident.results()
             new_points = self.order_values_from_attr(attr)
 
-        # ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.x()), QgsRaster.IdentifyFormatValue ).results()
-            # TODO : put values in right order
-#             new_points=[]
-#             for i in range(1, len(attr)+1):
-#                 new_points.append( (self.the_layer_to_display.band_invert[i], attr[i] ))
-#             points = self.order_values(new_points)
-
             points_for_curve = [ t[1] for t in new_points ]
             logger.debug("points_for_curve: {}".format(points_for_curve))
             abs = [ t[0] for t in new_points ]
             logger.debug("abs: {}".format(abs))
 
-    #         colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
-    #         print "len(colors)", len(colors)
-    #         color = colors[ random.randint(0, len(colors)-1) ]
-    #         print 'color from creation courbe', color
-            # QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), x, y, points_for_curve)
             QObject.connect(curve_temp, SIGNAL("deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
             QObject.connect(curve_temp, SIGNAL("colorChanged()"), self.update_plot)
