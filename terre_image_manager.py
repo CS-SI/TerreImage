@@ -109,9 +109,6 @@ class TerreImageManager():
         logger.debug("{}".format(process))
         if process:
             try:
-                loaded_layers_id = [x.id() for x in self.iface.legendInterface().layers()]
-                if process[0].output_working_layer.qgis_layer.id() in loaded_layers_id:
-                    QgsMapLayerRegistry.instance().removeMapLayer(process[0].output_working_layer.qgis_layer.id())
                 ProcessingManager().remove_processing(process[0])
                 ProcessingManager().remove_display(process[0])
             except KeyError:
