@@ -59,6 +59,7 @@ try:
     # from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.figure import Figure
+    import matplotlib.pyplot as plt
 except:
     hasmpl = False
 if hasmpl:
@@ -161,6 +162,8 @@ class ValueWidget(QWidget, Ui_Widget):
         self.maptool = self.canvas.mapTool()
         self.tool = None
 
+        self.lines_mpl = None
+
         QObject.connect(self.cbxActive, SIGNAL("stateChanged(int)"), self.changeActive)
         QObject.connect(self.cbxGraph, SIGNAL("stateChanged(int)"), self.changePage)
         QObject.connect(self.canvas, SIGNAL("keyPressed( QKeyEvent * )"), self.pauseDisplay)
@@ -203,11 +206,15 @@ class ValueWidget(QWidget, Ui_Widget):
             # mpl stuff
             # should make figure light gray
             self.sc_1 = ValueWidgetGraph(self, width=5, height=4, dpi=100)
+            self.figure = plt.figure()
+            self.canvas_mpl = FigureCanvas(self.figure)
+            self.ax = self.figure.add_subplot(111)
 
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         self.stackedWidget.addWidget(self.sc_1)
+        self.stackedWidget.addWidget(self.canvas_mpl)
         self.stackedWidget.setCurrentIndex(0)
 
     def disconnect(self):
@@ -252,7 +259,8 @@ class ValueWidget(QWidget, Ui_Widget):
             self.groupBox_saved_layers.setVisible(True)
             self.checkBox_hide_current.setVisible(True)
             self.pushButton_get_point.show()
-            self.stackedWidget.setCurrentIndex(1)
+            # WARNING !!!
+            self.stackedWidget.setCurrentIndex(2)
         else:
             self.groupBox_saved_layers.setVisible(False)
             self.plotSelector.setVisible(False)
@@ -641,6 +649,7 @@ class ValueWidget(QWidget, Ui_Widget):
             irow += 1
 
     def plot(self):
+        print "plot"
         items = self.values
         new_items = self.order_values(items)
         logger.debug("items {}".format(new_items))
@@ -667,15 +676,32 @@ class ValueWidget(QWidget, Ui_Widget):
 
         if (self.hasmpl and (self.plotSelector.currentText() == 'mpl')):
 
-            self.sc_1.clear()
+            self.remove_current_line()
+            if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
+                self.sc_1.clear()
 
-            t = range(1, len(numvalues) + 1)
-            self.sc_1.plot(t, numvalues, 'k', 'o-')
+                t = range(1, len(numvalues) + 1)
+                self.sc_1.plot(t, numvalues, 'k', 'o-')
 
-            self.temp_values = numvalues
 
-        if self.saved_curves:
-            self.extra_plot()
+                self.lines_mpl = self.ax.plot(t, numvalues, color = 'k', marker = 'o', linestyle = "-")
+
+                self.temp_values = numvalues
+                print "self.canvas.draw()"
+
+        # if self.saved_curves:
+        #     self.extra_plot()
+
+        self.canvas_mpl.draw()
+
+    def remove_current_line(self):
+        #remove the first line
+        if self.lines_mpl:
+            try:
+                l = self.lines_mpl.pop(0).remove()
+                del l
+            except IndexError:
+                pass
 
     def del_extra_curve(self, curve):
         self.saved_curves.remove(curve)
@@ -690,6 +716,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 line += ","
         else:
             line = 'self.axes.plot('
+            self.remove_current_line()
 
         i = 0
 
@@ -703,6 +730,8 @@ class ValueWidget(QWidget, Ui_Widget):
                 ymax = self.ymax
 
                 color_curve = curve.color
+                self.ax.plot(t, numvalues, color = color_curve, marker = 'o', linestyle = "-")
+
 
                 t = range(1, len(numvalues) + 1)
                 self.sc_1.plot(t, numvalues, color_curve, 'o-')
