@@ -32,6 +32,26 @@ from TerreImage import terre_image_logging
 logger = terre_image_logging.configure_logger()
 
 
+LETTERSTOQCOLOR = {"bleu": QColor(0, 132, 255), "vert": QColor(148, 255, 69),
+                   "rouge": QColor(255, 30, 0), "cyan": QColor(0, 255, 204),
+                   "magenta": QColor(255, 0, 255), "jaune": QColor(255, 255, 0),
+                   "noir": QColor(0, 0, 0)}
+
+FRENCHTOLETTER = {"bleu": 'b', "vert": 'g',
+                       "rouge": 'r', "cyan": 'c',
+                       "magenta": 'm', "jaune": 'y',
+                       "noir": 'k'}
+
+LETTERSTONAMECOLOR = {"b": "blue", "g": "green", "r": "red",
+                           "c": "cyan", "m": "magenta",
+                           "y": "yellow", "k": "black"}
+
+NAMECOLORSTOLETTERS = dict((v, k) for k, v in LETTERSTONAMECOLOR.iteritems())
+
+COLORS = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
+
+
+
 class TerreImageCurve(QWidget, Ui_Form):
 
     __pyqtSignals__ = ("curveTitleChanged(str)", "hideCurve(int)", "colorChanged()", "deleteCurve()")
@@ -47,26 +67,9 @@ class TerreImageCurve(QWidget, Ui_Form):
         self.coordinates = "[x=" + str(x) + ", y=" + str(y) + "]"
         self.label_coordinates.setText(self.coordinates)
 
-        self.lettersToQColor = {"bleu": QColor(0, 132, 255), "vert": QColor(148, 255, 69),
-                                "rouge": QColor(255, 30, 0), "cyan": QColor(0, 255, 204),
-                                "magenta": QColor(255, 0, 255), "jaune": QColor(255, 255, 0),
-                                "noir": QColor(0, 0, 0)}
-
-        self.frenchToLetter = {"bleu": 'b', "vert": 'g',
-                               "rouge": 'r', "cyan": 'c',
-                               "magenta": 'm', "jaune": 'y',
-                               "noir": 'k'}
-
-        self.lettersToNameColor = {"b": "blue", "g": "green", "r": "red",
-                                   "c": "cyan", "m": "magenta",
-                                   "y": "yellow", "k": "black"}
-
-        self.nameColorsToLetters = dict((v, k) for k, v in self.lettersToNameColor.iteritems())
-
         if color is None:
-            colors = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
-            logger.debug("len(colors): {}".format(len(colors)))
-            color = colors[ random.randint(0, len(colors) - 1) ]
+            logger.debug("len(colors): {}".format(len(COLORS)))
+            color = COLORS[ random.randint(0, len(COLORS) - 1) ]
             logger.debug("color from creation courbe: {}".format(color))
         self.color = color
 
@@ -76,7 +79,7 @@ class TerreImageCurve(QWidget, Ui_Form):
             self.abs = None
 
         pixmap = QPixmap(self.pushButton_color.size())
-        pixmap.fill(QColor(self.lettersToNameColor[self.color]))
+        pixmap.fill(QColor(LETTERSTONAMECOLOR[self.color]))
         icon = QIcon(pixmap)
         self.pushButton_color.setIcon(icon)
 
@@ -93,14 +96,14 @@ class TerreImageCurve(QWidget, Ui_Form):
     def set_color(self):
         # couleur = QtGui.QColorDialog.getColor(QtCore.Qt.white)
 
-        testqt, ok = QInputDialog.getItem(None, "Couleur", "Selection d'une couleur", self.lettersToQColor.keys(), False)
+        testqt, ok = QInputDialog.getItem(None, "Couleur", "Selection d'une couleur", LETTERSTOQCOLOR.keys(), False)
         if ok:
             # couleur = self.nameColorsToLetters[testqt]
-            couleur = self.lettersToQColor[testqt]
+            couleur = LETTERSTOQCOLOR[testqt]
             logger.debug(couleur)
-            self.color = self.frenchToLetter[testqt]
+            self.color = FRENCHTOLETTER[testqt]
         else:
-            couleur = self.lettersToQColor['noir']
+            couleur = LETTERSTOQCOLOR['noir']
             self.color = 'b'
 
         # self.color = str(couleur.name())
