@@ -48,12 +48,6 @@ from ptmaptool import ProfiletoolMapTool_ValueTool
 from terre_image_curve import TerreImageCurve
 from ui_valuewidgetbase import Ui_ValueWidgetBase as Ui_Widget
 
-hasqwt = False
-try:
-    from PyQt4.Qwt5 import QwtPlot, QwtPlotCurve, QwtScaleDiv, QwtSymbol
-except:
-    hasqwt = False
-
 # test if matplotlib >= 1.0
 hasmpl = True
 try:
@@ -140,7 +134,6 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def __init__(self, iface):
 
-        self.hasqwt = hasqwt
         self.hasmpl = hasmpl
         self.layerMap = dict()
         self.statsChecked = False
@@ -197,39 +190,12 @@ class ValueWidget(QWidget, Ui_Widget):
         self.groupBox_saved_layers.setVisible(False)
         self.pushButton_get_point.hide()
         self.checkBox_hide_current.setVisible(False)
-        if self.hasqwt:
-            self.plotSelector.addItem('Qwt')
         if self.hasmpl:
             self.plotSelector.addItem('mpl')
         self.plotSelector.setCurrentIndex(0)
-        if (not self.hasqwt or not self.hasmpl):
+        if  not self.hasmpl:
             # self.plotSelector.setVisible(False)
             self.plotSelector.setEnabled(False)
-
-        # Page 2 - qwt
-        if self.hasqwt:
-            self.qwtPlot = QwtPlot(self.stackedWidget)
-            self.qwtPlot.setAutoFillBackground(False)
-            self.qwtPlot.setObjectName("qwtPlot")
-            self.curve = QwtPlotCurve()
-            self.curve.setSymbol(
-                QwtSymbol(QwtSymbol.Ellipse,
-                          QBrush(Qt.white),
-                          QPen(Qt.red, 2),
-                          QSize(9, 9)))
-            self.curve.attach(self.qwtPlot)
-            self.qwtPlot.setVisible(False)
-        else:
-            self.qwtPlot = QtGui.QLabel("Need Qwt >= 5.0 or matplotlib >= 1.0 !")
-
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.qwtPlot.sizePolicy().hasHeightForWidth())
-        self.qwtPlot.setSizePolicy(sizePolicy)
-        self.qwtPlot.setObjectName("qwtPlot")
-        self.qwtPlot.updateGeometry()
-        self.stackedWidget.addWidget(self.qwtPlot)
 
         # Page 3 - matplotlib
         self.mplLine = None  # make sure to invalidate when layers change
@@ -237,8 +203,6 @@ class ValueWidget(QWidget, Ui_Widget):
             # mpl stuff
             # should make figure light gray
             self.sc_1 = ValueWidgetGraph(self, width=5, height=4, dpi=100)
-        else:
-            self.mplPlot = QtGui.QLabel("Need Qwt >= 5.0 or matplotlib >= 1.0 !")
 
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -288,11 +252,7 @@ class ValueWidget(QWidget, Ui_Widget):
             self.groupBox_saved_layers.setVisible(True)
             self.checkBox_hide_current.setVisible(True)
             self.pushButton_get_point.show()
-
-            if (self.plotSelector.currentText() == 'mpl'):
-                self.stackedWidget.setCurrentIndex(2)
-            else:
-                self.stackedWidget.setCurrentIndex(1)
+            self.stackedWidget.setCurrentIndex(1)
         else:
             self.groupBox_saved_layers.setVisible(False)
             self.plotSelector.setVisible(False)
@@ -689,7 +649,7 @@ class ValueWidget(QWidget, Ui_Widget):
         ligne = 0
 
         numvalues = []
-        if (self.hasqwt or self.hasmpl):
+        if self.hasmpl:
             for row in new_items:
                 layername, value, pixel_, ligne_ = row
                 pixel = pixel_
@@ -705,19 +665,7 @@ class ValueWidget(QWidget, Ui_Widget):
             ymin = float(self.leYMin.text())
             ymax = float(self.leYMax.text())
 
-        if (self.hasqwt and (self.plotSelector.currentText() == 'Qwt')):
-
-            self.qwtPlot.setAxisMaxMinor(QwtPlot.xBottom, 0)
-            # self.qwtPlot.setAxisMaxMajor(QwtPlot.xBottom,0)
-            self.qwtPlot.setAxisScale(QwtPlot.xBottom, 1, len(new_items))
-            # self.qwtPlot.setAxisScale(QwtPlot.yLeft,self.ymin,self.ymax)
-            self.qwtPlot.setAxisScale(QwtPlot.yLeft, ymin, ymax)
-
-            self.curve.setData(range(1, len(numvalues) + 1), numvalues)
-            self.qwtPlot.replot()
-            self.qwtPlot.setVisible(len(numvalues) > 0)
-
-        elif (self.hasmpl and (self.plotSelector.currentText() == 'mpl')):
+        if (self.hasmpl and (self.plotSelector.currentText() == 'mpl')):
 
             self.sc_1.clear()
 
