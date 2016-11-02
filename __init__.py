@@ -21,24 +21,6 @@
  This script initializes the plugin, making it known to QGIS.
 """
 
-def name():
-    return "TerreImage"
-
-def description():
-    return ""
-
-def version():
-    return "2.3.16"
-
-def qgisMinimumVersion():
-    return "2.0"
-
-def icon():
-    return "img/icon.png"
-
-def authorName():
-    return "CS SI (alexia.mondot@c-s.fr)"
-
 
 def classFactory(iface):
     # load QGISEducation class from file QGISEducation
