@@ -20,9 +20,9 @@ about=
     License: GPL v3; Fichier de licence disponible dans les sources.
     
 
-qgisMinimumVersion=2.0
+qgisMinimumVersion=2.8
 qgisMaximumVersion=2.8.99
-version=2.4.0-RC3
+version=2.4.0-RC34
 author=CS SI
 email=alexia.mondot@c-s.fr
 
