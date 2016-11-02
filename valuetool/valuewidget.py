@@ -706,9 +706,10 @@ class ValueWidget(QWidget, Ui_Widget):
     def del_extra_curve(self, curve):
         self.saved_curves.remove(curve)
         curve.close()
-        self.plot()
+        self.extra_plot()
 
     def extra_plot(self):
+        plt.cla()
         if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
             t = range(1, len(self.temp_values) + 1)
             line = 'self.axes.plot(' + str(t) + ',' + str(self.temp_values) + ', "ko-"'
@@ -743,7 +744,7 @@ class ValueWidget(QWidget, Ui_Widget):
         line += ')'
 
         # print "line", line
-        self.sc_1.plot_line(line)
+        # self.sc_1.plot_line(line)
 
     def on_get_point_button(self):
         if self.tool is None:
