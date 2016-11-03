@@ -25,7 +25,6 @@ from PyQt4.QtCore import QUrl
 from PyQt4.QtGui import QDialog, QPixmap
 
 from ui_dlg import Ui_DlgAbout
-from TerreImage import name, description, version
 import platform
 
 try:
