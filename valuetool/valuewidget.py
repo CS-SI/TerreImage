@@ -710,8 +710,8 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def extra_plot(self):
         plt.cla()
+        t = range(1, len(self.temp_values) + 1)
         if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
-            t = range(1, len(self.temp_values) + 1)
             line = 'self.axes.plot(' + str(t) + ',' + str(self.temp_values) + ', "ko-"'
             if self.saved_curves:
                 line += ","
