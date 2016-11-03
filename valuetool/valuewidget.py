@@ -700,7 +700,7 @@ class ValueWidget(QWidget, Ui_Widget):
             try:
                 l = self.lines_mpl.pop(0).remove()
                 del l
-            except IndexError:
+            except (IndexError, ValueError):
                 pass
 
     def del_extra_curve(self, curve):
