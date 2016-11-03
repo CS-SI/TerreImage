@@ -311,9 +311,9 @@ class manage_bands:
         3     600 – 720 nm (rouge)
         4     750 – 950 nm (proche infrarouge)
         """
-        self.blue = 3
+        self.blue = 1
         self.green = 2
-        self.red = 1
+        self.red = 3
         self.pir = 4
         self.mir = -1
         self.update_blue_mir("blue")
