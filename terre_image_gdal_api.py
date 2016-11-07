@@ -79,7 +79,7 @@ def computeStatistics(OneFeature, i, j = None, nodata = True):
     dataset = gdal.Open(OneFeature, gdal.GA_ReadOnly)
     # dataset  : GDALDataset
     if dataset is None:
-        print "Error : Opening file ", OneFeature
+        logger.error(u"Error : Opening file {}".format(OneFeature))
     else:
         if j is None:
             band = dataset.GetRasterBand(1)

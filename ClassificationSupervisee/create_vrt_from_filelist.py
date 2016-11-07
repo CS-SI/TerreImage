@@ -5,6 +5,11 @@ import xml.etree.ElementTree as ET
 import os
 import argparse
 
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
+
+
 
 def create_vrt_from_filelist(vrt_name, filelist):
     rootNode = ET.Element( 'VRTDataset' )
@@ -13,10 +18,10 @@ def create_vrt_from_filelist(vrt_name, filelist):
     totalYSize = 512
 
     for filename in filelist:
-        print filename
+        logger.debug(filename)
         ds = gdal.Open(filename)
 
-        print "[ RASTER BAND COUNT ]: ", ds.RasterCount
+        logger.debug("[ RASTER BAND COUNT ]: {}".format(ds.RasterCount))
         for band_number in range( ds.RasterCount ):
             band_number += 1
             bandNode = ET.SubElement( rootNode, "VRTRasterBand", {'band': '1'} )
@@ -38,7 +43,7 @@ def create_vrt_from_filelist(vrt_name, filelist):
     node.text = ds.GetProjection() # projection
 
     stringToReturn = ET.tostring(rootNode)
-    print stringToReturn
+    logger.debug(stringToReturn)
 
 
     #if not os.path.isfile( vrt_name):

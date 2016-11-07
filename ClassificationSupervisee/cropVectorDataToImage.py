@@ -43,7 +43,7 @@ def usage(argParser, return_code = 1):
     :param return_code:
     :return:
     """
-    print argParser.format_usage()
+    logger.error(argParser.format_usage())
     sys.exit(return_code)
 
 
@@ -86,10 +86,10 @@ def get_arguments():
 
     # checking if inputs exist
     if not os.path.isfile(input_image):
-        print "Error, input image is missing "
+        logger.error("Error, input image is missing ")
         usage(argParser, 2)
     if not os.path.isfile(input_vector):
-        print "Error, input vector is missing "
+        logger.error("Error, input vector is missing ")
         usage(argParser, 2)
 
     return input_image, input_vector, output_directory
@@ -129,7 +129,7 @@ def ReprojectVector(inputVectorFileName,  inputImageFileName, epsg_code, output_
     # test authority code availability
     epsg_vector = get_vector_epsg_with_ogr(inputVectorFileName)
     if not epsg_vector:
-        print "Bad projection !"
+        logger.warning("Bad projection !")
         #raise
         # TODO add exception
 

@@ -28,6 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from PyQt4 import QtCore, QtGui
 import xml.etree.ElementTree as xml
 
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
+
 
 def read_results_old(outputresults):
     percentage = {}
@@ -73,7 +77,8 @@ def read_results(confmat, kappa, out_pop):
             matrix.append([x.replace("\n", "") for x in line.split(",")])
 
     # Kappa index
-    print '{"percentage": percentage, "confusion": matrix, "kappa": kappa}', {"percentage": percentage, "confusion": matrix, "kappa": kappa}
+    logger.debug('{"percentage": percentage, "confusion": matrix, "kappa": kappa}')
+    logger.debug({"percentage": percentage, "confusion": matrix, "kappa": kappa})
     return {"percentage": percentage, "confusion": matrix, "kappa": kappa}
 
 

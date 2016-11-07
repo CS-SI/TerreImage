@@ -27,6 +27,10 @@ from terre_image_test_case import TerreImageTestCase
 from TerreImage import terre_image_gdal_system
 from TerreImage.terre_image_exceptions import TerreImageRunProcessError
 
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
+
 
 class TestGdalSystem(TerreImageTestCase):
 
@@ -64,7 +68,7 @@ class TestGdalSystem(TerreImageTestCase):
         output_image = terre_image_gdal_system.compute_overviews(copy_image_test)
         split = os.path.splitext(os.path.basename(self.image_test))
         ovr_file = os.path.join(self.working_dir, os.path.basename(self.image_test) + ".ovr")
-        print "Test existence of {}".format(ovr_file)
+        logger.debug(u"Test existence of {}".format(ovr_file))
         self.assertTrue(os.path.exists(ovr_file))
 
     def test_gdal_edit_remove_no_data(self):

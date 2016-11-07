@@ -26,6 +26,10 @@ from TerreImage import terre_image_configuration
 from TerreImage.terre_image_exceptions import TerreImageRunProcessError
 from terre_image_test_case import TerreImageTestCase
 
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
+
 
 class TestTerreImageProcess(TerreImageTestCase):
 
@@ -76,7 +80,7 @@ class TestTerreImageProcess(TerreImageTestCase):
         # bindir = os.path.join(self.otb_dir, "bin")
         # process.set_otb_process_env_custom(otb_app_path=libdir,
         #                                    path=bindir)
-        print os.environ.get("PATH")
+        logger.debug(os.environ.get("PATH"))
         command = "which otbApplicationLauncherCommandLine"
         result = process.run_process(command)
         self.assertIsNotNone(result)

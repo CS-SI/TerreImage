@@ -96,7 +96,7 @@ class TerreImageManager():
     def display_values(self):
         if self.valuedockwidget is None :
             self.set_value_tool_dock_widget()
-        print "dispkay values 123456789"
+        logger.debug("dispkay values 123456789")
         self.valuedockwidget.show()
         self.value_tool.changeActive(QtCore.Qt.Checked)
         self.value_tool.cbxActive.setCheckState(QtCore.Qt.Checked)

@@ -132,7 +132,7 @@ class MyMplCanvas(FigureCanvas):
         # logger.debug( "image: " + str(image) + " band: " + str(band_number) )
         dataset = gdal.Open(image, gdal.GA_ReadOnly)
         if dataset is None:
-            print "Error: Opening file ", image
+            logger.error(u"Error: Opening file {}".format(image))
         else:
             # get raster band
             band = dataset.GetRasterBand(band_number)

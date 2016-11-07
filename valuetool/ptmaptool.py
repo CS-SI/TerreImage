@@ -29,6 +29,12 @@ from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
 
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
+
+
+
 class ProfiletoolMapTool_ValueTool(QgsMapTool):
 
     def __init__(self, canvas):
@@ -47,7 +53,7 @@ class ProfiletoolMapTool_ValueTool(QgsMapTool):
         self.canvas.setCursor(self.cursor)
 
     def deactivate(self):
-        print "desactivate 123456789"
+        logger.debug("desactivate 123456789")
         # self.emit( SIGNAL("deactivate") )
         # self.canvas.setCursor( QCursor(Qt.ArrowCursor))
         QgsMapTool.deactivate(self)

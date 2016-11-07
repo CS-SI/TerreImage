@@ -412,7 +412,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                         try:
                             QgsMapLayerRegistry.instance().removeMapLayer(process.get_output_working_layer().qgis_layer.id())
                         except AttributeError:
-                            print 'Failed to delete ', process
+                            logger.error(u'Failed to delete {}'.format(process))
                     if text_changed == "Angle Spectral":
                         widget = self.iface.messageBar().createMessage("Terre Image", "Cliquez sur un point de l'image pour en obtenir son angle spectral...")
                         self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
@@ -562,7 +562,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
         dict_user_metadata = OrderedDict({})
         if not os.path.exists(metadata_file):
-            print "Fichier metadonnees manquant"
+            logger.warning("Fichier metadonnees manquant")
         else:
             f=codecs.open(metadata_file, mode="r", encoding='utf-8')
             for line in f.readlines():

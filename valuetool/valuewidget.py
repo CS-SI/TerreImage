@@ -559,7 +559,7 @@ class ValueWidget(QWidget, Ui_Widget):
                     self.layerMap[layer.id()] = True
                 return
         else:
-            print('ERROR, no layers to get stats for')
+            logger.error('ERROR, no layers to get stats for')
 
         save_state = self.cbxActive.isChecked()
         self.changeActive(Qt.Unchecked)  # deactivate
@@ -649,7 +649,7 @@ class ValueWidget(QWidget, Ui_Widget):
             irow += 1
 
     def plot(self):
-        print "plot"
+        logger.debug("plot")
         items = self.values
         new_items = self.order_values(items)
         logger.debug("items {}".format(new_items))
@@ -687,7 +687,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 self.lines_mpl = self.ax.plot(t, numvalues, color = 'k', marker = 'o', linestyle = "-")
 
                 self.temp_values = numvalues
-                print "self.canvas.draw()"
+                logger.debug("self.canvas.draw()")
 
         # if self.saved_curves:
         #     self.extra_plot()

@@ -62,10 +62,10 @@ class TerreImageTestCase( unittest.TestCase ):
         logger.info("Comparing {} and {}".format(reference_image, tested_image))
 
         if not os.path.isfile(tested_image):
-            print "Missing input {}".format(tested_image)
+            logger.warning(u"Missing input {}".format(tested_image))
             return False
         if not os.path.isfile(reference_image):
-            print "Missing input {}".format(reference_image)
+            logger.warning(u"Missing input {}".format(reference_image))
             return False
 
         command = "otbcli_CompareImages -ref.in {} -ref.channel {} " \
