@@ -93,10 +93,9 @@ class ValueWidgetGraph(FigureCanvas):
         self.axes.clear()
 
     def plot(self, x, y, color, marker='o'):
-        # print "x", x
-        # print "y", y
+        # logger.debug("x {}; y {}".format(x, y))
         options = '"' + color + marker + '"'
-        # print options
+        # logger.debug("options {}
         self.axes.plot(x, y, color + marker)
         xtext = self.axes.set_xlabel('Bandes')  # returns a Text instance
         ytext = self.axes.set_ylabel('Valeur')
@@ -653,6 +652,7 @@ class ValueWidget(QWidget, Ui_Widget):
         items = self.values
         new_items = self.order_values(items)
         logger.debug("items {}".format(new_items))
+        self.temp_values = None
 
         pixel = 0
         ligne = 0
@@ -667,6 +667,8 @@ class ValueWidget(QWidget, Ui_Widget):
                     numvalues.append(float(value))
                 except:
                     numvalues.append(0)
+
+        self.plot_values = numvalues
 
         ymin = self.ymin
         ymax = self.ymax
@@ -706,20 +708,22 @@ class ValueWidget(QWidget, Ui_Widget):
     def del_extra_curve(self, curve):
         self.saved_curves.remove(curve)
         curve.close()
-        self.extra_plot()
+        self.extra_plot(True)
 
-    def extra_plot(self):
+    def extra_plot(self, current_line=False):
+        """
+        Manages the plot of saved curves
+        Args:
+            current_line:
+
+        Returns:
+
+        """
         plt.cla()
-        t = range(1, len(self.temp_values) + 1)
-        if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
-            line = 'self.axes.plot(' + str(t) + ',' + str(self.temp_values) + ', "ko-"'
-            if self.saved_curves:
-                line += ","
-        else:
-            line = 'self.axes.plot('
-            self.remove_current_line()
-
-        i = 0
+        if current_line and self.temp_values:
+            t = range(1, len(self.temp_values) + 1)
+            if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
+                self.lines_mpl = self.ax.plot(t, self.temp_values, color = 'k', marker = 'o', linestyle = "-")
 
         for curve in self.saved_curves:
             if curve.display_points():
@@ -730,21 +734,12 @@ class ValueWidget(QWidget, Ui_Widget):
                 ymin = self.ymin
                 ymax = self.ymax
 
+                t = range(1, len(numvalues) + 1)
                 color_curve = curve.color
                 self.ax.plot(t, numvalues, color = color_curve, marker = 'o', linestyle = "-")
 
-
-                t = range(1, len(numvalues) + 1)
                 self.sc_1.plot(t, numvalues, color_curve, 'o-')
-                line += str(t) + ',' + str(numvalues) + ', \'' + color_curve + 'o-\''
-                if i + 1 < len(self.saved_curves):
-                    line += ","
-            i += 1
 
-        line += ')'
-
-        # print "line", line
-        # self.sc_1.plot_line(line)
 
     def on_get_point_button(self):
         if self.tool is None:
@@ -784,7 +779,7 @@ class ValueWidget(QWidget, Ui_Widget):
 
             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), x, y, points_for_curve)
             QObject.connect(curve_temp, SIGNAL("deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
-            QObject.connect(curve_temp, SIGNAL("colorChanged()"), self.update_plot)
+            QObject.connect(curve_temp, SIGNAL("redraw()"), self.curve_state_changed)
             self.saved_curves.append(curve_temp)
             self.verticalLayout_curves.addWidget(curve_temp)
             self.groupBox_saved_layers.show()
@@ -798,7 +793,7 @@ class ValueWidget(QWidget, Ui_Widget):
         csv_file = open(csv, "w")
         if csv:
             for curve in self.saved_curves:
-                # print "save curve", curve
+                logger.debug(u"save curve {}".format(curve))
                 csv_file.write(str(curve.name) + u';Coordonnées pixel '.encode('utf8') + curve.coordinates + "\n")
                 csv_file.write(u'Bande spectrale; Intensité \n'.encode('utf8'))
                 for i in range(1, len(curve.points) + 1):
@@ -809,6 +804,12 @@ class ValueWidget(QWidget, Ui_Widget):
     def update_plot(self):
         # print "update plot"
         self.plot()
+
+    def curve_state_changed(self):
+        logger.info("====State changed from valuewidget====")
+        self.extra_plot(True)
+        self.update_plot()
+
 
     def statsNeedChecked(self, indx):
         # self.statsChecked = False

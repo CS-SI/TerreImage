@@ -54,7 +54,8 @@ COLORS = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
 
 class TerreImageCurve(QWidget, Ui_Form):
 
-    __pyqtSignals__ = ("curveTitleChanged(str)", "hideCurve(int)", "colorChanged()", "deleteCurve()")
+    __pyqtSignals__ = ("curveTitleChanged(str)", "hideCurve(int)", "colorChanged()",
+                       "deleteCurve()", "redraw()")
 
     def __init__(self, name, x, y, points, abs = None, color = None):
         QWidget.__init__(self)
@@ -89,8 +90,15 @@ class TerreImageCurve(QWidget, Ui_Form):
         self.connect(self.lineEdit_curve_name, SIGNAL("editingFinished()"), self.set_name)
         self.connect(self.pushButton_color, SIGNAL("clicked()"), self.set_color)
         self.connect(self.pushButton_delete_curve, SIGNAL("clicked()"), self, SIGNAL("deleteCurve()"))
+        self.connect(self.checkBox_curve_visible, SIGNAL("stateChanged(int)"), self.change_state)
+
+    def change_state(self, state):
+        print "====**State changed===="
+        logger.info("====**State changed from ti_curve====")
+        self.emit(SIGNAL("redraw()"))
 
     def display_points(self):
+        logger.debug("checkBox_curve_visible.checkState() {}".format(self.checkBox_curve_visible.checkState()))
         return self.checkBox_curve_visible.checkState() == Qt.Checked
 
     def set_color(self):
@@ -124,7 +132,7 @@ class TerreImageCurve(QWidget, Ui_Form):
         # palette.setColor(QtGui.QPalette.ButtonText, self.lettersToQColor[testqt])
         # palette.setColor(10, couleur)
         # self.pushButton_color.setPalette(palette)
-        self.emit(SIGNAL("colorChanged"))
+        self.emit(SIGNAL("redraw()"))
 
     def set_name(self, text = None):
         self.name = self.lineEdit_curve_name.text()
