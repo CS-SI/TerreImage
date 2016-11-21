@@ -305,15 +305,19 @@ class manage_bands:
 
     def define_pleiade(self):
         """
-        Multispectral ???
         1     430 – 550 nm (bleu)
         2     490 – 610 nm (vert)
         3     600 – 720 nm (rouge)
         4     750 – 950 nm (proche infrarouge)
+        -> Terre Image :
+        1 rouge
+        2 vert
+        3 bleu
+        4 PIR
         """
-        self.blue = 1
+        self.blue = 3
         self.green = 2
-        self.red = 3
+        self.red = 1
         self.pir = 4
         self.mir = -1
         self.update_blue_mir("blue")
