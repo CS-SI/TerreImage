@@ -96,7 +96,7 @@ def computeStatistics(OneFeature, i, j = None, nodata = True):
     return None
 
 
-def get_image_size_with_gdal(image_in):
+def get_image_size_with_gdal(image_in, get_pixel_size=False):
     """
     Extract the following information from the given image:
         - size x
@@ -109,4 +109,12 @@ def get_image_size_with_gdal(image_in):
         return
 
     size = [dataset.RasterXSize, dataset.RasterYSize]
+
+    if get_pixel_size:
+        geotransform = dataset.GetGeoTransform()
+        pixel_size_x = geotransform[1]
+        pixel_size_y = geotransform[5]
+        pixel_size = [pixel_size_x, pixel_size_y]
+        return size, pixel_size
+
     return size

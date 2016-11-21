@@ -22,6 +22,9 @@
 
 import os
 import datetime
+import codecs
+from collections import OrderedDict
+import re
 
 from PyQt4.QtGui import QFileDialog, QMessageBox
 from PyQt4.QtCore import QDir, QSettings
@@ -32,9 +35,8 @@ import manage_QGIS
 import terre_image_processing
 from terre_image_constant import TerreImageConstant
 from processing_manager import ProcessingManager
-import terre_image_run_process
-import OTBApplications
 import terre_image_gdal_system
+import terre_image_gdal_api
 
 # import logging for debug messages
 import terre_image_logging
@@ -205,4 +207,57 @@ def restore_working_layer(filename, bands, layer_type):
     return layer, bands
 
 
+def get_info_from_metadata(image_source, sat):
+    """
 
+    Args:
+        image_source:
+
+    Returns:
+
+    """
+    image_file_name_without_extension = os.path.splitext(image_source)[0]
+    metadata_file = image_file_name_without_extension + ".MTD"
+    # get image size and resolution
+    (total_size_x, total_size_y),\
+    (pixel_size_x, pixel_size_y) = terre_image_gdal_api.get_image_size_with_gdal(image_source,
+                                                                               True)
+
+    dict_user_metadata = OrderedDict({})
+    if not os.path.exists(metadata_file):
+        logger.warning("Fichier metadonnees manquant")
+    else:
+        f=codecs.open(metadata_file, mode="r", encoding='utf-8')
+        for line in f.readlines():
+            split = re.split("\s", line)
+            if len(split)<2:
+                continue
+            key = re.split("\s", line)[0]
+            values = " ".join(re.split("\s", line)[1:])
+            dict_user_metadata[key] = values
+        f.close()
+
+    if not "Lieu" in dict_user_metadata.keys():
+        dict_user_metadata["Lieu"] = "Inconnu"
+
+    if sat is None:
+        if not "Satellite" in dict_user_metadata.keys():
+            sat = "Inconnu"
+        else:
+            sat = dict_user_metadata["Satellite"]
+            del dict_user_metadata["Satellite"]
+
+
+    list_to_display = [(u"Satellite", sat),
+                       (u"Lieu", dict_user_metadata["Lieu"]),
+                       (u"Lignes", str(total_size_x)),
+                       (u"Colonnes", str(total_size_y)),
+                       (u"Résolution", str(pixel_size_x))]
+    del dict_user_metadata["Lieu"]
+
+    for key, value in dict_user_metadata.iteritems():
+        list_to_display.append((key, value))
+
+    print list_to_display
+
+    return list_to_display
