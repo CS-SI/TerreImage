@@ -82,9 +82,9 @@ class TerreImageProcessing(TerreImageTask, QObject):
         self.r_layer = rlayer
 
         self.arg = None
-        # print "arg", arg
+        # logger.debug("arg {}".format(arg))
         if arg:
-            # print processing, "gave ", arg
+            # logger.debug("{} gave {}".format( processing, arg))
             self.arg = arg
 
         self.run()
@@ -150,8 +150,8 @@ class TerreImageProcessing(TerreImageTask, QObject):
 
     def display(self, output_filename):
         #         if "Angle Spectral" in self.processing_name:
-        #             print self.rubberband
-        #             print self.rubberband.getPoint(0)
+        #             logger.debug(self.rubberband)
+        #             logger.debug(self.rubberband.getPoint(0))
         self.freezeCanvas(True)
         # result_layer = manage_QGIS.get_raster_layer( output_filename,
         # os.path.basename(os.path.splitext(self.layer.source_file)[0]) + "_" + self.processing_name )

@@ -228,14 +228,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         """
         Function for debug
         """
-        print "############# Status #############"
-        print(self.qgis_education_manager)
-        print("self.qgis_education_manager.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors)) + "\n"
-        print ProcessingManager()
-        print ProcessingManager().get_processings_name()
-        print "layers value tool "
-        print self.qgis_education_manager.value_tool.layers_to_display
-        print "##########################"
+        logger.info("############# Status #############")
+        logger.info(self.qgis_education_manager)
+        logger.info("self.qgis_education_manager.mirror_map_tool.dockableMirrors {} \n".format(str(self.qgis_education_manager.mirror_map_tool.dockableMirrors)))
+        logger.info(ProcessingManager())
+        logger.info(ProcessingManager().get_processings_name())
+        logger.info("layers value tool ")
+        logger.info(self.qgis_education_manager.value_tool.layers_to_display)
+        logger.info("##########################")
 
     def plugin_classification(self):
         """
@@ -430,7 +430,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             self.comboBox_processing.setCurrentIndex(0)
 
     def processing_end_display(self, my_processing):
-        logger.debug("processing_end_display")
+        logger.info("processing_end_display")
         self.set_combobox_histograms()
         self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
         self.set_working_message(False)

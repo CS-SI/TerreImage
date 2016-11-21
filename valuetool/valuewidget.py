@@ -115,7 +115,7 @@ class ValueWidgetGraph(FigureCanvas):
 #         try:
 #             eval(line)
 #         except SyntaxError:
-#             print "Erreur display"
+#             logger.error("Erreur display")
 #         else:
 #             xtext = self.axes.set_xlabel('Bande') # returns a Text instance
 #             ytext = self.axes.set_ylabel('Valeur')
@@ -531,7 +531,7 @@ class ValueWidget(QWidget, Ui_Widget):
         if self.cbxGraph.isChecked():
             # TODO don't plot if there is no data to plot...
             if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
-                # print "show values self.values", self.values
+                # logger.debug("show values self.values {}".format(self.values))
                 self.plot()
             else:
                 self.sc_1.clear()
@@ -802,7 +802,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 csv_file.write("\n\n\n")
 
     def update_plot(self):
-        # print "update plot"
+        # logger.debug("update plot")
         self.plot()
 
     def curve_state_changed(self):

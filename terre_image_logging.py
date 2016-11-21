@@ -80,7 +80,7 @@ def display_parameters(dictParameters, functionName, logger):
     Used as follows :
         display_parameters(locals(), "color_mapping_cli_ref_image")
     """
-    # print "dictParameters", dictParameters
+    # logger.debug(""dictParameters {}".format(dictParameters))
     logger.debug("--------------------------------")
     logger.debug( u"\t {}".format(functionName))
     for argument, value in dictParameters.iteritems():

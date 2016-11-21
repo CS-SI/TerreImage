@@ -114,7 +114,7 @@ class DockableMirrorMapPlugin(QObject):
 
     def onScaleChanged(self):
         pass
-#         print "on scale changed"
+#         logger.debug("on scale changed")
 #         for view in self.dockableMirrors :
 #             prevFlag = view.mainWidget.canvas.renderFlag()
 #             view.mainWidget.canvas.setRenderFlag( False )

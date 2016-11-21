@@ -43,10 +43,10 @@ class ProfiletoolMapTool_ValueTool(QgsMapTool):
         self.cursor = QCursor(Qt.CrossCursor)
 
     def canvasReleaseEvent(self, event):
-        # print "canvasReleaseEvent_v"
-        # print "event", event
+        # logger.debug("canvasReleaseEvent_v")
+        # logger.debug("event {}".format(event))
         self.emit(SIGNAL("canvas_clicked_v"), {'x': event.pos().x(), 'y': event.pos().y()})
-        # print "canvasReleaseEvent_v"
+        # logger.debug("canvasReleaseEvent_v")
 
     def activate(self):
         QgsMapTool.activate(self)

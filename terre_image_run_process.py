@@ -43,10 +43,10 @@ class TerreImageProcess():
         logger.info(u"Running {}".format(command))
         self.process.setProcessEnvironment(self.env)
 
-        # print "..............", self.process.processEnvironment().value("OTB_APPLICATION_PATH")
-        # print "..............", self.process.processEnvironment().value("PATH")
-        # print "Environ : PATH {}".format(os.environ["PATH"])
-        # print "Environ : OTB_APPLICATION_PATH {}".format(os.environ.get("OTB_APPLICATION_PATH", "Empty"))
+        # logger.debug("..............{}".format(self.process.processEnvironment().value("OTB_APPLICATION_PATH")))
+        # logger.debug("..............{}".format(self.process.processEnvironment().value("PATH")))
+        # logger.debug("Environ : PATH {}".format(os.environ["PATH"]))
+        # logger.debug("Environ : OTB_APPLICATION_PATH {}".format(os.environ.get("OTB_APPLICATION_PATH", "Empty")))
         self.command = command
         self.process.start(command)
         if self.process.waitForStarted():
@@ -55,9 +55,9 @@ class TerreImageProcess():
             if exit_code != 0:
                 self.error_management(exit_code)
             result = self.process.readAllStandardOutput()
-            # print type(result), result
+            # logger.debug(" {} {}".format(type(result), result))
             error = self.process.readAllStandardError().data()
-            # print repr(error)
+            # logger.debug(repr(error))
             if not error in ["\n", ""]:
                 logger.error("error : %s"%(error))
             output = result.data()
@@ -96,7 +96,7 @@ class TerreImageProcess():
         else:
             # replace value if existing
             self.env.insert(varname, varval)
-        # print "env {} {}".format(varname, self.env.value(varname))
+        # logger.debug("env {} {}".format(varname, self.env.value(varname)))
 
     def set_otb_process_env(self):
         dirname = os.path.dirname(os.path.abspath(__file__))
@@ -133,7 +133,7 @@ class TerreImageProcess():
         self.set_env_var("PATH", terre_image_configuration.PATH, append = True, pre=True)
         if terre_image_configuration.LD_LIBRARY_PATH:
             self.set_env_var("LD_LIBRARY_PATH", terre_image_configuration.LD_LIBRARY_PATH, append = True, pre=True)
-        # print os.listdir(terre_image_configuration.PATH)
+        # logger.debug(os.listdir(terre_image_configuration.PATH))
 
 
 def get_otb_command(app_name, arguments):

@@ -258,6 +258,4 @@ def get_info_from_metadata(image_source, sat):
     for key, value in dict_user_metadata.iteritems():
         list_to_display.append((key, value))
 
-    print list_to_display
-
     return list_to_display

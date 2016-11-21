@@ -93,8 +93,7 @@ class TerreImageCurve(QWidget, Ui_Form):
         self.connect(self.checkBox_curve_visible, SIGNAL("stateChanged(int)"), self.change_state)
 
     def change_state(self, state):
-        print "====**State changed===="
-        logger.info("====**State changed from ti_curve====")
+        logger.debug("====**State changed from ti_curve====")
         self.emit(SIGNAL("redraw()"))
 
     def display_points(self):

@@ -76,7 +76,7 @@ class MyMplCanvas(FigureCanvas):
             self.multiband = True
         else:
             self.multiband = False
-        # print "self.multiband0", self.multiband
+        # logger.debug("self.multiband0 {}".format(self.multiband))
 
     def get_2_98_percent(self, sizeX, sizeY, histogram):
         # get 2 - 98 %
@@ -90,9 +90,9 @@ class MyMplCanvas(FigureCanvas):
         logger.debug("nb_pixels_2: {}, nb_pixels_98: {}".format(nb_pixels_2, nb_pixels_98))
 
         hist_cum = cumsum(histogram)
-        # print "histogram", histogram
-        # print "hist cum", hist_cum
-        # print "len(hist_cum)", len(hist_cum)
+        # logger.debug("histogram {}".format(histogram))
+        # logger.debug("hist cum {}".format(hist_cum))
+        # logger.debug("len(hist_cum) {}".format(len(hist_cum)))
 
         self.x_min = 0
         self.x_max = len(hist_cum)
@@ -104,7 +104,7 @@ class MyMplCanvas(FigureCanvas):
                 self.x_max = index + self.rasterMin
                 break
 
-        # print "self.x_min, self.x_max", self.x_min, self.x_max
+        # logger.debug("self.x_min {}, self.x_max {}".format(self.x_min, self.x_max))
 
         logger.debug("self.x_min: {}, self.x_max: {}".format(self.x_min, self.x_max))
         self.x_min = (self.x_min - self.rasterMin) * self.bin_witdh + self.rasterMin
@@ -112,16 +112,16 @@ class MyMplCanvas(FigureCanvas):
         self.two_min = self.x_min
         self.ninety_eight_max = self.x_max
 
-        # print "self.x_min, self.x_max", self.x_min, self.x_max
+        # logger.debug("self.x_min {}, self.x_max {}".format(self.x_min, self.x_max))
 
         if self.multiband:
             dic = {"r": "red", "g": "green", "b": "blue"}
             p = TerreImageParamaters()
             if not p.is_complete():
                 exec("p." + dic[self.color] + "_min=" + str(self.x_min))
-                # print "p." + dic[self.color] + "_min=" + str(self.x_min)
+                # logger.debug("p.{} _min= {}".format(dic[self.color], str(self.x_min)))
                 exec("p." + dic[self.color] + "_max=" + str(self.x_max))
-                # print "p." + dic[self.color] + "_max=" + str(self.x_max)
+                # logger.debug("p.{} _max={}".format(dic[self.color], str(self.x_max)))
 
     def get_GDAL_histogram(self, image, band_number, qgis_layer, no_data=-1):
         """
@@ -148,46 +148,46 @@ class MyMplCanvas(FigureCanvas):
 
             # get overview statistics
             self.rasterMin, self.rasterMax, mean, stddev = band_overview.ComputeStatistics(False)
-            # print self.rasterMin, self.rasterMax, mean, stddev
+            # logger.debug(self.rasterMin, self.rasterMax, mean, stddev
             logger.debug("self.rasterMax: {}, self.rasterMin: {}".format(self.rasterMax, self.rasterMin))
             nbVal = self.rasterMax - self.rasterMin
-            # print "nbVal", nbVal
+            # logger.debug("nbVal {}".format(nbVal))
 
             # taking the size of the raster
             sizeX = float(band_overview.XSize)
             sizeY = float(band_overview.YSize)
-            # print "totalXSize", sizeX
-            # print "totalYSize", sizeY
+            # logger.debug( "totalXSize {}".format(sizeX))
+            # logger.debug( "totalYSize {}".format(sizeY))
 
             # computing nb bins
             stddev_part = 3.5 * stddev
             sizexy_part = math.pow(sizeX * sizeY, 1. / 3.)
-            # print "stddev", stddev_part
-            # print "sizexy", sizexy_part
+            # logger.debug( "stddev {}".format(stddev_part))
+            # logger.debug( "sizexy {}".format(sizexy_part))
 
             # warning stddev
             nb_bin_part = (3.5 * stddev) / (math.pow(sizeX * sizeY, 1. / 3.))
-            # print nb_bin_part
+            # logger.debug(nb_bin_part)
             self.nb_bin = int(math.ceil(nbVal / nb_bin_part))
-            # print "nb_bin", self.nb_bin
+            # logger.debug("nb_bin {}".format(self.nb_bin))
 
             self.bin_witdh = float(self.rasterMax - self.rasterMin) / self.nb_bin
-            # print "bin_witdh", self.bin_witdh
+            # logger.debug("bin_width {}".format(self.bin_witdh))
 
             histogram = band_overview.GetHistogram(self.rasterMin - self.bin_witdh / 2, self.rasterMax + self.bin_witdh / 2, self.nb_bin, approx_ok=0)
 
-            # print "histogram", histogram
+            # logger.debug("histogram {}".format(histogram))
 
             self.get_2_98_percent(sizeX, sizeY, histogram)
 
             if self.multiband:
                 p = TerreImageParamaters()
                 if p.is_complete():
-                    # print "here"
+                    # logger.debug("here")
                     dic = {"r": "red", "g": "green", "b": "blue"}
                     exec("self.x_min=int(p." + dic[self.color] + "_min)")
                     exec("self.x_max=int(p." + dic[self.color] + "_max)")
-                    # print self.x_min, self.x_max
+                    # logger.debug(self.x_min, self.x_max)
 
             return histogram
 
@@ -234,7 +234,7 @@ class MyMplCanvas(FigureCanvas):
 
     def draw_min_max_percent(self):
         if self.x_min and self.x_max:
-            # print "self.x_min, self.x_max for", self.color, self.x_min, self.x_max
+            # logger.debug("self.x_min {}, self.x_max {} for {}".format(self.x_min, self.x_max, self.color))
             logger.debug("self.x_min: {}, self.x_max: {}".format(self.x_min, self.x_max))
             self.axes.axvline(x=self.x_min, c="red", linewidth=2, zorder=0, clip_on=False)
             self.axes.axvline(x=self.x_max, c="red", linewidth=2, zorder=0, clip_on=False)
@@ -299,9 +299,9 @@ class MyMplCanvas(FigureCanvas):
                 dic = {"r": "red", "g": "green", "b": "blue"}
                 p = TerreImageParamaters()
                 exec("p." + dic[self.color] + "_min=" + str(self.x_min))
-                # print "p." + dic[self.color] + "_min=" + str(self.x_min)
+                # logger.debug("p. {} _min={}".format(dic[self.color], str(self.x_min))
                 exec("p." + dic[self.color] + "_max=" + str(self.x_max))
-                # print "p." + dic[self.color] + "_max=" + str(self.x_max)
+                #  logger.debug("p. {} _max={}".format(dic[self.color], str(self.x_max))
 
 
 class TerreImageHistogram(QtGui.QWidget, QtCore.QObject):  # , Ui_Form):
@@ -403,15 +403,15 @@ class TerreImageHistogram_multiband(TerreImageHistogram):  # , Ui_Form):
         else:
             TerreImageHistogram.__init__(self, layer, nb_bands, True)
 
-        # print "processing", processing
+        # logger.debug("processing {}".format(processing))
         logger.debug("processing {}".format(processing))
         if processing is None:
             logger.debug("processing none")
             self.canvas = canvas
             self.processing = None
         else:
-            # print "canvas", canvas
-            # print "processing.mirror.mainWidget.canvas", processing.mirror.mainWidget.canvas
+            # logger.debug("canvas {}".format(canvas))
+            # logger.debug("processing.mirror.mainWidget.canvas {}".format(processing.mirror.mainWidget.canvas))
             logger.debug("processing not none")
             self.canvas = processing.mirror.mainWidget.canvas
             self.processing = processing

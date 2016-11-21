@@ -40,16 +40,16 @@ class SpectralAngleMapTool(QgsMapTool):
     __pyqtSignals__ = ("canvas_clicked(PyQt_PyObject)")
 
     def __init__(self, canvas):
-        # print "SpectralAngleMapTool"
+        # logger.debug("SpectralAngleMapTool")
         QgsMapTool.__init__(self, canvas)
         self.canvas = canvas
         self.cursor = QtGui.QCursor(QtCore.Qt.CrossCursor)
 
     def canvasReleaseEvent(self, event):
-        # print "canvasReleaseEvent before"
-        # print "event", event.pos()
+        # logger.debug("canvasReleaseEvent before")
+        # logger.debug("event{}".format(event.pos()))
         self.emit(QtCore.SIGNAL("canvas_clicked"), {'x': event.pos().x(), 'y': event.pos().y()})
-        # print "canvasReleaseEvent after"
+        # logger.debug("canvasReleaseEvent after")
 
     def activate(self):
         QgsMapTool.activate(self)
@@ -148,9 +148,9 @@ class SpectralAngle(QtCore.QObject):
 
 
     def get_point_for_angles(self, layer):
-        # print "get point for angles"
+        # logger.debug("get point for angles")
         self.tool = SpectralAngleMapTool(self.iface.mapCanvas())  # the mouselistener
-        # print "self.tool", self.tool
+        # logger.debug("self.tool{}".format(self.tool))
         logger.debug("self.tool {}".format(self.tool))
         self.layer = layer
         logger.debug("get point for angles")
@@ -176,14 +176,14 @@ class SpectralAngle(QtCore.QObject):
 
 
     def onRightClick(self, position):  # used to quit the current action
-        # print "right click", position
+        # logger.debug("right click{}".format(position))
         mapPos = self.canvas.getCoordinateTransform().toMapCoordinates(position["x"], position["y"])
         newPoints = [[mapPos.x(), mapPos.y()]]
         # if newPoints == self.lastClicked: return # sometimes a strange "double click" is given
 
         # self.rubberband.reset(self.polygon)
         # self.rubberband.reset(QGis.Point)
-        # print "setting rubberband", mapPos.x(),mapPos.y()
+        # logger.debug("setting rubberband {} {}".format(mapPos.x(),mapPos.y()))
         self.rubberband.addPoint(QgsPoint(mapPos.x(), mapPos.y()))
         self.toolPan = QgsMapToolPan(self.canvas)
         self.canvas.setMapTool(self.toolPan)
