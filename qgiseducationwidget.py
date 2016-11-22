@@ -95,10 +95,23 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
         self.qgis_education_manager = TerreImageManager(self.iface)
         self.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
+        logger.debug("Before connecting toto titi")
+        self.qgis_education_manager.essai.connect(self.toto)
+        self.qgis_education_manager.updated.connect(self.titi)
+        self.qgis_education_manager.tapped.connect(self.toto)
+        logger.debug("After connecting toto titi")
 
         QtCore.QObject.connect(QgsMapLayerRegistry.instance(), QtCore.SIGNAL("layerWillBeRemoved(QString)"), self.layer_deleted)
 
         self.dock_histo_opened = False
+
+    @QtCore.pyqtSlot(int)
+    def titi(self):
+        logger.debug("signal updated catched")
+
+    @QtCore.pyqtSlot()
+    def toto(self):
+        logger.debug("signal p_updated catched")
 
     def setupUi_extra(self):
         """
@@ -136,7 +149,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.toolButton_histograms = QtGui.QToolButton()
         self.toolButton_histograms.setMenu(QtGui.QMenu())
         self.toolButton_histograms.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
-        # self.iface.addToolBarWidget(self.toolButton_histograms) 
+        # self.iface.addToolBarWidget(self.toolButton_histograms)
         self.toolbar.addWidget(self.toolButton_histograms)
         m2 = self.toolButton_histograms.menu()
 
@@ -154,7 +167,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             if index == 0:
                 self.toolButton_histograms.setDefaultAction(action_h)
         self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
-        self.toolButton_histograms.triggered.connect(self.do_manage_actions_for_histogram)
+        self.comboBox_histogrammes.highlighted.connect(self.do_manage_histograms)
+        self.toolButton_histograms.triggered.connect(self.set_combobox_histograms)
 
         # widget puttons signal connections
         self.pushButton_kmeans.clicked.connect(self.kmeans)
@@ -330,7 +344,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.do_manage_histograms(histogram_name)
 
     def do_manage_histograms(self, text_changed):
-        logger.debug("text changed histogram: " + text_changed)
+        logger.debug("text changed histogram: {}".format(text_changed))
         if text_changed == "Image de travail":
             self.main_histogram()
         elif text_changed != "Histogrammes" and text_changed != "":
@@ -582,7 +596,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         logger.debug("Disconnect interface if layer is working layer")
         if self.qgis_education_manager:
             # logger.debug( "ProcessingManager().working_layer.get_qgis_layer().id(): " +  str(ProcessingManager().working_layer.get_qgis_layer().id()))
-            if ProcessingManager().working_layer:
+            if ProcessingManager().working_layer and ProcessingManager().working_layer.get_qgis_layer():
                 if ProcessingManager().working_layer.get_qgis_layer().id() == layer_id:
                     self.disconnect_interface()
 
