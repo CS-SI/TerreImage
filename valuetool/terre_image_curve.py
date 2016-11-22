@@ -137,7 +137,7 @@ class TerreImageCurve(QWidget, Ui_Form):
         self.name = self.lineEdit_curve_name.text()
 
     def __str__(self):
-        return "{} {} {} {}".format(self.name, self.coordinates, self.color, self.points)
+        return u"{} {} {} {}".format(self.name, self.coordinates, self.color, self.points)
 
     def has_abs(self):
         return self.abs is not None

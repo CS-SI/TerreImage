@@ -376,6 +376,7 @@ class ValueWidget(QWidget, Ui_Widget):
             if self.the_layer_to_display is not None:
                 if layer == self.the_layer_to_display.get_qgis_layer():
                     is_the_working_layer = True
+            layername = ""
             try:
                 if not is_the_working_layer:
                     layername = unicode(layer.name())
@@ -383,6 +384,7 @@ class ValueWidget(QWidget, Ui_Widget):
                     layername = ""
             except Exception:
                 pass
+            layerSrs = ""
             try:
                 if QGis.QGIS_VERSION_INT >= 10900:
                     layerSrs = layer.crs()
