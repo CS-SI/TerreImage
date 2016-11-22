@@ -117,13 +117,6 @@ class TerreImageManager(QtCore.QObject):
         process = ProcessingManager().processing_from_name(name_of_the_closed_view)
         logger.debug("{}".format(process))
         if process:
-            loaded_layers_id = [x.id() for x in self.iface.legendInterface().layers()]
-            logger.debug(loaded_layers_id)
-            if process[0] and process[0].output_working_layer and process[0].output_working_layer.qgis_layer and \
-                process[0].output_working_layer.qgis_layer.id():
-                if process[0].output_working_layer.qgis_layer.id() in loaded_layers_id:
-                    QgsMapLayerRegistry.instance().removeMapLayer(process[0].output_working_layer.qgis_layer.id())
-
             try:
                 ProcessingManager().remove_processing(process[0])
                 ProcessingManager().remove_display(process[0])
