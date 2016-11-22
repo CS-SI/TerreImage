@@ -22,7 +22,7 @@ about=
 
 qgisMinimumVersion=2.8
 qgisMaximumVersion=2.8.99
-version=2.4.0-RC6
+version=2.4.0-RC7
 author=CS SI
 email=alexia.mondot@c-s.fr
 
