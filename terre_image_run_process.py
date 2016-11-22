@@ -74,15 +74,20 @@ class TerreImageProcess():
             4:"QProcess::ReadError", 5:"QProcess::UnknownError",
             127:"Other, The application may not have been found"}
         try:
-            logger.error(u"Error {} {}".format(errorCode, dic_err[errorCode]))
+            type_qt_error = dic_err[errorCode]
+            logger.error(u"Error {} {}".format(errorCode, type_qt_error))
         except KeyError:
-            pass
+            type_qt_error = ""
         error = self.process.readAllStandardError().data()
         logger.error(error)
         logger.error( self.process.readAllStandardOutput())
-        raise terre_image_exceptions.TerreImageRunProcessError(u"Error running : {}\n {}{}".format(self.command,
-                                                                                  dic_err[errorCode], error
+        try:
+            raise terre_image_exceptions.TerreImageRunProcessError(u"Error running : {}\n {}{}".format(self.command,
+                                                                                  type_qt_error, error
                                                                                   ))
+        except UnicodeError:
+            raise terre_image_exceptions.TerreImageRunProcessError(u"Error running : {}\n {}".format(self.command,
+                                                                                  type_qt_error))
 
     def set_env_var(self, varname, varval, append = False, pre = False):
 
