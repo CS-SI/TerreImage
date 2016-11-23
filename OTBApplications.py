@@ -128,14 +128,25 @@ def color_mapping_cli_ref_image(image_to_color, reference_image, working_dir):
 
 
 def otbcli_export_kmz(filename, working_directory, warning_size=0):
+    """
+    Returns the output of KmzExport
+    Args:
+        filename:
+        working_directory:
+        warning_size:
+
+    Returns:
+
+    """
     output_kmz = os.path.join(working_directory, os.path.basename(os.path.splitext(filename)[0]) + ".kmz")
     if not os.path.isfile(output_kmz):
         # args = u' -in "{}" -out "{}"'.format(filename, output_kmz)
         # if warning_size != 0:
         #     args += " -tilesize {}".format(warning_size)
 
-        args = get_osgeo_command("", ["-in", filename, "-out", output_kmz] +
-                                     ["-tilesize", str(warning_size)] if warning_size != 0 else "")
+        list_args = ["-in", filename, "-out", output_kmz] + (["-tilesize", str(warning_size)] if warning_size != 0 else [])
+
+        args = get_osgeo_command("", list_args)
 
 
         command = get_otb_command("KmzExport", args)
