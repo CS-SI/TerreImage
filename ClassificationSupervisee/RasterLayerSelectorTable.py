@@ -251,7 +251,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
 
         Returns a string containing the vrt xml
         """
-        logger.debug( "{} {}".format(filename, band_number) )
+        logger.debug( u"{} {}".format(filename, band_number) )
         ds = gdal.Open(filename)
         if ds is not None :
             band = ds.GetRasterBand(band_number)
