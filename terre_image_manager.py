@@ -37,12 +37,12 @@ logger = terre_image_logging.configure_logger()
 
 class TerreImageManager(QtCore.QObject):
 
-    essai = QtCore.pyqtSignal()
-    updated = QtCore.pyqtSignal(int)
-    tapped = QtCore.Signal()
+    processings_updated = QtCore.pyqtSignal()
 
     def __init__(self, iface):
         QtCore.QObject.__init__(self)
+
+        logger.debug("Manager 3 {}".format(id(self)))
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.working_directory = None  # , _ = terre_image_utils.fill_default_directory()
@@ -52,13 +52,14 @@ class TerreImageManager(QtCore.QObject):
         self.valuedockwidget = None
 
         self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
+
+        logger.debug("mirror_map_tool 1 {}".format(id(self.mirror_map_tool)))
         self.mirror_map_tool.initGui()
         QtCore.QObject.connect(self.mirror_map_tool, QtCore.SIGNAL("mirrorClosed(PyQt_PyObject)"), self.view_closed)
 
         # self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
 
         self.classif_tool = SupervisedClassificationDialog(self.iface)
-        self.updated.emit(1)
         # self.classif_tool.setupUi()
 
     def set_value_tool_dock_widget(self):
@@ -109,10 +110,9 @@ class TerreImageManager(QtCore.QObject):
         self.value_tool.set_layers(ProcessingManager().get_working_layers())
 
     def view_closed(self, name_of_the_closed_view):
+
+        logger.debug("Manager 2 {}".format(id(self)))
         # logger.debug("{} has been closed".format(str(name_of_the_closed_view)))
-        self.essai.emit()
-        self.tapped.emit()
-        logger.debug("Trying to emit something")
         logger.debug("{} has been closed".format(name_of_the_closed_view))
         process = ProcessingManager().processing_from_name(name_of_the_closed_view)
         logger.debug("{}".format(process))
@@ -123,7 +123,10 @@ class TerreImageManager(QtCore.QObject):
             except KeyError:
                 pass
             else:
+                logger.debug("Trying to emit something")
+                self.processings_updated.emit()
                 logger.debug("ProcessingChanged signal emitted")
+
 
     def removing_layer(self, layer_id):
         ProcessingManager().remove_process_from_layer_id(layer_id)

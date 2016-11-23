@@ -182,6 +182,8 @@ class DockableMirrorMapPlugin(QObject):
             mapCanvas.setRenderFlag(prevFlag)
 
     def onCloseDockableMirror(self, wdg):
+
+        logger.debug("mirror_map_tool 2 {}".format(id(self)))
         title = wdg.title
         if self.dockableMirrors.count(wdg) > 0:
             self.dockableMirrors.remove(wdg)

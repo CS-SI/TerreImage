@@ -77,41 +77,43 @@ class Terre_Image_Main_Dock_widget(QtGui.QDockWidget):
                 self.emit(QtCore.SIGNAL("closed(PyQt_PyObject)"), self)
 
 
-class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
+class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     """
     Main widget
     """
     __pyqtSignals__ = ("valueChanged()")
 
-    def __init__(self, iface):
+    def __init__(self, iface, working_dir):
 
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
 
         QtGui.QWidget.__init__(self)
-        QtCore.QObject.__init__(self)
         self.setupUi(self)
         self.setupUi_extra()
 
         self.qgis_education_manager = TerreImageManager(self.iface)
+
+        #working dir
+        self.qgis_education_manager.working_directory = working_dir
+        self.lineEdit_working_dir.setText(working_dir)
+
+        # todo remove this init
+        self.qgis_education_manager.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), ProcessingManager().working_layer.get_qgis_layer(), ProcessingManager().working_layer.band_invert)
+        self.qgis_education_manager.classif_tool.set_directory(working_dir)
+        self.qgis_education_manager.classif_tool.setupUi()
+
+        logger.debug("Manager 1 {}".format(id(self.qgis_education_manager)))
         self.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
         logger.debug("Before connecting toto titi")
-        self.qgis_education_manager.essai.connect(self.toto)
-        self.qgis_education_manager.updated.connect(self.titi)
-        self.qgis_education_manager.tapped.connect(self.toto)
+        self.qgis_education_manager.processings_updated.connect(self.set_combobox_histograms)
+
         logger.debug("After connecting toto titi")
 
         QtCore.QObject.connect(QgsMapLayerRegistry.instance(), QtCore.SIGNAL("layerWillBeRemoved(QString)"), self.layer_deleted)
 
         self.dock_histo_opened = False
 
-    @QtCore.pyqtSlot(int)
-    def titi(self):
-        logger.debug("signal updated catched")
-
-    @QtCore.pyqtSlot()
-    def toto(self):
-        logger.debug("signal p_updated catched")
 
     def setupUi_extra(self):
         """
@@ -167,7 +169,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             if index == 0:
                 self.toolButton_histograms.setDefaultAction(action_h)
         self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
-        self.comboBox_histogrammes.highlighted.connect(self.set_combobox_histograms)
+        # self.comboBox_histogrammes.highlighted.connect(self.set_combobox_histograms)
         self.toolButton_histograms.triggered.connect(self.set_combobox_histograms)
 
         # widget puttons signal connections
@@ -464,7 +466,12 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
             if ProcessingManager().working_layer.has_natural_colors():
                 logger.debug("couleurs naturelles")
-                self.comboBox_sprectral_band_display.insertItem(1, "Afficher en couleurs naturelles")
+                text = "Afficher en couleurs naturelles"
+                self.comboBox_sprectral_band_display.insertItem(1, text)
+                action_d = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionInOverview.png"),
+                                         text, self.iface.mainWindow())
+                action_d.setWhatsThis(text)
+                m3.addAction(action_d)
 
             for i in range(ProcessingManager().working_layer.get_band_number()):
                 y = [x for x in bands if bands[x] == i + 1]
