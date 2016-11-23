@@ -796,7 +796,7 @@ class ValueWidget(QWidget, Ui_Widget):
         if csv:
             for curve in self.saved_curves:
                 logger.debug(u"save curve {}".format(curve))
-                csv_file.write(str(curve.name) + u';Coordonnées pixel '.encode('utf8') + curve.coordinates + "\n")
+                csv_file.write(u'{} ;Coordonnées pixel {}\n'.format(curve.name, curve.coordinates).encode('utf8'))
                 csv_file.write(u'Bande spectrale; Intensité \n'.encode('utf8'))
                 for i in range(1, len(curve.points) + 1):
                     csv_file.write("{};{}\n".format(i, int(curve.points[i - 1])))
