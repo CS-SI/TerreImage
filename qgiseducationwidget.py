@@ -168,7 +168,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             m2.addAction(action_h)
             if index == 0:
                 self.toolButton_histograms.setDefaultAction(action_h)
-        self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
         # self.comboBox_histogrammes.highlighted.connect(self.set_combobox_histograms)
         self.toolButton_histograms.triggered.connect(self.set_combobox_histograms)
 
@@ -510,6 +509,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                     if i == 0:
                         self.toolButton_histograms.setDefaultAction(action_h)
                 self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
+                self.toolButton_histograms.triggered.connect(self.do_manage_actions_for_histogram)
 
     def do_manage_actions_for_display(self, action):
         """
