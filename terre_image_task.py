@@ -98,8 +98,8 @@ class TerreImageProcessing(TerreImageTask, QObject):
         return message
 
     def run(self):
-        logger.debug("run, processing name {}".format(self.processing_name))
-        logger.debug("self.arg {}".format(self.arg))
+        logger.debug(u"run, processing name {}".format(self.processing_name))
+        logger.debug(u"self.arg {}".format(self.arg))
         output_filename = ""
         if "NDVI" in self.processing_name:
             output_filename = terre_image_processing.ndvi(self.layer, self.working_directory)
