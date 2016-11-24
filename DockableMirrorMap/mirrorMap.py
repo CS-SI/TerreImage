@@ -192,30 +192,33 @@ class MirrorMap(QWidget):
         self.canvas.refresh()
 
     def delLayer(self, layerId=None):
-        if layerId is None:
-            layer = self.iface.activeLayer()
-            if layer is None:
+        try :
+            if layerId is None:
+                layer = self.iface.activeLayer()
+                if layer is None:
+                    return
+                layerId = self._layerId(layer)
+
+            # remove the layer from the map canvas layer set
+            if layerId not in self.layerId2canvasLayer:
                 return
-            layerId = self._layerId(layer)
 
-        # remove the layer from the map canvas layer set
-        if layerId not in self.layerId2canvasLayer:
-            return
+            prevFlag = self.canvas.renderFlag()
+            self.canvas.setRenderFlag(False)
 
-        prevFlag = self.canvas.renderFlag()
-        self.canvas.setRenderFlag(False)
+            cl = self.layerId2canvasLayer[ layerId ]
+            if cl is not None:
+                del self.layerId2canvasLayer[ layerId ]
+            self.canvasLayers.remove(cl)
+            self.canvas.setLayerSet(self.canvasLayers)
+            del cl
 
-        cl = self.layerId2canvasLayer[ layerId ]
-        if cl is not None:
-            del self.layerId2canvasLayer[ layerId ]
-        self.canvasLayers.remove(cl)
-        self.canvas.setLayerSet(self.canvasLayers)
-        del cl
-
-        self.onExtentsChanged()
-        self.canvas.setRenderFlag(prevFlag)
-        self.canvas.repaint()
-        self.canvas.refresh()
+            self.onExtentsChanged()
+            self.canvas.setRenderFlag(prevFlag)
+            self.canvas.repaint()
+            self.canvas.refresh()
+        except RuntimeError:
+            pass
 
     def _layerId(self, layer):
         if hasattr(layer, 'id'):

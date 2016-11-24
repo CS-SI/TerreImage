@@ -190,6 +190,7 @@ class DockableMirrorMapPlugin(QObject):
 
         if len(self.dockableMirrors) <= 0:
             self.lastDockableMirror = 0
+        del wdg
         self.emit(SIGNAL("mirrorClosed(PyQt_PyObject)"), title)
 
 
