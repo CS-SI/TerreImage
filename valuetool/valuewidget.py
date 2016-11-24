@@ -710,7 +710,7 @@ class ValueWidget(QWidget, Ui_Widget):
     def del_extra_curve(self, curve):
         self.saved_curves.remove(curve)
         curve.close()
-        self.extra_plot(True)
+        self.curve_state_changed()
 
     def extra_plot(self, current_line=False):
         """
