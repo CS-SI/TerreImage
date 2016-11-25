@@ -227,8 +227,22 @@ def get_info_from_metadata(image_source, sat):
     if not os.path.exists(metadata_file):
         logger.warning("Fichier metadonnees manquant")
     else:
-        f=codecs.open(metadata_file, mode="r", encoding='utf-8')
-        for line in f.readlines():
+        lines = None
+        try:
+            # try unix format
+            f=codecs.open(metadata_file, mode="r", encoding='utf-8')
+            lines = f.readlines()
+        except UnicodeError:
+            # try windows format
+            try:
+                f=codecs.open(metadata_file, mode="r", encoding='mbcs')
+                lines = f.readlines()
+            except UnicodeError:
+                logger.error("Impossible de lire le fichier MTD")
+        if not lines:
+            return
+
+        for line in lines:
             split = re.split("\s", line)
             if len(split)<2:
                 continue
