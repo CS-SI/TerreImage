@@ -22,7 +22,7 @@
 import os
 import ConfigParser
 from PyQt4.QtCore import QUrl
-from PyQt4.QtGui import QDialog, QPixmap
+from PyQt4.QtGui import QDialog
 
 from ui_dlg import Ui_DlgAbout
 import platform
@@ -39,7 +39,7 @@ class DlgAbout(QDialog, Ui_DlgAbout):
         self.setupUi(self)
 
         config = ConfigParser.ConfigParser()
-        config.read(os.path.join(os.path.dirname(__file__),'metadata.txt'))
+        config.read(os.path.join(os.path.dirname(__file__), 'metadata.txt'))
 
         name        = config.get('general', 'name')
         description = config.get('general', 'description')
