@@ -169,7 +169,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             if index == 0:
                 self.toolButton_histograms.setDefaultAction(action_h)
         # self.comboBox_histogrammes.highlighted.connect(self.set_combobox_histograms)
-        self.toolButton_histograms.triggered.connect(self.set_combobox_histograms)
+        # self.toolButton_histograms.triggered.connect(self.set_combobox_histograms)
+
+        self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
+        self.toolButton_histograms.triggered.connect(self.do_manage_actions_for_histogram)
 
         # widget puttons signal connections
         self.pushButton_kmeans.clicked.connect(self.kmeans)
@@ -508,8 +511,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                     m2.addAction(action_h)
                     if i == 0:
                         self.toolButton_histograms.setDefaultAction(action_h)
-                self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
-                self.toolButton_histograms.triggered.connect(self.do_manage_actions_for_histogram)
+                logger.debug("Connect combo box histogram")
 
     def do_manage_actions_for_display(self, action):
         """
@@ -519,6 +521,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.do_manage_sprectral_band_display(band_name)
 
     def do_manage_sprectral_band_display(self, text_changed):
+        logger.debug("Combobox histogram changed")
         do_it = True
         if text_changed and text_changed != "Affichage des bandes spectrales...":
             band_to_display = None
