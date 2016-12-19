@@ -232,15 +232,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.toolbar.addAction(action_kmz)
         action_kmz.triggered.connect(self.export_kmz)
 
-        action_info = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionContextHelp.png"),
-                                    "Information", self.iface.mainWindow())
-        action_info.setWhatsThis(u"Information")
-        self.toolbar.addAction(action_info)
-
-        action_settings = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionOptions.png"),
-                                        "Configuration", self.iface.mainWindow())
-        action_settings.setWhatsThis(u"Configuration")
-        self.toolbar.addAction(action_settings)
 
     def status(self):
         """
