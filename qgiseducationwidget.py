@@ -258,15 +258,19 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         Display the histogram of the working image
         """
         self.set_working_message(True)
-        if not self.dock_histo_opened:
-            self.hist = TerreImageHistogram_multiband(ProcessingManager().working_layer, self.canvas)
-            self.histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow())
-            self.histodockwidget.setObjectName("Histogrammes")
-            self.histodockwidget.setWidget(self.hist)
-            self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
-            QtCore.QObject.connect(self.hist, QtCore.SIGNAL("threshold(PyQt_PyObject)"), self.histogram_threshold)
-            QtCore.QObject.connect(self.histodockwidget, QtCore.SIGNAL("closed(PyQt_PyObject)"), self.histogram_closed)
-        self.dock_histo_opened = True
+        if ProcessingManager().processings:
+            message ="Veuillez fermer les vues de traitement avant de lancer l'histogramme de l'image de travail"
+            QtGui.QMessageBox.warning(self, "Attention", message)
+        else:
+            if not self.dock_histo_opened:
+                self.hist = TerreImageHistogram_multiband(ProcessingManager().working_layer, self.canvas)
+                self.histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow())
+                self.histodockwidget.setObjectName("Histogrammes")
+                self.histodockwidget.setWidget(self.hist)
+                self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
+                QtCore.QObject.connect(self.hist, QtCore.SIGNAL("threshold(PyQt_PyObject)"), self.histogram_threshold)
+                QtCore.QObject.connect(self.histodockwidget, QtCore.SIGNAL("closed(PyQt_PyObject)"), self.histogram_closed)
+                self.dock_histo_opened = True
         self.set_working_message(False)
 
     def histogram_closed(self):
