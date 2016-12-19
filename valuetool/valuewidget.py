@@ -250,8 +250,8 @@ class ValueWidget(QWidget, Ui_Widget):
                     else:
                         temp_list.append(layer_temp)
                         nrow += layer_temp.bandCount()
-            self.layers_to_display = [self.the_layer_to_display.get_qgis_layer()] #temp_list
-            self.tableWidget.setRowCount(self.the_layer_to_display.qgis_layer.bandCount()) #nrow)
+            self.layers_to_display = temp_list
+            self.tableWidget.setRowCount(nrow)
 
     def changePage(self, state):
         if (state == Qt.Checked):
