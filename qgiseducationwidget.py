@@ -169,7 +169,10 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
             if index == 0:
                 self.toolButton_histograms.setDefaultAction(action_h)
         # self.comboBox_histogrammes.highlighted.connect(self.set_combobox_histograms)
-        self.toolButton_histograms.triggered.connect(self.set_combobox_histograms)
+        # self.toolButton_histograms.triggered.connect(self.set_combobox_histograms)
+
+        self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
+        self.toolButton_histograms.triggered.connect(self.do_manage_actions_for_histogram)
 
         # widget puttons signal connections
         self.pushButton_kmeans.clicked.connect(self.kmeans)
@@ -229,15 +232,6 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.toolbar.addAction(action_kmz)
         action_kmz.triggered.connect(self.export_kmz)
 
-        action_info = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionContextHelp.png"),
-                                    "Information", self.iface.mainWindow())
-        action_info.setWhatsThis(u"Information")
-        self.toolbar.addAction(action_info)
-
-        action_settings = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionOptions.png"),
-                                        "Configuration", self.iface.mainWindow())
-        action_settings.setWhatsThis(u"Configuration")
-        self.toolbar.addAction(action_settings)
 
     def status(self):
         """
@@ -264,15 +258,19 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         Display the histogram of the working image
         """
         self.set_working_message(True)
-        if not self.dock_histo_opened:
-            self.hist = TerreImageHistogram_multiband(ProcessingManager().working_layer, self.canvas)
-            self.histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow())
-            self.histodockwidget.setObjectName("Histogrammes")
-            self.histodockwidget.setWidget(self.hist)
-            self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
-            QtCore.QObject.connect(self.hist, QtCore.SIGNAL("threshold(PyQt_PyObject)"), self.histogram_threshold)
-            QtCore.QObject.connect(self.histodockwidget, QtCore.SIGNAL("closed(PyQt_PyObject)"), self.histogram_closed)
-        self.dock_histo_opened = True
+        if ProcessingManager().processings:
+            message ="Veuillez fermer les vues de traitement avant de lancer l'histogramme de l'image de travail"
+            QtGui.QMessageBox.warning(self, "Attention", message)
+        else:
+            if not self.dock_histo_opened:
+                self.hist = TerreImageHistogram_multiband(ProcessingManager().working_layer, self.canvas)
+                self.histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow())
+                self.histodockwidget.setObjectName("Histogrammes")
+                self.histodockwidget.setWidget(self.hist)
+                self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
+                QtCore.QObject.connect(self.hist, QtCore.SIGNAL("threshold(PyQt_PyObject)"), self.histogram_threshold)
+                QtCore.QObject.connect(self.histodockwidget, QtCore.SIGNAL("closed(PyQt_PyObject)"), self.histogram_closed)
+                self.dock_histo_opened = True
         self.set_working_message(False)
 
     def histogram_closed(self):
@@ -508,8 +506,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
                     m2.addAction(action_h)
                     if i == 0:
                         self.toolButton_histograms.setDefaultAction(action_h)
-                self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
-                self.toolButton_histograms.triggered.connect(self.do_manage_actions_for_histogram)
+                logger.debug("Connect combo box histogram")
 
     def do_manage_actions_for_display(self, action):
         """
@@ -519,6 +516,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
         self.do_manage_sprectral_band_display(band_name)
 
     def do_manage_sprectral_band_display(self, text_changed):
+        logger.debug("Combobox histogram changed")
         do_it = True
         if text_changed and text_changed != "Affichage des bandes spectrales...":
             band_to_display = None
