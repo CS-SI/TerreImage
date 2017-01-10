@@ -37,8 +37,10 @@ email=alexia.mondot@c-s.fr
 tags=
 
 homepage=https://enseignants-mediateurs.cnes.fr/fr/web/CNES-fr/10884-edutheque.php
-tracker=https://bitbucket.org/CS-SI/terreimage/issues
-repository=https://bitbucket.org/CS-SI/terreimage
+#FIXME when we decide where is the final place
+tracker=https://github.com/CS-SI/TerreImage/issues
+#FIXME when we decide where is the final place
+repository=https://github.com/CS-SI/TerreImage
 icon=img/icon.png
 # experimental flag
 experimental=False
