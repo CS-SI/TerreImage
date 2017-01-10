@@ -1,15 +1,13 @@
 
 /*=========================================================================
 
- Program:   ORFEO Toolbox
+ Program:   OTB TerreImage Module
  Language:  C++
- Date:      $Date$
- Version:   $Revision$
 
 
- Copyright (c) Centre National d'Etudes Spatiales. All rights reserved.
- See OTBCopyright.txt for details.
+ Copyright (c) CS  Système d'Informations
 
+ Author(s) : Mickael Savinaud (mickael.savinaud@c-s.fr)
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -63,7 +61,7 @@ private:
     SetDocName("TODO");
     SetDocLongDescription("TODO");
     SetDocLimitations("TODO");
-    SetDocAuthors("OTB-Team");
+    SetDocAuthors("Mickael Savinaud");
     SetDocSeeAlso("TODO");
  
     AddDocTag(Tags::Learning);
