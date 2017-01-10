@@ -30,23 +30,39 @@ from valuetool.valuewidget import ValueWidget
 from DockableMirrorMap.dockableMirrorMapPlugin import DockableMirrorMapPlugin
 from ClassificationSupervisee.supervisedclassificationdialog import SupervisedClassificationDialog
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_TerreImageManager')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
-class TerreImageManager():
+class TerreImageManager(QtCore.QObject):
+
+    processings_updated = QtCore.pyqtSignal()
 
     def __init__(self, iface):
+        QtCore.QObject.__init__(self)
+
+        logger.debug("Manager 3 {}".format(id(self)))
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.working_directory = None  # , _ = terre_image_utils.fill_default_directory()
         self.layer = None
-
+        # settrace()
         self.value_tool = ValueWidget(self.iface)  # , self )
+        self.valuedockwidget = None
+
+        self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
+
+        logger.debug("mirror_map_tool 1 {}".format(id(self.mirror_map_tool)))
+        self.mirror_map_tool.initGui()
+        QtCore.QObject.connect(self.mirror_map_tool, QtCore.SIGNAL("mirrorClosed(PyQt_PyObject)"), self.view_closed)
+
+        # self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
+
+        self.classif_tool = SupervisedClassificationDialog(self.iface)
+        # self.classif_tool.setupUi()
+
+    def set_value_tool_dock_widget(self):
         # creating a dock widget
         # create the dockwidget with the correct parent and add the valuewidget
         self.valuedockwidget = QtGui.QDockWidget("Valeurs spectrales", self.iface.mainWindow())
@@ -56,14 +72,6 @@ class TerreImageManager():
         self.valuedockwidget.hide()
         logger.info(self.value_tool)
 
-        self.mirror_map_tool = DockableMirrorMapPlugin(self.iface)
-        self.mirror_map_tool.initGui()
-        QtCore.QObject.connect(self.mirror_map_tool, QtCore.SIGNAL("mirrorClosed(PyQt_PyObject)"), self.view_closed)
-
-        # self.angle_tool = SpectralAngle(self.iface, self.qgis_education_manager.working_directory, self.layer, self.mirror_map_tool)
-
-        self.classif_tool = SupervisedClassificationDialog(self.iface)
-        # self.classif_tool.setupUi()
 
     def set_current_layer(self):
         self.layer, bands = terre_image_utils.get_workinglayer_on_opening(self.iface)
@@ -93,33 +101,41 @@ class TerreImageManager():
         return self.layer, bands
 
     def display_values(self):
-
+        if self.valuedockwidget is None :
+            self.set_value_tool_dock_widget()
+        logger.debug("dispkay values 123456789")
         self.valuedockwidget.show()
         self.value_tool.changeActive(QtCore.Qt.Checked)
         self.value_tool.cbxActive.setCheckState(QtCore.Qt.Checked)
         self.value_tool.set_layers(ProcessingManager().get_working_layers())
 
     def view_closed(self, name_of_the_closed_view):
-        # print str(name_of_the_closed_view) + " has been closed"
-        logger.debug(str(name_of_the_closed_view) + " has been closed")
+
+        logger.debug("Manager 2 {}".format(id(self)))
+        # logger.debug("{} has been closed".format(str(name_of_the_closed_view)))
+        logger.debug("{} has been closed".format(name_of_the_closed_view))
         process = ProcessingManager().processing_from_name(name_of_the_closed_view)
-        # print process
+        logger.debug("{}".format(process))
         if process:
             try:
-                # WARNING Comment this line to make the plugin work on Windows
-                if process[0].output_working_layer.qgis_layer.id() in self.canvas.layers():
-                    QgsMapLayerRegistry.instance().removeMapLayer(process[0].output_working_layer.qgis_layer.id())
                 ProcessingManager().remove_processing(process[0])
                 ProcessingManager().remove_display(process[0])
             except KeyError:
                 pass
+            else:
+                logger.debug("Trying to emit something")
+                self.processings_updated.emit()
+                logger.debug("ProcessingChanged signal emitted")
+
 
     def removing_layer(self, layer_id):
         ProcessingManager().remove_process_from_layer_id(layer_id)
 
     def disconnect(self):
+        logger.debug("Disconnect")
         # disconnect value tool
         self.iface.mainWindow().statusBar().clearMessage()
+        logger.debug("Statusbar cleared")
         try:
             self.value_tool.changeActive(QtCore.Qt.Unchecked)
             self.value_tool.set_layers([])
@@ -128,9 +144,13 @@ class TerreImageManager():
             self.value_tool = None
         except AttributeError:
             pass
+        logger.debug("ValueTool cleared")
 
         # disconnect dockable mirror map
         self.mirror_map_tool.unload()
+        logger.debug("Mirror map tool unloaded")
 
         # remove the dockwidget from iface
-        self.iface.removeDockWidget(self.valuedockwidget)
+        if self.valuedockwidget:
+            self.iface.removeDockWidget(self.valuedockwidget)
+            logger.debug("Remove dock widget")

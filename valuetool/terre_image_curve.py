@@ -27,17 +27,35 @@ from ui_terre_image_curve import Ui_Form
 
 import random
 
-#import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger( 'TerreImage_Curve' )
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
+
+
+LETTERSTOQCOLOR = {"bleu": QColor(0, 132, 255), "vert": QColor(148, 255, 69),
+                   "rouge": QColor(255, 30, 0), "cyan": QColor(0, 255, 204),
+                   "magenta": QColor(255, 0, 255), "jaune": QColor(255, 255, 0),
+                   "noir": QColor(0, 0, 0)}
+
+FRENCHTOLETTER = {"bleu": 'b', "vert": 'g',
+                       "rouge": 'r', "cyan": 'c',
+                       "magenta": 'm', "jaune": 'y',
+                       "noir": 'k'}
+
+LETTERSTONAMECOLOR = {"b": "blue", "g": "green", "r": "red",
+                           "c": "cyan", "m": "magenta",
+                           "y": "yellow", "k": "black"}
+
+NAMECOLORSTOLETTERS = dict((v, k) for k, v in LETTERSTONAMECOLOR.iteritems())
+
+COLORS = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
+
 
 
 class TerreImageCurve(QWidget, Ui_Form):
 
-    __pyqtSignals__ = ("curveTitleChanged(str)", "hideCurve(int)", "colorChanged()", "deleteCurve()")
+    __pyqtSignals__ = ("curveTitleChanged(str)", "hideCurve(int)", "colorChanged()",
+                       "deleteCurve()", "redraw()")
 
     def __init__(self, name, x, y, points, abs = None, color = None):
         QWidget.__init__(self)
@@ -46,31 +64,14 @@ class TerreImageCurve(QWidget, Ui_Form):
         self.name = name
         self.lineEdit_curve_name.setText(name)
 
-        logger.debug("from curve: " + str(x) + " " + str(y))
+        logger.debug("from curve: {} {}".format(x, y))
         self.coordinates = "[x=" + str(x) + ", y=" + str(y) + "]"
         self.label_coordinates.setText(self.coordinates)
 
-        self.lettersToQColor = {"bleu": QColor(0, 132, 255), "vert": QColor(148, 255, 69),
-                                "rouge": QColor(255, 30, 0), "cyan": QColor(0, 255, 204),
-                                "magenta": QColor(255, 0, 255), "jaune": QColor(255, 255, 0),
-                                "noir": QColor(0, 0, 0)}
-
-        self.frenchToLetter = {"bleu": 'b', "vert": 'g',
-                               "rouge": 'r', "cyan": 'c',
-                               "magenta": 'm', "jaune": 'y',
-                               "noir": 'k'}
-
-        self.lettersToNameColor = {"b": "blue", "g": "green", "r": "red",
-                                   "c": "cyan", "m": "magenta",
-                                   "y": "yellow", "k": "black"}
-
-        self.nameColorsToLetters = dict((v, k) for k, v in self.lettersToNameColor.iteritems())
-
         if color is None:
-            colors = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
-            logger.debug("len(colors): " + str(len(colors)))
-            color = colors[ random.randint(0, len(colors) - 1) ]
-            logger.debug('color from creation courbe: ' + str(color))
+            logger.debug("len(colors): {}".format(len(COLORS)))
+            color = COLORS[ random.randint(0, len(COLORS) - 1) ]
+            logger.debug("color from creation courbe: {}".format(color))
         self.color = color
 
         if abs:
@@ -79,7 +80,7 @@ class TerreImageCurve(QWidget, Ui_Form):
             self.abs = None
 
         pixmap = QPixmap(self.pushButton_color.size())
-        pixmap.fill(QColor(self.lettersToNameColor[self.color]))
+        pixmap.fill(QColor(LETTERSTONAMECOLOR[self.color]))
         icon = QIcon(pixmap)
         self.pushButton_color.setIcon(icon)
 
@@ -89,21 +90,27 @@ class TerreImageCurve(QWidget, Ui_Form):
         self.connect(self.lineEdit_curve_name, SIGNAL("editingFinished()"), self.set_name)
         self.connect(self.pushButton_color, SIGNAL("clicked()"), self.set_color)
         self.connect(self.pushButton_delete_curve, SIGNAL("clicked()"), self, SIGNAL("deleteCurve()"))
+        self.connect(self.checkBox_curve_visible, SIGNAL("stateChanged(int)"), self.change_state)
+
+    def change_state(self, state):
+        logger.debug("====**State changed from ti_curve====")
+        self.emit(SIGNAL("redraw()"))
 
     def display_points(self):
+        logger.debug("checkBox_curve_visible.checkState() {}".format(self.checkBox_curve_visible.checkState()))
         return self.checkBox_curve_visible.checkState() == Qt.Checked
 
     def set_color(self):
         # couleur = QtGui.QColorDialog.getColor(QtCore.Qt.white)
 
-        testqt, ok = QInputDialog.getItem(None, "Couleur", "Selection d'une couleur", self.lettersToQColor.keys(), False)
+        testqt, ok = QInputDialog.getItem(None, "Couleur", "Selection d'une couleur", LETTERSTOQCOLOR.keys(), False)
         if ok:
             # couleur = self.nameColorsToLetters[testqt]
-            couleur = self.lettersToQColor[testqt]
+            couleur = LETTERSTOQCOLOR[testqt]
             logger.debug(couleur)
-            self.color = self.frenchToLetter[testqt]
+            self.color = FRENCHTOLETTER[testqt]
         else:
-            couleur = self.lettersToQColor['noir']
+            couleur = LETTERSTOQCOLOR['noir']
             self.color = 'b'
 
         # self.color = str(couleur.name())
@@ -124,13 +131,13 @@ class TerreImageCurve(QWidget, Ui_Form):
         # palette.setColor(QtGui.QPalette.ButtonText, self.lettersToQColor[testqt])
         # palette.setColor(10, couleur)
         # self.pushButton_color.setPalette(palette)
-        self.emit(SIGNAL("colorChanged"))
+        self.emit(SIGNAL("redraw()"))
 
     def set_name(self, text = None):
         self.name = self.lineEdit_curve_name.text()
 
     def __str__(self):
-        return self.name + " " + str(self.coordinates) + " " + str(self.color) + " " + str(self.points)
+        return u"{} {} {} {}".format(self.name, self.coordinates, self.color, self.points)
 
     def has_abs(self):
         return self.abs is not None

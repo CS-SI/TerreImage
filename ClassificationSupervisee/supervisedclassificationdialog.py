@@ -29,19 +29,21 @@ from PyQt4 import QtCore, QtGui
 from RasterLayerSelectorTable import RasterLayerSelectorTable
 from VectorLayerSelectorTable import VectorLayerSelectorTable
 from ConfusionMatrixViewer import ConfusionMatrixViewer
-from TerreImage import terre_image_run_process
+from TerreImage.terre_image_run_process import TerreImageProcess
+from cropVectorDataToImage import cropVectorDataToImage
+import mergeVectorData
 
 from QGisLayers import QGisLayers
 from QGisLayers import QGisLayerType
+from classif import full_classification
 
 import os
 import shutil
 import datetime
 
-import logging
-# create logger
-logger = logging.getLogger( 'SupervisedClassificationDialog' )
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 def ensure_clean_dir(d):
     #d = os.path.dirname(f)
@@ -105,7 +107,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         QtGui.QApplication.restoreOverrideCursor()
 
         self.app_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)), "win32", "bin")
-        logger.debug( "self.app_dir" + str(self.app_dir) )
+        logger.debug( "self.app_dir {}".format(self.app_dir) )
 
         #self.setupUi()
         QGisLayers.setInterface(iface)
@@ -185,7 +187,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
     def update_layers(self, layers):
         self.layers = layers
         # for layer in self.layers:
-        #    print layer.name()
+        #    logger.debug(layer.name())
         vectorlayers = QGisLayers.getVectorLayers(QGisLayerType.POLYGON)
         self.vectorlayerselector.set_layers(vectorlayers)
         rasterlayers = layers
@@ -198,7 +200,7 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.outputdirwidget.setText(dirname)
 
     def getOutputDir(self):
-        return str(self.output_dir) #outputdirwidget.text())
+        return self.output_dir #outputdirwidget.text())
 
     def selectOutputDir(self):
         filedialog = QtGui.QFileDialog()
@@ -217,49 +219,40 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         self.statusLabel.setText("")
 
     def classify(self):
-        dirDest = QtGui.QFileDialog.getExistingDirectory( None, str( "Répertoire de destination des fichiers de la classification" ), self.output_dir )
+        dirDest = QtGui.QFileDialog.getExistingDirectory( None, u"Répertoire de destination des fichiers de la classification", self.output_dir )
         if dirDest :
             self.output_dir = dirDest
 
 
         logger.debug( "classify" )
         simulation = False
-
-        # Get rasters
-        selectedrasterlayers = self.rasterlayerselector.getSelectedOptions()
-        logger.debug( "selectedrasterlayers" + str(selectedrasterlayers) )
-        if len(selectedrasterlayers) < 1:
-            QtGui.QMessageBox.critical( self, \
-                                        u"Erreur", \
-                                        u"Aucune couche raster sélectionnée" )
-            return
-
-        # Get vectors
-        selectedvectorlayers = self.vectorlayerselector.getSelectedOptions()
-        if len(selectedvectorlayers) < 2:
-            QtGui.QMessageBox.critical( self, \
-                                        u"Erreur", \
-                                        u"Au minimum deux couches vecteur doivent être sélectionnées" )
-            return
-
         try:
+            # Get rasters
+            selectedrasterlayers = self.rasterlayerselector.getSelectedOptions()
+            logger.debug( "selectedrasterlayers {}".format(selectedrasterlayers) )
+            if len(selectedrasterlayers) < 1:
+                QtGui.QMessageBox.critical( self, \
+                                            u"Erreur", \
+                                            u"Aucune couche raster sélectionnée" )
+                return
+
+            # Get vectors
+            selectedvectorlayers = self.vectorlayerselector.getSelectedOptions()
+            if len(selectedvectorlayers) < 2:
+                QtGui.QMessageBox.critical( self, \
+                                            u"Erreur", \
+                                            u"Au minimum deux couches vecteur doivent être sélectionnées" )
+                return
+
             errorDuringClassif = False
             outputdir = self.getOutputDir()
 
-            # Build list of input raster files
-            rasterlist = ""
-            for r in selectedrasterlayers:
-                rasterlist += '"%s" ' % (r.source())
-            #logger.debug( "rasterlist" + str( rasterlist ) )
-
-            #firstraster = '"%s" ' % (unicode(selectedrasterlayers[0].source()))
-            logger.debug( "selectedrasterlayers[0]" + str(selectedrasterlayers[0]) )
-            firstraster = '"%s" ' % (selectedrasterlayers[0].source())
-
             # Build list of input vector files
-            vectorlist = ""
+            vectorlist = []
             labeldescriptor = {}
             label = 0
+
+            logger.info("Crop and reproject vector data")
             for i in range(len(selectedvectorlayers)):
                 v = selectedvectorlayers[i]
                 inputshpfilepath = v[0].source()
@@ -267,146 +260,33 @@ class SupervisedClassificationDialog(QtGui.QDialog):
                 classlabel = v[2]
 
                 labeldescriptor[label] = (classcolor, classlabel)
-                logger.debug( "labeldescriptor" + str(labeldescriptor) )
+                logger.debug( "labeldescriptor {}".format(labeldescriptor) )
                 label += 1
 
                 # Reprocess input shp file to crop it to firstraster extent
                 vectordir = os.path.join(outputdir, 'class%s' % (str(i)))
                 ensure_clean_dir(vectordir)
-                #preprocessedshpfile = os.path.join(vectordir, transform_spaces(os.path.basename(unicode(inputshpfilepath))))
-                preprocessedshpfile = os.path.join(vectordir, "preprocessed.shp")
 
-                cropcommand = ('%s/cropvectortoimage.bat '
-                             '"%s" '
-                             '"%s" '
-                             '"%s" '
-                             '"%s" '
-                             '"%s" '
-                             % ( self.app_dir,
-                                 inputshpfilepath,
-                                 selectedrasterlayers[0].source(),
-                                 os.path.join(vectordir,"imageenveloppe.shp"),
-                                 os.path.join(vectordir,"tmp_reprojected.shp"),
-                                 preprocessedshpfile) )
-                terre_image_run_process.run_process(cropcommand, True)
-#                 try:
-#                   if (simulation):
-#                       time.sleep(3)
-#                   else:
-#                       proc = subprocess.Popen(cropcommand.encode('mbcs'),
-#                                               shell=True,
-#                                               stdout=subprocess.PIPE,
-#                                               stdin=subprocess.PIPE,
-#                                               stderr=subprocess.STDOUT,
-#                                               universal_newlines=False)
-#
-#                       loglines = []
-#                       for line in iter(proc.stdout.readline, ""):
-#                           loglines.append(line)
-#
-#                       proc.wait()
-#                       if proc.returncode != 0:
-#                           raise OSError
-#
-#                 except OSError:
-#                   errorDuringClassif = True
-#
-#                   mbox = QtGui.QMessageBox()
-#                   mbox.setWindowTitle(u"Erreur")
-#                   mbox.setText(u"Une erreur a été rencontrée lors de la préparation des données vecteurs")
-#
-#                   # has no effect...
-#                   #mbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-#                   #mbox.setSizeGripEnabled(True)
-#
-#                   detailedtext = (u"Code de retour : %s%s"
-#                                   "Commande : %s%s"
-#                                   "Sortie standard :%s%s"
-#                                   % ( proc.returncode, 2*os.linesep,
-#                                       cropcommand, 2*os.linesep,
-#                                       os.linesep, u''.join([u'%s%s' % (unicode(c, 'mbcs'), os.linesep) for c in loglines]) ) )
-#
-#                   mbox.setDetailedText(detailedtext)
-#                   mbox.setIcon(QtGui.QMessageBox.Critical)
-#                   mbox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
-#                   ret = mbox.exec_()
-#                   raise OSError
+                preprocessedshpfile = cropVectorDataToImage(selectedrasterlayers[0].source(), inputshpfilepath, vectordir)
+                vectorlist.append(preprocessedshpfile)
 
-                vectorlist += '"%s" ' % (preprocessedshpfile)
+            logger.info("Merge vector data")
+            union = mergeVectorData.unionPolygonsWithOGR(vectorlist, outputdir)
 
+            logger.info("Run classification")
             # Build classifcommand
             outputlog = os.path.join(outputdir, 'output.log')
             outputclassification = os.path.join(outputdir, 'classification.tif')
-            outputresults = os.path.join(outputdir, 'classification.resultats.txt')
+            out_pop = os.path.join(outputdir, 'classification.resultats.txt')
 
-            launcher = "%s/classification.bat" % self.app_dir
-            classifcommand = (  '%s '
-                                '-io.il %s '
-                                '-io.vd %s '
-                                '-io.out "%s" '
-                                '-io.results "%s"'
-                                %  (launcher,
-                                    rasterlist,
-                                    vectorlist,
-                                    outputclassification,
-                                    outputresults) )
+            confmat, kappa = full_classification([r.source() for r in selectedrasterlayers],
+                                                 union, outputclassification, out_pop, outputdir)
 
-            terre_image_run_process.run_process(classifcommand, True)
-            # Execute commandline
-#             try:
-#                 if (simulation):
-#                     time.sleep(3)
-#                 else:
-#                     proc = subprocess.Popen(classifcommand.encode('mbcs'),
-#                                             shell=True,
-#                                             stdout=subprocess.PIPE,
-#                                             stdin=subprocess.PIPE,
-#                                             stderr=subprocess.STDOUT,
-#                                             universal_newlines=False)
-#
-#                     loglines = []
-#                     with open(outputlog, "w") as logfile:
-#                       for line in iter(proc.stdout.readline, ""):
-#                           loglines.append(line)
-#                           logfile.writelines(line)
-#                           logfile.flush()
-#                           os.fsync(logfile.fileno())
-#
-#                     proc.wait()
-#                     if proc.returncode != 0:
-#                         raise OSError
-#
-#             except OSError:
-#                 errorDuringClassif = True
-#
-#                 mbox = QtGui.QMessageBox()
-#                 mbox.setWindowTitle(u"Erreur")
-#                 mbox.setText(u"Une erreur a été rencontrée lors de la classification")
-#
-#                 # has no effect...
-#                 #mbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-#                 #mbox.setSizeGripEnabled(True)
-#
-#                 detailedtext = (u"Code de retour : %s%s"
-#                                 "Commande : %s%s"
-#                                 "Sortie standard :%s%s"
-#                                 % ( proc.returncode, 2*os.linesep,
-#                                     classifcommand, 2*os.linesep,
-#                                     os.linesep, u''.join([u'%s%s' % (unicode(c, 'mbcs'), os.linesep) for c in loglines]) ) )
-#
-#                 mbox.setDetailedText(detailedtext)
-#                 mbox.setIcon(QtGui.QMessageBox.Critical)
-#                 mbox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
-#                 ret = mbox.exec_()
-#
-#                 saferemovefile(outputlog)
-#                 saferemovefile(outputclassification)
-#                 saferemovefile(outputresults)
-
+            logger.info("Run confusion matrix viewer")
             if (not simulation and not errorDuringClassif):
                 QGisLayers.loadLabelImage(outputclassification, labeldescriptor)
 
-                notificationDialog = ConfusionMatrixViewer(selectedvectorlayers, outputresults)
+                notificationDialog = ConfusionMatrixViewer(selectedvectorlayers, confmat, kappa, out_pop)
 
                 self.clearStatus()
                 QtGui.QApplication.restoreOverrideCursor()
@@ -426,4 +306,4 @@ class SupervisedClassificationDialog(QtGui.QDialog):
         finally:
             self.clearStatus()
             QtGui.QApplication.restoreOverrideCursor()
-            return # this discards exception
+        #     return # this discards exception

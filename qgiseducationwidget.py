@@ -38,12 +38,9 @@ from terre_image_histogram import TerreImageHistogram_monoband
 from terre_image_manager import TerreImageManager
 from processing_manager import ProcessingManager
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_qgiseducationwidget')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class Terre_Image_Dock_widget(QtGui.QDockWidget):
@@ -80,28 +77,43 @@ class Terre_Image_Main_Dock_widget(QtGui.QDockWidget):
                 self.emit(QtCore.SIGNAL("closed(PyQt_PyObject)"), self)
 
 
-class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
+class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation):
     """
     Main widget
     """
     __pyqtSignals__ = ("valueChanged()")
 
-    def __init__(self, iface):
+    def __init__(self, iface, working_dir):
 
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
 
         QtGui.QWidget.__init__(self)
-        QtCore.QObject.__init__(self)
         self.setupUi(self)
         self.setupUi_extra()
 
         self.qgis_education_manager = TerreImageManager(self.iface)
+
+        #working dir
+        self.qgis_education_manager.working_directory = working_dir
+        self.lineEdit_working_dir.setText(working_dir)
+
+        # todo remove this init
+        self.qgis_education_manager.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), ProcessingManager().working_layer.get_qgis_layer(), ProcessingManager().working_layer.band_invert)
+        self.qgis_education_manager.classif_tool.set_directory(working_dir)
+        self.qgis_education_manager.classif_tool.setupUi()
+
+        logger.debug("Manager 1 {}".format(id(self.qgis_education_manager)))
         self.lineEdit_working_dir.setText(self.qgis_education_manager.working_directory)
+        logger.debug("Before connecting toto titi")
+        self.qgis_education_manager.processings_updated.connect(self.set_combobox_histograms)
+
+        logger.debug("After connecting toto titi")
 
         QtCore.QObject.connect(QgsMapLayerRegistry.instance(), QtCore.SIGNAL("layerWillBeRemoved(QString)"), self.layer_deleted)
 
         self.dock_histo_opened = False
+
 
     def setupUi_extra(self):
         """
@@ -139,7 +151,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.toolButton_histograms = QtGui.QToolButton()
         self.toolButton_histograms.setMenu(QtGui.QMenu())
         self.toolButton_histograms.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
-        # self.iface.addToolBarWidget(self.toolButton_histograms) 
+        # self.iface.addToolBarWidget(self.toolButton_histograms)
         self.toolbar.addWidget(self.toolButton_histograms)
         m2 = self.toolButton_histograms.menu()
 
@@ -156,6 +168,9 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             m2.addAction(action_h)
             if index == 0:
                 self.toolButton_histograms.setDefaultAction(action_h)
+        # self.comboBox_histogrammes.highlighted.connect(self.set_combobox_histograms)
+        # self.toolButton_histograms.triggered.connect(self.set_combobox_histograms)
+
         self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
         self.toolButton_histograms.triggered.connect(self.do_manage_actions_for_histogram)
 
@@ -217,28 +232,19 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.toolbar.addAction(action_kmz)
         action_kmz.triggered.connect(self.export_kmz)
 
-        action_info = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionContextHelp.png"),
-                                    "Information", self.iface.mainWindow())
-        action_info.setWhatsThis(u"Information")
-        self.toolbar.addAction(action_info)
-
-        action_settings = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionOptions.png"),
-                                        "Configuration", self.iface.mainWindow())
-        action_settings.setWhatsThis(u"Configuration")
-        self.toolbar.addAction(action_settings)
 
     def status(self):
         """
         Function for debug
         """
-        print "############# Status #############"
-        print(self.qgis_education_manager)
-        print("self.qgis_education_manager.mirror_map_tool.dockableMirrors " + str(self.qgis_education_manager.mirror_map_tool.dockableMirrors)) + "\n"
-        print ProcessingManager()
-        print ProcessingManager().get_processings_name()
-        print "layers value tool "
-        print self.qgis_education_manager.value_tool.layers_to_display
-        print "##########################"
+        logger.info("############# Status #############")
+        logger.info(self.qgis_education_manager)
+        logger.info("self.qgis_education_manager.mirror_map_tool.dockableMirrors {} \n".format(str(self.qgis_education_manager.mirror_map_tool.dockableMirrors)))
+        logger.info(ProcessingManager())
+        logger.info(ProcessingManager().get_processings_name())
+        logger.info("layers value tool ")
+        logger.info(self.qgis_education_manager.value_tool.layers_to_display)
+        logger.info("##########################")
 
     def plugin_classification(self):
         """
@@ -252,15 +258,19 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         Display the histogram of the working image
         """
         self.set_working_message(True)
-        if not self.dock_histo_opened:
-            self.hist = TerreImageHistogram_multiband(ProcessingManager().working_layer, self.canvas)
-            self.histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow())
-            self.histodockwidget.setObjectName("Histogrammes")
-            self.histodockwidget.setWidget(self.hist)
-            self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
-            QtCore.QObject.connect(self.hist, QtCore.SIGNAL("threshold(PyQt_PyObject)"), self.histogram_threshold)
-            QtCore.QObject.connect(self.histodockwidget, QtCore.SIGNAL("closed(PyQt_PyObject)"), self.histogram_closed)
-        self.dock_histo_opened = True
+        if ProcessingManager().processings:
+            message ="Veuillez fermer les vues de traitement avant de lancer l'histogramme de l'image de travail"
+            QtGui.QMessageBox.warning(self, "Attention", message)
+        else:
+            if not self.dock_histo_opened:
+                self.hist = TerreImageHistogram_multiband(ProcessingManager().working_layer, self.canvas)
+                self.histodockwidget = Terre_Image_Dock_widget("Histogrammes", self.iface.mainWindow())
+                self.histodockwidget.setObjectName("Histogrammes")
+                self.histodockwidget.setWidget(self.hist)
+                self.iface.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.histodockwidget)
+                QtCore.QObject.connect(self.hist, QtCore.SIGNAL("threshold(PyQt_PyObject)"), self.histogram_threshold)
+                QtCore.QObject.connect(self.histodockwidget, QtCore.SIGNAL("closed(PyQt_PyObject)"), self.histogram_closed)
+                self.dock_histo_opened = True
         self.set_working_message(False)
 
     def histogram_closed(self):
@@ -333,7 +343,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.do_manage_histograms(histogram_name)
 
     def do_manage_histograms(self, text_changed):
-        logger.debug("text changed histogram: " + text_changed)
+        logger.debug("text changed histogram: {}".format(text_changed))
         if text_changed == "Image de travail":
             self.main_histogram()
         elif text_changed != "Histogrammes" and text_changed != "":
@@ -411,7 +421,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                         try:
                             QgsMapLayerRegistry.instance().removeMapLayer(process.get_output_working_layer().qgis_layer.id())
                         except AttributeError:
-                            print 'Failed to delete ', process
+                            logger.error(u'Failed to delete {}'.format(process))
                     if text_changed == "Angle Spectral":
                         widget = self.iface.messageBar().createMessage("Terre Image", "Cliquez sur un point de l'image pour en obtenir son angle spectral...")
                         self.iface.messageBar().pushWidget(widget, QgsMessageBar.INFO)
@@ -433,7 +443,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             self.comboBox_processing.setCurrentIndex(0)
 
     def processing_end_display(self, my_processing):
-        logger.debug("processing_end_display")
+        logger.info("processing_end_display")
         self.set_combobox_histograms()
         self.qgis_education_manager.value_tool.set_layers(ProcessingManager().get_working_layers())
         self.set_working_message(False)
@@ -453,7 +463,12 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
             if ProcessingManager().working_layer.has_natural_colors():
                 logger.debug("couleurs naturelles")
-                self.comboBox_sprectral_band_display.insertItem(1, "Afficher en couleurs naturelles")
+                text = "Afficher en couleurs naturelles"
+                self.comboBox_sprectral_band_display.insertItem(1, text)
+                action_d = QtGui.QAction(QtGui.QIcon(":/plugins/qgiseducation/img/mActionInOverview.png"),
+                                         text, self.iface.mainWindow())
+                action_d.setWhatsThis(text)
+                m3.addAction(action_d)
 
             for i in range(ProcessingManager().working_layer.get_band_number()):
                 y = [x for x in bands if bands[x] == i + 1]
@@ -478,7 +493,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         if self.qgis_education_manager:
             if ProcessingManager().working_layer:
                 process = ["Histogrammes", "Image de travail"] + [x for x in ProcessingManager().get_processings_name() if x not in ["KMEANS", "Seuillage"]]
-                logger.debug("process: " + str(process))
+                logger.debug("process {}".format(process))
 
                 self.comboBox_histogrammes.clear()
                 m2 = self.toolButton_histograms.menu()
@@ -491,7 +506,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
                     m2.addAction(action_h)
                     if i == 0:
                         self.toolButton_histograms.setDefaultAction(action_h)
-                self.comboBox_histogrammes.currentIndexChanged[str].connect(self.do_manage_histograms)
+                logger.debug("Connect combo box histogram")
 
     def do_manage_actions_for_display(self, action):
         """
@@ -501,6 +516,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.do_manage_sprectral_band_display(band_name)
 
     def do_manage_sprectral_band_display(self, text_changed):
+        logger.debug("Combobox histogram changed")
         do_it = True
         if text_changed and text_changed != "Affichage des bandes spectrales...":
             band_to_display = None
@@ -546,20 +562,11 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         self.set_working_message(False)
 
     def display_metadata(self):
-        # get image size and resolution
-        dataset = gdal.Open(ProcessingManager().working_layer.source_file)
-        if dataset is not None:
-            total_size_x = dataset.RasterXSize
-            total_size_y = dataset.RasterYSize
-            geotransform = dataset.GetGeoTransform()
-            pixel_size_x = geotransform[1]
-            pixel_size_y = geotransform[5]
 
-        list_to_display = [(u"Satellite", ProcessingManager().working_layer.type),
-                           (u"Lieu", "TO BE DEFINED"),
-                           (u"Lignes", str(total_size_x)),
-                           (u"Colonnes", str(total_size_y)),
-                           (u"Résolution", "TOBEDEFINED" + str(pixel_size_x))]
+
+        sat = ProcessingManager().working_layer.type
+        list_to_display = terre_image_utils.get_info_from_metadata(ProcessingManager().working_layer.source_file, sat)
+
         # QTreeWidget
         self.treeWidget.clear()
         header = QtGui.QTreeWidgetItem([u"Métadonnée", "Valeur"])
@@ -567,7 +574,7 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
 
         root = QtGui.QTreeWidgetItem(self.treeWidget, ["Image de travail"])
         for key, value in list_to_display:
-            A = QtGui.QTreeWidgetItem(root, [key, str(value)])
+            A = QtGui.QTreeWidgetItem(root, [key, value])
         self.treeWidget.resizeColumnToContents(0)
         self.treeWidget.resizeColumnToContents(1)
 
@@ -578,9 +585,8 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         root.setExpanded(True)
 
     def layer_deleted(self, layer_id):
-
+        logger.debug("Layer deleted")
         # logger.debug( str(layer_id) + " deleted")
-        # print str(layer_id) + " deleted"
         layer_id = layer_id.encode('utf-8')
 
         if "Angle_Spectral" in str(layer_id):
@@ -592,11 +598,14 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
             self.label_a_s.hide()
             self.label_a_s_img.hide()
 
+        logger.debug("Disconnect interface if layer is working layer")
         if self.qgis_education_manager:
             # logger.debug( "ProcessingManager().working_layer.get_qgis_layer().id(): " +  str(ProcessingManager().working_layer.get_qgis_layer().id()))
-            if ProcessingManager().working_layer.get_qgis_layer().id() == layer_id:
-                self.disconnect_interface()
+            if ProcessingManager().working_layer and ProcessingManager().working_layer.get_qgis_layer():
+                if ProcessingManager().working_layer.get_qgis_layer().id() == layer_id:
+                    self.disconnect_interface()
 
+        logger.debug("Empty processing manager")
         ProcessingManager().remove_process_from_layer_id(layer_id)
         ProcessingManager().remove_displays_from_layer_id(layer_id)
 
@@ -605,15 +614,19 @@ class QGISEducationWidget(QtGui.QWidget, Ui_QGISEducation, QtCore.QObject):
         except AttributeError:
             pass
 
+        logger.debug("Update combobox")
         self.set_combobox_histograms()
 
     def disconnect_interface(self):
+        logger.debug("Disconnect interface")
         if self.qgis_education_manager:
             self.qgis_education_manager.disconnect()
+            logger.debug("Disconnect qgis eduction manager")
         # histograms
         try:
             self.hist.close()
             self.hist = None
+            logger.debug("Close histograms")
         except AttributeError:
             pass
         # rubberband

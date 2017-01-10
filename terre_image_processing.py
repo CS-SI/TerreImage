@@ -33,23 +33,15 @@ from qgis.core import QgsPoint, QgsRaster
 from PyQt4.QtGui import QInputDialog
 
 import OTBApplications
-import terre_image_run_process
+from terre_image_run_process import TerreImageProcess
+from terre_image_gdal_api import get_image_size_with_gdal
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_processing')
-logger.setLevel(logging.DEBUG)
-# log_file = os.path.join(os.path.expanduser("~"), "log_terr_image_qprocess")
-# fh = logging.FileHandler(log_file)
-# formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s - %(message)s')
-# fh.setFormatter(formatter)
-# fh.setLevel(logging.DEBUG)
-# logger.addHandler(fh)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
-def ndvi(layer, working_directory, iface):
+def ndvi(layer, working_directory):
     # NDVI= (PIR-R)/(PIR+R)
     if not layer:
         logger.debug("Aucune layer selectionnée")
@@ -62,18 +54,17 @@ def ndvi(layer, working_directory, iface):
                                            os.path.basename(os.path.splitext(image_in)[0]) + "_ndvi" + os.path.splitext(image_in)[1])
             logger.debug(output_filename)
             if not os.path.isfile(output_filename):
-                layer_pir = "im1b" + str(layer.pir)
-                layer_red = "im1b" + str(layer.red)
-                expression = "\"(" + layer_pir + "+" + layer_red + ")!=0?(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "):0)\""
+                layer_pir = "im1b{}".format(layer.pir)
+                layer_red = "im1b{}".format(layer.red)
+                expression = "\"((" + layer_pir + "+" + layer_red + ")!=0?(" + layer_pir + "-" + layer_red + ")/(" + layer_pir + "+" + layer_red + "):0)\""
                 logger.debug(expression)
-                print "expression", expression
                 logger.debug("image_in" + image_in)
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
             return output_filename
     return ""
 
 
-def ndti(layer, working_directory, iface):
+def ndti(layer, working_directory):
     # SQRT(R+0.5)
     # NDTI= (R-G)/(R+G)
     if not layer:
@@ -85,18 +76,17 @@ def ndti(layer, working_directory, iface):
             output_filename = os.path.join(working_directory, os.path.basename(os.path.splitext(image_in)[0]) + "_ndti" + os.path.splitext(image_in)[1])
             logger.debug(output_filename)
             if not os.path.isfile(output_filename):
-                layer_red = "im1b" + str(layer.red)
-                layer_green = "im1b" + str(layer.green)
+                layer_red = "im1b{}".format(layer.red)
+                layer_green = "im1b{}".format(layer.green)
                 # expression = "\"sqrt(" + layer_red + "+0.5)\""
-                expression = "\"(" + layer_red + "+" + layer_green + ")!=0?(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "):0)\""
+                expression = "\"((" + layer_red + "+" + layer_green + ")!=0?(" + layer_red + "-" + layer_green + ")/(" + layer_red + "+" + layer_green + "):0)\""
                 logger.debug(expression)
-                print "expression", expression
                 logger.debug("image_in" + image_in)
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
             return output_filename
 
 
-def brightness(layer, working_directory, iface):
+def brightness(layer, working_directory):
     # IB = sqrt(RxR+PIRxPIR)
     if not layer:
         logger.debug("Aucune layer selectionnée")
@@ -109,9 +99,9 @@ def brightness(layer, working_directory, iface):
                                            os.path.basename(os.path.splitext(image_in)[0]) + "_brillance" + os.path.splitext(image_in)[1])
             logger.debug(output_filename)
             if not os.path.isfile(output_filename):
-                layer_pir = "im1b" + str(layer.pir)
-                layer_red = "im1b" + str(layer.red)
-                expression = "\"sqrt(" + layer_red + "*" + layer_red + "*" + layer_pir + "*" + layer_pir + ")\""
+                layer_pir = "im1b{}".format(layer.pir)
+                layer_red = "im1b{}".format(layer.red)
+                expression = "\"sqrt(" + layer_red + "*" + layer_red + "+" + layer_pir + "*" + layer_pir + ")\""
                 logger.debug(expression)
                 logger.debug("image_in" + image_in)
                 OTBApplications.bandmath_cli([image_in], expression, output_filename)
@@ -119,7 +109,7 @@ def brightness(layer, working_directory, iface):
 
 
 def threshold(layer, working_directory, forms):
-    logger.debug("threshold" + str(forms))
+    logger.debug("threshold {}".format(forms))
     image_in = layer.get_source()
     temp = []
     i = 1
@@ -142,7 +132,7 @@ def threshold(layer, working_directory, forms):
     return output_filename
 
 
-def angles(layer, working_directory, iface, x, y):
+def angles(layer, working_directory, x, y):
     ident = layer.get_qgis_layer().dataProvider().identify(QgsPoint(x, y), QgsRaster.IdentifyFormatValue)
     logger.debug(ident)
     if ident is not None:
@@ -160,36 +150,35 @@ def angles(layer, working_directory, iface, x, y):
                 # (sqrt((1269*1269+1060*1060+974*974+1576*1576)*
                 # (im1b1*im1b1+im1b2*im1b2+im1b3*im1b3+im1b4*im1b4))))
                 for index in range(1, layer.get_qgis_layer().bandCount() + 1):
-                    current_band = "im1b" + str(index)
+                    current_band = "im1b{}".format(index)
                     band_value = attr[index]
                     num.append(current_band + "*" + str(band_value))
                     denom.append(str(band_value) + "*" + str(band_value))
                     fact.append(current_band + "*" + current_band)
 
-                formula = "((" + "+".join(fact) + ") != 0)?"
+                #compute denom for testing != 0
+                mult_denom = "({})*({})".format("+".join(denom),
+                                                "+".join(fact))
+                #raw formula
+                formula = "acos(({})/(sqrt({})))".format("+".join(num),
+                                                        mult_denom)
+                #add threshold
+                formule_ = '"({}>0.0001?1/{}:0)"'.format(formula, formula)
+                #add test on denom
+                formula_with_test_denom_diff_0 = "({}!=0?{}:0)".format(mult_denom, formule_)
 
-                formula += "acos("
-                formula += "(" + "+".join(num) + ")/"
-                formula += "(sqrt("
-                formula += "(" + "+".join(denom) + ")*"
-                formula += "(" + "+".join(fact) + ")"
-                formula += "))"
-                formula += "): 0)"
+                logger.debug("num {}".format(num))
+                logger.debug("denom {}".format(denom))
+                logger.debug("fact {}".format(fact))
+                logger.debug("formula {}".format(formula_with_test_denom_diff_0))
 
-                formule_ = "\"" + formula + ">0.0001?1/" + formula + ":0)\""
-
-                logger.debug("num" + str(num))
-                logger.debug("denom" + str(denom))
-                logger.debug("fact" + str(fact))
-                logger.debug("formula" + str(formula))
-
-                OTBApplications.bandmath_cli([image_in], formule_, output_filename)
+                OTBApplications.bandmath_cli([image_in], formula_with_test_denom_diff_0, output_filename)
                 # rlayer = manage_QGIS.addRasterLayerToQGIS( output_filename, os.path.basename(os.path.splitext(image_in)[0]) + "_angles" + str(x) + "_" + str(y), iface )
                 # manage_QGIS.histogram_stretching( rlayer, iface.mapCanvas())
             return output_filename
 
 
-def kmeans(layer, working_directory, iface, nb_class=None):
+def kmeans(layer, working_directory, nb_class=None):
     """
     WARNING: nb_valid_pixels à calculer ?
     """
@@ -239,27 +228,22 @@ def gdal_translate_get_one_band(image_in, band_number, working_dir):
     """
     output_image_one_band = os.path.join(working_dir, os.path.splitext(os.path.basename(image_in))[0] + "-b" + str(band_number) + os.path.splitext(image_in)[1])
     if not os.path.isfile(output_image_one_band):
-        command_gdal = "gdal_translate -b " + str(band_number) + " " + "\"" + image_in + "\"" + " " + "\"" + output_image_one_band + "\""
-        logger.info("command_gdal" + command_gdal)
-        # os.system( command_gdal )
-        terre_image_run_process.run_process(command_gdal)
+        command_gdal = u'gdal_translate -b {} "{}" "{}"'.format(band_number, image_in, output_image_one_band)
+        logger.info(u"command_gdal {}".format(command_gdal))
+        TerreImageProcess().run_process(command_gdal)
     return output_image_one_band
 
 
 def get_sensor_id(image):
-    currentOs = os.name
+    """
+    Returns the sensor of the given image if found by ReadImageInfo
+    Args:
+        image:
 
-#     if currentOs == "posix":
-    command = "otbcli ReadImageInfo "  # -in " + image  # + " | grep \"sensor:\""
-#     else:
-#         command = "otbcli ReadImageInfo -in " + image #+ " | findstr \"sensor:\""
-    args = " -in " + image
+    Returns:
 
-    if currentOs == "posix":
-        command += args
-        result_sensor = terre_image_run_process.run_process(command)
-    else:
-        result_sensor = terre_image_run_process.run_otb_app("ReadImageInfo", args)
+    """
+    result_sensor = OTBApplications.read_image_info_cli(image)
     if result_sensor:
         # type(result_sensor) = PyQt4.QtCore.QByteArray
         for line in str(result_sensor).splitlines():
@@ -282,7 +266,13 @@ def export_kmz(filenames, working_directory):
 
     kmzs = []
     for image in filenames:
-        kmz_tmp = OTBApplications.otbcli_export_kmz(image, internal_working_directory)
+        size = get_image_size_with_gdal(image)
+        warning_size = 0
+        # by default, tile size of kmz export is 512
+        # if the image size is smaller than 512, the application does not work properly
+        if size[0] < 512 or size[1] < 512:
+            warning_size = size[0] if (size[0]<size[1]) else size[1]
+        kmz_tmp = OTBApplications.otbcli_export_kmz(image, internal_working_directory, warning_size)
         kmzs.append(kmz_tmp)
 
     # attention rustine

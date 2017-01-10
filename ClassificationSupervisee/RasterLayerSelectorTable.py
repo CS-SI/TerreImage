@@ -31,11 +31,9 @@ import xml.etree.ElementTree as ET
 from osgeo import gdal
 from qgis.core import QgsRasterLayer
 
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger( 'RasterLayerSelectorTable' )
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class TreeWidgetItem(QtGui.QTreeWidgetItem):
@@ -76,7 +74,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
 
         self.table = QtGui.QTreeWidget()
         self.table.setHeaderHidden( True )
-        logger.debug(  "self.table.isHeaderHidden()" + str(self.table.isHeaderHidden()) )
+        logger.debug(  "self.table.isHeaderHidden() {}".format(self.table.isHeaderHidden()) )
         self.table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         # self.table = Window()
         self.table.setColumnCount(1)
@@ -109,11 +107,12 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             if not widget.checkState(0) == QtCore.Qt.Checked:
                 checked = QtCore.Qt.Checked
                 break
-        for i in range(len(self.layers)):
-            widget = self.table.itemAt(i, 0)
-            widget.setCheckState(0, checked)
-            for i in range( widget.childCount() ):
-                child_temp = widget.child(i)
+
+        for i in range(self.table.topLevelItemCount()):
+            item = self.table.topLevelItem(i)
+            item.setCheckState(0, checked)
+            for i in range(item.childCount()):
+                child_temp = item.child(i)
                 child_temp.setCheckState(0, checked)
 
     def setTableContent(self):
@@ -134,13 +133,13 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             if layer == self.the_layer:
                 rename_bands = True
             if not layer.rasterType() == 0:
-                logger.debug( "multiband" + str(layer.bandCount()) )
+                logger.debug( u"multiband {}".format(layer.bandCount()) )
                 for i in range(layer.bandCount()):
                     if rename_bands:
                         logger.debug( self.the_layer_bands[i+1] )
-                        child_name = layer.name() + "_band " + corres[self.the_layer_bands[i+1]]
+                        child_name = u"{}_band{}".format(layer.name(),corres[self.the_layer_bands[i+1]])
                     else:
-                        child_name = layer.name() + "_band " + str(i+1)
+                        child_name = u"{}_band{}".format(layer.name(),i+1)
                     #logger.debug(  "child_name" + str(child_name) )
                     item_child = QtGui.QTreeWidgetItem()
                     item_child.setFlags(item_child.flags()|QtCore.Qt.ItemIsUserCheckable)
@@ -154,9 +153,9 @@ class RasterLayerSelectorTable(QtGui.QWidget):
         selectedLayers = []
         it = QtGui.QTreeWidgetItemIterator(self.table)
         index_layer = 0
-        logger.debug( "nb layers: " + str( len(self.layers)))
+        logger.debug( "nb layers: {}".format(len(self.layers)))
         while it.value() is not None:
-            logger.debug( "index_layer" + str(index_layer) )
+            logger.debug( "index_layer {}".format(index_layer) )
             logger.debug( it.value().text(0) )
             logger.debug( it.value() )
 
@@ -171,7 +170,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                 # how many children are checked
                 all_children = 0
                 list_children = []
-                logger.debug( "widget.childCount()" + str(widget.childCount()) )
+                logger.debug( "widget.childCount() {}".format(widget.childCount()) )
                 if widget.childCount() > 0:
                     for j in range( widget.childCount() ):
                         child_temp = widget.child(j)
@@ -182,18 +181,18 @@ class RasterLayerSelectorTable(QtGui.QWidget):
                             #adding vrt raster layer to the list
                             list_children.append(vrt_temp_layer)
                         it += 1
-                        logger.debug( "***index_layer" + str(index_layer) )
+                        logger.debug( "***index_layer {}".format(index_layer) )
                         logger.debug( it.value().text(0) )
                         logger.debug( it.value() )
-                    logger.debug("list_children"  + str( list_children ))
+                    logger.debug(u"list_children {}".format( list_children ))
                     if all_children == widget.childCount():
                         logger.debug( "all children checked, multiband image added" )
                         #all children checked, multiband image added
                         selectedLayers.append(self.layers[index_layer])
                     else :
                         logger.debug( "add single bands")
-                        logger.debug( "selectedLayers" + str(selectedLayers) )
-                        logger.debug( "list_children" + str(list_children) )
+                        logger.debug( u"selectedLayers {}".format(selectedLayers) )
+                        logger.debug( u"list_children {}".format(list_children) )
                         # else add single bands
                         selectedLayers2 = selectedLayers + list_children
                         selectedLayers = selectedLayers2
@@ -219,7 +218,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
     def manageChild2(self, item):
         # void 	itemChanged ( QTreeWidgetItem * item, int column )
         logger.debug(  "managechild2" )
-        logger.debug(  "previous" + str(item) )
+        logger.debug(  "previous {}".format(item) )
 
         if item.childCount() > 0:
             checked = QtCore.Qt.Unchecked
@@ -232,8 +231,8 @@ class RasterLayerSelectorTable(QtGui.QWidget):
     def manageChild3(self, tree, item):
         # void 	currentItemChanged ( QTreeWidgetItem * current, QTreeWidgetItem * previous )
         logger.debug(  "managechild3" )
-        logger.debug(  "current" + str(tree) )
-        logger.debug(  "previous" + str(item) )
+        logger.debug(  "current {}".format(tree) )
+        logger.debug(  "previous {}".format(item) )
 
         if item.childCount() > 0:
             checked = QtCore.Qt.Unchecked
@@ -252,7 +251,7 @@ class RasterLayerSelectorTable(QtGui.QWidget):
 
         Returns a string containing the vrt xml
         """
-        logger.debug( filename + str(band_number) )
+        logger.debug( u"{} {}".format(filename, band_number) )
         ds = gdal.Open(filename)
         if ds is not None :
             band = ds.GetRasterBand(band_number)
@@ -287,8 +286,8 @@ class RasterLayerSelectorTable(QtGui.QWidget):
             node.text = ds.GetProjection()  # "EPSG:4326"  # projection
             bandNode.attrib['dataType'] = dataType
 
-            logger.debug( 'Projection is ' + str(ds.GetProjection()) )
-            logger.debug( "geotransform" + str(ds.GetGeoTransform() ) )
+            logger.debug( "Projection is {}".format(ds.GetProjection()) )
+            logger.debug( "geotransform {}".format(ds.GetGeoTransform() ) )
 
             ds = None
             stringToReturn = ET.tostring(rootNode)

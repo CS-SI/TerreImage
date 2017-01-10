@@ -22,6 +22,9 @@
 
 import os
 import datetime
+import codecs
+from collections import OrderedDict
+import re
 
 from PyQt4.QtGui import QFileDialog, QMessageBox
 from PyQt4.QtCore import QDir, QSettings
@@ -32,15 +35,12 @@ import manage_QGIS
 import terre_image_processing
 from terre_image_constant import TerreImageConstant
 from processing_manager import ProcessingManager
-import terre_image_run_process
-import OTBApplications
+import terre_image_gdal_system
+import terre_image_gdal_api
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('Terre_Image_Utils')
-logger.setLevel(logging.DEBUG)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 def fill_default_directory():
@@ -65,7 +65,7 @@ def getOutputDirectory(ui):
     else:
         path = QDir.currentPath()
     output_directory = ""
-    dir_dest = QFileDialog.getExistingDirectory(None, str("Répertoire de destination des fichiers de TerreImage"), path)
+    dir_dest = QFileDialog.getExistingDirectory(None, u"Répertoire de destination des fichiers de TerreImage", path)
     if dir_dest:
         ui.lineEdit_working_dir.setText(dir_dest)
         output_directory = dir_dest
@@ -107,7 +107,7 @@ def working_layer(canvas):
         bands = {'red': red, 'green': green, 'blue': blue, 'pir': pir, 'mir': mir}
         layer.set_bands(bands)
 
-        logger.debug(str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+        logger.debug("{} {} {} {} {}".format(red, green, blue, pir, mir))
         return layer
 
 
@@ -160,10 +160,8 @@ def get_workinglayer_on_opening(iface):
             pass
         else:
             raster_layer = manage_QGIS.get_raster_layer(file_opened, os.path.splitext(os.path.basename(file_opened))[0])
-            if not os.name == "posix":
-                terre_image_run_process.set_OTB_PATH()
             type_image = terre_image_processing.get_sensor_id(file_opened)
-            logger.debug("type_image " + str(type_image))
+            logger.debug("type_image {}".format(type_image))
             layer = WorkingLayer(file_opened, raster_layer)
             layer.set_type(type_image)
             # self.layer = self.canvas.currentLayer()
@@ -171,7 +169,7 @@ def get_workinglayer_on_opening(iface):
                 # self.define_bands(self.layer)
                 # manage_bands()
                 # self.red, self.green, self.blue, self.pir, self.mir = manage_bands().get_values()
-                red, green, blue, pir, mir, type_satellite = manage_bands(type_image, layer.get_band_number()).get_values()
+                red, green, blue, pir, mir = manage_bands(type_image, layer.get_band_number()).get_values()
 
                 if red != -1 or green != -1 or blue != -1 or pir != -1 or mir != -1:
                     all_set = True
@@ -181,16 +179,14 @@ def get_workinglayer_on_opening(iface):
                             all_set = False
                     if all_set:
                         layer.set_bands(bands)
-                        if layer.type is None:
-                            layer.set_type(type_satellite)
 
-                        logger.debug(str(red) + " " + str(green) + " " + str(blue) + " " + str(pir) + " " + str(mir))
+                        logger.debug("{} {} {} {} {}".format(red, green, blue, pir, mir))
 
                         cst = TerreImageConstant()
                         cst.index_group = cst.iface.legendInterface().addGroup("Terre Image", True, None)
 
                         manage_QGIS.add_qgis_raser_layer(raster_layer, iface.mapCanvas(), bands)
-                        OTBApplications.compute_overviews(file_opened)
+                        terre_image_gdal_system.compute_overviews(file_opened)
                         return layer, bands
                     else:
                         QMessageBox.warning(None, "Erreur",
@@ -211,4 +207,69 @@ def restore_working_layer(filename, bands, layer_type):
     return layer, bands
 
 
+def get_info_from_metadata(image_source, sat):
+    """
 
+    Args:
+        image_source:
+
+    Returns:
+
+    """
+    image_file_name_without_extension = os.path.splitext(image_source)[0]
+    metadata_file = image_file_name_without_extension + ".MTD"
+    # get image size and resolution
+    (total_size_x, total_size_y),\
+    (pixel_size_x, pixel_size_y) = terre_image_gdal_api.get_image_size_with_gdal(image_source,
+                                                                               True)
+
+    dict_user_metadata = OrderedDict({})
+    if not os.path.exists(metadata_file):
+        logger.warning("Fichier metadonnees manquant")
+    else:
+        lines = None
+        try:
+            # try unix format
+            f=codecs.open(metadata_file, mode="r", encoding='utf-8')
+            lines = f.readlines()
+        except UnicodeError:
+            # try windows format
+            try:
+                f=codecs.open(metadata_file, mode="r", encoding='mbcs')
+                lines = f.readlines()
+            except UnicodeError:
+                logger.error("Impossible de lire le fichier MTD")
+        if not lines:
+            return
+
+        for line in lines:
+            split = re.split("\s", line)
+            if len(split)<2:
+                continue
+            key = re.split("\s", line)[0]
+            values = " ".join(re.split("\s", line)[1:])
+            dict_user_metadata[key] = values
+        f.close()
+
+    if not "Lieu" in dict_user_metadata.keys():
+        dict_user_metadata["Lieu"] = "Inconnu"
+
+    if sat is None:
+        if not "Satellite" in dict_user_metadata.keys():
+            sat = "Inconnu"
+        else:
+            sat = dict_user_metadata["Satellite"]
+            del dict_user_metadata["Satellite"]
+
+
+    list_to_display = [(u"Satellite", sat),
+                       (u"Lieu", dict_user_metadata["Lieu"]),
+                       (u"Lignes", str(total_size_x)),
+                       (u"Colonnes", str(total_size_y)),
+                       (u"Résolution", str(pixel_size_x))]
+    del dict_user_metadata["Lieu"]
+
+    for key, value in dict_user_metadata.iteritems():
+        list_to_display.append((key, value))
+
+    return list_to_display

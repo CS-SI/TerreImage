@@ -19,12 +19,9 @@
  *                                                                         *
  ***************************************************************************/
  """
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_ProcessingManager')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class ProcessingManager(object):
@@ -79,7 +76,7 @@ class ProcessingManager(object):
 
     def remove_process_from_layer_id(self, layer_id):
         process = [ p for p in self.processings if p.output_working_layer.qgis_layer.id() == layer_id ]
-        logger.debug("process" + str(process))
+        logger.debug("process {}".format(process))
         if process:
             try:
                 process[0].mirror.close()
@@ -94,11 +91,11 @@ class ProcessingManager(object):
 
     def remove_displays_from_layer_id(self, layer_id):
         # for p in self.displays:
-        #    print p.output_working_layer.qgis_layer.id()
+        #    logger.debug(p.output_working_layer.qgis_layer.id())
         process = [ p for p in self.displays if p.output_working_layer.qgis_layer.id() == layer_id ]
-        logger.debug("process" + str(process))
+        logger.debug("process {}".format(process))
         if process :
-            # print "process trouvé"
+            # logger.debug("process trouvé")
             process[0].mirror.close()
             self.remove_display(process[0])
 

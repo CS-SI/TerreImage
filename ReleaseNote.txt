@@ -1,3 +1,18 @@
+Version 2.4
+- Migration à l'OTB 5.4
+- Modification des éléments de l'interface
+- Ajout d'une barre d'outil
+- Passage de la chaîne de classif en utilisant des OTB Applications
+- Refactoring
+- Correction de la formule de la brillance
+- Amélioration de la gestion des lancements d'applications
+- Ajout de tests
+- Ajout d'un gestionnaire de logging
+- Correction de la regression sur les accents
+- Ajout d'un test sur l'export KMZ de très petites images
+- Profil spectral : affichage uniquement de l'image de travail
+- Ajout de l'affichage des métadonnées
+
 Version 2.3.16
 - Correction du problème d'affichage de l'info bulle de l'angle spectral
 - Correction du bug sur l'affichage des courbes

@@ -29,12 +29,9 @@ from PyQt4.QtGui import QAction, QIcon, QGridLayout
 
 import resources_rc
 
-#import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger( 'DockableMirrorMap_plugin' )
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class DockableMirrorMapPlugin(QObject):
@@ -117,7 +114,7 @@ class DockableMirrorMapPlugin(QObject):
 
     def onScaleChanged(self):
         pass
-#         print "on scale changed"
+#         logger.debug("on scale changed")
 #         for view in self.dockableMirrors :
 #             prevFlag = view.mainWidget.canvas.renderFlag()
 #             view.mainWidget.canvas.setRenderFlag( False )
@@ -185,12 +182,15 @@ class DockableMirrorMapPlugin(QObject):
             mapCanvas.setRenderFlag(prevFlag)
 
     def onCloseDockableMirror(self, wdg):
+
+        logger.debug("mirror_map_tool 2 {}".format(id(self)))
         title = wdg.title
         if self.dockableMirrors.count(wdg) > 0:
             self.dockableMirrors.remove(wdg)
 
         if len(self.dockableMirrors) <= 0:
             self.lastDockableMirror = 0
+        del wdg
         self.emit(SIGNAL("mirrorClosed(PyQt_PyObject)"), title)
 
 

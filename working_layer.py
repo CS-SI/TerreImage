@@ -19,12 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 """
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger( 'TerreImage_WorkingLayer' )
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class WorkingLayer():
@@ -36,7 +33,7 @@ class WorkingLayer():
         self.type = None
 
     def __str__(self):
-        message = self.source_file + " " + self.qgis_layer.name() + " " + str(self.bands)
+        message = u"{} {} {}".format(self.source_file, self.qgis_layer.name(), self.bands)
         return message
 
     def set_bands(self, bands):

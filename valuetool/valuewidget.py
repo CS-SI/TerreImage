@@ -27,9 +27,10 @@
 # from __future__ import unicode_literals
 
 
+import gdalconst
+import qgis.gui
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import SIGNAL, QObject, QSize, Qt
-from PyQt4.QtGui import QWidget, QBrush, QPen, QTableWidgetItem, QFileDialog
+from osgeo import osr, gdal
 from qgis.core import (QGis,
                        QgsMapLayer,
                        QgsRasterDataProvider,
@@ -39,42 +40,35 @@ from qgis.core import (QGis,
                        QgsCoordinateTransform,
                        QgsRasterBandStats,
                        QgsRectangle)
-import qgis.gui
 
-from ui_valuewidgetbase import Ui_ValueWidgetBase as Ui_Widget
-from terre_image_curve import TerreImageCurve
+from PyQt4.QtCore import SIGNAL, QObject, QSize, Qt
+from PyQt4.QtGui import QWidget, QBrush, QPen, QTableWidgetItem, QFileDialog
+
 from ptmaptool import ProfiletoolMapTool_ValueTool
-
-from osgeo import osr, gdal
-import gdalconst
-
-hasqwt = False
-try:
-    from PyQt4.Qwt5 import QwtPlot, QwtPlotCurve, QwtScaleDiv, QwtSymbol
-except:
-    hasqwt = False
+from terre_image_curve import TerreImageCurve
+from ui_valuewidgetbase import Ui_ValueWidgetBase as Ui_Widget
 
 # test if matplotlib >= 1.0
 hasmpl = True
 try:
     import matplotlib
+    from matplotlib.ticker import MultipleLocator
+    from matplotlib.ticker import MaxNLocator
     # import matplotlib.pyplot as plt
     # import matplotlib.ticker as ticker
     # from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.figure import Figure
+    import matplotlib.pyplot as plt
 except:
     hasmpl = False
 if hasmpl:
     if int(matplotlib.__version__[0]) < 1:
         hasmpl = False
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('ValueTool_valueWidget')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class ValueWidgetGraph(FigureCanvas):
@@ -99,14 +93,20 @@ class ValueWidgetGraph(FigureCanvas):
         self.axes.clear()
 
     def plot(self, x, y, color, marker='o'):
-        # print "x", x
-        # print "y", y
+        # logger.debug("x {}; y {}".format(x, y))
         options = '"' + color + marker + '"'
-        # print options
+        # logger.debug("options {}
         self.axes.plot(x, y, color + marker)
         xtext = self.axes.set_xlabel('Bandes')  # returns a Text instance
         ytext = self.axes.set_ylabel('Valeur')
         self.axes.figure.canvas.draw()
+        xa = self.axes.get_xaxis()
+
+        xa.set_major_locator(MaxNLocator(integer=True))
+
+
+
+
 
     def update_plot(self):
         self.axes.figure.canvas.draw()
@@ -115,7 +115,7 @@ class ValueWidgetGraph(FigureCanvas):
 #         try:
 #             eval(line)
 #         except SyntaxError:
-#             print "Erreur display"
+#             logger.error("Erreur display")
 #         else:
 #             xtext = self.axes.set_xlabel('Bande') # returns a Text instance
 #             ytext = self.axes.set_ylabel('Valeur')
@@ -134,7 +134,6 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def __init__(self, iface):
 
-        self.hasqwt = hasqwt
         self.hasmpl = hasmpl
         self.layerMap = dict()
         self.statsChecked = False
@@ -153,8 +152,6 @@ class ValueWidget(QWidget, Ui_Widget):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.legend = self.iface.legendInterface()
-        self.logger = logging.getLogger('.'.join((__name__,
-                                        self.__class__.__name__)))
 
         QWidget.__init__(self)
         self.setupUi(self)
@@ -163,6 +160,8 @@ class ValueWidget(QWidget, Ui_Widget):
         # self.tool = ProfiletoolMapTool_ValueTool(self.iface.mapCanvas())
         self.maptool = self.canvas.mapTool()
         self.tool = None
+
+        self.lines_mpl = None
 
         QObject.connect(self.cbxActive, SIGNAL("stateChanged(int)"), self.changeActive)
         QObject.connect(self.cbxGraph, SIGNAL("stateChanged(int)"), self.changePage)
@@ -193,39 +192,12 @@ class ValueWidget(QWidget, Ui_Widget):
         self.groupBox_saved_layers.setVisible(False)
         self.pushButton_get_point.hide()
         self.checkBox_hide_current.setVisible(False)
-        if self.hasqwt:
-            self.plotSelector.addItem('Qwt')
         if self.hasmpl:
             self.plotSelector.addItem('mpl')
         self.plotSelector.setCurrentIndex(0)
-        if (not self.hasqwt or not self.hasmpl):
+        if  not self.hasmpl:
             # self.plotSelector.setVisible(False)
             self.plotSelector.setEnabled(False)
-
-        # Page 2 - qwt
-        if self.hasqwt:
-            self.qwtPlot = QwtPlot(self.stackedWidget)
-            self.qwtPlot.setAutoFillBackground(False)
-            self.qwtPlot.setObjectName("qwtPlot")
-            self.curve = QwtPlotCurve()
-            self.curve.setSymbol(
-                QwtSymbol(QwtSymbol.Ellipse,
-                          QBrush(Qt.white),
-                          QPen(Qt.red, 2),
-                          QSize(9, 9)))
-            self.curve.attach(self.qwtPlot)
-            self.qwtPlot.setVisible(False)
-        else:
-            self.qwtPlot = QtGui.QLabel("Need Qwt >= 5.0 or matplotlib >= 1.0 !")
-
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.qwtPlot.sizePolicy().hasHeightForWidth())
-        self.qwtPlot.setSizePolicy(sizePolicy)
-        self.qwtPlot.setObjectName("qwtPlot")
-        self.qwtPlot.updateGeometry()
-        self.stackedWidget.addWidget(self.qwtPlot)
 
         # Page 3 - matplotlib
         self.mplLine = None  # make sure to invalidate when layers change
@@ -233,36 +205,29 @@ class ValueWidget(QWidget, Ui_Widget):
             # mpl stuff
             # should make figure light gray
             self.sc_1 = ValueWidgetGraph(self, width=5, height=4, dpi=100)
-
-#             self.mplBackground = None #http://www.scipy.org/Cookbook/Matplotlib/Animations
-#             self.mplFig = plt.Figure(facecolor='w', edgecolor='w')
-#             self.mplFig.subplots_adjust(left=0.1, right=0.975, bottom=0.13, top=0.95)
-#             self.mplPlt = self.mplFig.add_subplot(111)
-#             self.mplPlt.tick_params(axis='both', which='major', labelsize=12)
-#             self.mplPlt.tick_params(axis='both', which='minor', labelsize=10)
-#             # qt stuff
-#             self.pltCanvas = FigureCanvasQTAgg(self.mplFig)
-#             self.pltCanvas.setParent(self.stackedWidget)
-#             self.pltCanvas.setAutoFillBackground(False)
-#             self.pltCanvas.setObjectName("mplPlot")
-#             self.mplPlot = self.pltCanvas
-#             self.mplPlot.setVisible(False)
-        else:
-            self.mplPlot = QtGui.QLabel("Need Qwt >= 5.0 or matplotlib >= 1.0 !")
+            self.figure = plt.figure()
+            self.canvas_mpl = FigureCanvas(self.figure)
+            self.ax = self.figure.add_subplot(111)
 
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-#         sizePolicy.setHeightForWidth(self.mplPlot.sizePolicy().hasHeightForWidth())
-#         self.mplPlot.setSizePolicy(sizePolicy)
-#         self.qwtPlot.setObjectName("qwtPlot")
-#         self.mplPlot.updateGeometry()
         self.stackedWidget.addWidget(self.sc_1)
+        self.stackedWidget.addWidget(self.canvas_mpl)
         self.stackedWidget.setCurrentIndex(0)
 
     def disconnect(self):
         self.changeActive(False)
+        self.changeActive(Qt.Unchecked)
         QObject.disconnect(self.canvas, SIGNAL("keyPressed( QKeyEvent * )"), self.pauseDisplay)
+        self.saved_curves = []
+        QObject.disconnect(self.cbxActive, SIGNAL("stateChanged(int)"), self.changeActive)
+        QObject.disconnect(self.cbxGraph, SIGNAL("stateChanged(int)"), self.changePage)
+        QObject.disconnect(self.canvas, SIGNAL("keyPressed( QKeyEvent * )"), self.pauseDisplay)
+        QObject.disconnect(self.plotSelector, SIGNAL("currentIndexChanged ( int )"), self.changePlot)
+        QObject.disconnect(self.pushButton_get_point, SIGNAL("clicked()"), self.on_get_point_button)
+        QObject.disconnect(self.pushButton_csv, SIGNAL("clicked()"), self.export_csv)
+        QObject.disconnect(self.checkBox_hide_current, SIGNAL("stateChanged(int)"), self.update_plot)
 
     def pauseDisplay(self, e):
         pass
@@ -290,17 +255,11 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def changePage(self, state):
         if (state == Qt.Checked):
-            # self.plotSelector.setVisible( True )
-            # self.cbxStats.setVisible( True )
-            # self.graphControls.setVisible( True )
             self.groupBox_saved_layers.setVisible(True)
             self.checkBox_hide_current.setVisible(True)
             self.pushButton_get_point.show()
-
-            if (self.plotSelector.currentText() == 'mpl'):
-                self.stackedWidget.setCurrentIndex(2)
-            else:
-                self.stackedWidget.setCurrentIndex(1)
+            # WARNING !!!
+            self.stackedWidget.setCurrentIndex(2)
         else:
             self.groupBox_saved_layers.setVisible(False)
             self.plotSelector.setVisible(False)
@@ -317,15 +276,13 @@ class ValueWidget(QWidget, Ui_Widget):
 
     def changeActive(self, state):
         if (state == Qt.Checked):
-            # QObject.connect(self.legend, SIGNAL( "itemAdded ( QModelIndex )" ), self.statsNeedChecked )
-            # QObject.connect(self.legend, SIGNAL( "itemRemoved ()" ), self.invalidatePlot )
-            QObject.connect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
+            # QObject.connect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
             if QGis.QGIS_VERSION_INT >= 10300:  # for QGIS >= 1.3
                 QObject.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint &)"), self.printValue)
             else:
                 QObject.connect(self.canvas, SIGNAL("xyCoordinates(QgsPoint &)"), self.printValue)
         else:
-            QObject.disconnect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
+            # QObject.disconnect(self.canvas, SIGNAL("layersChanged ()"), self.invalidatePlot)
             if QGis.QGIS_VERSION_INT >= 10300:  # for QGIS >= 1.3
                 QObject.disconnect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint &)"), self.printValue)
             else:
@@ -402,9 +359,6 @@ class ValueWidget(QWidget, Ui_Widget):
                 rasterlayers = self.layers_to_display
             else:
                 rasterlayers = self.get_raster_layers()
-#         else:
-#             print "position", position
-#             rasterlayers = self.get_raster_layers()
 
         irow = 0
         self.values = []
@@ -422,6 +376,7 @@ class ValueWidget(QWidget, Ui_Widget):
             if self.the_layer_to_display is not None:
                 if layer == self.the_layer_to_display.get_qgis_layer():
                     is_the_working_layer = True
+            layername = ""
             try:
                 if not is_the_working_layer:
                     layername = unicode(layer.name())
@@ -429,6 +384,7 @@ class ValueWidget(QWidget, Ui_Widget):
                     layername = ""
             except Exception:
                 pass
+            layerSrs = ""
             try:
                 if QGis.QGIS_VERSION_INT >= 10900:
                     layerSrs = layer.crs()
@@ -464,7 +420,7 @@ class ValueWidget(QWidget, Ui_Widget):
                     if not layer.dataProvider().extent().contains(pos):
                         ident = dict()
                         for iband in range(1, layer.bandCount() + 1):
-                            ident[iband] = str(self.tr('En dehors de l\'image'))
+                            ident[iband] = self.tr('En dehors de l\'image')
                     # we can only use context if layer is not projected
                     elif canvas.hasCrsTransformEnabled() and layer.dataProvider().crs() != canvas.mapRenderer().destinationCrs():
                         ident = layer.dataProvider().identify(pos, QgsRaster.IdentifyFormatValue).results()
@@ -577,7 +533,7 @@ class ValueWidget(QWidget, Ui_Widget):
         if self.cbxGraph.isChecked():
             # TODO don't plot if there is no data to plot...
             if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
-                # print "show values self.values", self.values
+                # logger.debug("show values self.values {}".format(self.values))
                 self.plot()
             else:
                 self.sc_1.clear()
@@ -589,7 +545,7 @@ class ValueWidget(QWidget, Ui_Widget):
             self.printInTable()
 
     def calculateStatistics(self, layersWOStatistics):
-        self.invalidatePlot(False)
+        #self.invalidatePlot(False)
 
         self.statsChecked = True
 
@@ -599,17 +555,12 @@ class ValueWidget(QWidget, Ui_Widget):
                 layerNames.append(layer.name())
 
         if (len(layerNames) != 0):
-#            res = QMessageBox.warning( self, self.tr( 'Warning' ),
-#                                       self.tr( 'There are no statistics in the following rasters:\n%1\n\nCalculate?' ).arg(layerNames.join('\n')),
-#                                       QMessageBox.Yes | QMessageBox.No )
-#            if res != QMessageBox.Yes:
             if not self.cbxStats.isChecked():
-                # self.cbxActive.setCheckState(Qt.Unchecked)
                 for layer in layersWOStatistics:
                     self.layerMap[layer.id()] = True
                 return
         else:
-            print('ERROR, no layers to get stats for')
+            logger.error('ERROR, no layers to get stats for')
 
         save_state = self.cbxActive.isChecked()
         self.changeActive(Qt.Unchecked)  # deactivate
@@ -693,25 +644,23 @@ class ValueWidget(QWidget, Ui_Widget):
                 # create the item
                 self.tableWidget.setItem(irow, 0, QTableWidgetItem())
                 self.tableWidget.setItem(irow, 1, QTableWidgetItem())
-                # self.tableWidget.setItem(irow, 2, QTableWidgetItem())
-                # self.tableWidget.setItem(irow, 3, QTableWidgetItem())
 
             self.tableWidget.item(irow, 0).setText(layername)
             self.tableWidget.item(irow, 1).setText(value)
-            # self.tableWidget.item(irow, 2).setText( x )
-            # self.tableWidget.item(irow, 3).setText( y )
             irow += 1
 
     def plot(self):
+        logger.debug("plot")
         items = self.values
         new_items = self.order_values(items)
-        # print "items", new_items
+        logger.debug("items {}".format(new_items))
+        self.temp_values = None
 
         pixel = 0
         ligne = 0
 
         numvalues = []
-        if (self.hasqwt or self.hasmpl):
+        if self.hasmpl:
             for row in new_items:
                 layername, value, pixel_, ligne_ = row
                 pixel = pixel_
@@ -721,18 +670,7 @@ class ValueWidget(QWidget, Ui_Widget):
                 except:
                     numvalues.append(0)
 
-        # print numvalues
-
-
-#         if self.memorize_curve:
-#             print "num values curve temp", numvalues
-#             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), pixel, ligne, numvalues)
-#             QObject.connect( curve_temp, SIGNAL( "deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
-#             self.saved_curves.append(curve_temp)
-#             self.memorize_curve = False
-#             self.verticalLayout_curves.addWidget( curve_temp )
-#             self.groupBox_saved_layers.show()
-#             print curve_temp
+        self.plot_values = numvalues
 
         ymin = self.ymin
         ymax = self.ymax
@@ -740,76 +678,54 @@ class ValueWidget(QWidget, Ui_Widget):
             ymin = float(self.leYMin.text())
             ymax = float(self.leYMax.text())
 
-        if (self.hasqwt and (self.plotSelector.currentText() == 'Qwt')):
+        if (self.hasmpl and (self.plotSelector.currentText() == 'mpl')):
 
-            self.qwtPlot.setAxisMaxMinor(QwtPlot.xBottom, 0)
-            # self.qwtPlot.setAxisMaxMajor(QwtPlot.xBottom,0)
-            self.qwtPlot.setAxisScale(QwtPlot.xBottom, 1, len(new_items))
-            # self.qwtPlot.setAxisScale(QwtPlot.yLeft,self.ymin,self.ymax)
-            self.qwtPlot.setAxisScale(QwtPlot.yLeft, ymin, ymax)
+            self.remove_current_line()
+            if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
+                self.sc_1.clear()
 
-            self.curve.setData(range(1, len(numvalues) + 1), numvalues)
-            self.qwtPlot.replot()
-            self.qwtPlot.setVisible(len(numvalues) > 0)
+                t = range(1, len(numvalues) + 1)
+                self.sc_1.plot(t, numvalues, 'k', 'o-')
 
-        elif (self.hasmpl and (self.plotSelector.currentText() == 'mpl')):
 
-            self.sc_1.clear()
+                self.lines_mpl = self.ax.plot(t, numvalues, color = 'k', marker = 'o', linestyle = "-")
 
-            t = range(1, len(numvalues) + 1)
-            self.sc_1.plot(t, numvalues, 'k', 'o-')
+                self.temp_values = numvalues
+                logger.debug("self.canvas.draw()")
 
-            self.temp_values = numvalues
+        # if self.saved_curves:
+        #     self.extra_plot()
 
-        if self.saved_curves:
-            self.extra_plot()
+        self.canvas_mpl.draw()
 
-            # line = "self.axes.plot(" + str(t) + ", " + str(numvalues) +", ko-)"
-            # self.sc_1.plot_line(line)
-
-#             self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color='k', mfc='b', mec='b')
-#             self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-#             self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-#             self.mplPlt.set_xlim( (1-0.25,len(new_items)+0.25 ) )
-#             self.mplPlt.set_ylim( (ymin, ymax) )
-#             self.mplFig.canvas.draw()
-
-            # disable optimizations - too many bugs, depending on mpl version!
-#             if self.mplLine is None:
-#                 self.mplPlt.clear()
-#                 self.mplLine, = self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color='k', mfc='b', mec='b', animated=True)
-#                 self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-#                 self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-#                 self.mplPlt.set_xlim( (1-0.25,len(self.values)+0.25 ) )
-#                 self.mplPlt.set_ylim( (self.ymin, self.ymax) )
-#                 self.mplFig.canvas.draw()
-#                 self.mplBackground = self.mplFig.canvas.copy_from_bbox(self.mplFig.bbox)
-#             else:
-#                 # restore the clean slate background
-#                 self.mplFig.canvas.restore_region(self.mplBackground)
-#                 # update the data
-#                 self.mplLine.set_xdata(range(1,len(numvalues)+1))
-#                 self.mplLine.set_ydata(numvalues)
-#                 self.mplPlt.draw_artist(self.mplLine)
-#                 # just redraw the axes rectangle
-#                 self.mplFig.canvas.blit(self.mplFig.bbox)
-#             self.mplPlot.setVisible(len(numvalues)>0)
+    def remove_current_line(self):
+        #remove the first line
+        if self.lines_mpl:
+            try:
+                l = self.lines_mpl.pop(0).remove()
+                del l
+            except (IndexError, ValueError):
+                pass
 
     def del_extra_curve(self, curve):
         self.saved_curves.remove(curve)
         curve.close()
-        self.plot()
+        self.curve_state_changed()
 
-    def extra_plot(self):
-        if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
+    def extra_plot(self, current_line=False):
+        """
+        Manages the plot of saved curves
+        Args:
+            current_line:
+
+        Returns:
+
+        """
+        plt.cla()
+        if current_line and self.temp_values:
             t = range(1, len(self.temp_values) + 1)
-            line = 'self.axes.plot(' + str(t) + ',' + str(self.temp_values) + ', "ko-"'
-            if self.saved_curves:
-                line += ","
-        else:
-            line = 'self.axes.plot('
-
-        i = 0
+            if self.checkBox_hide_current.checkState() == QtCore.Qt.Unchecked:
+                self.lines_mpl = self.ax.plot(t, self.temp_values, color = 'k', marker = 'o', linestyle = "-")
 
         for curve in self.saved_curves:
             if curve.display_points():
@@ -820,26 +736,12 @@ class ValueWidget(QWidget, Ui_Widget):
                 ymin = self.ymin
                 ymax = self.ymax
 
-                color_curve = curve.color
-
                 t = range(1, len(numvalues) + 1)
+                color_curve = curve.color
+                self.ax.plot(t, numvalues, color = color_curve, marker = 'o', linestyle = "-")
+
                 self.sc_1.plot(t, numvalues, color_curve, 'o-')
-                line += str(t) + ',' + str(numvalues) + ', \'' + color_curve + 'o-\''
-                if i + 1 < len(self.saved_curves):
-                    line += ","
-            i += 1
 
-        line += ')'
-
-        # print "line", line
-        self.sc_1.plot_line(line)
-
-#                 self.mplPlt.plot(range(1,len(numvalues)+1), numvalues, marker='o', color=color_curve, mfc='b', mec='b')
-#                 self.mplPlt.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-#                 self.mplPlt.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-#                 self.mplPlt.set_xlim( (1-0.25,len(numvalues)+0.25 ) )
-#                 self.mplPlt.set_ylim( (ymin, ymax) )
-#                 self.mplFig.canvas.draw()
 
     def on_get_point_button(self):
         if self.tool is None:
@@ -872,26 +774,14 @@ class ValueWidget(QWidget, Ui_Widget):
             attr = ident.results()
             new_points = self.order_values_from_attr(attr)
 
-        # ident = self.the_layer_to_display.get_qgis_layer().dataProvider().identify(QgsPoint(mapPos.x(), mapPos.x()), QgsRaster.IdentifyFormatValue ).results()
-            # TODO : put values in right order
-#             new_points=[]
-#             for i in range(1, len(attr)+1):
-#                 new_points.append( (self.the_layer_to_display.band_invert[i], attr[i] ))
-#             points = self.order_values(new_points)
-
             points_for_curve = [ t[1] for t in new_points ]
-            logger.debug("points_for_curve: " + str(points_for_curve))
+            logger.debug("points_for_curve: {}".format(points_for_curve))
             abs = [ t[0] for t in new_points ]
-            logger.debug("abs: " + str(abs))
+            logger.debug("abs: {}".format(abs))
 
-    #         colors=['b', 'r', 'g', 'c', 'm', 'y', 'k', 'w']
-    #         print "len(colors)", len(colors)
-    #         color = colors[ random.randint(0, len(colors)-1) ]
-    #         print 'color from creation courbe', color
-            # QtGui.QColor(random.randint(0,256), random.randint(0,256), random.randint(0,256))
             curve_temp = TerreImageCurve("Courbe" + str(len(self.saved_curves)), x, y, points_for_curve)
             QObject.connect(curve_temp, SIGNAL("deleteCurve()"), lambda who=curve_temp: self.del_extra_curve(who))
-            QObject.connect(curve_temp, SIGNAL("colorChanged()"), self.update_plot)
+            QObject.connect(curve_temp, SIGNAL("redraw()"), self.curve_state_changed)
             self.saved_curves.append(curve_temp)
             self.verticalLayout_curves.addWidget(curve_temp)
             self.groupBox_saved_layers.show()
@@ -899,23 +789,29 @@ class ValueWidget(QWidget, Ui_Widget):
         self.on_get_point_button()
 
     def export_csv(self):
-        csv = QFileDialog.getSaveFileName(None, str("Fichier CSV"))
+        csv = QFileDialog.getSaveFileName(None, "Fichier CSV")
         if not csv.endswith(".csv"):
             csv += ".csv"
         csv_file = open(csv, "w")
         if csv:
             for curve in self.saved_curves:
-                # print "save curve", curve
-                csv_file.write(str(curve.name) + u';Coordonnées pixel '.encode('utf8') + curve.coordinates + "\n")
+                logger.debug(u"save curve {}".format(curve))
+                csv_file.write(u'{} ;Coordonnées pixel {}\n'.format(curve.name, curve.coordinates).encode('utf8'))
                 csv_file.write(u'Bande spectrale; Intensité \n'.encode('utf8'))
                 for i in range(1, len(curve.points) + 1):
-                    csv_file.write(str(i) + ";" + str(int(curve.points[i - 1])) + "\n")
+                    csv_file.write("{};{}\n".format(i, int(curve.points[i - 1])))
 
                 csv_file.write("\n\n\n")
 
     def update_plot(self):
-        # print "update plot"
+        # logger.debug("update plot")
         self.plot()
+
+    def curve_state_changed(self):
+        logger.info("====State changed from valuewidget====")
+        self.extra_plot(True)
+        self.update_plot()
+
 
     def statsNeedChecked(self, indx):
         # self.statsChecked = False
@@ -929,7 +825,9 @@ class ValueWidget(QWidget, Ui_Widget):
         # update empty plot
         if replot and self.cbxGraph.isChecked():
             # self.values=[]
-            self.printValue(None)
+            #self.printValue(None)
+            pass
 
     def resizeEvent(self, event):
-        self.invalidatePlot()
+        pass
+        #self.invalidatePlot()

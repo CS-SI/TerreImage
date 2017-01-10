@@ -29,6 +29,12 @@ from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
 
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
+
+
+
 class ProfiletoolMapTool_ValueTool(QgsMapTool):
 
     def __init__(self, canvas):
@@ -37,16 +43,17 @@ class ProfiletoolMapTool_ValueTool(QgsMapTool):
         self.cursor = QCursor(Qt.CrossCursor)
 
     def canvasReleaseEvent(self, event):
-        # print "canvasReleaseEvent_v"
-        # print "event", event
+        # logger.debug("canvasReleaseEvent_v")
+        # logger.debug("event {}".format(event))
         self.emit(SIGNAL("canvas_clicked_v"), {'x': event.pos().x(), 'y': event.pos().y()})
-        # print "canvasReleaseEvent_v"
+        # logger.debug("canvasReleaseEvent_v")
 
     def activate(self):
         QgsMapTool.activate(self)
         self.canvas.setCursor(self.cursor)
 
     def deactivate(self):
+        logger.debug("desactivate 123456789")
         # self.emit( SIGNAL("deactivate") )
         # self.canvas.setCursor( QCursor(Qt.ArrowCursor))
         QgsMapTool.deactivate(self)

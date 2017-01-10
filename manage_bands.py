@@ -25,12 +25,9 @@ from PyQt4.QtCore import QObject, SIGNAL, Qt
 
 from ui_bands import Ui_Dialog
 
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_manage_bands')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class manage_bands:
@@ -55,7 +52,6 @@ class manage_bands:
         self.blue = None
         self.pir = None
         self.mir = None
-        self.satellite = "Non renseigné"
 
         # connect the qdialog button box
         # QObject.connect(self.bandsUi.buttonBox, SIGNAL("accepted()"), self.set_bands)
@@ -190,16 +186,16 @@ class manage_bands:
             self.update_blue_mir("blue")
         else:
             QMessageBox.critical(None , "Erreur", "L'image en entrée doit avoir 1, 3 ou 4 bandes !", QMessageBox.Ok)
-        # print "define by bands"
+        # logger.debug("define by bands")
         # self.debug()
 
     def debug(self, message=""):
-        print message
-        print "self.blue", self.blue
-        print "self.green", self.green
-        print "self.red", self.red
-        print "self.pir", self.pir
-        print "self.mir", self.mir
+        logger.info(message)
+        logger.info("self.blue {}".format(self.blue))
+        logger.info("self.green {}".format(self.green))
+        logger.info("self.red {}".format(self.red))
+        logger.info("self.pir {}".format(self.pir))
+        logger.info("self.mir {}".format(self.mir))
 
 
     def set_spinbox_read_only(self, state):
@@ -266,7 +262,7 @@ class manage_bands:
 
 
     def update_spin_box(self):
-        # print self.red
+        # logger.debug(self.red)
         self.bandsUi.spinBox_red.setValue(self.red)
         if self.red == -1:
             self.bandsUi.spinBox_red.setEnabled(False)
@@ -305,16 +301,19 @@ class manage_bands:
         self.mir = -1
         self.update_blue_mir("blue")
         self.update_spin_box()
-        self.satellite = "Formosat"
         self.bandsUi.radioButton_formosat.setEnabled(True)
 
     def define_pleiade(self):
         """
-        Multispectral ???
         1     430 – 550 nm (bleu)
         2     490 – 610 nm (vert)
         3     600 – 720 nm (rouge)
         4     750 – 950 nm (proche infrarouge)
+        -> Terre Image :
+        1 rouge
+        2 vert
+        3 bleu
+        4 PIR
         """
         self.blue = 3
         self.green = 2
@@ -323,7 +322,6 @@ class manage_bands:
         self.mir = -1
         self.update_blue_mir("blue")
         self.update_spin_box()
-        self.satellite = "Pleiade"
         self.bandsUi.radioButton_pleiades.setEnabled(True)
 
 
@@ -334,7 +332,7 @@ class manage_bands:
         Bande 3: Proche infrarouge (0,78 - 0,89 µm)
         Bande 4: Moyen infrarouge (MIR) (1,58 - 1,75 µm)
         """
-        # print "define spot"
+        # logger.debug("define spot")
         # spot 4-5
         self.blue = -1
         self.green = 3
@@ -347,7 +345,6 @@ class manage_bands:
             else:
                 self.update_blue_mir("none")
         self.update_spin_box()
-        self.satellite = "Spot"
         self.bandsUi.radioButton_spot.setEnabled(True)
 
 
@@ -357,5 +354,5 @@ class manage_bands:
 #         self.blue = self.bandsUi.spinBox_blue.value()
 #         self.pir = self.bandsUi.spinBox_pir.value()
 #         self.mir = self.bandsUi.spinBox_mir.value()
-        # print self.red
-        return self.red, self.green, self.blue, self.pir, self.mir, self.satellite
+        # logger.debug(self.red)
+        return self.red, self.green, self.blue, self.pir, self.mir

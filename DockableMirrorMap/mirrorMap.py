@@ -27,13 +27,9 @@ from PyQt4.QtGui import QWidget, QGridLayout, QColor
 from qgis.core import QgsMapLayerRegistry
 from qgis.gui import QgsMapCanvas, QgsMapCanvasLayer
 
-
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('DockableMirrorMap_mirrorMap')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+from TerreImage import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class MirrorMap(QWidget):

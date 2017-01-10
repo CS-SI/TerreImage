@@ -41,13 +41,9 @@ from processing_manager import ProcessingManager
 # from supervisedclassification import SupervisedClassification
 from terre_image_environement import TerreImageParamaters
 
-
-# import loggin for debug messages
-import logging
-logging.basicConfig()
-# create logger
-logger = logging.getLogger('TerreImage_qgiseducation')
-logger.setLevel(logging.INFO)
+# import logging for debug messages
+import terre_image_logging
+logger = terre_image_logging.configure_logger()
 
 
 class QGISEducation:
@@ -91,7 +87,7 @@ class QGISEducation:
 
 
     def do_display_one_band(self, who, qgis_layer, working_directory, mirror_tool):
-        logger.debug("who" + str(who))
+        logger.debug("who {}".format(who))
         # manage_QGIS.display_one_band(self.qgis_education_manager.layer, who, self.iface)
         if qgis_layer:
             my_process = TerreImageDisplay(self.iface, working_directory, ProcessingManager().working_layer, mirror_tool, who, None, qgis_layer)
@@ -111,8 +107,9 @@ class QGISEducation:
         self.iface.removeToolBarIcon(self.action)
 
     def unload_interface(self):
-        if self.qgisedudockwidget is not None and self.educationWidget is not None:
+        if self.qgisedudockwidget is not None:
             self.qgisedudockwidget.close()
+        if self.educationWidget is not None:
             self.educationWidget.disconnectP()
 
     # run method that performs all the real work
@@ -132,7 +129,7 @@ class QGISEducation:
 
         timeEnd = time.time()
         timeExec = timeEnd - timeBegin
-        logger.info("temps de chargement: " + str(timeExec))
+        logger.info("temps de chargement: {}".format(timeExec))
 
         self.show_education_widget(bands, working_dir)
 
@@ -143,23 +140,15 @@ class QGISEducation:
 
             if not self.dockOpened:
                 # create the widget to display information
-                self.educationWidget = QGISEducationWidget(self.iface)
+                self.educationWidget = QGISEducationWidget(self.iface, working_dir)
                 QObject.connect(self.educationWidget, SIGNAL("terminated()"), self.unload_interface)
                 # self.educationWidget.qgis_education_manager = self.qgis_education_manager
-                self.educationWidget.qgis_education_manager = TerreImageManager(self.iface)
-                self.educationWidget.qgis_education_manager.working_directory = working_dir
-                self.educationWidget.lineEdit_working_dir.setText(working_dir)
-
-                self.educationWidget.qgis_education_manager.classif_tool.set_layers(ProcessingManager().get_qgis_working_layers(), ProcessingManager().working_layer.get_qgis_layer(), ProcessingManager().working_layer.band_invert)
-                self.educationWidget.qgis_education_manager.classif_tool.set_directory(working_dir)
-                self.educationWidget.qgis_education_manager.classif_tool.setupUi()
 
                 # create the dockwidget with the correct parent and add the valuewidget
                 self.qgisedudockwidget = Terre_Image_Main_Dock_widget("Terre Image", self.iface.mainWindow(), self.iface)
                 self.qgisedudockwidget.setObjectName("Terre Image")
                 self.qgisedudockwidget.setWidget(self.educationWidget)
                 QObject.connect(self.qgisedudockwidget, SIGNAL("closed(PyQt_PyObject)"), self.close_dock)
-
                 # add the dockwidget to iface
                 self.iface.addDockWidget(Qt.RightDockWidgetArea, self.qgisedudockwidget)
                 self.educationWidget.set_comboBox_sprectral_band_display()
@@ -208,13 +197,13 @@ class QGISEducation:
         QgsProject.instance().writeEntry("QGISEducation", "/working_layer", ProcessingManager().working_layer.source_file)
         # write band orders
         QgsProject.instance().writeEntry("QGISEducation", "/working_layer_bands", str(ProcessingManager().working_layer.bands))
-        logger.debug(str(ProcessingManager().working_layer.bands))
+        logger.debug("{}".format(ProcessingManager().working_layer.bands))
         QgsProject.instance().writeEntry("QGISEducation", "/working_layer_type", ProcessingManager().working_layer.type)
         QgsProject.instance().writeEntry("QGISEducation", "/working_directory", self.educationWidget.qgis_education_manager.working_directory)
         p = []
         for process in ProcessingManager().get_processings():
             p.append((process.processing_name, process.output_working_layer.get_source()))
-        # print "process", p
+        # logger.debug("process{}".format(p))
 
         QgsProject.instance().writeEntry("QGISEducation", "/process", str(p))
         QgsProject.instance().writeEntry("QGISEducation", "/index_group", self.constants.index_group)
@@ -227,7 +216,7 @@ class QGISEducation:
                     # get point
                     if item.size() > 0:
                         point = item.getPoint(0)
-                        # print point
+                        # logger.debug(point)
                         QgsProject.instance().writeEntryDouble("QGISEducation", "/angle_spectral_point_x", point.x())
                         QgsProject.instance().writeEntryDouble("QGISEducation", "/angle_spectral_point_y", point.y())
 
@@ -282,7 +271,7 @@ class QGISEducation:
             process = eval(process)
 
             for qgis_layer in self.iface.legendInterface().layers():
-                # print "layer loading ", qgis_layer.name()
+                # logger.debug("layer loading {}".format(qgis_layer.name()))
                 if qgis_layer.name() in [ "NDVI", "NDTI", "Indice de brillance", "KMEANS" ]:
                     process = TerreImageProcessing(self.iface, working_dir, ProcessingManager().working_layer, self.educationWidget.qgis_education_manager.mirror_map_tool, qgis_layer.name(), None, qgis_layer)
                 elif "Angle Spectral" in qgis_layer.name():
@@ -300,9 +289,9 @@ class QGISEducation:
                 else:
                     corres = { 'red':"_bande_rouge", 'green':"_bande_verte", 'blue':"_bande_bleue", 'pir':"_bande_pir", 'mir':"_bande_mir", "nat":"_couleurs_naturelles" }
                     result = [x for x in corres if qgis_layer.name().endswith(corres[x])]
-                    # print result
+                    # logger.debug(result)
                     if result:
-                        # print "the couleur", result[0]
+                        # logger.debug("the couleur{}".format(result[0]))
                         try:
                             self.do_display_one_band(result[0], qgis_layer, working_dir, self.educationWidget.qgis_education_manager.mirror_map_tool)
                         except AttributeError:
@@ -313,9 +302,9 @@ class QGISEducation:
 
             angle_spectral_point_x, ok_x = QgsProject.instance().readDoubleEntry("QGISEducation", "/angle_spectral_point_x")
             angle_spectral_point_y, ok_y = QgsProject.instance().readDoubleEntry("QGISEducation", "/angle_spectral_point_y")
-            # print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
+            # logger.debug("angle_spectral_point_x {}, angle_spectral_point_y{}".format(angle_spectral_point_x, angle_spectral_point_y))
             if ok_x and ok_y:
-                # print "angle_spectral_point_x, angle_spectral_point_y", angle_spectral_point_x, angle_spectral_point_y
+                # logger.debug("angle_spectral_point_x {}, angle_spectral_point_y{}".format(angle_spectral_point_x, angle_spectral_point_y))
                 p = ProcessingManager().processing_from_name("Angle Spectral")
                 if p:
                     rubberband = p[0].rubberband

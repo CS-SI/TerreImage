@@ -47,6 +47,7 @@ class DockableMirrorMap(QDockWidget):
 
     def closeEvent(self, event):
         self.emit(SIGNAL("closed(PyQt_PyObject)"), self)
+        del self.mainWidget
         return QDockWidget.closeEvent(self, event)
 
     def setNumber(self, n = -1):
